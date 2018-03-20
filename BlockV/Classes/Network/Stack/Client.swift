@@ -10,8 +10,8 @@ import Alamofire
 
 protocol ClientProtocol {
     
-    /// Request that returns Data.
-    func request(_ endpoint: Endpoint<Void>, completion: @escaping (Data?, Error?) -> Void ) //TODO: Return BV Error
+    /// Request that returns raw data.
+    func request(_ endpoint: Endpoint<Void>, completion: @escaping (Data?, BVError?) -> Void )
     
     /// Request that returns native object (must conform to decodable).
     func request<Response>(_ endpoint: Endpoint<Response>, completion: @escaping (Response?, BVError?) -> Void ) where Response: Decodable
@@ -106,11 +106,13 @@ public final class Client: ClientProtocol {
     
     // MARK: - Requests
     
-    /// Endpoints generic over `void` return raw data.
+    /// Endpoints generic over `void` complete by passing in the raw data response.
     ///
-    /// BEWARE: Raw requests are for degubbing purposes only.
-    /// They do not partake in OAuth and general lifecycle handling.
-    func request(_ endpoint: Endpoint<Void>, completion: @escaping (Data?, Error?) -> Void) {
+    /// This is usefull for actions whose reponse payloads are not know since reactors may change at
+    /// any time.
+    ///
+    /// NOTE: Raw requests do not partake in OAuth and general lifecycle handling.
+    func request(_ endpoint: Endpoint<Void>, completion: @escaping (Data?, BVError?) -> Void) {
         
         // create request
         let request = self.sessionManager.request(
@@ -126,7 +128,15 @@ public final class Client: ClientProtocol {
         request.responseData { (dataResponse) in
             switch dataResponse.result {
             case let .success(data): completion(data, nil)
-            case let .failure(err): completion(nil, err)
+            case let .failure(err):
+                // check for a BVError
+                if let err = err as? BVError {
+                    completion(nil, err)
+                } else {
+                    // create a wrapped networking errir
+                    let error = BVError.networkingError(error: err)
+                    completion(nil, error)
+                }
             }
         }
         
@@ -254,9 +264,11 @@ public final class Client: ClientProtocol {
                         completion(val, nil)
                         
                     case let .failure(err):
+                        // check for a BVError
                         if let err = err as? BVError {
                             completion(nil, err)
                         } else {
+                            // create a wrapped networking errir
                             let error = BVError.networkingError(error: err)
                             completion(nil, error)
                         }

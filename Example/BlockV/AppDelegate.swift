@@ -1,9 +1,6 @@
 //
 //  AppDelegate.swift
-//  BlockV
-//
-//  Created by cjmconie on 01/10/2018.
-//  Copyright (c) 2018 cjmconie. All rights reserved.
+//  BlockV_Example
 //
 
 import UIKit

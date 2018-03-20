@@ -2,9 +2,6 @@
 //  VatomTableViewController.swift
 //  BlockV_Example
 //
-//  Created by Cameron McOnie on 2018/03/18.
-//  Copyright © 2018 CocoaPods. All rights reserved.
-//
 
 import UIKit
 import BlockV
@@ -22,12 +19,12 @@ class VatomDetailTableViewController: UITableViewController {
     // MARK: - Properties
     
     fileprivate let dateFormatter: DateFormatter = {
-       let formatter = DateFormatter()
+        let formatter = DateFormatter()
         formatter.dateStyle = .medium
         formatter.timeStyle = .short
         return formatter
     }()
-
+    
     // MARK: - Outlets
     
     // info
@@ -51,8 +48,14 @@ class VatomDetailTableViewController: UITableViewController {
     @IBOutlet weak var dateCreatedValueLabel: UILabel!
     @IBOutlet weak var dateModifiedValueLabel: UILabel!
     
+    // MARK: - Actions
+    
+    @IBAction func availableActionsTapped(_ sender: UIBarButtonItem) {
+        self.performSegue(withIdentifier: "seg.availableActions", sender: self)
+    }
+    
     // MARK: - Lifecycle
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -70,7 +73,7 @@ class VatomDetailTableViewController: UITableViewController {
     fileprivate func handleRefresh() {
         fetchVatom()
     }
-
+    
     /// Fetches the input vatom's properties from the Blockv Platform.
     fileprivate func fetchVatom() {
         
@@ -135,5 +138,22 @@ class VatomDetailTableViewController: UITableViewController {
     fileprivate func prettyBool(_ bool: Bool) -> String {
         return bool ? "Yes" : "No"
     }
+    
+    // MARK: - Navigation
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        let destination = segue.destination as! UINavigationController
+        let vc = destination.viewControllers[0] as! ActionListTableViewController
+        // pass vatom along
+        vc.vatom = self.vatom
+        
+        
+    }
+    
+    //    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
+    //        // prevent segue - we will programmatical handle it
+    //        return false
+    //    }
     
 }

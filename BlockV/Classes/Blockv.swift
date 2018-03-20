@@ -550,7 +550,7 @@ extension Blockv {
         self.client.upload(endpoint, progressCompletion: progressCompletion) { (generalModel, error) in
             
             // extract model, handle error
-            guard let model = generalModel?.payload, error == nil else {
+            guard let _ = generalModel?.payload, error == nil else {
                 DispatchQueue.main.async {
                     //print(error!.localizedDescription)
                     completion(error)
@@ -584,10 +584,10 @@ extension Blockv {
         self.client.request(endpoint) { (generalModel, error) in
             
             // extract model, handle error
-            guard let model = generalModel?.payload, error == nil else {
+            guard let _ = generalModel?.payload, error == nil else {
                 DispatchQueue.main.async {
-                    //print(error!.localizedDescription)
-                    completion(error)
+//                    print(error!.localizedDescription)
+                    completion(error!)
                 }
                 return
             }
@@ -629,8 +629,8 @@ extension Blockv {
             // extract model, handle error
             guard var model = groupModel?.payload, error == nil else {
                 DispatchQueue.main.async {
-                    print(error!.localizedDescription)
-                    completion(nil, error)
+//                    print(error!.localizedDescription)
+                    completion(nil, error!)
                 }
                 return
             }
@@ -669,8 +669,8 @@ extension Blockv {
             // extract model, handle error
             guard var model = groupModel?.payload, error == nil else {
                 DispatchQueue.main.async {
-                    print(error!.localizedDescription)
-                    completion(nil, error)
+//                    print(error!.localizedDescription)
+                    completion(nil, error!)
                 }
                 return
             }
@@ -691,6 +691,77 @@ extension Blockv {
             
         }
         
+    }
+    
+    /// Searches for vAtoms on the BLOCKv Platform.
+    ///
+    /// - Parameters:
+    ///   - query: <#query description#>
+    ///   - completion: The completion handler to call when the request is completed.
+    ///                 This handler is executed on the main queue.
+    public static func discover(query: [String: Any], completion: @escaping (GroupModel?, BVError?) -> Void) {
+     
+        let endpoint = API.VatomDiscover.discover()
+        
+        self.client.request(endpoint) { (groupModel, error) in
+            
+            // extract model, handle error
+            guard var model = groupModel?.payload, error == nil else {
+                DispatchQueue.main.async {
+//                    print(error!.localizedDescription)
+                    completion(nil, error!)
+                }
+                return
+            }
+            
+            // model is available
+            
+            // url encoding - this is awful. maybe encode on init?
+            for vatomIndex in 0..<model.vatoms.count {
+                for resourceIndex in 0..<model.vatoms[vatomIndex].resources.count {
+                    model.vatoms[vatomIndex].resources[resourceIndex].encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
+                }
+            }
+            
+            DispatchQueue.main.async {
+                //print(model)
+                completion(model, nil)
+            }
+            
+        }
+        
+    }
+    
+    // MARK: Actions
+    
+    public static func performAction(name: String, payload: [String : Any], completion: @escaping (Data?, BVError?) -> Void) {
+
+        let endpoint = API.VatomAction.custom(name: name, payload: payload)
+
+        self.client.request(endpoint) { (data, error) in
+
+            // unwrap data, ensure no error
+            guard let data = data, error == nil else {
+                DispatchQueue.main.async {
+//                    print(error!.localizedDescription)
+                    completion(nil, error!)
+                }
+                return
+            }
+
+            // data is available
+            DispatchQueue.main.async {
+                //print(data)
+                completion(data, nil)
+            }
+        }
+
+    }
+    
+    public static func acquireVatom(id: String, completion: @escaping (Data?, BVError?) -> Void) {
+    
+        
+    
     }
     
 }

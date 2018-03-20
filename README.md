@@ -6,9 +6,13 @@
 
 ## Example
 
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
+This example app lets you try out the BLOCKv SDK. It's a great place to start if you're getting up to speed on the platform. To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
 ## Requirements
+
+- iOS 10.0+
+- Xcode 9.2+
+- Swift 4+
 
 ## Installation
 
@@ -21,8 +25,8 @@ pod 'BlockV'
 
 ## Author
 
-BlockV, developer.blockv.io
+[BlockV](developer.blockv.io)
 
 ## License
 
-BlockV is available under the MIT license. See the LICENSE file for more info.
+BlockV is available under the <????> license. See the LICENSE file for more info.

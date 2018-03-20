@@ -2,9 +2,6 @@
 //  InventoryCollectionViewController.swift
 //  BlockV_Example
 //
-//  Created by Cameron McOnie on 2018/03/12.
-//  Copyright © 2018 CocoaPods. All rights reserved.
-//
 
 import UIKit
 import BlockV

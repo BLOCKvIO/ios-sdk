@@ -25,11 +25,6 @@ import Alamofire
 
 // MARK: Defines
 
-/*
- These type aliases allow a level of indirection.
- Types defined by alamofire become available without the need to types using
- Endpoint to import Alamofire.
- */
 typealias Parameters = [String : Any]
 typealias Path = String
 

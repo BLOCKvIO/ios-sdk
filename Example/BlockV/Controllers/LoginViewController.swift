@@ -2,9 +2,6 @@
 //  LoginViewController.swift
 //  BlockV_Example
 //
-//  Created by Cameron McOnie on 2018/03/02.
-//  Copyright © 2018 CocoaPods. All rights reserved.
-//
 
 import UIKit
 import BlockV
@@ -128,6 +125,8 @@ class LoginViewController: UIViewController {
         case .email:
             userTokenTextField.keyboardType = .emailAddress
             userTokenTextField.placeholder = "Email address"
+        default:
+            assertionFailure("Unhandled Type.")
         }
     }
     

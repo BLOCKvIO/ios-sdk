@@ -29,13 +29,14 @@ public enum BVError: Error {
     /// Platform error. Associated values: `code` and `message`.
     public enum PlatformErrorReason {
         
-        
         case tokenExpired(Int, String)
         case invalidPayload(Int, String)
         case tokenUnavailable(Int, String)
         case invalidDateFormat(Int, String)
         
         case malformedRequestBody(Int, String)
+        
+        case vatomNotFound(Int, String)
         
         case cannotFindUser(Int, String)
         case authenticationFailed(Int, String)
@@ -61,6 +62,8 @@ public enum BVError: Error {
                 
             case 1004: self = .malformedRequestBody(code, message)
             
+            case 1701: self = .vatomNotFound(code, message)
+            
             // User management
             //case 11: self = .tokenAlreadyTaken(code, message)
 
@@ -73,6 +76,7 @@ public enum BVError: Error {
             case 2564: self = .invalidVerificationCode(code, message)
             case 2569: self = .invalidPhoneNumber(code, message)
             default:
+                // useful for debugging
                 assertionFailure("Unhandled error: \(code) \(message)")
                 self = .unknown(code, message)
             }
@@ -100,13 +104,22 @@ extension BVError: LocalizedError {
 extension BVError.PlatformErrorReason {
     var localizedDescription: String {
         switch self {
+            
         //TODO: Is there a better way to do this with pattern matching?
         case let .unknownWithMissingCode(_, message):
             return "UNKNOWN: BlockV Platform Error: (Missing Code) - Message: \(message)"
         case let .unknown(code, message):
             return "UNKNOWN: BlockV Platform Error: (\(code)) Message: \(message)"
+        
+        //
         case let .malformedRequestBody(code, message):
             return "BlockV Platform Error: (\(code)) Message: \(message)"
+            
+        //
+        case let .vatomNotFound(code, message):
+            return "BlockV Platform Error: (\(code)) Message: \(message)"
+
+        //
         case let .cannotFindUser(code, message):
             return "BlockV Platform Error: (\(code)) Message: \(message)"
         case let .authenticationFailed(code, message):

@@ -25,7 +25,6 @@ public struct GroupModel: Decodable {
 
 // MARK: - Equatable
 
-// Every value type should be equatable.
 extension GroupModel: Equatable {}
 
 public func ==(lhs: GroupModel, rhs: GroupModel) -> Bool {

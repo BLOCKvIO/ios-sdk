@@ -1,0 +1,12 @@
+use_frameworks!
+
+target 'BlockV_Example' do
+    
+  pod 'BlockV', :path => '../'
+
+  target 'BlockV_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end

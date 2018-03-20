@@ -11,6 +11,7 @@ import Foundation
 public enum UserTokenType: String, Codable {
     case phone = "phone_number"
     case email = "email"
+    case id    = "id"
 }
 
 /// User token model.

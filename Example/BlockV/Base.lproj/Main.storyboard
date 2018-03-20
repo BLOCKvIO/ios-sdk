@@ -1358,7 +1358,26 @@
                                     <segment title="Email"/>
                                     <segment title="User ID"/>
                                 </segments>
+                                <connections>
+                                    <action selector="tokenTypeSegmentChanged:" destination="cxT-03-HrX" eventType="valueChanged" id="dzh-QA-N42"/>
+                                </connections>
                             </segmentedControl>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uUd-lt-vXX">
+                                <rect key="frame" x="242" y="293" width="53" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Pick Up"/>
+                                <connections>
+                                    <action selector="pickupTapped:" destination="cxT-03-HrX" eventType="touchUpInside" id="BMx-4n-Jm1"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hvc-4k-9pH">
+                                <rect key="frame" x="87" y="292" width="34" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Drop"/>
+                                <connections>
+                                    <action selector="dropTapped:" destination="cxT-03-HrX" eventType="touchUpInside" id="gre-Vk-z24"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
@@ -1374,8 +1393,8 @@
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="destinationTokenTextField" destination="yiC-qm-Amg" id="yWs-VX-bvf"/>
-                        <outlet property="userTokenSegmentedControl" destination="U5Q-Jm-fT2" id="fQl-v1-Yqu"/>
+                        <outlet property="tokenTypeSegmentedControl" destination="U5Q-Jm-fT2" id="DDE-19-TLj"/>
+                        <outlet property="userTokenTextField" destination="yiC-qm-Amg" id="kSv-qP-pU0"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="7M3-G3-NMY" userLabel="First Responder" sceneMemberID="firstResponder"/>

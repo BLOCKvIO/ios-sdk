@@ -125,6 +125,8 @@ class LoginViewController: UIViewController {
         case .email:
             userTokenTextField.keyboardType = .emailAddress
             userTokenTextField.placeholder = "Email address"
+        default:
+            assertionFailure("Unhandled Type.")
         }
     }
     

@@ -75,7 +75,6 @@ extension VatomResource: Hashable {
 
 // MARK: Equatable
 
-// Every value type should be equatable.
 extension VatomResource: Equatable {}
 
 public func ==(lhs: VatomResource, rhs: VatomResource) -> Bool {

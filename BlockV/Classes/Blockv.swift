@@ -699,41 +699,50 @@ extension Blockv {
     ///   - query: <#query description#>
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
-    public static func discover(query: [String: Any], completion: @escaping (GroupModel?, BVError?) -> Void) {
-     
-        let endpoint = API.VatomDiscover.discover()
-        
-        self.client.request(endpoint) { (groupModel, error) in
-            
-            // extract model, handle error
-            guard var model = groupModel?.payload, error == nil else {
-                DispatchQueue.main.async {
-//                    print(error!.localizedDescription)
-                    completion(nil, error!)
-                }
-                return
-            }
-            
-            // model is available
-            
-            // url encoding - this is awful. maybe encode on init?
-            for vatomIndex in 0..<model.vatoms.count {
-                for resourceIndex in 0..<model.vatoms[vatomIndex].resources.count {
-                    model.vatoms[vatomIndex].resources[resourceIndex].encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
-                }
-            }
-            
-            DispatchQueue.main.async {
-                //print(model)
-                completion(model, nil)
-            }
-            
-        }
-        
-    }
+//    public static func discover(query: [String: Any], completion: @escaping (GroupModel?, BVError?) -> Void) {
+//
+//        let endpoint = API.VatomDiscover.discover()
+//
+//        self.client.request(endpoint) { (groupModel, error) in
+//
+//            // extract model, handle error
+//            guard var model = groupModel?.payload, error == nil else {
+//                DispatchQueue.main.async {
+////                    print(error!.localizedDescription)
+//                    completion(nil, error!)
+//                }
+//                return
+//            }
+//
+//            // model is available
+//
+//            // url encoding - this is awful. maybe encode on init?
+//            for vatomIndex in 0..<model.vatoms.count {
+//                for resourceIndex in 0..<model.vatoms[vatomIndex].resources.count {
+//                    model.vatoms[vatomIndex].resources[resourceIndex].encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
+//                }
+//            }
+//
+//            DispatchQueue.main.async {
+//                //print(model)
+//                completion(model, nil)
+//            }
+//
+//        }
+//
+//    }
     
     // MARK: Actions
     
+    /// Performs an action on the BLOCKv Platform.
+    ///
+    /// This is the most flexible of the action calls and should be used as a last resort.
+    ///
+    /// - Parameters:
+    ///   - name: Name of the action to perform, e.g. "Drop".
+    ///   - payload: Body payload that will be sent as JSON in the request body.
+    ///   - completion: The completion handler to call when the action is completed.
+    ///                 This handler is executed on the main queue.
     public static func performAction(name: String, payload: [String : Any], completion: @escaping (Data?, BVError?) -> Void) {
 
         let endpoint = API.VatomAction.custom(name: name, payload: payload)
@@ -743,7 +752,7 @@ extension Blockv {
             // unwrap data, ensure no error
             guard let data = data, error == nil else {
                 DispatchQueue.main.async {
-//                    print(error!.localizedDescription)
+                    // print(error!.localizedDescription)
                     completion(nil, error!)
                 }
                 return
@@ -758,9 +767,23 @@ extension Blockv {
 
     }
     
-    public static func acquireVatom(id: String, completion: @escaping (Data?, BVError?) -> Void) {
+    /// Performs an acquire action on a vAtom.
+    ///
+    /// Often, only a vAtom's ID is known, e.g. scanning a QR code with an embeded vAtom ID. This call is useful
+    /// is such circumstances.
+    ///
+    /// - Parameters:
+    ///   - id: The id of the vAtom to acquire.
+    ///   - completion: The completion handler to call when the action is completed.
+    ///                 This handler is executed on the main queue.
+    public static func acquireVatom(withID id: String, completion: @escaping (Data?, BVError?) -> Void) {
     
+        let body = ["this.id": id]
         
+        // perfor the action
+        self.performAction(name: "Acquire", payload: body) { (data, error) in
+            completion(data, error)
+        }
     
     }
     

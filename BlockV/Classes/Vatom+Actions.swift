@@ -29,14 +29,17 @@ extension Vatom {
     public func transfer(toToken token: String, type: OutboundTokenType,
                          completion: @escaping (Data?, BVError?) -> Void) {
         
-        Blockv.performAction(name: "Transfer",
-                             payload: [
-                                "this.id": self.id,
-                                type.rawValue: token
-            ]) { (data, error) in
-                // should it be weak self?
+        let body = [
+            "this.id": self.id,
+            type.rawValue: token
+        ]
+        
+        // perform the action
+        Blockv.performAction(name: "Transfer", payload: body) { (data, error) in
+            //TODO: should it be weak self?
             completion(data, error)
         }
+        
     }
     
     /// Drops this vAtom as the specified location.
@@ -52,17 +55,20 @@ extension Vatom {
     public func drop(latitude: Double, longitude: Double,
                      completion: @escaping (Data?, BVError?) -> Void) {
         
-        Blockv.performAction(name: "Drop",
-                             payload: [
-                                "this.id": self.id,
-                                "geo.pos": [
-                                    "lat": latitude,
-                                    "lon": longitude
-                                ]
-        ]) { (data, error) in
-            // should it be weak self?
+        let body: [String : Any] = [
+            "this.id": self.id,
+            "geo.pos": [
+                "lat": latitude,
+                "lon": longitude
+            ]
+        ]
+        
+        // perform the action
+        Blockv.performAction(name: "Drop", payload: body) { (data, error) in
+            //TODO: should it be weak self?
             completion(data, error)
         }
+        
     }
     
     /// Picks up the vAtom from it's dropped location.
@@ -73,15 +79,17 @@ extension Vatom {
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
     public func pickUp(completion: @escaping (Data?, BVError?) -> Void) {
-     
-        Blockv.performAction(name: "Pickup",
-                             payload: [
-                                "this.id": self.id
-        ]) { (data, error) in
-            // should it be weak self?
+        
+        let body = [
+            "this.id": self.id
+        ]
+        
+        // perform the action
+        Blockv.performAction(name: "Pickup", payload: body) { (data, error) in
+            //TODO: should it be weak self?
             completion(data, error)
         }
         
     }
-        
+    
 }

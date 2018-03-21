@@ -5,25 +5,7 @@ import Alamofire
 // Beta 0.5
 //TODO: Inpect the `expires_in` before a request is made. Refresh the access token if necessary.
 //TODO: Allow for server environment switching.
-//TODO: Document User Management inline.
-//TODO: Document User Management - dev site.
 
-// Post 0.5
-//TODO: Add vAtom endpoints.
-//TODO: Expose vAtom endpoint through Blockv to the viewer.
-//TODO: Document Vatoms inline.
-//TODO: Docuemnt Vatoms - dev site.
-
-// -
-//TODO: Unit Tests: https://priteshrnandgaonkar.github.io/Unit-Testing-a-feature/
-
-func printBV(info string: String) {
-    print("\nBV SDK > \(string)")
-}
-
-func printBV(error string: String) {
-    print("\nBV SDK >>> Error: \(string)")
-}
 
 // This is not good. The sdk module name is BlockV and this class is Blockv. They are too similar.
 public final class Blockv {
@@ -138,8 +120,8 @@ public final class Blockv {
     
     /// Configures the SDK with your issued app id.
     ///
-    /// Note, as a viewer, `configure` should be the first method call you make
-    /// on the Blockv SDK. Typically, you would call `configure` in `application(_:didFinishLaunchingWithOptions:)`
+    /// Note, as a viewer, `configure` should be the first method call you make  on the Blockv SDK.
+    /// Typically, you would call `configure` in `application(_:didFinishLaunchingWithOptions:)`
     public static func configure(appID: String) {
         self.appID = appID
     }
@@ -217,12 +199,11 @@ extension Blockv {
         
         let endpoint = API.Session.register(tokens: tokens, userInfo: nil)
         
-        self.client.request(endpoint) { (authModel, error) in
+        self.client.request(endpoint) { (baseModel, error) in
             
-            // extract model, handle error
-            guard var model = authModel?.payload, error == nil else {
+            // extract model, ensure no error
+            guard var authModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
-                    //print(error!.localizedDescription)
                     completion(nil, error)
                 }
                 return
@@ -230,15 +211,14 @@ extension Blockv {
             
             // model is available
             DispatchQueue.main.async {
-                //print(model)
                 // persist credentials
-                CredentialStore.saveRefreshToken(model.refreshToken)
-                CredentialStore.saveAssetProviders(model.assetProviders)
+                CredentialStore.saveRefreshToken(authModel.refreshToken)
+                CredentialStore.saveAssetProviders(authModel.assetProviders)
                 
                 // encode the model's urls
-                model.user.encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
+                authModel.user.encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
                 
-                completion(model.user, nil)
+                completion(authModel.user, nil)
             }
             
         }
@@ -255,7 +235,8 @@ extension Blockv {
     ///   - password: The user's password.
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
-    public static func login(withUserToken token: String, type: UserTokenType, password: String, completion: @escaping (UserModel?, BVError?) -> Void) {
+    public static func login(withUserToken token: String, type: UserTokenType, password: String,
+                             completion: @escaping (UserModel?, BVError?) -> Void) {
         let params = UserTokenLoginParams(value: token, type: type, password: password)
         self.login(tokenParams: params, completion: completion)
     }
@@ -267,7 +248,8 @@ extension Blockv {
     ///   - provider: The OAuth provider, e.g. Facebook.
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
-    public static func login(withOAuthToken oauthToken: String, provider: String, completion: @escaping (UserModel?, BVError?) -> Void) {
+    public static func login(withOAuthToken oauthToken: String, provider: String,
+                             completion: @escaping (UserModel?, BVError?) -> Void) {
         let params = OAuthTokenLoginParams(provider: provider, oauthToken: oauthToken)
         self.login(tokenParams: params, completion: completion)
     }
@@ -284,16 +266,16 @@ extension Blockv {
     }
     
     /// Login using token params
-    fileprivate static func login(tokenParams: LoginTokenParams, completion: @escaping (UserModel?, BVError?) -> Void) {
+    fileprivate static func login(tokenParams: LoginTokenParams,
+                                  completion: @escaping (UserModel?, BVError?) -> Void) {
         
         let endpoint = API.Session.login(tokenParams: tokenParams)
         
-        self.client.request(endpoint) { (authModel, error) in
+        self.client.request(endpoint) { (baseModel, error) in
             
-            // extract model, handle error
-            guard var model = authModel?.payload, error == nil else {
+            // extract model, ensure no error
+            guard var authModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
-                    //print(error!.localizedDescription)
                     completion(nil, error)
                 }
                 return
@@ -303,13 +285,13 @@ extension Blockv {
             DispatchQueue.main.async {
                 
                 // persist credentials
-                CredentialStore.saveRefreshToken(model.refreshToken)
-                CredentialStore.saveAssetProviders(model.assetProviders)
+                CredentialStore.saveRefreshToken(authModel.refreshToken)
+                CredentialStore.saveAssetProviders(authModel.assetProviders)
                 
                 // encode the model's urls
-                model.user.encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
-                
-                completion(model.user, nil)
+                authModel.user.encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
+                // completion
+                completion(authModel.user, nil)
             }
             
         }
@@ -326,17 +308,17 @@ extension Blockv {
     ///   - code: The verification code send to the user's token (phone or email).
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
-    public static func verifyUserToken(_ token: String, type: UserTokenType, code: String, completion: @escaping (UserToken?, BVError?) -> Void) {
+    public static func verifyUserToken(_ token: String, type: UserTokenType, code: String,
+                                       completion: @escaping (UserToken?, BVError?) -> Void) {
         
         let userToken = UserToken(value: token, type: type)
         let endpoint = API.CurrentUser.verifyToken(userToken, code: code)
         
-        self.client.request(endpoint) { (userTokenModel, error) in
+        self.client.request(endpoint) { (baseModel, error) in
             
-            // extract model, handle error
-            guard let model = userTokenModel?.payload, error == nil else {
+            // extract model, ensure no error
+            guard let userTokenModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
-                    //print(error!.localizedDescription)
                     completion(nil, error)
                 }
                 return
@@ -344,8 +326,7 @@ extension Blockv {
             
             // model is available
             DispatchQueue.main.async {
-                //print(model)
-                completion(model, nil)
+                completion(userTokenModel, nil)
             }
             
         }
@@ -364,17 +345,17 @@ extension Blockv {
     ///   - type: The type of the token `phone` or `email`.
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
-    public static func resetToken(_ token: String, type: UserTokenType, completion: @escaping (UserToken?, BVError?) -> Void) {
+    public static func resetToken(_ token: String, type: UserTokenType,
+                                  completion: @escaping (UserToken?, BVError?) -> Void) {
         
         let userToken = UserToken(value: token, type: type)
         let endpoint = API.CurrentUser.resetToken(userToken)
         
-        self.client.request(endpoint) { (userTokenModel, error) in
+        self.client.request(endpoint) { (baseModel, error) in
             
-            // extract model, handle error
-            guard let model = userTokenModel?.payload, error == nil else {
+            // extract model, ensure no error
+            guard let userTokenModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
-                    //print(error!.localizedDescription)
                     completion(nil, error)
                 }
                 return
@@ -382,8 +363,7 @@ extension Blockv {
             
             // model is available
             DispatchQueue.main.async {
-                //print(model)
-                completion(model, nil)
+                completion(userTokenModel, nil)
             }
             
         }
@@ -400,17 +380,17 @@ extension Blockv {
     ///   - type: The type of the token `phone` or `email`.
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
-    public static func resetVerification(forUserToken token: String, type: UserTokenType, completion: @escaping (UserToken?, BVError?) -> Void) {
+    public static func resetVerification(forUserToken token: String, type: UserTokenType,
+                                         completion: @escaping (UserToken?, BVError?) -> Void) {
         
         let userToken = UserToken(value: token, type: type)
         let endpoint = API.CurrentUser.resetTokenVerification(forToken: userToken)
         
-        self.client.request(endpoint) { (userTokenModel, error) in
+        self.client.request(endpoint) { (baseModel, error) in
             
             // extract model, handle error
-            guard let model = userTokenModel?.payload, error == nil else {
+            guard let userTokenModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
-                    //print(error!.localizedDescription)
                     completion(nil, error)
                 }
                 return
@@ -418,8 +398,7 @@ extension Blockv {
             
             // model is available
             DispatchQueue.main.async {
-                //print(model)
-                completion(model, nil)
+                completion(userTokenModel, nil)
             }
             
         }
@@ -436,12 +415,11 @@ extension Blockv {
         
         let endpoint = API.CurrentUser.get()
         
-        self.client.request(endpoint) { (userModel, error) in
+        self.client.request(endpoint) { (baseModel, error) in
             
-            // extract model, handle error
-            guard var model = userModel?.payload, error == nil else {
+            // extract model, ensure no error
+            guard var userModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
-                    //print(error!.localizedDescription)
                     completion(nil, error)
                 }
                 return
@@ -451,10 +429,9 @@ extension Blockv {
             DispatchQueue.main.async {
                 
                 // encode the model's urls
-                model.encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
+                userModel.encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
                 
-                //print(model)
-                completion(model, nil)
+                completion(userModel, nil)
             }
             
         }
@@ -469,12 +446,11 @@ extension Blockv {
         
         let endpoint = API.CurrentUser.getTokens()
         
-        self.client.request(endpoint) { (fullTokens, error) in
+        self.client.request(endpoint) { (baseModel, error) in
             
             // extract model, handle error
-            guard let model = fullTokens?.payload, error == nil else {
+            guard let fullTokens = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
-                    //print(error!.localizedDescription)
                     completion(nil, error)
                 }
                 return
@@ -482,8 +458,7 @@ extension Blockv {
             
             // model is available
             DispatchQueue.main.async {
-                //print(model)
-                completion(model, nil)
+                completion(fullTokens, nil)
             }
             
         }
@@ -498,16 +473,16 @@ extension Blockv {
     ///               Only the properties to be updated should be set.
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
-    public static func updateCurrentUser(_ userInfo: UserInfo, completion: @escaping (UserModel?, BVError?) -> Void) {
+    public static func updateCurrentUser(_ userInfo: UserInfo,
+                                         completion: @escaping (UserModel?, BVError?) -> Void) {
         
         let endpoint = API.CurrentUser.update(userInfo: userInfo)
         
-        self.client.request(endpoint) { (userModel, error) in
+        self.client.request(endpoint) { (baseModel, error) in
             
-            // extract model, handle error
-            guard let model = userModel?.payload, error == nil else {
+            // extract model, ensure no error
+            guard let userModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
-                    //print(error!.localizedDescription)
                     completion(nil, error)
                 }
                 return
@@ -515,8 +490,7 @@ extension Blockv {
             
             // model is available
             DispatchQueue.main.async {
-                //print(model)
-                completion(model, nil)
+                completion(userModel, nil)
             }
             
         }
@@ -547,12 +521,11 @@ extension Blockv {
         // build endpoint
         let endpoint = API.CurrentUser.uploadAvatar(imageData)
         
-        self.client.upload(endpoint, progressCompletion: progressCompletion) { (generalModel, error) in
+        self.client.upload(endpoint, progressCompletion: progressCompletion) { (baseModel, error) in
             
-            // extract model, handle error
-            guard let _ = generalModel?.payload, error == nil else {
+            // extract model, ensure no error
+            guard let _ = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
-                    //print(error!.localizedDescription)
                     completion(error)
                 }
                 return
@@ -560,7 +533,6 @@ extension Blockv {
             
             // model is available
             DispatchQueue.main.async {
-                //print(model)
                 completion(nil)
             }
             
@@ -581,12 +553,11 @@ extension Blockv {
         
         let endpoint = API.CurrentUser.logOut()
         
-        self.client.request(endpoint) { (generalModel, error) in
+        self.client.request(endpoint) { (baseModel, error) in
             
-            // extract model, handle error
-            guard let _ = generalModel?.payload, error == nil else {
+            // extract model, ensure no error
+            guard let _ = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
-//                    print(error!.localizedDescription)
                     completion(error!)
                 }
                 return
@@ -594,10 +565,8 @@ extension Blockv {
             
             // model is available
             DispatchQueue.main.async {
-                //print(model)
                 // teardown
                 reset()
-                // no need to pass general model to closure
                 completion(nil)
             }
             
@@ -607,14 +576,17 @@ extension Blockv {
     
     // MARK: Vatoms
     
-    /// Fetches the current user's inventory of vAtoms. The completion handler is passed in a `GroupModel` which  includes the returned vAtoms
-    /// as well as the configured Faces and Actions.
+    /// Fetches the current user's inventory of vAtoms. The completion handler is passed in a
+    /// `GroupModel` which  includes the returned vAtoms as well as the configured Faces and Actions.
     ///
     /// - Parameters:
-    ///   - parentID: Allows you to specify a parent ID. If a period "." is supplied the root inventory will be retrieved (i.e. all vAtom's
-    ///     without a parent) - this is the default. If a vAtom ID is passed in, only the child vAtoms are returned.
-    ///   - page: The number of the page for which the vAtoms are returned. If omitted or set as zero, the first page is returned.
-    ///   - limit: Defines the number of vAtoms per response page (up to 100). If omitted or set as zero, the max number is returned.
+    ///   - parentID: Allows you to specify a parent ID. If a period "." is supplied the root
+    ///               inventory will be retrieved (i.e. all vAtom's without a parent) - this is the
+    ///               default. If a vAtom ID is passed in, only the child vAtoms are returned.
+    ///   - page: The number of the page for which the vAtoms are returned. If omitted or set as
+    ///           zero, the first page is returned.
+    ///   - limit: Defines the number of vAtoms per response page (up to 100). If omitted or set as
+    ///            zero, the max number is returned.
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
     public static func getInventory(parentID: String = ".",
@@ -624,12 +596,11 @@ extension Blockv {
         
         let endpoint = API.UserVatom.getInventory(parentID: parentID, page: page, limit: limit)
         
-        self.client.request(endpoint) { (groupModel, error) in
+        self.client.request(endpoint) { (baseModel, error) in
             
-            // extract model, handle error
-            guard var model = groupModel?.payload, error == nil else {
+            // extract model, ensure no error
+            guard var groupModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
-//                    print(error!.localizedDescription)
                     completion(nil, error!)
                 }
                 return
@@ -638,23 +609,22 @@ extension Blockv {
             // model is available
             
             // url encoding - this is awful. maybe encode on init?
-            for vatomIndex in 0..<model.vatoms.count {
-                for resourceIndex in 0..<model.vatoms[vatomIndex].resources.count {
-                    model.vatoms[vatomIndex].resources[resourceIndex].encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
+            for vatomIndex in 0..<groupModel.vatoms.count {
+                for resourceIndex in 0..<groupModel.vatoms[vatomIndex].resources.count {
+                    groupModel.vatoms[vatomIndex].resources[resourceIndex].encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
                 }
             }
             
             DispatchQueue.main.async {
-                //print(model)
-                completion(model, nil)
+                completion(groupModel, nil)
             }
             
         }
         
     }
     
-    /// Fetches vAtoms by providing an array of vAtom IDs. The response includes the vAtoms as well as the configured Faces and Actions
-    /// in a `GroupModel`.
+    /// Fetches vAtoms by providing an array of vAtom IDs. The response includes the vAtoms as well
+    /// as the configured Faces and Actions in a `GroupModel`.
     ///
     /// - Parameters:
     ///   - ids: Array of vAtom IDs
@@ -664,12 +634,11 @@ extension Blockv {
         
         let endpoint = API.UserVatom.getVatoms(withIDs: ids)
         
-        self.client.request(endpoint) { (groupModel, error) in
+        self.client.request(endpoint) { (baseModel, error) in
             
-            // extract model, handle error
-            guard var model = groupModel?.payload, error == nil else {
+            // extract model, ensure no error
+            guard var groupModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
-//                    print(error!.localizedDescription)
                     completion(nil, error!)
                 }
                 return
@@ -678,15 +647,14 @@ extension Blockv {
             // model is available
             
             // url encoding - this is awful. maybe encode on init?
-            for vatomIndex in 0..<model.vatoms.count {
-                for resourceIndex in 0..<model.vatoms[vatomIndex].resources.count {
-                    model.vatoms[vatomIndex].resources[resourceIndex].encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
+            for vatomIndex in 0..<groupModel.vatoms.count {
+                for resourceIndex in 0..<groupModel.vatoms[vatomIndex].resources.count {
+                    groupModel.vatoms[vatomIndex].resources[resourceIndex].encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
                 }
             }
             
             DispatchQueue.main.async {
-                //print(model)
-                completion(model, nil)
+                completion(groupModel, nil)
             }
             
         }
@@ -734,6 +702,36 @@ extension Blockv {
     
     // MARK: Actions
     
+    /// Fetches all the actions configured for a template.
+    ///
+    /// - Parameters:
+    ///   - id: Uniquie identified of the template.
+    ///   - completion: The completion handler to call when the call is completed.
+    ///                 This handler is executed on the main queue.
+    public static func getActions(forTemplateID id: String,
+                                  completion: @escaping ([Action]?, BVError?) -> Void) {
+     
+        let endpoint = API.UserActions.getActions(forTemplateID: id)
+        
+        self.client.request(endpoint) { (baseModel, error) in
+            
+            // extract array of actions, ensure no error
+            guard let actions = baseModel?.payload, error == nil else {
+                DispatchQueue.main.async {
+                    completion(nil, error!)
+                }
+                return
+            }
+            
+            // data is available
+            DispatchQueue.main.async {
+                completion(actions, nil)
+            }
+            
+        }
+        
+    }
+    
     /// Performs an action on the BLOCKv Platform.
     ///
     /// This is the most flexible of the action calls and should be used as a last resort.
@@ -743,16 +741,16 @@ extension Blockv {
     ///   - payload: Body payload that will be sent as JSON in the request body.
     ///   - completion: The completion handler to call when the action is completed.
     ///                 This handler is executed on the main queue.
-    public static func performAction(name: String, payload: [String : Any], completion: @escaping (Data?, BVError?) -> Void) {
+    public static func performAction(name: String, payload: [String : Any],
+                                     completion: @escaping (Data?, BVError?) -> Void) {
 
         let endpoint = API.VatomAction.custom(name: name, payload: payload)
 
         self.client.request(endpoint) { (data, error) in
 
-            // unwrap data, ensure no error
+            // extract data, ensure no error
             guard let data = data, error == nil else {
                 DispatchQueue.main.async {
-                    // print(error!.localizedDescription)
                     completion(nil, error!)
                 }
                 return
@@ -760,7 +758,6 @@ extension Blockv {
 
             // data is available
             DispatchQueue.main.async {
-                //print(data)
                 completion(data, nil)
             }
         }
@@ -769,22 +766,34 @@ extension Blockv {
     
     /// Performs an acquire action on a vAtom.
     ///
-    /// Often, only a vAtom's ID is known, e.g. scanning a QR code with an embeded vAtom ID. This call is useful
-    /// is such circumstances.
+    /// Often, only a vAtom's ID is known, e.g. scanning a QR code with an embeded vAtom
+    /// ID. This call is useful is such circumstances.
     ///
     /// - Parameters:
     ///   - id: The id of the vAtom to acquire.
     ///   - completion: The completion handler to call when the action is completed.
     ///                 This handler is executed on the main queue.
-    public static func acquireVatom(withID id: String, completion: @escaping (Data?, BVError?) -> Void) {
+    public static func acquireVatom(withID id: String,
+                                    completion: @escaping (Data?, BVError?) -> Void) {
     
         let body = ["this.id": id]
         
-        // perfor the action
+        // perform the action
         self.performAction(name: "Acquire", payload: body) { (data, error) in
             completion(data, error)
         }
     
     }
     
+}
+
+
+// MARK: - Print Helpers
+
+func printBV(info string: String) {
+    print("\nBV SDK > \(string)")
+}
+
+func printBV(error string: String) {
+    print("\nBV SDK >>> Error: \(string)")
 }

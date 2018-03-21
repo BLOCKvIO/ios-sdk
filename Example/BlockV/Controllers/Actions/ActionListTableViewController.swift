@@ -20,7 +20,7 @@ class ActionListTableViewController: UITableViewController {
     //
     // In a future release, the actions configure for the vAtom's template
     // will be returned.
-    var actions: [String] = ["Transfer"]
+    fileprivate var actions: [String] = ["Transfer"]
     
     // MARK: - Actions
     
@@ -35,8 +35,30 @@ class ActionListTableViewController: UITableViewController {
 
         precondition(vatom != nil, "A vAtom must be passed into this view controller.")
         
+        fetchActions()
     }
 
+    // MARK: - Helpers
+    
+    /// Fetches all the actions configured / associated with our vAtom's template.
+    fileprivate func fetchActions() {
+        
+        let templateID = self.vatom.templateID
+        
+        Blockv.getActions(forTemplateID: templateID) { (actions, error) in
+            
+            // unwrap actions, handle error
+            guard let actions = actions, error == nil else {
+                print(error!.localizedDescription)
+                return
+            }
+            
+            // success
+            print("Actions: \(actions.debugDescription)")
+            
+        }
+        
+    }
 
     // MARK: - Navigation
 

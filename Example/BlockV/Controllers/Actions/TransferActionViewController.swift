@@ -18,6 +18,7 @@ class TransferActionViewController: UIViewController {
             switch tokenTypeSegmentedControl.selectedSegmentIndex {
             case 0: return .phone
             case 1: return .email
+            case 2: return .id
             default: fatalError("Unhandled index.")
             }
         }
@@ -51,14 +52,21 @@ class TransferActionViewController: UIViewController {
     
     @IBAction func performActionTapped(_ sender: Any) {
         
-        guard let token = userTokenTextField.text else { return }
+        // create the token
+        guard let value = userTokenTextField.text else { return }
+        let token = UserToken(value: value, type: tokenType)
         
-        /*
-         Use the vAtoms convenience transfer method to transfer the vAtom to
-         a another user via a phone, email, or user id token.
-         */
+        performTransferManual(token: token)
+        // OR
+        //performTransferConvenience(token: token)
         
-        self.vatom.transfer(toToken: token, type: .email) { [weak self] (data, error) in
+    }
+    
+    /// Option 1 - This show the convenience `transfer` methods on Vatom to transfer the vAtom to
+    /// a another user via a phone, email, or user id token.
+    func performTransferConvenience(token: UserToken) {
+        
+        self.vatom.transfer(toToken: token) { [weak self] (data, error) in
             
             // unwrap data, handle error
             guard let data = data, error == nil else {
@@ -69,6 +77,33 @@ class TransferActionViewController: UIViewController {
             // success
             print("Action response: \(String.init(data: data, encoding: .utf8))")
             self?.hide()
+        }
+        
+    }
+    
+    /// Option 2 - This show the manual, method of performing an action.
+    func performTransferManual(token: UserToken) {
+        
+        /*
+         Each action has a defined payload structure.
+        */
+        let body = [
+            "this.id": self.vatom.id,
+            "new.owner.\(token.type.rawValue)": token.value
+        ]
+        
+        Blockv.performAction(name: "Transfer", payload: body) { [weak self] (data, error) in
+            
+            // unwrap data, handle error
+            guard let data = data, error == nil else {
+                print(error!.localizedDescription)
+                return
+            }
+            
+            // success
+            print("Action response: \(String.init(data: data, encoding: .utf8))")
+            self?.hide()
+            
         }
         
     }

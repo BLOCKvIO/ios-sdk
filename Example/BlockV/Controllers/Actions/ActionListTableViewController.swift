@@ -49,7 +49,7 @@ class ActionListTableViewController: UITableViewController {
             
             // unwrap actions, handle error
             guard let actions = actions, error == nil else {
-                print(error!.localizedDescription)
+                print(error?.localizedDescription)
                 return
             }
             

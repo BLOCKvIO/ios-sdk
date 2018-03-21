@@ -129,6 +129,9 @@ public final class Client: ClientProtocol {
             switch dataResponse.result {
             case let .success(data): completion(data, nil)
             case let .failure(err):
+                
+                //TODO: The error should be parsed and a BVError created and passed in.
+                
                 // check for a BVError
                 if let err = err as? BVError {
                     completion(nil, err)

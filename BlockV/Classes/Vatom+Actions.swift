@@ -15,16 +15,15 @@ extension Vatom {
     /// template. If an action has not been configured, an error will be generated.
     ///
     /// - Parameters:
-    ///   - token: Phone, Email, or User ID
-    ///   - type: Three outbound tokens are accepted: `.phone`, `.email`, and `.id`.
+    ///   - token: Standard UserToken (Phone, Email, or User ID)
     ///   - completion: The completion handler to call when the action is completed.
     ///                 This handler is executed on the main queue.
-    public func transfer(toToken token: String, type: UserTokenType,
+    public func transfer(toToken token: UserToken,
                          completion: @escaping (Data?, BVError?) -> Void) {
         
         let body = [
             "this.id": self.id,
-            "new.owner.\(type.rawValue)": token
+            "new.owner.\(token.type.rawValue)": token.value
         ]
         
         // perform the action

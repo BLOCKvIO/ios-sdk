@@ -9,7 +9,9 @@ import Foundation
 
 //TODO: Define hashable conformance
 
-/// A simple struct that models a template action.
+/// This type models a template action.
+///
+///
 public struct Action {
     
     /// Combination of the template and action name.
@@ -26,8 +28,13 @@ public struct Action {
     ///
     /// E.g. vatomic.prototyping::v1::vAtom::Combined
     public let templateID: String
-    public let meta: MetaModel
-    public let properties: Properties
+    
+    /*
+     NB: `meta` and `properties` are only returned in group responses.
+     Calls such as GET /user/actions/:template_id do not.
+    */
+    public let meta: MetaModel?
+    public let properties: Properties?
 
     public struct Properties: Codable {
         public let reactor: String
@@ -51,8 +58,8 @@ extension Action: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
         let name = try container.decode(String.self, forKey: .name)
-        let properties = try container.decode(Properties.self, forKey: .properties)
-        let meta = try container.decode(MetaModel.self, forKey: .meta)
+        let properties = try container.decodeIfPresent(Properties.self, forKey: .properties)
+        let meta = try container.decodeIfPresent(MetaModel.self, forKey: .meta)
         
         let (templateID, actionName) = try Action.splitCompoundName(name)
         

@@ -237,7 +237,6 @@ extension API {
     enum VatomDiscover {
         
         // This needs a discover builder or something rather?
-        
         // Filter field (if it is there) will mess things up. How to decode a limited payload?
         
         /// Returns the endpoint to search for vatoms using a discover query.
@@ -263,12 +262,27 @@ extension API {
          */
 
         /// Returns the endpoint to perform and action on a vAtom.
+        ///
+        /// The enpoint is generic over Void which means the raw data will be returned.
         static func custom(name: String, payload: [String : Any]) -> Endpoint<Void> {
             return Endpoint(method: .post,
                             path: actionPath + "/\(name)",
                             parameters: payload)
         }
 
+    }
+    
+    /// Consolidates all the user actions.
+    enum UserActions {
+        
+        private static let userActionsPath = "/v1/user/actions"
+        
+        /// Returns the endpoint for fetching the actions configured for a template ID.
+        static func getActions(forTemplateID id: String) -> Endpoint<BaseModel<[Action]>> {
+            return Endpoint(method: .get,
+                            path: userActionsPath + "/\(id)")
+        }
+        
     }
     
 }

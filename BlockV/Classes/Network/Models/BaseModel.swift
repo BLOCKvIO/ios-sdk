@@ -7,12 +7,8 @@
 
 import Foundation
 
-/// Represents the top-level JSON structure for 200...299 Blockv network requests.
+/// Represents the top-level JSON structure for success (200...299) BlockV Platform responses.
 public struct BaseModel<T: Decodable> : Decodable {
-    //Note: status, error, and message are not required. They are meaningless on a succees response.
-    let status: String?
-    let error: Int?
-    let message: String?
     let payload: T
 }
 

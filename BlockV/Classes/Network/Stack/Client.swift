@@ -82,7 +82,7 @@ public final class Client: ClientProtocol {
         self.baseURL = URL(string: config.baseURLString)!
         
         var defaultHeaders = Alamofire.SessionManager.defaultHTTPHeaders
-        defaultHeaders["X-Vatomic-App-Id"] = config.appID
+        defaultHeaders["App-Id"] = config.appID
         
         let configuration = URLSessionConfiguration.default
         configuration.httpAdditionalHeaders = defaultHeaders

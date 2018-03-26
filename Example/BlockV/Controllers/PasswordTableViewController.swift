@@ -1,34 +1,26 @@
 //
-//  UserInfoTableViewController.swift
+//  PasswordTableViewController.swift
 //  BlockV_Example
+//
+//  Created by Cameron McOnie on 2018/03/24.
+//  Copyright © 2018 CocoaPods. All rights reserved.
 //
 
 import UIKit
 import BlockV
 
-class UserInfoTableViewController: UITableViewController {
+class PasswordTableViewController: UITableViewController {
     
     // MARK: - Enums
     
     /// Represents a table section
     fileprivate enum TableSection: Int {
-        case info = 0
+        case password = 0
     }
     
     // MARK: - Outlets
     
     @IBOutlet var doneButton: UIBarButtonItem!
-    
-    // MARK: - Properties
-    
-    ///
-    var userModel: UserModel?
-    
-    fileprivate let titleValueCellId = "cell.titleValue"
-    
-    /// Dictionary of table view cells for display. Since the number of cells is known and
-    /// the count small, we needn't worry about efficiently deque-ing from a reuse pool.
-    fileprivate var tableViewCells: [TableSection: [TitleValueCell]] = [:]
     
     // MARK: - Actions
     
@@ -36,15 +28,21 @@ class UserInfoTableViewController: UITableViewController {
         updateProfile()
     }
     
-    // MARK: - Lifecycle
+    // MARK: - Properties
     
+    fileprivate let titleValueCellId = "cell.titleValue"
+    
+    /// Dictionary of table view cells for display. Since the number of cells is known and
+    /// the count small, we needn't worry about efficiently deque-ing from a reuse pool.
+    fileprivate var tableViewCells: [TableSection: [TitleValueCell]] = [:]
+    
+    // MARK: - Lifecycle
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
+        // add cells to tableview
         createCells()
-        
-        self.tableView.register(TitleValueCell.self, forCellReuseIdentifier: titleValueCellId)
-        self.tableView.tableFooterView = UIView()
     }
     
     // MARK: - Helpers
@@ -52,44 +50,24 @@ class UserInfoTableViewController: UITableViewController {
     /// Creates table view cellls.
     fileprivate func createCells() {
         
-        let firstCell = TitleValueCell()
-        firstCell.titleLabel.text = "First"
-        firstCell.valueTextField.placeholder = "John"
-        firstCell.valueTextField.text = userModel?.firstName
-        firstCell.valueTextField.keyboardType = .namePhonePad
-        firstCell.valueTextField.autocorrectionType = .no
-        firstCell.valueTextField.autocapitalizationType = .none
+        let passwordCell = TitleValueCell()
+        passwordCell.titleLabel.text = "Password"
+        passwordCell.valueTextField.placeholder = "******"
+        passwordCell.valueTextField.keyboardType = .default
+        passwordCell.valueTextField.autocorrectionType = .no
+        passwordCell.valueTextField.autocapitalizationType = .none
         
-        let lastCell = TitleValueCell()
-        lastCell.titleLabel.text = "Last"
-        lastCell.valueTextField.placeholder = "Appleseed"
-        lastCell.valueTextField.text = userModel?.lastName
-        lastCell.valueTextField.keyboardType = .namePhonePad
-        lastCell.valueTextField.autocorrectionType = .no
-        lastCell.valueTextField.autocapitalizationType = .none
-
-        let birthdayCell = TitleValueCell()
-        birthdayCell.titleLabel.text = "Birthday"
-        birthdayCell.valueTextField.placeholder = "yyyy-MM-dd"
-        birthdayCell.valueTextField.text = userModel?.birthday
-        birthdayCell.valueTextField.keyboardType = .numbersAndPunctuation
-        birthdayCell.valueTextField.autocorrectionType = .no
-
         // add cells
-        tableViewCells[.info] = [firstCell, lastCell, birthdayCell]
+        tableViewCells[.password] = [passwordCell]
         
     }
-    
+
     /// Capture data from table view cells.
     fileprivate func buildForm() -> UserInfo {
+
+        let passwordCell = tableViewCells[.password]![0]
         
-        let firstCell = tableViewCells[.info]![0]
-        let lastCell = tableViewCells[.info]![1]
-        let birthdayCell = tableViewCells[.info]![2]
-        
-        return UserInfo(firstName: firstCell.valueTextField.text,
-                                lastName: lastCell.valueTextField.text,
-                                birthday: birthdayCell.valueTextField.text)
+        return UserInfo(password: passwordCell.valueTextField.text)
         
     }
     
@@ -119,7 +97,6 @@ class UserInfoTableViewController: UITableViewController {
             print("Viewer > \(model)\n")
             
             // update the model
-            self?.userModel = model
             self?.tableView.reloadData()
             
             // pop back
@@ -133,7 +110,7 @@ class UserInfoTableViewController: UITableViewController {
 
 // MARK: - Table view data source
 
-extension UserInfoTableViewController {
+extension PasswordTableViewController {
     
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
@@ -141,11 +118,11 @@ extension UserInfoTableViewController {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch TableSection(rawValue: section)! {
-        case .info: return tableViewCells[.info]!.count
+        case .password: return tableViewCells[.password]!.count
         }
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> TitleValueCell {
         let section = TableSection(rawValue: indexPath.section)!
         return tableViewCells[section]![indexPath.row]
     }

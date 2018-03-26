@@ -122,7 +122,7 @@ class OAuth2Handler: RequestAdapter, RequestRetrier {
         let urlString = "\(baseURLString)/v1/access_token"
         
         let headers: HTTPHeaders = [
-            "X-Vatomic-App-Id": self.appID,
+            "App-Id": self.appID,
             "Authorization": "Bearer \(refreshToken)"
         ]
         

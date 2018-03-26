@@ -26,6 +26,7 @@ class VatomDetailTableViewController: UITableViewController {
     }()
     
     // MARK: - Outlets
+    @IBOutlet weak var actionsButton: UIBarButtonItem!
     
     // info
     @IBOutlet weak var titleValueLabel: UILabel!
@@ -58,6 +59,9 @@ class VatomDetailTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        //
+        self.navigationItem.rightBarButtonItem = nil
         
         self.refreshControl?.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
         

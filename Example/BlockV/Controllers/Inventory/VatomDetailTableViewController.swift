@@ -60,7 +60,8 @@ class VatomDetailTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //
+        // Comment out to reveal the actions button.
+        // This is not officially supported.
         self.navigationItem.rightBarButtonItem = nil
         
         self.refreshControl?.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)

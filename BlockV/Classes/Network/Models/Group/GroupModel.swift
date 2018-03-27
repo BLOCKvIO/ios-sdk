@@ -26,25 +26,46 @@ public struct GroupModel: Decodable {
     public var actions: [Action]
     public var count: Int?
     
+    /// These coding keys accomadate both the inventory and discover calls.
     enum CodingKeys: String, CodingKey {
-        case vatoms = "results"
+        case results // discover only
+        case vatoms
         case faces
         case actions
         case count
     }
     
     public init(from decoder: Decoder) throws {
+        
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
         /*
          The arrays of vatoms, faces, and actions are be decded 'safely'. In other words,
          encountering a failure when decoding a an element will result in that element
          not being included in the parsed arrays.
-        */
+         */
         
-        self.vatoms = try container
-            .decode([Safe<Vatom>].self, forKey: .vatoms)
-            .flatMap { $0.value }
+        /*
+         Below is a workaround to accomadate the inventory and discover calls.
+         */
+        
+        if let vatoms = try container.decodeIfPresent([Safe<Vatom>].self, forKey: .vatoms) {
+            self.vatoms = vatoms.flatMap { $0.value }
+        } else if let vatoms = try container.decodeIfPresent([Safe<Vatom>].self, forKey: .results) {
+            self.vatoms = vatoms.flatMap { $0.value }
+        } else {
+            self.vatoms = []
+        }
+        
+        /*
+         Ideally, is should just be this.
+         
+         self.vatoms = try container
+         .decode([Safe<Vatom>].self, forKey: .vatoms)
+         .flatMap { $0.value }
+         
+         */
+        
         self.faces = try container
             .decode([Safe<Face>].self, forKey: .faces)
             .flatMap { $0.value }
@@ -53,7 +74,7 @@ public struct GroupModel: Decodable {
             .flatMap { $0.value }
         self.count = try container.decodeIfPresent(Int.self, forKey: .count)
     }
-
+    
 }
 
 // MARK: Equatable
@@ -62,7 +83,7 @@ extension GroupModel: Equatable {}
 
 public func ==(lhs: GroupModel, rhs: GroupModel) -> Bool {
     return lhs.faces == rhs.faces &&
-    lhs.actions == rhs.actions &&
-    lhs.vatoms == rhs.vatoms &&
-    lhs.count == rhs.count
+        lhs.actions == rhs.actions &&
+        lhs.vatoms == rhs.vatoms &&
+        lhs.count == rhs.count
 }

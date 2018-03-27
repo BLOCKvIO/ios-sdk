@@ -74,8 +74,8 @@ class InventoryCollectionViewController: UICollectionViewController {
         super.viewDidLoad()
         
         self.collectionView?.refreshControl = self.refreshControl
-        //self.fetchInventory()
-        self.performDiscoverQuery()
+        self.fetchInventory()
+        //self.performDiscoverQuery()
     }
     
     // MARK: - Helpers

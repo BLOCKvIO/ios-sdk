@@ -1,8 +1,12 @@
 //
-//  BVError.swift
-//  BlockV
+//  BlockV AG. Copyright (c) 2018, all rights reserved.
 //
-//  Created by Cameron McOnie on 2018/02/27.
+//  Licensed under the BlockV SDK License (the "License"); you may not use this file or
+//  the BlockV SDK except in compliance with the License accompanying it. Unless
+//  required by applicable law or agreed to in writing, the BlockV SDK distributed under
+//  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+//  ANY KIND, either express or implied. See the License for the specific language
+//  governing permissions and limitations under the License.
 //
 
 import Foundation
@@ -35,6 +39,7 @@ public enum BVError: Error {
         case invalidDateFormat(Int, String)
         
         case malformedRequestBody(Int, String)
+        case invalidDataValidation(Int, String)
         
         case vatomNotFound(Int, String)
         
@@ -61,6 +66,7 @@ public enum BVError: Error {
             case 527: self  = .invalidDateFormat(code, message)
                 
             case 1004: self = .malformedRequestBody(code, message)
+            case 1041: self = .invalidDataValidation(code, message)
             
             case 1701: self = .vatomNotFound(code, message)
             
@@ -77,7 +83,7 @@ public enum BVError: Error {
             case 2569: self = .invalidPhoneNumber(code, message)
             default:
                 // useful for debugging
-                assertionFailure("Unhandled error: \(code) \(message)")
+                //assertionFailure("Unhandled error: \(code) \(message)")
                 self = .unknown(code, message)
             }
         }
@@ -113,6 +119,8 @@ extension BVError.PlatformErrorReason {
         
         //
         case let .malformedRequestBody(code, message):
+            return "BlockV Platform Error: (\(code)) Message: \(message)"
+        case let .invalidDataValidation(code, message):
             return "BlockV Platform Error: (\(code)) Message: \(message)"
             
         //

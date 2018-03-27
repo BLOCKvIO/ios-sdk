@@ -1,3 +1,13 @@
+//
+//  BlockV AG. Copyright (c) 2018, all rights reserved.
+//
+//  Licensed under the BlockV SDK License (the "License"); you may not use this file or
+//  the BlockV SDK except in compliance with the License accompanying it. Unless
+//  required by applicable law or agreed to in writing, the BlockV SDK distributed under
+//  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+//  ANY KIND, either express or implied. See the License for the specific language
+//  governing permissions and limitations under the License.
+//
 
 import Foundation
 import Alamofire
@@ -5,7 +15,7 @@ import Alamofire
 // Beta 0.5
 //TODO: Inpect the `expires_in` before a request is made. Refresh the access token if necessary.
 //TODO: Allow for server environment switching.
-
+//TODO: Discover builder.
 
 // This is not good. The sdk module name is BlockV and this class is Blockv. They are too similar.
 public final class Blockv {
@@ -16,8 +26,9 @@ public final class Blockv {
     ///
     /// Options:
     /// - development
+    /// - production
     public enum BVEnvironment: String {
-        //case production = ""
+        case production  = "https://api.blockv.io"
         case development = "https://apidev.blockv.net"
     }
     
@@ -664,41 +675,52 @@ extension Blockv {
     /// Searches for vAtoms on the BLOCKv Platform.
     ///
     /// - Parameters:
-    ///   - query: <#query description#>
+    ///   - builder: A discover query builder object. Use the builder to simplify constructing
+    ///              discover queries.
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
-//    public static func discover(query: [String: Any], completion: @escaping (GroupModel?, BVError?) -> Void) {
-//
-//        let endpoint = API.VatomDiscover.discover()
-//
-//        self.client.request(endpoint) { (groupModel, error) in
-//
-//            // extract model, handle error
-//            guard var model = groupModel?.payload, error == nil else {
-//                DispatchQueue.main.async {
-////                    print(error!.localizedDescription)
-//                    completion(nil, error!)
-//                }
-//                return
-//            }
-//
-//            // model is available
-//
-//            // url encoding - this is awful. maybe encode on init?
-//            for vatomIndex in 0..<model.vatoms.count {
-//                for resourceIndex in 0..<model.vatoms[vatomIndex].resources.count {
-//                    model.vatoms[vatomIndex].resources[resourceIndex].encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
-//                }
-//            }
-//
-//            DispatchQueue.main.async {
-//                //print(model)
-//                completion(model, nil)
-//            }
-//
-//        }
-//
-//    }
+    public static func discover(_ builder: DiscoverQueryBuilder, completion: @escaping (GroupModel?, BVError?) -> Void) {
+        self.discover(payload: builder.toDictionary(), completion: completion)
+    }
+    
+    /// Searches for vAtoms on the BLOCKv Platform.
+    ///
+    /// - Parameters:
+    ///   - payload: Dictionary
+    ///   - completion: The completion handler to call when the request is completed.
+    ///                 This handler is executed on the main queue.
+    public static func discover(payload: [String: Any], completion: @escaping (GroupModel?, BVError?) -> Void) {
+
+        let endpoint = API.VatomDiscover.discover(payload)
+
+        self.client.request(endpoint) { (baseModel, error) in
+
+            // extract model, handle error
+            guard var groupModel = baseModel?.payload, error == nil else {
+                DispatchQueue.main.async {
+                    print(error!.localizedDescription)
+                    completion(nil, error!)
+                }
+                return
+            }
+
+            // model is available
+
+            // url encoding - this is awful. maybe encode on init?
+            for vatomIndex in 0..<groupModel.vatoms.count {
+                for resourceIndex in 0..<groupModel.vatoms[vatomIndex].resources.count {
+                    groupModel.vatoms[vatomIndex].resources[resourceIndex].encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
+                }
+            }
+
+            DispatchQueue.main.async {
+                //print(model)
+                completion(groupModel, nil)
+            }
+
+        }
+
+    }
     
     // MARK: Actions
     

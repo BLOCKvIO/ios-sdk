@@ -4,6 +4,8 @@
 [![License](https://img.shields.io/cocoapods/l/BlockV.svg?style=flat)](http://cocoapods.org/pods/BlockV)
 [![Platform](https://img.shields.io/cocoapods/p/BlockV.svg?style=flat)](http://cocoapods.org/pods/BlockV)
 
+The BLOCKv SDK allows for easy integration into the BLOCKv Platform.
+
 ## Requirements
 
 - iOS 10.0+
@@ -31,6 +33,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         BLOCKv.configure(appID: "your-app-id")
         // Set platform environment
         BLOCKv.setEnvironment(.development)
+        
         // Check logged in state
         if BLOCKv.isLoggedIn {
             // show interesting ui
@@ -42,16 +45,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 ```
 
-## Example
+## Example App
 
 The example app lets you try out the BLOCKv SDK. It's a great place to start if you're getting up to speed on the platform. It demonstrates the following features:
 
-- Authentication (registration & login)
-- Profile management
-- Fetching the user's inventory of vAtoms
-- Fetching individual vAtoms by thier ID(s)
-- Dispalying vAtoms in a collection view
-- Searching for vAtoms on the BLOCKv Platform
+- [x] Authentication (registration & login)
+- [x] Profile management
+- [x] Fetching the user's inventory of vAtoms
+- [x] Fetching individual vAtoms by thier ID(s)
+- [x] Dispalying vAtoms in a collection view
+- [x] Searching for vAtoms on the BLOCKv Platform
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
@@ -65,4 +68,4 @@ If you believe you have identified a security vulnerability with BLOCKv, you sho
 
 ## License
 
-BlockV is available under the Blockv AG license. See the [LICENSE](https://github.com/BLOCKvIO/ios-sdk/blob/master/LICENSE) file for more info.
+BLOCKv is available under the Blockv AG license. See the [LICENSE](https://github.com/BLOCKvIO/ios-sdk/blob/master/LICENSE) file for more info.

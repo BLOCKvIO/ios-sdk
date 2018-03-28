@@ -55,10 +55,14 @@ The example app lets you try out the BLOCKv SDK. It's a great place to start if 
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
+### Security Disclosure
+
+If you believe you have identified a security vulnerability with BLOCKv, you should report it as soon as possible via email to support@blockv.io. Please do not post it to a public issue tracker.
+
 ## Author
 
 [BlockV](developer.blockv.io)
 
 ## License
 
-BlockV is available under the <????> license. See the LICENSE file for more info.
+BlockV is available under the Blockv AG license. See the [LICENSE](https://github.com/BLOCKvIO/ios-sdk/blob/master/LICENSE) file for more info.

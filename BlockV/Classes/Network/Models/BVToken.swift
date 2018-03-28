@@ -37,7 +37,7 @@ func ==(lhs: BVToken, rhs: BVToken) -> Bool {
     lhs.expiresIn == rhs.expiresIn
 }
 
-/// Blockv refresh token response
+/// BLOCKv refresh token response
 struct RefreshModel: Decodable {
     let accessToken: BVToken
     

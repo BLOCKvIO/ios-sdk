@@ -27,7 +27,7 @@
 //
 
 import UIKit
-import BlockV
+import BLOCKv
 
 class UserInfoTableViewController: UITableViewController {
     
@@ -124,7 +124,7 @@ class UserInfoTableViewController: UITableViewController {
         
         let userInfo = buildForm()
         
-        Blockv.updateCurrentUser(userInfo) {
+        BLOCKv.updateCurrentUser(userInfo) {
             [weak self] (userModel, error) in
             
             // reset nav bar

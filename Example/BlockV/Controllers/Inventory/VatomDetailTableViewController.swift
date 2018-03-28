@@ -27,7 +27,7 @@
 //
 
 import UIKit
-import BlockV
+import BLOCKv
 
 /// This view controller demonstrates how to fetch a single vAtom.
 ///
@@ -107,7 +107,7 @@ class VatomDetailTableViewController: UITableViewController {
     /// Fetches the input vatom's properties from the Blockv Platform.
     fileprivate func fetchVatom() {
         
-        Blockv.getVatoms(withIDs: [vatom.id]) { [weak self] (groupModel, error) in
+        BLOCKv.getVatoms(withIDs: [vatom.id]) { [weak self] (groupModel, error) in
             
             // end refreshing
             self?.refreshControl?.endRefreshing()

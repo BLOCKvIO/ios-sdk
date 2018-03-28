@@ -27,7 +27,7 @@
 //
 
 import UIKit
-import BlockV
+import BLOCKv
 import Alamofire
 
 class ProfileViewController: UITableViewController {
@@ -149,7 +149,7 @@ class ProfileViewController: UITableViewController {
     /// Fetches the user's profile information.
     fileprivate func fetchUserProfile() {
         
-        Blockv.getCurrentUser { [weak self] (userModel, error) in
+        BLOCKv.getCurrentUser { [weak self] (userModel, error) in
             
             // end refreshing
             self?.refreshControl?.endRefreshing()
@@ -208,7 +208,7 @@ class ProfileViewController: UITableViewController {
         uploadState = .busy
         
         // do avatar upload
-        Blockv.uploadAvatar(image, progressCompletion: { [weak self] percent in
+        BLOCKv.uploadAvatar(image, progressCompletion: { [weak self] percent in
             
             self?.uploadProgressView.setProgress(percent, animated: true)
             print("Percent complete: \(percent)")
@@ -238,7 +238,7 @@ class ProfileViewController: UITableViewController {
     /// Logs the user out.
     fileprivate func logout() {
         
-        Blockv.logout { [weak self] error in
+        BLOCKv.logout { [weak self] error in
             // handle error
             guard error == nil else {
                 print(">>> Error > Viewer: \(error!.localizedDescription)\n")

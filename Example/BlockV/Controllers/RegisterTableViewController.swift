@@ -27,7 +27,7 @@
 //
 
 import UIKit
-import BlockV
+import BLOCKv
 
 
 class RegisterTableViewController: UITableViewController {
@@ -165,7 +165,7 @@ class RegisterTableViewController: UITableViewController {
         }
         
         /// Register a user with multiple tokens
-        Blockv.register(tokens: tokens, userInfo: userInfo) {
+        BLOCKv.register(tokens: tokens, userInfo: userInfo) {
             [weak self] (userModel, error) in
             
             // hide loader

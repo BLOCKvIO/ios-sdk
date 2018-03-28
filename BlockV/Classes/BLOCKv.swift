@@ -12,16 +12,16 @@
 import Foundation
 import Alamofire
 
-// Beta 0.5
+// Beta 0.9
 //TODO: Inpect the `expires_in` before a request is made. Refresh the access token if necessary.
 //TODO: Allow for server environment switching.
 
-// This is not good. The sdk module name is BlockV and this class is Blockv. They are too similar.
-public final class Blockv {
+/// Primary interface into the the BLOCKv SDK.
+public final class BLOCKv {
     
     // MARK: - Enums
     
-    /// Models the Blockv platform environments.
+    /// Models the BLOCKv platform environments.
     ///
     /// Options:
     /// - development
@@ -71,11 +71,11 @@ public final class Blockv {
     fileprivate static var clientConfiguration: Client.Configuration {
         get {
             // ensure host app has set an app id
-            precondition(Blockv.appID != nil, "Please call 'Blockv.configure(appID:)' with your issued app ID before making network requests.")
-            precondition(Blockv.environment != nil, "Please call `Blockv.setEnvironment(_:)' to set the Blockv Platform environemnt.")
+            precondition(BLOCKv.appID != nil, "Please call 'BLOCKv.configure(appID:)' with your issued app ID before making network requests.")
+            precondition(BLOCKv.environment != nil, "Please call `BLOCKv.setEnvironment(_:)' to set the BLOCKv Platform environemnt.")
             // return the configuration (inexpensive object)
-            return Client.Configuration(baseURLString: Blockv.environment!.rawValue,
-                                        appID: Blockv.appID!,
+            return Client.Configuration(baseURLString: BLOCKv.environment!.rawValue,
+                                        appID: BLOCKv.appID!,
                                         refreshToken: CredentialStore.refreshToken?.token)
         }
     }
@@ -97,7 +97,7 @@ public final class Blockv {
             /// check if a new instance must be initialized
             if _client == nil {
                 /// init a new instance
-                _client = Client(config: Blockv.clientConfiguration)
+                _client = Client(config: BLOCKv.clientConfiguration)
                 return _client!
             } else {
                 /// return the backing instance
@@ -130,15 +130,15 @@ public final class Blockv {
     
     /// Configures the SDK with your issued app id.
     ///
-    /// Note, as a viewer, `configure` should be the first method call you make  on the Blockv SDK.
+    /// Note, as a viewer, `configure` should be the first method call you make  on the BLOCKv SDK.
     /// Typically, you would call `configure` in `application(_:didFinishLaunchingWithOptions:)`
     public static func configure(appID: String) {
         self.appID = appID
     }
     
-    /// Sets the Blockv platform environment.
+    /// Sets the BLOCKv platform environment.
     ///
-    /// By setting the environment you are informing the SDK which Blockv
+    /// By setting the environment you are informing the SDK which BLOCKv
     /// platfrom environment to interact with.
     ///
     /// Typically, you would call `setEnvironment` in `application(_:didFinishLaunchingWithOptions:)`.
@@ -158,18 +158,18 @@ public final class Blockv {
     
     // MARK: - Init
     
-    /// Blockv follows the static pattern. Instance creation is not allowed.
+    /// BLOCKv follows the static pattern. Instance creation is not allowed.
     fileprivate init() {}
     
 }
 
 // MARK: - Platform
 
-extension Blockv {
+extension BLOCKv {
     
     // MARK: Register
     
-    /// Registers a user on the Blockv platform. Accepts a user token (phone or email).
+    /// Registers a user on the BLOCKv platform. Accepts a user token (phone or email).
     ///
     /// - Parameters:
     ///   - token: A user token value, i.e. phone number or email.
@@ -184,7 +184,7 @@ extension Blockv {
         self.register(tokens: [registerToken], userInfo: userInfo, completion: completion)
     }
     
-    /// Registers a user on the Blockv platform. Accepts an OAuth token.
+    /// Registers a user on the BLOCKv platform. Accepts an OAuth token.
     ///
     /// - Parameters:
     ///   - oauthToken: An OAuth token from a supported OAuth provider, e.g. Facebook.
@@ -197,7 +197,7 @@ extension Blockv {
         self.register(tokens: [oauthToken], userInfo: userInfo, completion: completion)
     }
     
-    /// Registers a user on the Blockv platform.
+    /// Registers a user on the BLOCKv platform.
     ///
     /// This call allows for multiple tokens (e.g. phone, email, or OAuth) to be associated
     /// with the user's account.
@@ -237,7 +237,7 @@ extension Blockv {
     
     // MARK: Login
     
-    /// Logs a user into the Blockv platform. Accepts a user token (phone or email).
+    /// Logs a user into the BLOCKv platform. Accepts a user token (phone or email).
     ///
     /// - Parameters:
     ///   - token: A user token value, i.e. phone number or email.
@@ -251,7 +251,7 @@ extension Blockv {
         self.login(tokenParams: params, completion: completion)
     }
     
-    /// Logs a user into the Blockv platform. Accepts an OAuth token.
+    /// Logs a user into the BLOCKv platform. Accepts an OAuth token.
     ///
     /// - Parameters:
     ///   - oauthToken: The OAuth token issued by the OAuth provider.
@@ -264,10 +264,10 @@ extension Blockv {
         self.login(tokenParams: params, completion: completion)
     }
     
-    /// Logs a user into the Blockv platform. Accepts a guest ID.
+    /// Logs a user into the BLOCKv platform. Accepts a guest ID.
     ///
     /// - Parameters:
-    ///   - id: User identifier generated by the Blockv platform.
+    ///   - id: User identifier generated by the BLOCKv platform.
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
     public static func login(withGuestID id: String, completion: @escaping (UserModel?, BVError?) -> Void) {
@@ -310,7 +310,7 @@ extension Blockv {
     
     // MARK: Verify
     
-    /// Verifies ownership of a token by submitting the verification code to the Blockv Platform.
+    /// Verifies ownership of a token by submitting the verification code to the BLOCKv Platform.
     ///
     /// - Parameters:
     ///   - token: A user token value, i.e. phone number or email.
@@ -417,7 +417,7 @@ extension Blockv {
     
     // MARK: User
     
-    /// Fetches the current user's profile information from the Blockv Platform.
+    /// Fetches the current user's profile information from the BLOCKv Platform.
     ///
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
@@ -476,7 +476,7 @@ extension Blockv {
     }
     
     
-    /// Updates the current user's profile on the Blockv Platform.
+    /// Updates the current user's profile on the BLOCKv Platform.
     ///
     /// - Parameters:
     ///   - userInfo: A simple struct that holds the properties of the user, e.g. their first name.
@@ -555,7 +555,7 @@ extension Blockv {
     /// Log out the current user.
     ///
     /// The current user will not longer be authorized to perform user scoped requests on the
-    /// Blockv platfrom.
+    /// BLOCKv platfrom.
     ///
     /// - Parameter completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.

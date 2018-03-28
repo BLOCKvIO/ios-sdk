@@ -30,7 +30,7 @@
 //
 
 import UIKit
-import BlockV
+import BLOCKv
 
 class PasswordTableViewController: UITableViewController {
     
@@ -102,7 +102,7 @@ class PasswordTableViewController: UITableViewController {
         
         let userInfo = buildForm()
         
-        Blockv.updateCurrentUser(userInfo) {
+        BLOCKv.updateCurrentUser(userInfo) {
             [weak self] (userModel, error) in
             
             // reset nav bar

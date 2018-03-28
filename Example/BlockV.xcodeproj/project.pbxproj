@@ -34,7 +34,6 @@
 		D5728D562060FD1B0041F4F7 /* Secret.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5728D552060FD1B0041F4F7 /* Secret.swift */; };
 		D5728D5C206131980041F4F7 /* TransferActionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5728D5B206131980041F4F7 /* TransferActionViewController.swift */; };
 		D5728D5E206155600041F4F7 /* ActionListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5728D5D206155600041F4F7 /* ActionListTableViewController.swift */; };
-		D585E4842056EBEE00D071FA /* VatomStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D585E4832056EBEE00D071FA /* VatomStore.swift */; };
 		D597FF272051305A009B2910 /* UIAlertController+Etx.swift in Sources */ = {isa = PBXBuildFile; fileRef = D597FF262051305A009B2910 /* UIAlertController+Etx.swift */; };
 		D5A08F3B2066514900FB3CB7 /* PasswordTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A08F3A2066514900FB3CB7 /* PasswordTableViewController.swift */; };
 		D5E3AC9F2049883900CFFEEA /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E3AC9E2049883800CFFEEA /* LoginViewController.swift */; };
@@ -89,7 +88,6 @@
 		D5728D552060FD1B0041F4F7 /* Secret.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secret.swift; sourceTree = "<group>"; };
 		D5728D5B206131980041F4F7 /* TransferActionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferActionViewController.swift; sourceTree = "<group>"; };
 		D5728D5D206155600041F4F7 /* ActionListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionListTableViewController.swift; sourceTree = "<group>"; };
-		D585E4832056EBEE00D071FA /* VatomStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VatomStore.swift; sourceTree = "<group>"; };
 		D597FF262051305A009B2910 /* UIAlertController+Etx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Etx.swift"; sourceTree = "<group>"; };
 		D5A08F3A2066514900FB3CB7 /* PasswordTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordTableViewController.swift; sourceTree = "<group>"; };
 		D5E3AC9E2049883800CFFEEA /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
@@ -155,7 +153,6 @@
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
 				D58E31B5205E962D0024BA0E /* Controllers */,
 				D58E31B0205E90DB0024BA0E /* Views */,
-				D58E31AF205E901D0024BA0E /* Models */,
 				D58E31B6205E96910024BA0E /* Utility */,
 				D597FF2520512FF3009B2910 /* Extensions */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
@@ -245,14 +242,6 @@
 				D5728D5B206131980041F4F7 /* TransferActionViewController.swift */,
 			);
 			path = Actions;
-			sourceTree = "<group>";
-		};
-		D58E31AF205E901D0024BA0E /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				D585E4832056EBEE00D071FA /* VatomStore.swift */,
-			);
-			path = Models;
 			sourceTree = "<group>";
 		};
 		D58E31B0205E90DB0024BA0E /* Views */ = {
@@ -490,12 +479,12 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-BlockV_Example/Pods-BlockV_Example-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
-				"${BUILT_PRODUCTS_DIR}/BlockV/BlockV.framework",
+				"${BUILT_PRODUCTS_DIR}/BLOCKv/BLOCKv.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BlockV.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BLOCKv.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -543,7 +532,6 @@
 				D55B21F92056DE6D00B6D5C2 /* UIColor+Ext.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 				D55B21EA2052E38000B6D5C2 /* RoundedImageView.swift in Sources */,
-				D585E4842056EBEE00D071FA /* VatomStore.swift in Sources */,
 				D5728D5E206155600041F4F7 /* ActionListTableViewController.swift in Sources */,
 				D519A845205E6EE3006B0D19 /* NetworkOperation.swift in Sources */,
 				D547576D205E6C6300E6FE90 /* AsynchronousOperation.swift in Sources */,

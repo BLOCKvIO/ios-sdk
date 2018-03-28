@@ -27,7 +27,7 @@
 //
 
 import UIKit
-import BlockV
+import BLOCKv
 
 protocol VerfiyTokenDelegate: class {
     func verifyUserToken(token: UserToken, code: String, completion: @escaping (Bool) -> Void)
@@ -102,7 +102,7 @@ class VerifyTableViewController: UITableViewController {
         // show loader
         self.showNavBarActivityRight()
         
-        Blockv.getCurrentUserTokens { [weak self] (fullTokens, error) in
+        BLOCKv.getCurrentUserTokens { [weak self] (fullTokens, error) in
             
             // hide loader
             self?.hideNavBarActivityRight()
@@ -169,7 +169,7 @@ extension VerifyTableViewController: VerfiyTokenDelegate {
         // show loader
         self.showNavBarActivityRight()
         
-        Blockv.verifyUserToken(token.value, type: token.type, code: code) {
+        BLOCKv.verifyUserToken(token.value, type: token.type, code: code) {
             [weak self] (userToken, error) in
             
             // hide loader
@@ -198,7 +198,7 @@ extension VerifyTableViewController: VerfiyTokenDelegate {
         // show loader
         self.showNavBarActivityRight()
         
-        Blockv.resetVerification(forUserToken: token.value, type: token.type) {
+        BLOCKv.resetVerification(forUserToken: token.value, type: token.type) {
             [weak self] (userToken, error) in
             
             // hide loader

@@ -7,7 +7,7 @@
 //
 
 import XCTest
-import BlockV
+import BLOCKv
 
 class ModelDecodingTest: XCTestCase {
     

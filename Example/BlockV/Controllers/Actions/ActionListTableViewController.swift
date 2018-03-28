@@ -27,7 +27,7 @@
 //
 
 import UIKit
-import BlockV
+import BLOCKv
 
 /// This class lists the available actions for the passed in vAtom.
 ///
@@ -68,7 +68,7 @@ class ActionListTableViewController: UITableViewController {
         
         let templateID = self.vatom.templateID
         
-        Blockv.getActions(forTemplateID: templateID) { (actions, error) in
+        BLOCKv.getActions(forTemplateID: templateID) { (actions, error) in
             
             // unwrap actions, handle error
             guard let actions = actions, error == nil else {

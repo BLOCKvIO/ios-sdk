@@ -18,7 +18,7 @@ import Foundation
 /// It encompasses a few different types of errors, each with their own associated
 /// errors or reasons.
 ///
-/// NB: The BlockV Platform is in the process of unifying error codes.
+/// NB: The BLOCKv Platform is in the process of unifying error codes.
 /// BVError is subject to change in future releases.
 public enum BVError: Error {
     
@@ -26,7 +26,7 @@ public enum BVError: Error {
     
     /// Models a native swift model decoding error.
     case modelDecoding(reason: String)
-    /// Models a Blockv platform error.
+    /// Models a BLOCKv platform error.
     case platformError(reason: PlatformErrorReason)
     /// Models any underlying networking library errors.
     case networkingError(error: Error)
@@ -61,7 +61,7 @@ public enum BVError: Error {
         case unknownWithMissingCode(Int, String) //TODO: Remove. Temporary until all error responses return a code key-value pair.
         case unknown(Int, String) //TODO: Remove. All errors should be mapped.
         
-        /// Init using a blockv platfrom error code and message.
+        /// Init using a BLOCKv platfrom error code and message.
         init(code: Int, message: String) {
             switch code {
                 
@@ -121,45 +121,45 @@ extension BVError.PlatformErrorReason {
             
         //TODO: Is there a better way to do this with pattern matching?
         case let .unknownWithMissingCode(_, message):
-            return "UNKNOWN: BlockV Platform Error: (Missing Code) - Message: \(message)"
+            return "UNKNOWN: BLOCKv Platform Error: (Missing Code) - Message: \(message)"
         case let .unknown(code, message):
-            return "UNKNOWN: BlockV Platform Error: (\(code)) Message: \(message)"
+            return "UNKNOWN: BLOCKv Platform Error: (\(code)) Message: \(message)"
         
         //
         case let .malformedRequestBody(code, message):
-            return "BlockV Platform Error: (\(code)) Message: \(message)"
+            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
         case let .invalidDataValidation(code, message):
-            return "BlockV Platform Error: (\(code)) Message: \(message)"
+            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
             
         //
         case let .vatomNotFound(code, message):
-            return "BlockV Platform Error: (\(code)) Message: \(message)"
+            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
 
         //
         case let .cannotFindUser(code, message):
-            return "BlockV Platform Error: (\(code)) Message: \(message)"
+            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
         case let .authenticationFailed(code, message):
-            return "BlockV Platform Error: (\(code)) Message: \(message)"
+            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
         case let .tokenExpired(code, message):
-            return "BlockV Platform Error: (\(code)) Message: \(message)"
+            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
         case let .invalidToken(code, message):
-            return "BlockV Platform Error: (\(code)) Message: \(message)"
+            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
         case let .avatarUploadFailed(code, message):
-            return "BlockV Platform Error: (\(code)) Message: \(message)"
+            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
         case let .unableToRetrieveToken(code, message):
-            return "BlockV Platform Error: (\(code)) Message: \(message)"
+            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
         case let .tokenUnavailable(code, message):
-            return "BlockV Platform Error: (\(code)) Message: \(message)"
+            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
         case let .tokenAlreadyConfirmed(code, message):
-            return "BlockV Platform Error: (\(code)) Message: \(message)"
+            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
         case let .invalidVerificationCode(code, message):
-            return "BlockV Platform Error: (\(code)) Message: \(message)"
+            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
         case let .invalidPhoneNumber(code, message):
-            return "BlockV Platform Error: (\(code)) Message: \(message)"
+            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
         case let .invalidPayload(code, message):
-            return "BlockV Platform Error: (\(code)) Message: \(message)"
+            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
         case let .invalidDateFormat(code, message):
-            return "BlockV Platform Error: (\(code)) Message: \(message)"
+            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
         }
     }
     

@@ -27,7 +27,7 @@
 //
 
 import UIKit
-import BlockV
+import BLOCKv
 
 class LoginViewController: UIViewController {
     
@@ -71,7 +71,7 @@ class LoginViewController: UIViewController {
         let password = passwordTextField.text ?? ""
         
         // ask the BV platform to login
-        Blockv.login(withUserToken: token, type: tokenType, password: password) {
+        BLOCKv.login(withUserToken: token, type: tokenType, password: password) {
             [weak self] (userModel, error) in
             
             // reset nav bar
@@ -102,7 +102,7 @@ class LoginViewController: UIViewController {
         let token = userTokenTextField.text ?? ""
         
         // ask the BV platform to reset the token
-        Blockv.resetToken(token, type: tokenType) {
+        BLOCKv.resetToken(token, type: tokenType) {
             [weak self] (userToken, error) in
             
             // hide loader

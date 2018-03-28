@@ -1,6 +1,6 @@
 import UIKit
 import XCTest
-import BlockV
+import BLOCKv
 
 class Tests: XCTestCase {
     

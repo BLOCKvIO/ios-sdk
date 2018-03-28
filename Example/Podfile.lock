@@ -1,19 +1,19 @@
 PODS:
   - Alamofire (4.7.0)
-  - BlockV (1.0.0):
+  - BLOCKv (0.9.0):
     - Alamofire (~> 4.7)
 
 DEPENDENCIES:
-  - BlockV (from `../`)
+  - BLOCKv (from `../`)
 
 EXTERNAL SOURCES:
-  BlockV:
+  BLOCKv:
     :path: ../
 
 SPEC CHECKSUMS:
   Alamofire: 907e0a98eb68cdb7f9d1f541a563d6ac5dc77b25
-  BlockV: a17d6dc999888f7a9b4d5d2be371284a62da3664
+  BLOCKv: d5f2d4985d75fc282cf826954e735e11b9532747
 
-PODFILE CHECKSUM: 8891a877086641f2fb8a21923a8d6cf545f1cc28
+PODFILE CHECKSUM: 607654f8b0435c8536102866fa4fb9ba2ddddd6c
 
 COCOAPODS: 1.4.0

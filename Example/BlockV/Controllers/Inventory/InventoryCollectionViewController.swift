@@ -27,7 +27,7 @@
 //
 
 import UIKit
-import BlockV
+import BLOCKv
 
 /// This view controller demonstrates how to fetch the current user's inventory.
 ///
@@ -86,7 +86,7 @@ class InventoryCollectionViewController: UICollectionViewController {
     /// Note: Input parameters are left to their defautls.
     fileprivate func fetchInventory() {
         
-        Blockv.getInventory { [weak self] (groupModel, error) in
+        BLOCKv.getInventory { [weak self] (groupModel, error) in
             
             // handle error
             guard let model = groupModel, error == nil else {
@@ -118,7 +118,7 @@ class InventoryCollectionViewController: UICollectionViewController {
         builder.addDefinedFilter(forField: .templateID, filterOperator: .equal, value: "vatomic.prototyping::DrinkCoupon::v1", combineOperator: .and)
         
         // execute the discover call
-        Blockv.discover(builder) { [weak self] (groupModel, error) in
+        BLOCKv.discover(builder) { [weak self] (groupModel, error) in
             
             // handle error
             guard let model = groupModel, error == nil else {

@@ -31,7 +31,7 @@ extension Vatom {
         ]
         
         // perform the action
-        Blockv.performAction(name: "Transfer", payload: body) { (data, error) in
+        BLOCKv.performAction(name: "Transfer", payload: body) { (data, error) in
             //TODO: should it be weak self?
             completion(data, error)
         }
@@ -60,7 +60,7 @@ extension Vatom {
         ]
         
         // perform the action
-        Blockv.performAction(name: "Drop", payload: body) { (data, error) in
+        BLOCKv.performAction(name: "Drop", payload: body) { (data, error) in
             //TODO: should it be weak self?
             completion(data, error)
         }
@@ -81,7 +81,7 @@ extension Vatom {
         ]
         
         // perform the action
-        Blockv.performAction(name: "Pickup", payload: body) { (data, error) in
+        BLOCKv.performAction(name: "Pickup", payload: body) { (data, error) in
             //TODO: should it be weak self?
             completion(data, error)
         }

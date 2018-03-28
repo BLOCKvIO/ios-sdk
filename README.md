@@ -1,4 +1,4 @@
-# BlockV
+# BLOCKv
 
 [![Version](https://img.shields.io/cocoapods/v/BlockV.svg?style=flat)](http://cocoapods.org/pods/BlockV)
 [![License](https://img.shields.io/cocoapods/l/BlockV.svg?style=flat)](http://cocoapods.org/pods/BlockV)
@@ -12,11 +12,11 @@
 
 ## Installation
 
-BlockV is available through [CocoaPods](http://cocoapods.org). To install
+BLOCKv is available through [CocoaPods](http://cocoapods.org). To install
 it, simply add the following line to your Podfile:
 
 ```ruby
-pod 'BlockvSDK'
+pod 'BLOCKv'
 ```
 
 ## Configuration
@@ -28,11 +28,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Set appID
-        Blockv.configure(appID: "your-app-id")
+        BLOCKv.configure(appID: "your-app-id")
         // Set platform environment
-        Blockv.setEnvironment(.development)
+        BLOCKv.setEnvironment(.development)
         // Check logged in state
-        if Blockv.isLoggedIn {
+        if BLOCKv.isLoggedIn {
             // show interesting ui
         } else {
             // show authentication ui
@@ -51,14 +51,14 @@ The example app lets you try out the BLOCKv SDK. It's a great place to start if 
 - Fetching the user's inventory of vAtoms
 - Fetching individual vAtoms by thier ID(s)
 - Dispalying vAtoms in a collection view
-- Searching for vAtom on the BLOCKv Platform
+- Searching for vAtoms on the BLOCKv Platform
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
 ## Author
 
-[BlockV](developer.blockv.io)
+[BLOCKv](developer.blockv.io)
 
 ## License
 
-BlockV is available under the <????> license. See the LICENSE file for more info.
+BlockV is available under the BLOCKv AG license. See the LICENSE file for more info.

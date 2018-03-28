@@ -11,7 +11,7 @@
 
 import Foundation
 
-/// Error model returned by the Blockv server.
+/// Error model returned by the BLOCKv server.
 struct ErrorModel {
     let code: Int
     let message: String

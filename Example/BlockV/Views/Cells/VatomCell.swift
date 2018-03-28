@@ -22,7 +22,7 @@
 //
 
 import UIKit
-import BlockV
+import BLOCKv
 
 class VatomCell: UICollectionViewCell {
     

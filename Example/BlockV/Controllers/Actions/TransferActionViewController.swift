@@ -27,7 +27,7 @@
 //
 
 import UIKit
-import BlockV
+import BLOCKv
 
 class TransferActionViewController: UIViewController {
     
@@ -116,7 +116,7 @@ class TransferActionViewController: UIViewController {
             "new.owner.\(token.type.rawValue)": token.value
         ]
         
-        Blockv.performAction(name: "Transfer", payload: body) { [weak self] (data, error) in
+        BLOCKv.performAction(name: "Transfer", payload: body) { [weak self] (data, error) in
             
             // unwrap data, handle error
             guard let data = data, error == nil else {

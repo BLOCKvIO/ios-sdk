@@ -27,7 +27,7 @@
 //
 
 import UIKit
-import BlockV
+import BLOCKv
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -40,15 +40,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.tintColor = UIColor.seafoamBlue
         
         // Set appID
-        Blockv.configure(appID: MyApiKey)
+        BLOCKv.configure(appID: MyApiKey)
         
         // Set platform environment
-        Blockv.setEnvironment(.development)
+        BLOCKv.setEnvironment(.development)
         
-        print("\nViewer > isLoggedIn: \(Blockv.isLoggedIn)")
+        print("\nViewer > isLoggedIn: \(BLOCKv.isLoggedIn)")
         
         // Set window's vc based on the login state
-        if Blockv.isLoggedIn {
+        if BLOCKv.isLoggedIn {
             // show 'inventory' view controller
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             let nc = storyboard.instantiateViewController(withIdentifier: "sid.inventory.nc") as! UINavigationController

@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/cocoapods/l/BlockV.svg?style=flat)](http://cocoapods.org/pods/BlockV)
 [![Platform](https://img.shields.io/cocoapods/p/BlockV.svg?style=flat)](http://cocoapods.org/pods/BlockV)
 
-The BLOCKv SDK allows for easy integration into the BLOCKv Platform.
+This is the official BLOCKv SDK. It allow you to easily integrate your own apps into the BLOCKv Platform.
 
 ## Requirements
 

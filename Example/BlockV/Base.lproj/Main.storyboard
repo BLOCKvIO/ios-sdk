@@ -127,7 +127,7 @@
                             </constraints>
                         </view>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="eTn-C2-RV0">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="cell.input.id" id="eTn-C2-RV0">
                                 <rect key="frame" x="0.0" y="55.5" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="eTn-C2-RV0" id="jvT-6P-jAD">
@@ -1477,6 +1477,6 @@
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="BC4-u6-w3R"/>
-        <segue reference="Yb5-ds-2pd"/>
+        <segue reference="oyh-9U-83e"/>
     </inferredMetricsTieBreakers>
 </document>

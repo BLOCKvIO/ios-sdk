@@ -98,7 +98,7 @@ class TransferActionViewController: UIViewController {
             }
             
             // success
-            print("Action response: \(String.init(data: data, encoding: .utf8))")
+            print("Action response: \(String.init(data: data, encoding: .utf8) ?? "<parsing error>")")
             self?.hide()
         }
         
@@ -125,7 +125,7 @@ class TransferActionViewController: UIViewController {
             }
             
             // success
-            print("Action response: \(String.init(data: data, encoding: .utf8))")
+            print("Action response: \(String.init(data: data, encoding: .utf8) ?? "<parsing error>")")
             self?.hide()
             
         }

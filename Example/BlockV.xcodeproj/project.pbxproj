@@ -364,7 +364,7 @@
 				TargetAttributes = {
 					607FACCF1AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
-						DevelopmentTeam = 4CTEXATCUR;
+						DevelopmentTeam = WA2R22UJPX;
 						LastSwiftMigration = 0900;
 					};
 					607FACE41AFB9204008FA782 = {
@@ -693,12 +693,12 @@
 			baseConfigurationReference = 0B03B68EAC742F53F057C99E /* Pods-BlockV_Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 4CTEXATCUR;
+				DEVELOPMENT_TEAM = WA2R22UJPX;
 				INFOPLIST_FILE = BlockV/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.blockv.demo.sdk-example";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.blockv.vatom-sdk";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
@@ -711,12 +711,12 @@
 			baseConfigurationReference = BC27A08D03F2D2401C48F394 /* Pods-BlockV_Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 4CTEXATCUR;
+				DEVELOPMENT_TEAM = WA2R22UJPX;
 				INFOPLIST_FILE = BlockV/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.blockv.demo.sdk-example";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.blockv.vatom-sdk";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;

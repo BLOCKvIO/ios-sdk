@@ -45,7 +45,8 @@ class ModelDecodingTest: XCTestCase {
     func testVatomDecoding() {
         
         do {
-            let _ = try decoder.decode(Vatom.self, from: MockResponse.vatomJSON_Version1)
+            let vatom = try decoder.decode(Vatom.self, from: MockResponse.vatomJSON_Version1)
+            print(vatom)
         } catch {
             XCTFail("Decoding failed: \(error.localizedDescription)")
         }

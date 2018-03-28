@@ -14,8 +14,6 @@ import Foundation
 //TODO: Define hashable conformance
 
 /// This type models a template action.
-///
-///
 public struct Action {
     
     /// Combination of the template and action name.

@@ -15,7 +15,6 @@ import Alamofire
 // Beta 0.5
 //TODO: Inpect the `expires_in` before a request is made. Refresh the access token if necessary.
 //TODO: Allow for server environment switching.
-//TODO: Discover builder.
 
 // This is not good. The sdk module name is BlockV and this class is Blockv. They are too similar.
 public final class Blockv {

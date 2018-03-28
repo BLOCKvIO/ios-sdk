@@ -58,7 +58,7 @@ public struct Vatom {
     public var isTradeable: Bool
     public var isTransferable: Bool
     
-    //public var geoPosition: GeoJSONPoint
+    public var geoPosition: GeoPosition
     public var resources: [VatomResource] // `var` only to allow for resource encoding
     public var privateProperties: JSON? // Private section may contain JSON of any structure.
     
@@ -81,7 +81,7 @@ public struct Vatom {
         case cloningScore        = "cloning_score"
         case commerce
         case description
-        //case geoPosition       = "geo_pos"
+        case geoPosition         = "geo_pos"
         case isInContract        = "in_contract"
         case inContractWith      = "in_contract_with"
         case notifyMessage       = "notify_msg"
@@ -116,6 +116,20 @@ public struct Vatom {
         public let pricing: VatomPricing
     }
     
+    //TODO: Updgrade to full GeoJSON support.
+    
+    /// The geographic position of the vAtom.
+    ///
+    /// - SeeAlso:
+    /// [GeoJSON](https://tools.ietf.org/html/rfc7946)
+    public struct GeoPosition: Codable {
+        /// GeoJSON type. vAtoms are alwyas of type 'Point'
+        public var type: String
+        /// Coordinates of the vAtom
+        /// Format: `[lon, lat]`
+        public var coordinates: [Double]
+    }
+    
 }
 
 // MARK: Codable
@@ -143,7 +157,7 @@ extension Vatom: Decodable {
         description         = try propertiesContainer.decode(String.self, forKey: .description)
         isDisabled          = try propertiesContainer.decode(Bool.self, forKey: .isDisabled)
         isDropped           = try propertiesContainer.decode(Bool.self, forKey: .isDropped)
-        // geoPosition      = try propertiesContainer.decode(GeoJSONPoint.self, forKey: .geoPosition)
+        geoPosition         = try propertiesContainer.decode(GeoPosition.self, forKey: .geoPosition)
         isInContract        = try propertiesContainer.decode(Bool.self, forKey: .isInContract)
         inContractWith      = try propertiesContainer.decode(String.self, forKey: .inContractWith)
         notifyMessage       = try propertiesContainer.decode(String.self, forKey: .notifyMessage)
@@ -198,7 +212,7 @@ public func ==(lhs: Vatom, rhs: Vatom) -> Bool {
     lhs.description == rhs.description &&
     lhs.isDisabled == rhs.isDisabled &&
     lhs.isDropped == rhs.isDropped &&
-//    lhs.geoPosition == rhs.geoPosition &&
+    lhs.geoPosition == rhs.geoPosition &&
     lhs.isInContract == rhs.isInContract &&
     lhs.inContractWith == rhs.inContractWith &&
     lhs.notifyMessage == rhs.notifyMessage &&
@@ -232,6 +246,13 @@ extension Vatom.Commerce: Equatable {}
 
 public func ==(lhs: Vatom.Commerce, rhs: Vatom.Commerce) -> Bool {
     return lhs.pricing == rhs.pricing
+}
+
+extension Vatom.GeoPosition: Equatable {}
+
+public func ==(lhs: Vatom.GeoPosition, rhs: Vatom.GeoPosition) -> Bool {
+    return lhs.type == rhs.type &&
+    lhs.coordinates == rhs.coordinates
 }
 
 // MARK: - Vatom Pricing
@@ -358,7 +379,3 @@ public func ==(lhs: VatomChildPolicy.CreationPolicy, rhs: VatomChildPolicy.Creat
         lhs.policyCountMax == rhs.policyCountMax &&
         lhs.policyCountMin == rhs.policyCountMin
 }
-
-// MARK: - Asset Provider
-
-

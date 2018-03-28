@@ -21,6 +21,10 @@
 //  SOFTWARE.
 //
 
+//
+//  Adapted from Robert Ryan (https://github.com/robertmryan)
+//
+
 import Foundation
 import Alamofire
 

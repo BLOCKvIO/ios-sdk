@@ -85,7 +85,7 @@ class TransferActionViewController: UIViewController {
         
     }
     
-    /// Option 1 - This show the convenience `transfer` methods on Vatom to transfer the vAtom to
+    /// Option 1 - This show the convenience `transfer` method on Vatom to transfer the vAtom to
     /// a another user via a phone, email, or user id token.
     func performTransferConvenience(token: UserToken) {
         
@@ -98,13 +98,14 @@ class TransferActionViewController: UIViewController {
             }
             
             // success
-            print("Action response: \(String.init(data: data, encoding: .utf8))")
+            print("Action response: \(String.init(data: data, encoding: .utf8) ?? "<parsing error>")")
             self?.hide()
         }
         
     }
     
-    /// Option 2 - This show the manual, method of performing an action.
+    /// Option 2 - This show the manual, method of performing an action by constructing the
+    /// action body payload.
     func performTransferManual(token: UserToken) {
         
         /*
@@ -124,48 +125,13 @@ class TransferActionViewController: UIViewController {
             }
             
             // success
-            print("Action response: \(String.init(data: data, encoding: .utf8))")
+            print("Action response: \(String.init(data: data, encoding: .utf8) ?? "<parsing error>")")
             self?.hide()
             
         }
         
     }
-    
-    // TESTING ONLY
-    
-    @IBAction func dropTapped(_ sender: Any) {
-        
-        self.vatom.drop(latitude: -34.080461, longitude: 18.439537) { (data, error) in
-            
-            // unwrap data, handle error
-            guard let data = data, error == nil else {
-                print(error!.localizedDescription)
-                return
-            }
-            
-            // success
-            print("Action response: \(String.init(data: data, encoding: .utf8))")
-            
-        }
-    }
-    
-    @IBAction func pickupTapped(_ sender: Any) {
-        
-        self.vatom.pickUp { (data, error) in
-            
-            // unwrap data, handle error
-            guard let data = data, error == nil else {
-                print(error!.localizedDescription)
-                return
-            }
-            
-            // success
-            print("Action response: \(String.init(data: data, encoding: .utf8))")
-            
-        }
-    }
-    
-    // TESTING ONLY
+
     
     // MARK: - Helpers
     

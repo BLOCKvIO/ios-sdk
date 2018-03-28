@@ -8,8 +8,8 @@
 
 Pod::Spec.new do |s|
   s.name             = 'BlockV'
-  s.version          = '0.1.0'
-  s.summary          = 'BlockV is a web-based API for interacting with vAtoms.'
+  s.version          = '1.0.0'
+  s.summary          = 'The BlockV SDK allows for easy integration into the BLOCKv Platform.'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -17,14 +17,14 @@ Pod::Spec.new do |s|
 #   * Write the description between the DESC delimiters below.
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
-  s.description      = <<-DESC
-TODO: Add long description of the pod here.
-                       DESC
+#  s.description      = <<-DESC
+#TODO: Add long description of the pod here.
+#                       DESC
 
   s.homepage         = 'https://blockv.io'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
-  s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'Blockv' => 'developer.blockv.io' }
+  s.license          = { :type => 'BlockV AG', :file => 'LICENSE' }
+  s.author           = { 'BlockV' => 'developer.blockv.io' }
   s.source           = { :git => 'https://github.com/BLOCKvIO/ios-sdk.git', :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/blockv_io'
 
@@ -39,6 +39,6 @@ TODO: Add long description of the pod here.
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
  
-  s.dependency 'Alamofire', '~> 4.6'
+  s.dependency 'Alamofire', '~> 4.7'
   
 end

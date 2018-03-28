@@ -53,6 +53,8 @@ class VerifyTableViewController: UITableViewController {
     
     // MARK: - Properties
     
+    fileprivate let tokenCellID = "cell.token.id"
+
     /// This view controller shows a different set of data based on its presentation origin.
     var origin: Origin!
     
@@ -142,7 +144,7 @@ extension VerifyTableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell.token.id", for: indexPath) as! TokenCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: tokenCellID, for: indexPath) as! TokenCell
         cell.delegate = self
         
         switch origin! {

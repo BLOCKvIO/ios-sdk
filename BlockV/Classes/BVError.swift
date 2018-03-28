@@ -11,9 +11,15 @@
 
 import Foundation
 
-/// `BVError` is the error type returned by BlockvSDK.
+/// `BVError` is the error type returned by BlockvSDK. These errors should not be
+/// presented to users. Rather, they provide technical descriptions of the Platform
+/// error.
 ///
-/// It encompasses a few different types of errors, each with their own associated errors or reasons.
+/// It encompasses a few different types of errors, each with their own associated
+/// errors or reasons.
+///
+/// NB: The BlockV Platform is in the process of unifying error codes.
+/// BVError is subject to change in future releases.
 public enum BVError: Error {
     
     // MARK: Cases
@@ -46,6 +52,7 @@ public enum BVError: Error {
         case cannotFindUser(Int, String)
         case authenticationFailed(Int, String)
         case invalidToken(Int, String)
+        case avatarUploadFailed(Int, String)
         case unableToRetrieveToken(Int, String)
         case tokenAlreadyConfirmed(Int, String)
         case invalidVerificationCode(Int, String)
@@ -77,6 +84,7 @@ public enum BVError: Error {
             case 2031: self = .authenticationFailed(code, message)
             case 2032: self = .authenticationFailed(code, message)
             case 2034: self = .invalidToken(code, message)
+            case 2037: self = .avatarUploadFailed(code, message)
             case 2552: self = .unableToRetrieveToken(code, message)
             case 2563: self = .tokenAlreadyConfirmed(code, message)
             case 2564: self = .invalidVerificationCode(code, message)
@@ -135,6 +143,8 @@ extension BVError.PlatformErrorReason {
         case let .tokenExpired(code, message):
             return "BlockV Platform Error: (\(code)) Message: \(message)"
         case let .invalidToken(code, message):
+            return "BlockV Platform Error: (\(code)) Message: \(message)"
+        case let .avatarUploadFailed(code, message):
             return "BlockV Platform Error: (\(code)) Message: \(message)"
         case let .unableToRetrieveToken(code, message):
             return "BlockV Platform Error: (\(code)) Message: \(message)"

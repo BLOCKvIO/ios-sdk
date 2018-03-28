@@ -1,7 +1,7 @@
 PODS:
   - Alamofire (4.7.0)
-  - BlockV (0.1.0):
-    - Alamofire (~> 4.6)
+  - BlockV (1.0.0):
+    - Alamofire (~> 4.7)
 
 DEPENDENCIES:
   - BlockV (from `../`)
@@ -12,7 +12,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Alamofire: 907e0a98eb68cdb7f9d1f541a563d6ac5dc77b25
-  BlockV: 4eff1ca0b3246b92bb42a963e2020054c3ed4869
+  BlockV: a17d6dc999888f7a9b4d5d2be371284a62da3664
 
 PODFILE CHECKSUM: 8891a877086641f2fb8a21923a8d6cf545f1cc28
 

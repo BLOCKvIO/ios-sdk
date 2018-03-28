@@ -22,7 +22,7 @@
 //
 
 //
-//  Adapted from robertmryan: https://github.com/robertmryan
+//  Adapted from Robert Ryan (https://github.com/robertmryan)
 //
 
 import Foundation

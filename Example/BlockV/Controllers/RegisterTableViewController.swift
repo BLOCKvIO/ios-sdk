@@ -45,7 +45,7 @@ class RegisterTableViewController: UITableViewController {
     
     // MARK: - Properties
     
-    fileprivate let titleValueCellId = "cell.titleValue"
+    fileprivate let titleValueCellId = "cell.input.id"
     
     /// Array of user tokens for registration
     fileprivate var userTokens: [UserToken] = []

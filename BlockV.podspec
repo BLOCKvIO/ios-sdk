@@ -7,7 +7,7 @@
 #
 
 Pod::Spec.new do |s|
-  s.name             = 'BlockV'
+  s.name             = 'BLOCKv'
   s.version          = '0.9.0'
   s.summary          = 'The BlockV SDK allows for easy integration into the BLOCKv Platform.'
   s.homepage         = 'https://blockv.io'

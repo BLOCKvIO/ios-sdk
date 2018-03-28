@@ -27,6 +27,8 @@ public struct GroupModel: Decodable {
     public var count: Int?
     
     /// These coding keys accomadate both the inventory and discover calls.
+    ///
+    /// TODO: There may be a better way of handling this. Investigate.
     enum CodingKeys: String, CodingKey {
         case results // discover only
         case vatoms
@@ -40,13 +42,16 @@ public struct GroupModel: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
         /*
-         The arrays of vatoms, faces, and actions are be decded 'safely'. In other words,
-         encountering a failure when decoding a an element will result in that element
-         not being included in the parsed arrays.
-         */
-        
-        /*
-         Below is a workaround to accomadate the inventory and discover calls.
+         Below is a workaround to accomadate both the inventory and discover calls' json keys.
+         This has a pitfall in that the keys 'vatoms' and 'results' may never both appear in
+         either payload.
+         
+         Ideally, should just be:
+         
+         self.vatoms = try container
+         .decode([Safe<Vatom>].self, forKey: .vatoms)
+         .flatMap { $0.value }
+         
          */
         
         if let vatoms = try container.decodeIfPresent([Safe<Vatom>].self, forKey: .vatoms) {
@@ -57,15 +62,6 @@ public struct GroupModel: Decodable {
             self.vatoms = []
         }
         
-        /*
-         Ideally, is should just be this.
-         
-         self.vatoms = try container
-         .decode([Safe<Vatom>].self, forKey: .vatoms)
-         .flatMap { $0.value }
-         
-         */
-        
         self.faces = try container
             .decode([Safe<Face>].self, forKey: .faces)
             .flatMap { $0.value }
@@ -73,6 +69,15 @@ public struct GroupModel: Decodable {
             .decode([Safe<Action>].self, forKey: .actions)
             .flatMap { $0.value }
         self.count = try container.decodeIfPresent(Int.self, forKey: .count)
+        
+        /*
+         NOTE: The arrays of vatoms, faces, and actions are be decded 'safely'. In other words,
+         encountering a failure when decoding an element will result in only that element not being
+         included in the decoded array. This is opposed to the default behaviour of `decode` for
+         collections where the decoding failure of a single element throws and no elements are
+         added.
+         */
+        
     }
     
 }

@@ -23,7 +23,6 @@
 
 import Foundation
 
-//TODO: Maybe this should become a BVError?
-public enum GenericJSONError: Swift.Error {
+public enum BVJSONError: Swift.Error {
     case decodingError
 }

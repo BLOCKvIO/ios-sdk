@@ -43,7 +43,7 @@ extension JSON {
             case let dict as [String:Any]:
                 self = .object(try dict.mapValues(JSON.init))
             default:
-                throw GenericJSONError.decodingError
+                throw BVJSONError.decodingError
         }
     }
 }

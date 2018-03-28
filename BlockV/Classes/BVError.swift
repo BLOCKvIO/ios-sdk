@@ -99,8 +99,8 @@ extension BVError: LocalizedError {
             return "Networking failed with error: \(error.localizedDescription)"
         case .platformError(let reason):
             return reason.localizedDescription
-        case .modelDecoding(let error):
-            return "Model decoding failed with error: \(error)"
+        case .modelDecoding(let reason):
+            return "Model decoding failed with error: \(reason)"
         case .custom(reason: let reason):
             return reason
         }

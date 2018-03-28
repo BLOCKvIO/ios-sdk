@@ -10,7 +10,6 @@
 //
 
 import Foundation
-typealias BV = BLOCKv
 
 /*
  This file adds some convenient actions to Vatom.
@@ -36,7 +35,7 @@ extension Vatom {
         ]
         
         // perform the action
-        BV.performAction(name: "Transfer", payload: body) { (data, error) in
+        BLOCKv.performAction(name: "Transfer", payload: body) { (data, error) in
             //TODO: should it be weak self?
             completion(data, error)
         }
@@ -65,7 +64,7 @@ extension Vatom {
         ]
         
         // perform the action
-        BV.performAction(name: "Drop", payload: body) { (data, error) in
+        BLOCKv.performAction(name: "Drop", payload: body) { (data, error) in
             //TODO: should it be weak self?
             completion(data, error)
         }
@@ -86,7 +85,7 @@ extension Vatom {
         ]
         
         // perform the action
-        BV.performAction(name: "Pickup", payload: body) { (data, error) in
+        BLOCKv.performAction(name: "Pickup", payload: body) { (data, error) in
             //TODO: should it be weak self?
             completion(data, error)
         }

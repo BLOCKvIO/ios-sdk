@@ -90,6 +90,9 @@ public class DiscoverQueryBuilder {
     
     /// Sets the scope of the search query.
     ///
+    /// A scope must alway be supplied. Scopes are defined using a `key` and `value`.
+    /// The key specifies the property of the vAtom to search. The value is the search term.
+    ///
     /// - Parameters:
     ///   - scope: Search field.
     ///   - value: Value for lookup.
@@ -98,6 +101,11 @@ public class DiscoverQueryBuilder {
     }
     
     /// Adds a defined filter element to the query.
+    ///
+    /// Filter elements, similar to scopes, are defined using a `field` and `value`. However, filters
+    /// offer more flexibility because they allow a *filter operator* to be supplied, e.g. `Gt` which
+    /// filters those vAtoms whose value is greater than the supplied `value`. The combine operator is
+    /// applied *between* filter elements.
     ///
     /// - Parameters:
     ///   - field: Search field.
@@ -114,7 +122,7 @@ public class DiscoverQueryBuilder {
     
     /// Adds a custom filter element to the query.
     ///
-    /// This method provides you with full control over the contents of the fileter element.
+    /// This method provides you with full control over the contents of the filter element.
     ///
     /// - Parameters:
     ///   - field: Lookup field.
@@ -129,7 +137,11 @@ public class DiscoverQueryBuilder {
         
     }
     
-    /// Optionally set the return structure.
+    /// Sets the return type.
+    ///
+    /// - Parameter type: Result `type` controls the response payload of the query
+    ///     - `*` returns vAtoms.
+    ///     - `count` returns only the numerical count of the query and an empty vAtom array.
     public func setReturn(type: ResultType) {
         self.resultStructure = ["type": type.rawValue]
     }

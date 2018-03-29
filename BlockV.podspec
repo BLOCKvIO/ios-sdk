@@ -6,7 +6,7 @@
 Pod::Spec.new do |s|
   s.name                  = 'BLOCKv'
   s.version               = '0.9.1'
-  s.summary               = 'The BLOCKv SDK allows for easy integration into the BLOCKv Platform.'
+  s.summary               = 'The BLOCKv SDK allows you to easily integrate your apps into the BLOCKv Platform.'
   s.homepage              = 'https://blockv.io'
   s.license               = { :type => 'BLOCKv AG', :file => 'LICENSE' }
   s.author                = { 'BLOCKv' => 'developer.blockv.io' }

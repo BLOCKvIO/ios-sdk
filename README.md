@@ -52,8 +52,8 @@ The example app lets you try out the BLOCKv SDK. It's a great place to start if 
 - [x] Authentication (registration & login)
 - [x] Profile management
 - [x] Fetching the user's inventory of vAtoms
-- [x] Fetching individual vAtoms by thier ID(s)
-- [x] Dispalying vAtoms in a collection view
+- [x] Fetching individual vAtoms
+- [x] Dispalying vAtoms in a UICollectionView
 - [x] Searching for vAtoms on the BLOCKv Platform
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.

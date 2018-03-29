@@ -107,7 +107,7 @@ class OAuth2Handler: RequestAdapter, RequestRetrier {
         
         // check for rate limiting
         if let response = request.task?.response as? HTTPURLResponse, response.statusCode == 403 {
-            print("◦◦◦ BV SDK ◦ Wanring: Server is rate limiting requests.")
+            print("\n◦◦◦ BV SDK ◦ Wanring: Server is rate limiting requests.")
         }
         
     }
@@ -140,10 +140,14 @@ class OAuth2Handler: RequestAdapter, RequestRetrier {
             case let .success(val):
                 // fire completion handler passing in the access token
                 completion(true, val.payload.accessToken.token, nil)
+                
             case let .failure(err):
                 //TODO: Better to propagate the error here rather than return false.
                 // Maybe not, perhaps succeeded false is enough. Auto-logout is
                 // triggered from there.
+                
+                print("\nBV SDK >>> Error: \(err.localizedDescription)")
+                
                 completion(false, nil, nil)
             }
 

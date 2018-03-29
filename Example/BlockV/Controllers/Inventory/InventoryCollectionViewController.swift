@@ -128,7 +128,7 @@ class InventoryCollectionViewController: UICollectionViewController {
             }
             
             // handle success
-            print("\nViewer > Fetched inventory group model")
+            print("\nViewer > Fetched discover group model")
             print("\n\(model)")
             
         }

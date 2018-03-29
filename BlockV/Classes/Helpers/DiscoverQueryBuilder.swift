@@ -36,6 +36,36 @@ public class DiscoverQueryBuilder {
     
     // MARK: - Properties
     
+    // - Public
+    
+    /*
+     Page and limit are not yet documented by the backend.
+     They will be added in a later release.
+     */
+    
+    /// The page to return.
+    ///
+    /// Note: This property should only be use in conjunction with a non-zero `limit`
+    /// property.
+    ///
+    /// The listing below will return the first page of results (up to a maximum
+    /// of 10 vAtoms).
+    /// ```
+    /// "page": 1,
+    /// "limit" : 10
+    /// ```
+//    public var page: Int = 0
+    
+    /// Limits the number of vAtoms returned in the response.
+    ///
+    /// Defaults to zero - which enusres *all* results are returned.
+    ///
+    /// Note that the API will return a maximum of 1000 vAtoms. The `page`
+    /// property should be used to traverse the colleciton further.
+//    public var limit: Int = 0
+    
+    // - Private
+    
     /// A scope is fast due to db indexing.
     private var scope: [String : String] = [:]
     
@@ -45,7 +75,7 @@ public class DiscoverQueryBuilder {
     /// Alters the structure of the response.
     ///
     /// Defaults to returning the full payload.
-    private var resultStructure: [String : Any] = ["type": ResultType.payload.rawValue, "fields": []]
+    private var resultStructure: [String : Any] = ["type": ResultType.payload.rawValue]
     
     // MARK: - Init
     
@@ -100,8 +130,8 @@ public class DiscoverQueryBuilder {
     }
     
     /// Optionally set the return structure.
-    public func setReturn(type: ResultType, fields: [String]) {
-        self.resultStructure = ["type": type.rawValue, "fields": fields]
+    public func setReturn(type: ResultType) {
+        self.resultStructure = ["type": type.rawValue]
     }
     
 }
@@ -140,7 +170,8 @@ extension DiscoverQueryBuilder {
             case lessThan       = "Lt"
             case lessOrEqual    = "Le"
             case notEqual       = "Ne"
-            case match          = "Match" // <- Match is a special case, allowing for a regex query in the value field
+            /// `match` is a special case, allowing for a regex query in the `value` field.
+            case match          = "Match"
         }
         
         /// Filter field

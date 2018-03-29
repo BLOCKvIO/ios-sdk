@@ -290,7 +290,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Uxk-cN-Blm" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2974" y="1126"/>
+            <point key="canvasLocation" x="2985" y="1216"/>
         </scene>
         <!--Inventory-->
         <scene sceneID="VIo-uD-zoh">
@@ -465,7 +465,7 @@
                                             <segue destination="uiP-Q8-05u" kind="show" identifier="seg.profile.userInfo" id="OET-MJ-q28"/>
                                         </connections>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="cell.userInfo.id" rowHeight="45" id="rbf-15-3gY">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="cell.password.id" rowHeight="45" id="rbf-15-3gY">
                                         <rect key="frame" x="0.0" y="263" width="375" height="45"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="rbf-15-3gY" id="UaR-VX-cr1">
@@ -637,7 +637,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="41u-cf-ici" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="7372" y="1126"/>
+            <point key="canvasLocation" x="7372" y="1216"/>
         </scene>
         <!--Welcome-->
         <scene sceneID="C9o-bn-ZQq">
@@ -1323,121 +1323,6 @@
             </objects>
             <point key="canvasLocation" x="5790" y="-529"/>
         </scene>
-        <!--Available Actions-->
-        <scene sceneID="ojA-hF-2FZ">
-            <objects>
-                <tableViewController title="Available Actions" id="7dh-lV-o4g" customClass="ActionListTableViewController" customModule="BlockV_Example" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="50" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="iTZ-Gg-ov7">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="cell.action.id" textLabel="101-J7-KSB" style="IBUITableViewCellStyleDefault" id="yQI-FR-BGV">
-                                <rect key="frame" x="0.0" y="28" width="375" height="50"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="yQI-FR-BGV" id="f51-ND-gS6">
-                                    <rect key="frame" x="0.0" y="0.0" width="341" height="49.5"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Transfer" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="101-J7-KSB">
-                                            <rect key="frame" x="16" y="0.0" width="324" height="49.5"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                            <nil key="textColor"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                    </subviews>
-                                </tableViewCellContentView>
-                                <connections>
-                                    <segue destination="cxT-03-HrX" kind="show" id="zkR-6o-4vX"/>
-                                </connections>
-                            </tableViewCell>
-                        </prototypes>
-                        <sections/>
-                        <connections>
-                            <outlet property="dataSource" destination="7dh-lV-o4g" id="xsF-nq-YIr"/>
-                            <outlet property="delegate" destination="7dh-lV-o4g" id="grT-uS-q5p"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" title="Actions" id="fhX-EI-t6C">
-                        <barButtonItem key="leftBarButtonItem" title="Cancel" id="8eI-II-zas">
-                            <connections>
-                                <action selector="cancelButtonTapped:" destination="7dh-lV-o4g" id="1u8-Nr-Yu0"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="X37-i2-YvO" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="7372" y="-528"/>
-        </scene>
-        <!--Transfer-->
-        <scene sceneID="Ea8-T9-qtb">
-            <objects>
-                <viewController title="Transfer" id="cxT-03-HrX" customClass="TransferActionViewController" customModule="BlockV_Example" customModuleProvider="target" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="MWL-7X-GPH"/>
-                        <viewControllerLayoutGuide type="bottom" id="T4Y-D2-8h9"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="C2m-Z9-ut0">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Bzw-K1-IOD">
-                                <rect key="frame" x="20" y="218" width="335" height="50"/>
-                                <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.096264982880000002" colorSpace="custom" customColorSpace="sRGB"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="50" id="fgi-JD-oLq"/>
-                                </constraints>
-                                <state key="normal" title="Perform"/>
-                                <connections>
-                                    <action selector="nextButton:" destination="AXV-qq-3XQ" eventType="touchUpInside" id="9CD-gg-DzA"/>
-                                    <action selector="performActionTapped:" destination="cxT-03-HrX" eventType="touchUpInside" id="nTo-79-Equ"/>
-                                </connections>
-                            </button>
-                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Phone, Email, User ID" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="yiC-qm-Amg">
-                                <rect key="frame" x="20" y="132" width="335" height="36"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="36" id="51Q-3k-N6f"/>
-                                </constraints>
-                                <nil key="textColor"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits"/>
-                            </textField>
-                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="U5Q-Jm-fT2">
-                                <rect key="frame" x="20" y="84" width="335" height="29"/>
-                                <segments>
-                                    <segment title="Phone"/>
-                                    <segment title="Email"/>
-                                    <segment title="User ID"/>
-                                </segments>
-                                <connections>
-                                    <action selector="tokenTypeSegmentChanged:" destination="cxT-03-HrX" eventType="valueChanged" id="dzh-QA-N42"/>
-                                </connections>
-                            </segmentedControl>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <constraints>
-                            <constraint firstItem="yiC-qm-Amg" firstAttribute="top" secondItem="U5Q-Jm-fT2" secondAttribute="bottom" constant="20" id="HtO-KK-4Yh"/>
-                            <constraint firstItem="U5Q-Jm-fT2" firstAttribute="leading" secondItem="C2m-Z9-ut0" secondAttribute="leading" constant="20" id="OVU-nb-QfF"/>
-                            <constraint firstItem="Bzw-K1-IOD" firstAttribute="leading" secondItem="C2m-Z9-ut0" secondAttribute="leading" constant="20" id="Rf6-Jy-aYU"/>
-                            <constraint firstAttribute="trailing" secondItem="U5Q-Jm-fT2" secondAttribute="trailing" constant="20" id="b9u-Aq-s3H"/>
-                            <constraint firstAttribute="trailing" secondItem="yiC-qm-Amg" secondAttribute="trailing" constant="20" id="cMI-wd-rvE"/>
-                            <constraint firstItem="Bzw-K1-IOD" firstAttribute="top" secondItem="yiC-qm-Amg" secondAttribute="bottom" constant="50" id="eWS-or-wsE"/>
-                            <constraint firstItem="yiC-qm-Amg" firstAttribute="leading" secondItem="C2m-Z9-ut0" secondAttribute="leading" constant="20" id="hUQ-E6-ESU"/>
-                            <constraint firstItem="U5Q-Jm-fT2" firstAttribute="top" secondItem="MWL-7X-GPH" secondAttribute="bottom" constant="20" id="iiI-Bx-yaC"/>
-                            <constraint firstAttribute="trailing" secondItem="Bzw-K1-IOD" secondAttribute="trailing" constant="20" id="viq-P0-6kW"/>
-                        </constraints>
-                    </view>
-                    <connections>
-                        <outlet property="tokenTypeSegmentedControl" destination="U5Q-Jm-fT2" id="DDE-19-TLj"/>
-                        <outlet property="userTokenTextField" destination="yiC-qm-Amg" id="kSv-qP-pU0"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="7M3-G3-NMY" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="8178" y="-528"/>
-        </scene>
         <!--Navigation Controller-->
         <scene sceneID="lXe-Qd-Gup">
             <objects>
@@ -1456,27 +1341,9 @@
             </objects>
             <point key="canvasLocation" x="5790" y="358"/>
         </scene>
-        <!--Navigation Controller-->
-        <scene sceneID="YwQ-1K-HyE">
-            <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="qiL-yF-nMp" sceneMemberID="viewController">
-                    <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="4s1-9Q-swQ">
-                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <nil name="viewControllers"/>
-                    <connections>
-                        <segue destination="7dh-lV-o4g" kind="relationship" relationship="rootViewController" id="cGV-sS-xhd"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Qbj-tV-QT5" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="6564.8000000000002" y="-528.03598200899557"/>
-        </scene>
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="BC4-u6-w3R"/>
-        <segue reference="oyh-9U-83e"/>
+        <segue reference="Yb5-ds-2pd"/>
     </inferredMetricsTieBreakers>
 </document>

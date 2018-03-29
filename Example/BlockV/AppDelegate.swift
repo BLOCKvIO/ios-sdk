@@ -36,14 +36,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
-        // Theme
-        window?.tintColor = UIColor.seafoamBlue
-        
-        // Set appID
+        // Set app id
         BLOCKv.configure(appID: MyApiKey)
         
-        // Set platform environment
-        BLOCKv.setEnvironment(.development)
+        // Set platform environment to production
+        BLOCKv.setEnvironment(.production)
         
         print("\nViewer > isLoggedIn: \(BLOCKv.isLoggedIn)")
         
@@ -63,6 +60,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             nc.viewControllers = [rootVC]
             self.window?.rootViewController = nc
         }
+        
+        // Theme
+        window?.tintColor = UIColor.seafoamBlue
         
         return true
     }

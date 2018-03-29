@@ -14,6 +14,7 @@ Pod::Spec.new do |s|
   s.social_media_url      = 'https://twitter.com/blockv_io'
   s.ios.deployment_target = '10.0'
   s.source_files          = 'BlockV/Classes/**/*'
+  s.swift_version         = '4.0'
   
   s.dependency 'Alamofire', '~> 4.7'
 end

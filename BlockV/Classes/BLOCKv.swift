@@ -24,23 +24,10 @@ public final class BLOCKv {
     /// Models the BLOCKv platform environments.
     ///
     /// Options:
-    /// - development
     /// - production
     public enum BVEnvironment: String {
         case production  = "https://api.blockv.io"
-        case development = "https://apidev.blockv.net"
     }
-    
-    /*
-     First App Launch:
-     - Stuff is nil
-     
-     Terminal-relaunch (no client created)
-     - Stuff is nil
-     
-     Terminate-relaunch (client was used)
-     - Stuff is nil - the class will not remain initialised (deint will be called when the app terminates).
-     */
     
     // MARK: - Properties
     

@@ -23,7 +23,7 @@ pod 'BLOCKv'
 
 ## Configuration
 
-Within the `AppDelegate` be sure to set your App ID and the desired server environment, e.g. `.development`.
+Within the `AppDelegate` be sure to set your App ID and the desired server environment, e.g. `.production`.
 
 ```Swift
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -33,7 +33,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Set app id
         BLOCKv.configure(appID: "your-app-id")
         // Set platform environment
-        BLOCKv.setEnvironment(.development)
+        BLOCKv.setEnvironment(.production)
         
         // Check logged in state
         if BLOCKv.isLoggedIn {
@@ -69,4 +69,4 @@ If you believe you have identified a security vulnerability with BLOCKv, you sho
 
 ## License
 
-BLOCKv is available under the Blockv AG license. See the [LICENSE](https://github.com/BLOCKvIO/ios-sdk/blob/master/LICENSE) file for more info.
+BLOCKv is available under the BLOCKv AG license. See the [LICENSE](https://github.com/BLOCKvIO/ios-sdk/blob/master/LICENSE) file for more info.

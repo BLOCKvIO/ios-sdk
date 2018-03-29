@@ -290,7 +290,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Uxk-cN-Blm" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2974" y="1126"/>
+            <point key="canvasLocation" x="2985" y="1216"/>
         </scene>
         <!--Inventory-->
         <scene sceneID="VIo-uD-zoh">
@@ -465,7 +465,7 @@
                                             <segue destination="uiP-Q8-05u" kind="show" identifier="seg.profile.userInfo" id="OET-MJ-q28"/>
                                         </connections>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="cell.userInfo.id" rowHeight="45" id="rbf-15-3gY">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="cell.password.id" rowHeight="45" id="rbf-15-3gY">
                                         <rect key="frame" x="0.0" y="263" width="375" height="45"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="rbf-15-3gY" id="UaR-VX-cr1">
@@ -637,7 +637,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="41u-cf-ici" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="7372" y="1126"/>
+            <point key="canvasLocation" x="7372" y="1216"/>
         </scene>
         <!--Welcome-->
         <scene sceneID="C9o-bn-ZQq">
@@ -1344,6 +1344,6 @@
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="BC4-u6-w3R"/>
-        <segue reference="oyh-9U-83e"/>
+        <segue reference="Yb5-ds-2pd"/>
     </inferredMetricsTieBreakers>
 </document>

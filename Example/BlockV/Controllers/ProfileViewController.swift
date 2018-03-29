@@ -239,6 +239,17 @@ class ProfileViewController: UITableViewController {
     fileprivate func logout() {
         
         BLOCKv.logout { [weak self] error in
+            
+            // Immediately pop the user to the onboarding view controller.
+            
+            // change root view controller
+            self?.changeToOnboardingViewController()
+            
+            // dismiss
+            self?.dismiss(animated: true, completion: nil)
+            
+            // Inspect the network response
+            
             // handle error
             guard error == nil else {
                 print(">>> Error > Viewer: \(error!.localizedDescription)\n")
@@ -249,11 +260,6 @@ class ProfileViewController: UITableViewController {
             // handle success
             print("\nViewer > Logged Out.")
             
-            // change root view controller
-            self?.changeToOnboardingViewController()
-            
-            // dismiss
-            self?.dismiss(animated: true, completion: nil)
             
         }
         

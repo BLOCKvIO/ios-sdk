@@ -57,6 +57,8 @@ public final class BLOCKv {
         }
     }
     
+    //TODO: Detect an environment switch, e.g. dev to prod, reset the client.
+    
     /// The BlockV platform environment to use.
     ///
     /// Must be set by the host app.
@@ -207,7 +209,7 @@ extension BLOCKv {
     public static func register(tokens: [RegisterTokenParams], userInfo: UserInfo? = nil,
                                 completion: @escaping (UserModel?, BVError?) -> Void) {
         
-        let endpoint = API.Session.register(tokens: tokens, userInfo: nil)
+        let endpoint = API.Session.register(tokens: tokens, userInfo: userInfo)
         
         self.client.request(endpoint) { (baseModel, error) in
             
@@ -565,6 +567,9 @@ extension BLOCKv {
         
         self.client.request(endpoint) { (baseModel, error) in
             
+            // reset 
+            reset()
+            
             // extract model, ensure no error
             guard let _ = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -575,8 +580,6 @@ extension BLOCKv {
             
             // model is available
             DispatchQueue.main.async {
-                // teardown
-                reset()
                 completion(nil)
             }
             

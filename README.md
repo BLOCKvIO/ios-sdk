@@ -23,7 +23,7 @@ pod 'BLOCKv'
 
 ## Configuration
 
-Within the `AppDelegate` be sure to set your App ID and the desired server environment.
+Within the `AppDelegate` be sure to set your App ID and the desired server environment, e.g. `.production`.
 
 ```Swift
 class AppDelegate: UIResponder, UIApplicationDelegate {

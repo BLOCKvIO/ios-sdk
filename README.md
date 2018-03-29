@@ -23,13 +23,14 @@ pod 'BLOCKv'
 
 ## Configuration
 
-Within the `AppDelegate` be sure to set your App ID and the desired server environment, e.g. `.production`.
+Within the `AppDelegate` be sure to set your App ID and the desired server environment, e.g. `.development`.
 
 ```Swift
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Set appID
+    
+        // Set app id
         BLOCKv.configure(appID: "your-app-id")
         // Set platform environment
         BLOCKv.setEnvironment(.development)

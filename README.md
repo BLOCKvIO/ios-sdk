@@ -32,7 +32,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
         // Set app id
         BLOCKv.configure(appID: "your-app-id")
-        // Set platform environment
+        
+        // Set platform environment to production
         BLOCKv.setEnvironment(.production)
         
         // Check logged in state

@@ -9,8 +9,8 @@ This is the official BLOCKv SDK. It allows you to easily integrate your own apps
 ## Requirements
 
 - iOS 10.0+
-- Xcode 9.2+
-- Swift 4+
+- Xcode 9.3+
+- Swift 4.1+
 
 ## Installation
 

@@ -55,6 +55,7 @@ The example app lets you try out the BLOCKv SDK. It's a great place to start if 
 - [x] Profile management
 - [x] Fetching the user's inventory of vAtoms
 - [x] Fetching individual vAtoms
+- [x] Fetching a vAtom's Activated Image
 - [x] Dispalying vAtoms in a UICollectionView
 - [x] Searching for vAtoms on the BLOCKv Platform
 

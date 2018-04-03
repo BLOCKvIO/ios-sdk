@@ -55,19 +55,19 @@ public struct GroupModel: Decodable {
          */
         
         if let vatoms = try container.decodeIfPresent([Safe<Vatom>].self, forKey: .vatoms) {
-            self.vatoms = vatoms.flatMap { $0.value }
+            self.vatoms = vatoms.compactMap { $0.value }
         } else if let vatoms = try container.decodeIfPresent([Safe<Vatom>].self, forKey: .results) {
-            self.vatoms = vatoms.flatMap { $0.value }
+            self.vatoms = vatoms.compactMap { $0.value }
         } else {
             self.vatoms = []
         }
         
         self.faces = try container
             .decode([Safe<Face>].self, forKey: .faces)
-            .flatMap { $0.value }
+            .compactMap { $0.value }
         self.actions = try container
             .decode([Safe<Action>].self, forKey: .actions)
-            .flatMap { $0.value }
+            .compactMap { $0.value }
         self.count = try container.decodeIfPresent(Int.self, forKey: .count)
         
         /*

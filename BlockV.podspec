@@ -5,7 +5,7 @@
 
 Pod::Spec.new do |s|
   s.name                  = 'BLOCKv'
-  s.version               = '0.9.1'
+  s.version               = '0.9.2'
   s.summary               = 'The BLOCKv SDK allows you to easily integrate your apps into the BLOCKv Platform.'
   s.homepage              = 'https://blockv.io'
   s.license               = { :type => 'BLOCKv AG', :file => 'LICENSE' }
@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.social_media_url      = 'https://twitter.com/blockv_io'
   s.ios.deployment_target = '10.0'
   s.source_files          = 'BlockV/Classes/**/*'
-  s.swift_version         = '4.0'
+  s.swift_version         = '4.1'
   
   s.dependency 'Alamofire', '~> 4.7'
 end

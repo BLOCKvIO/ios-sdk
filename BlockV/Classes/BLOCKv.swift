@@ -14,7 +14,6 @@ import Alamofire
 
 // Beta 0.9
 //TODO: Inpect the `expires_in` before a request is made. Refresh the access token if necessary.
-//TODO: Allow for server environment switching.
 
 /// Primary interface into the the BLOCKv SDK.
 public final class BLOCKv {
@@ -26,7 +25,7 @@ public final class BLOCKv {
     /// Options:
     /// - production
     public enum BVEnvironment: String {
-        case production  = "https://api.blockv.io"
+        case production = "https://api.blockv.io"
     }
     
     // MARK: - Properties
@@ -61,7 +60,11 @@ public final class BLOCKv {
         get {
             // ensure host app has set an app id
             precondition(BLOCKv.appID != nil, "Please call 'BLOCKv.configure(appID:)' with your issued app ID before making network requests.")
-            precondition(BLOCKv.environment != nil, "Please call `BLOCKv.setEnvironment(_:)' to set the BLOCKv Platform environemnt.")
+            
+            if environment == nil {
+                self.environment = .production // default to production
+            }
+            
             // return the configuration (inexpensive object)
             return Client.Configuration(baseURLString: BLOCKv.environment!.rawValue,
                                         appID: BLOCKv.appID!,
@@ -111,7 +114,7 @@ public final class BLOCKv {
         guard let token = CredentialStore.refreshToken else { return false }
         
         //FIXME: Check expiry before returning true. If expired, remove.
-        
+
         return true
     }
     
@@ -131,6 +134,7 @@ public final class BLOCKv {
     /// platfrom environment to interact with.
     ///
     /// Typically, you would call `setEnvironment` in `application(_:didFinishLaunchingWithOptions:)`.
+    @available(*, deprecated, message: "BLOCKv now defaults to production. You may remove this call to set the environment.")
     public static func setEnvironment(_ environment: BVEnvironment) {
         self.environment = environment
     }

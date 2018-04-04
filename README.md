@@ -23,7 +23,7 @@ pod 'BLOCKv'
 
 ## Configuration
 
-Within the `AppDelegate` be sure to set your App ID and the desired server environment, e.g. `.production`.
+Within the `AppDelegate` be sure to set the App ID.
 
 ```Swift
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -32,9 +32,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
         // Set app id
         BLOCKv.configure(appID: "your-app-id")
-        
-        // Set platform environment to production
-        BLOCKv.setEnvironment(.production)
         
         // Check logged in state
         if BLOCKv.isLoggedIn {

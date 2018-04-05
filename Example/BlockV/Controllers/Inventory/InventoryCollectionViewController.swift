@@ -109,7 +109,7 @@ class InventoryCollectionViewController: UICollectionViewController {
              `droppped` flag is set as `false` and the `whenModified` date updated.
              */
             
-            self?.vatoms = model.vatoms.sorted{ $0.whenModified > $1.whenModified }
+            self?.vatoms = model.vatoms.sorted { $0.whenModified > $1.whenModified }
             self?.collectionView?.reloadData()
             
             self?.dowloadActivatedImages()

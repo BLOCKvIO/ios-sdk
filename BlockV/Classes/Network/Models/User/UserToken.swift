@@ -19,7 +19,7 @@ public enum UserTokenType: String, Codable {
 }
 
 /// User token model.
-public struct UserToken: Codable {
+public struct UserToken: Codable, Equatable {
     public let value: String       // e.g. joshsmith@bv.com
     public let type: UserTokenType // e.g. .email
     
@@ -43,14 +43,4 @@ extension UserToken: DictionaryCodable {
         ]
     }
     
-}
-
-// MARK: - Equatable
-
-// Every value type should be equatable.
-extension UserToken: Equatable {}
-
-public func ==(lhs: UserToken, rhs: UserToken) -> Bool {
-    return lhs.value == rhs.value &&
-    lhs.type == rhs.type
 }

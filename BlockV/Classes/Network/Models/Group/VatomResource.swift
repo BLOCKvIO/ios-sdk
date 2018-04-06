@@ -11,7 +11,7 @@
 
 import Foundation
 
-public struct VatomResource {
+public struct VatomResource: Equatable {
     
     //TODO: Split type into type and format: "3D" and "Scene"
     
@@ -75,14 +75,4 @@ extension VatomResource: Hashable {
     public var hashValue: Int {
         return name.hashValue ^ type.hashValue ^ url.hashValue
     }
-}
-
-// MARK: Equatable
-
-extension VatomResource: Equatable {}
-
-public func ==(lhs: VatomResource, rhs: VatomResource) -> Bool {
-    return lhs.name == rhs.name &&
-    lhs.type == rhs.type &&
-    lhs.url == rhs.url
 }

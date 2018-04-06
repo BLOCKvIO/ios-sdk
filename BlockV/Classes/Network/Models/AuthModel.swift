@@ -20,7 +20,7 @@ protocol OAuthTokenModel {
 /// Auth response model.
 ///
 /// This model is valid for both login and register responses.
-struct AuthModel: Decodable, OAuthTokenModel {
+struct AuthModel: Decodable, Equatable, OAuthTokenModel {
     
     var user: UserModel
     let assetProviders: [AssetProvider]
@@ -34,15 +34,4 @@ struct AuthModel: Decodable, OAuthTokenModel {
         case refreshToken   = "refresh_token"
     }
 
-}
-
-// MARK: Equatable
-
-extension AuthModel: Equatable {}
-
-func ==(lhs: AuthModel, rhs: AuthModel) -> Bool {
-    return lhs.user == rhs.user &&
-        lhs.assetProviders == rhs.assetProviders &&
-        lhs.accessToken == rhs.accessToken &&
-        lhs.refreshToken == rhs.refreshToken
 }

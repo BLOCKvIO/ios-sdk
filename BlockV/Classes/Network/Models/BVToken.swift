@@ -14,7 +14,7 @@ import Foundation
 /// BlockV token model.
 ///
 /// Used to represent a refresh or access token.
-struct BVToken: Codable {
+struct BVToken: Codable, Equatable {
     let token: String
     let tokenType: String
     let expiresIn: Int
@@ -24,17 +24,6 @@ struct BVToken: Codable {
         case tokenType = "token_type"
         case expiresIn = "expires_in"
     }
-}
-
-// MARK: - Equatable
-
-// Every value type should be equatable.
-extension BVToken: Equatable {}
-
-func ==(lhs: BVToken, rhs: BVToken) -> Bool {
-    return lhs.token == rhs.token &&
-    lhs.tokenType == rhs.tokenType &&
-    lhs.expiresIn == rhs.expiresIn
 }
 
 /// BLOCKv refresh token response

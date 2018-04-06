@@ -65,7 +65,7 @@ protocol AssetProviderEncodable {
 //
 //}
 
-struct AssetProvider: Codable {
+struct AssetProvider: Codable, Equatable {
     
     let name: String
     let uri: URL
@@ -102,15 +102,4 @@ struct AssetProvider: Codable {
         
     }
     
-}
-
-// MARK: Equatable
-
-extension AssetProvider: Equatable {}
-
-func ==(lhs: AssetProvider, rhs: AssetProvider) -> Bool {
-    return lhs.name == rhs.name &&
-        lhs.uri == rhs.uri &&
-        lhs.type == rhs.type &&
-        lhs.descriptor == rhs.descriptor
 }

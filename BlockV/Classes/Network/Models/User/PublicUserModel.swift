@@ -12,13 +12,13 @@
 import Foundation
 
 /// Public user response model.
-public struct PublicUserModel: Codable {
+public struct PublicUserModel: Codable, Equatable {
     
     public let id : String
     public let meta : MetaModel
     public let properties : Properties
     
-    public struct Properties : Codable {
+    public struct Properties : Codable, Equatable {
         public let firstName : String
         public let lastName : String
         
@@ -28,23 +28,4 @@ public struct PublicUserModel: Codable {
         }
     }
     
-}
-
-// MARK: - Equatable
-
-// Every value type should be equatable.
-extension PublicUserModel: Equatable {}
-
-public func ==(lhs: PublicUserModel, rhs: PublicUserModel) -> Bool {
-    return lhs.id == rhs.id &&
-    lhs.meta == rhs.meta &&
-    lhs.properties == rhs.properties
-}
-
-// Every value type should be equatable.
-extension PublicUserModel.Properties: Equatable {}
-
-public func ==(lhs: PublicUserModel.Properties, rhs: PublicUserModel.Properties) -> Bool {
-    return lhs.firstName == rhs.firstName &&
-    lhs.lastName == rhs.lastName
 }

@@ -19,7 +19,7 @@ import Foundation
 ///   Technically, an array of all the faces linked to the parent templates of the vAtoms in the vAtoms array.
 /// 3. Array of all the actions associated with the vAtoms.
 ///   Technically, an array of all the actions linked to the parent templates of the vAtoms in the vAtoms array.
-public struct GroupModel: Decodable {
+public struct GroupModel: Decodable, Equatable {
     
     public var vatoms: [Vatom]
     public var faces: [Face]
@@ -80,15 +80,4 @@ public struct GroupModel: Decodable {
         
     }
     
-}
-
-// MARK: Equatable
-
-extension GroupModel: Equatable {}
-
-public func ==(lhs: GroupModel, rhs: GroupModel) -> Bool {
-    return lhs.faces == rhs.faces &&
-        lhs.actions == rhs.actions &&
-        lhs.vatoms == rhs.vatoms &&
-        lhs.count == rhs.count
 }

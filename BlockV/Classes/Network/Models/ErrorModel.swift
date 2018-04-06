@@ -12,7 +12,7 @@
 import Foundation
 
 /// Error model returned by the BLOCKv server.
-struct ErrorModel {
+struct ErrorModel: Equatable {
     let code: Int
     let message: String
     
@@ -37,14 +37,4 @@ extension ErrorModel: Codable {
         try container.encode(message, forKey: .message)
     }
     
-}
-
-// MARK: - Equatable
-
-// Every value type should be equatable.
-extension ErrorModel: Equatable {}
-
-func ==(lhs: ErrorModel, rhs: ErrorModel) -> Bool {
-    return lhs.code == rhs.code &&
-    lhs.message == rhs.message
 }

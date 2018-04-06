@@ -14,7 +14,7 @@ import Foundation
 //TODO: Define hashable conformance
 
 /// This type models a template action.
-public struct Action {
+public struct Action: Equatable {
     
     /// Combination of the template and action name.
     ///
@@ -38,7 +38,7 @@ public struct Action {
     public let meta: MetaModel?
     public let properties: Properties?
 
-    public struct Properties: Codable {
+    public struct Properties: Codable, Equatable {
         public let reactor: String
     }
     
@@ -95,22 +95,4 @@ extension Action {
         return (templateID, actionName)
     }
     
-}
-
-// MARK: - Equatable
-
-extension Action: Equatable {}
-
-public func ==(lhs: Action, rhs: Action) -> Bool {
-    return lhs.compoundName == rhs.compoundName &&
-    lhs.name == rhs.name &&
-    lhs.templateID == rhs.templateID &&
-    lhs.meta == rhs.meta &&
-    lhs.properties == rhs.properties
-}
-
-extension Action.Properties: Equatable {}
-
-public func ==(lhs: Action.Properties, rhs: Action.Properties) -> Bool {
-    return lhs.reactor == rhs.reactor
 }

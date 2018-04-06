@@ -12,13 +12,13 @@
 import Foundation
 
 /// Full token response model.
-public struct FullTokenModel: Codable {
+public struct FullTokenModel: Codable, Equatable {
     
     public let id: String
     public let meta: MetaModel
     public let properties: Properties
     
-    public struct Properties: Codable {
+    public struct Properties: Codable, Equatable {
         public let appId: String
         public let isConfirmed: Bool
         public let isDefault: Bool
@@ -42,30 +42,4 @@ public struct FullTokenModel: Codable {
         }
     }
 
-}
-
-// MARK: - Equatable
-
-// Every value type should be equatable.
-extension FullTokenModel: Equatable {}
-
-public func ==(lhs: FullTokenModel, rhs: FullTokenModel) -> Bool {
-    return lhs.id == rhs.id &&
-    lhs.meta == rhs.meta &&
-    lhs.properties == rhs.properties
-}
-
-// Every value type should be equatable.
-extension FullTokenModel.Properties: Equatable {}
-
-public func ==(lhs: FullTokenModel.Properties, rhs: FullTokenModel.Properties) -> Bool {
-    return lhs.appId == rhs.appId &&
-    lhs.isConfirmed == rhs.isConfirmed &&
-    lhs.isDefault == rhs.isDefault &&
-    lhs.otp == rhs.otp &&
-    lhs.token == rhs.token &&
-    lhs.tokenType == rhs.tokenType &&
-    lhs.userId == rhs.userId &&
-    lhs.verifyCode == rhs.verifyCode &&
-    lhs.verifyCodeExpires == rhs.verifyCodeExpires
 }

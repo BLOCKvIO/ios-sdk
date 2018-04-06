@@ -23,7 +23,7 @@ public enum ViewMode: String {
 }
 
 /// A simple struct that models a template face.
-public struct Face: Codable {
+public struct Face: Codable, Equatable {
     
     public let id: String
     public let templateName: String
@@ -37,7 +37,7 @@ public struct Face: Codable {
         case properties
     }
     
-    public struct Properties: Codable {
+    public struct Properties: Codable, Equatable {
         
         public let displayURL: URL
         public let constraints: Constraints
@@ -49,7 +49,7 @@ public struct Face: Codable {
             case resources
         }
         
-        public struct Constraints: Codable {
+        public struct Constraints: Codable, Equatable {
             
             public let viewMode: String
             public let platform: String
@@ -74,31 +74,3 @@ extension Face: Hashable {
     }
     
 }
-
-// MARK: - Equatable
-
-extension Face: Equatable {}
-
-public func ==(lhs: Face, rhs: Face) -> Bool {
-    return lhs.id == rhs.id &&
-    lhs.templateName == rhs.templateName &&
-    lhs.meta == rhs.meta &&
-    lhs.properties == rhs.properties
-    
-}
-
-extension Face.Properties: Equatable {}
-
-public func ==(lhs: Face.Properties, rhs: Face.Properties) -> Bool {
-    return lhs.displayURL == rhs.displayURL &&
-    lhs.constraints == rhs.constraints &&
-    lhs.resources == rhs.resources
-}
-
-extension Face.Properties.Constraints: Equatable {}
-
-public func ==(lhs: Face.Properties.Constraints, rhs: Face.Properties.Constraints) -> Bool {
-    return lhs.viewMode == rhs.viewMode &&
-    lhs.platform == rhs.platform
-}
-

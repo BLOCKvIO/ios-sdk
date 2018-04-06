@@ -11,8 +11,8 @@
 
 import Foundation
 
-public struct Vatom {
-    
+public struct Vatom: Equatable {
+
     // Top Level Properties
     
     // constants
@@ -107,12 +107,12 @@ public struct Vatom {
         case isTransferable      = "transferable"
     }
     
-    public struct Visibility: Codable {
+    public struct Visibility: Codable, Equatable {
         public let type: String
         public let value: String
     }
     
-    public struct Commerce: Codable {
+    public struct Commerce: Codable, Equatable {
         public let pricing: VatomPricing
     }
     
@@ -122,7 +122,7 @@ public struct Vatom {
     ///
     /// - SeeAlso:
     /// [GeoJSON](https://tools.ietf.org/html/rfc7946)
-    public struct GeoPosition: Codable {
+    public struct GeoPosition: Codable, Equatable {
         /// GeoJSON type. vAtoms are alwyas of type 'Point'
         public var type: String
         /// Coordinates of the vAtom
@@ -194,70 +194,9 @@ extension Vatom: Hashable {
     }
 }
 
-// MARK: Equatable
-
-extension Vatom: Equatable {}
-
-public func ==(lhs: Vatom, rhs: Vatom) -> Bool {
-    return lhs.id == rhs.id &&
-    lhs.version == rhs.version &&
-    lhs.isUnpublished == rhs.isUnpublished &&
-    lhs.whenCreated == rhs.whenCreated &&
-    lhs.isAcquirable == rhs.isAcquirable &&
-    lhs.author == rhs.author &&
-    lhs.category == rhs.category &&
-    lhs.clonedFrom == rhs.clonedFrom &&
-    lhs.cloningScore == rhs.cloningScore &&
-    lhs.commerce == rhs.commerce &&
-    lhs.description == rhs.description &&
-    lhs.isDisabled == rhs.isDisabled &&
-    lhs.isDropped == rhs.isDropped &&
-    lhs.geoPosition == rhs.geoPosition &&
-    lhs.isInContract == rhs.isInContract &&
-    lhs.inContractWith == rhs.inContractWith &&
-    lhs.notifyMessage == rhs.notifyMessage &&
-    lhs.numberDirectClones == rhs.numberDirectClones &&
-    lhs.owner == rhs.owner &&
-    lhs.parentID == rhs.parentID &&
-    lhs.publisherFqdn == rhs.publisherFqdn &&
-    lhs.isRedeemable == rhs.isRedeemable &&
-    lhs.resources == rhs.resources &&
-    lhs.rootType == rhs.rootType &&
-    lhs.tags == rhs.tags &&
-    lhs.templateID == rhs.templateID &&
-    lhs.templateVariationID == rhs.templateVariationID &&
-    lhs.title == rhs.title &&
-    lhs.isTradeable == rhs.isTradeable &&
-    lhs.isTransferable == rhs.isTransferable &&
-    lhs.transferredBy == rhs.transferredBy &&
-    lhs.visibility == rhs.visibility &&
-    lhs.privateProperties == rhs.privateProperties
-    
-}
-
-extension Vatom.Visibility: Equatable {}
-
-public func ==(lhs: Vatom.Visibility, rhs: Vatom.Visibility) -> Bool {
-    return lhs.type == rhs.type &&
-    lhs.value == rhs.value
-}
-
-extension Vatom.Commerce: Equatable {}
-
-public func ==(lhs: Vatom.Commerce, rhs: Vatom.Commerce) -> Bool {
-    return lhs.pricing == rhs.pricing
-}
-
-extension Vatom.GeoPosition: Equatable {}
-
-public func ==(lhs: Vatom.GeoPosition, rhs: Vatom.GeoPosition) -> Bool {
-    return lhs.type == rhs.type &&
-    lhs.coordinates == rhs.coordinates
-}
-
 // MARK: - Vatom Pricing
 
-public struct VatomPricing {
+public struct VatomPricing: Equatable {
     
     let pricingType: String
     let currency: String
@@ -311,21 +250,9 @@ extension VatomPricing: Codable {
     
 }
 
-// MARK: Equatable
-
-extension VatomPricing: Equatable {}
-
-public func ==(lhs: VatomPricing, rhs: VatomPricing) -> Bool {
-    return lhs.currency == rhs.currency &&
-    lhs.price == rhs.price &&
-    lhs.validFrom == rhs.validFrom &&
-    lhs.validThrough == rhs.validThrough &&
-    lhs.isVatIncluded == rhs.isVatIncluded
-}
-
 // MARK: - Vatom Child Policy
 
-public struct VatomChildPolicy: Codable {
+public struct VatomChildPolicy: Codable, Equatable {
     public let count: Int
     public let creationPolicy: CreationPolicy
     public let templateVariationName: String
@@ -336,7 +263,7 @@ public struct VatomChildPolicy: Codable {
         case templateVariationName = "template_variation"
     }
     
-    public struct CreationPolicy: Codable {
+    public struct CreationPolicy: Codable, Equatable {
         public let autoCreate: String
         public let autoCreateCount: Int
         public let autoCreateCountRandom: Bool
@@ -356,26 +283,4 @@ public struct VatomChildPolicy: Codable {
         }
     }
     
-}
-
-// MARK: Equatable
-
-extension VatomChildPolicy: Equatable {}
-
-public func ==(lhs: VatomChildPolicy, rhs: VatomChildPolicy) -> Bool {
-    return lhs.count == rhs.count &&
-        lhs.creationPolicy == rhs.creationPolicy &&
-        lhs.templateVariationName == rhs.templateVariationName
-}
-
-extension VatomChildPolicy.CreationPolicy: Equatable {}
-
-public func ==(lhs: VatomChildPolicy.CreationPolicy, rhs: VatomChildPolicy.CreationPolicy) -> Bool {
-    return lhs.autoCreate == rhs.autoCreate &&
-        lhs.autoCreateCount == rhs.autoCreateCount &&
-        lhs.autoCreateCountRandom == rhs.autoCreateCountRandom &&
-        lhs.enforcePolicyCountMax == rhs.enforcePolicyCountMax &&
-        lhs.enforcePolicyCountMin == rhs.enforcePolicyCountMin &&
-        lhs.policyCountMax == rhs.policyCountMax &&
-        lhs.policyCountMin == rhs.policyCountMin
 }

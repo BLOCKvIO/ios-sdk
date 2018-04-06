@@ -12,7 +12,7 @@
 import Foundation
 
 /// User model
-public struct UserModel {
+public struct UserModel: Equatable {
     
     // Public
     
@@ -52,7 +52,7 @@ public struct UserModel {
         case language            = "language"
     }
     
-    struct SystemProperties: Codable {
+    struct SystemProperties: Codable, Equatable {
         let isAdmin: Bool
         let isMerchant: Bool
         let lastLogin: Date
@@ -130,33 +130,3 @@ extension UserModel: Codable {
     }
     
 }
-
-// MARK: - Equatable
-
-extension UserModel: Equatable {}
-
-public func ==(lhs: UserModel, rhs: UserModel) -> Bool {
-    return lhs.id == rhs.id &&
-        lhs.firstName == rhs.firstName &&
-        lhs.lastName == rhs.lastName &&
-        lhs.namePublic == rhs.namePublic &&
-        lhs.avatarPublic == rhs.avatarPublic &&
-        lhs.avatarURL == rhs.avatarURL &&
-        lhs.birthday == rhs.birthday &&
-        lhs.guestID == rhs.guestID &&
-        lhs.nonPushNotification == rhs.nonPushNotification &&
-        lhs.lastName == rhs.language &&
-        lhs.meta == rhs.meta &&
-        lhs.systemProperties == rhs.systemProperties
-}
-
-extension UserModel.SystemProperties: Equatable {}
-
-func ==(lhs: UserModel.SystemProperties, rhs: UserModel.SystemProperties) -> Bool {
-    return lhs.isAdmin == rhs.isAdmin &&
-        lhs.isMerchant == lhs.isMerchant &&
-        lhs.lastLogin == rhs.lastLogin &&
-        lhs.isActivated == rhs.isActivated
-}
-
-

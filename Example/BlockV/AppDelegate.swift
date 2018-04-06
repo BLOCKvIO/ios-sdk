@@ -39,9 +39,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Set app id
         BLOCKv.configure(appID: MyApiKey)
         
-        // Set platform environment to production
-        BLOCKv.setEnvironment(.production)
-        
         print("\nViewer > isLoggedIn: \(BLOCKv.isLoggedIn)")
         
         // Set window's vc based on the login state

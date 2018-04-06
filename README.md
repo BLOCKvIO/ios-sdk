@@ -1,4 +1,4 @@
-# BLOCKv iOS SDK
+# BLOCKv SDK for iOS
 
 [![Version](https://img.shields.io/cocoapods/v/BLOCKv.svg?style=flat)](http://cocoapods.org/pods/BLOCKv)
 [![License](https://img.shields.io/cocoapods/l/BLOCKv.svg?style=flat)](http://cocoapods.org/pods/BLOCKv)
@@ -23,7 +23,7 @@ pod 'BLOCKv'
 
 ## Configuration
 
-Within the `AppDelegate` be sure to set your App ID and the desired server environment, e.g. `.production`.
+Within the `AppDelegate` be sure to set the App ID.
 
 ```Swift
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -32,9 +32,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
         // Set app id
         BLOCKv.configure(appID: "your-app-id")
-        
-        // Set platform environment to production
-        BLOCKv.setEnvironment(.production)
         
         // Check logged in state
         if BLOCKv.isLoggedIn {
@@ -61,7 +58,7 @@ The example app lets you try out the BLOCKv SDK. It's a great place to start if 
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
-### Security Disclosure
+## Security Disclosure
 
 If you believe you have identified a security vulnerability with BLOCKv, you should report it as soon as possible via email to support@blockv.io. Please do not post it to a public issue tracker.
 

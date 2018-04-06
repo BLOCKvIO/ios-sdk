@@ -98,7 +98,18 @@ class InventoryCollectionViewController: UICollectionViewController {
             // handle success
             print("\nViewer > Fetched inventory group model")
             
-            self?.vatoms = model.vatoms
+            /*
+             NOTE
+             
+             It is sometimes useful to order vAtoms by their `whenModified` date. This will
+             ensure new vAtoms appear at the top of the user's inventory.
+             
+             Additionally, if a vAtom's state changes on the BLOCKv Platform so to will its
+             `whenModifed` date. For example, if a vAtom is picked up off the map, its
+             `droppped` flag is set as `false` and the `whenModified` date updated.
+             */
+            
+            self?.vatoms = model.vatoms.sorted { $0.whenModified > $1.whenModified }
             self?.collectionView?.reloadData()
             
             self?.dowloadActivatedImages()

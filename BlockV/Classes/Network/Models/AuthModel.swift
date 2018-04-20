@@ -20,7 +20,7 @@ protocol OAuthTokenModel {
 /// Auth response model.
 ///
 /// This model is valid for both login and register responses.
-struct AuthModel: Decodable, Equatable, OAuthTokenModel {
+public struct AuthModel: Decodable, Equatable, OAuthTokenModel {
     
     var user: UserModel
     let assetProviders: [AssetProvider]

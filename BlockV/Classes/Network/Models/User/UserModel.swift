@@ -27,7 +27,7 @@ public struct UserModel: Equatable {
     public let language: String
     public let meta: MetaModel
     
-    public var avatarURL: URL
+    public var avatarURL: URL?
     
     // Internal
     
@@ -78,7 +78,9 @@ extension UserModel: AssetProviderEncodable {
     
     mutating func encodeEachURL(using encoder: URLEncoder, assetProviders: [AssetProvider]) {
         // encode url
-        self.avatarURL = encoder(self.avatarURL, assetProviders)
+        if let url = self.avatarURL {
+            self.avatarURL = encoder(url, assetProviders)
+        }
     }
     
 }
@@ -100,12 +102,14 @@ extension UserModel: Codable {
         lastName            = try propertiesContainer.decode(String.self, forKey: .lastName)
         namePublic          = try propertiesContainer.decode(Bool.self, forKey: .namePublic)
         avatarPublic        = try propertiesContainer.decode(Bool.self, forKey: .avatarPublic)
-        avatarURL           = try propertiesContainer.decode(URL.self, forKey: .avatarURL)
         birthday            = try propertiesContainer.decode(String.self, forKey: .birthday)
         guestID             = try propertiesContainer.decode(String.self, forKey: .guestID)
         nonPushNotification = try propertiesContainer.decode(Bool.self, forKey: .nonPushNotification)
         language            = try propertiesContainer.decode(String.self, forKey: .language)
         
+        // Avatar URLs generally have a default value - but this is not guaranteed.
+        avatarURL           = propertiesContainer.decodeSafely(Safe<URL>.self, forKey: .avatarURL)?.value
+
     }
     
     public func encode(to encoder: Encoder) throws {

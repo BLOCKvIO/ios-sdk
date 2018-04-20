@@ -86,8 +86,9 @@ public enum BVError: Error {
             case 2034: self = .invalidToken(code, message)
             case 2037: self = .avatarUploadFailed(code, message)
             case 2552: self = .unableToRetrieveToken(code, message)
-            case 2563: self = .tokenAlreadyConfirmed(code, message)
-            case 2564: self = .invalidVerificationCode(code, message)
+            
+            case 2564: self = .tokenAlreadyConfirmed(code, message)
+            case 2565: self = .invalidVerificationCode(code, message)
             case 2569: self = .invalidPhoneNumber(code, message)
             default:
                 // useful for debugging

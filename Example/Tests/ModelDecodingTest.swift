@@ -32,6 +32,24 @@ class ModelDecodingTest: XCTestCase {
         super.tearDown()
     }
     
+    // MARK: Login
+    
+    func testLoginDecoding() {
+        
+        do {
+            let _ = try decoder.decode(BaseModel<AuthModel>.self, from: MockResponse.loginResponse_v1)
+        } catch {
+            XCTFail("Decoding failed: \(error.localizedDescription)")
+        }
+        
+        do {
+            let _ = try decoder.decode(BaseModel<AuthModel>.self, from: MockResponse.loginResponse_v2)
+        } catch {
+            XCTFail("Decoding failed: \(error.localizedDescription)")
+        }
+        
+    }
+    
     // MARK: vAtom Resource
     
     func testVatomResourceDecoding() {

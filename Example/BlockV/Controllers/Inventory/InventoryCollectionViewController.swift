@@ -78,6 +78,10 @@ class InventoryCollectionViewController: UICollectionViewController {
         //self.performDiscoverQuery()
     }
     
+    deinit {
+        self.downloadQueue.cancelAllOperations()
+    }
+    
     // MARK: - Helpers
     
     /// Fetches the current user's inventory.

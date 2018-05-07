@@ -67,7 +67,7 @@ extension UserInfo: DictionaryCodable {
         ]
     }
     
-    /// Reuturns a dictionary of all non-nil members.
+    /// Reuturns a dictionary of all non-nil members (empty strings are permitted).
     ///
     /// Useful for PATCH requests.
     public func toSafeDictionary() -> [String : Any] {

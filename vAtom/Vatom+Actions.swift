@@ -11,10 +11,7 @@
 
 import Foundation
 
-/*
- This file adds some convenient actions to Vatom.
- */
-
+/// This file adds actions to Vatom (simply for convenience).
 extension Vatom {
     
     /// Transfers this vAtom to the specified token.

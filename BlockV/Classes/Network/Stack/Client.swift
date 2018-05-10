@@ -29,6 +29,7 @@ protocol ClientProtocol {
 /// - app id
 ///
 /// To change these values a new client instance must be created.
+/// ---------------------
 ///
 /// Client is variant over:
 /// - refresh token
@@ -108,6 +109,10 @@ public final class Client: ClientProtocol {
         
     }
     
+    func getAccessToken(completion: @escaping (_ success: Bool, _ accessToken: String?) -> Void) {
+        self.oauthHandler.getAccessToken(completion: completion)
+    }
+    
     // MARK: - Requests
     
     /// Endpoints generic over `void` complete by passing in the raw data response.
@@ -116,6 +121,10 @@ public final class Client: ClientProtocol {
     /// any time.
     ///
     /// NOTE: Raw requests do not partake in OAuth and general lifecycle handling.
+    ///
+    /// - Parameters:
+    ///   - endpoint: <#endpoint description#>
+    ///   - completion: <#completion description#>
     func request(_ endpoint: Endpoint<Void>, completion: @escaping (Data?, BVError?) -> Void) {
         
         // create request
@@ -186,9 +195,8 @@ public final class Client: ClientProtocol {
                 
                 // extract auth tokens if available
                 if let model = val as? BaseModel<AuthModel> {
-                    self.oauthHandler.setTokens(accessToken: model.payload.accessToken.token, refreshToken: model.payload.refreshToken.token)
+                    self.oauthHandler.set(accessToken: model.payload.accessToken.token, refreshToken: model.payload.refreshToken.token)
                 }
-                
                 
                 // ensure the payload was parsed correctly
                 // on success, the payload should alway have a value

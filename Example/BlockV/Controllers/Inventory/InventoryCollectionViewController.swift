@@ -35,8 +35,6 @@ import BLOCKv
 /// vAtom Face Code will be added to this example.
 class InventoryCollectionViewController: UICollectionViewController {
     
-    // MARK: - Outlets
-    
     // MARK: - Properties
     
     fileprivate lazy var refreshControl: UIRefreshControl = {

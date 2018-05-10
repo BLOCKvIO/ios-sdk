@@ -11,11 +11,11 @@
 
 import Foundation
 
-extension URL {
-    func encodeWithParams() -> URL {
-        
-        // Encode with blockv url params.
-        
-        return self
-    }
+extension NotificationCenter {
+    
+    /// BLOCKv Web socket Notification Center.
+    ///
+    /// All Web socket messages are broadcast using this notification center.
+    static var webSocket = NotificationCenter()
+    
 }

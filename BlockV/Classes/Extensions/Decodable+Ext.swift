@@ -21,7 +21,7 @@ public struct Safe<Base: Decodable>: Decodable {
             self.value = try container.decode(Base.self)
         } catch {
             //assertionFailure("ERROR: \(error)")
-            print(">>> Error > SDK: Decoding failed with error \(error)")
+            print("\nBV SDK >>> Error: Decoding failed with error \(error)")
             self.value = nil
         }
     }

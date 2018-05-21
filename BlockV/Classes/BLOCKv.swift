@@ -156,7 +156,7 @@ public final class BLOCKv {
     
     /// Closure that encodes a given url using a set of asset providers.
     ///
-    /// If non of the asset providers are able to perform encoding, the original URL is returned.
+    /// If none of the asset providers are able to perform encoding, the original URL is returned.
     internal static let blockvURLEncoder: URLEncoder = { (url, assetProviders) in
         let provider = assetProviders.first(where: { $0.isProviderForURL(url) })
         return provider?.encodedURL(url) ?? url

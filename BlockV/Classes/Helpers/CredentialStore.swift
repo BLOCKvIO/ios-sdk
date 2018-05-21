@@ -58,7 +58,7 @@ internal class CredentialStore: CredentialManager {
     
     /// Saves the refresh token to local storage.
     ///
-    /// This is an overwirte operation.
+    /// This is an overwrite operation.
     static func saveRefreshToken(_ token: BVToken) {
         // encode to data (ineffient, but inconsequential)
         
@@ -90,7 +90,7 @@ internal class CredentialStore: CredentialManager {
     
     /// Saves the asset providers to local storage.
     ///
-    /// This is an overwirte operation.
+    /// This is an overwrite operation.
     static func saveAssetProviders(_ providers: [AssetProvider]) {
         // encode to data (ineffient, but inconsequential)
         

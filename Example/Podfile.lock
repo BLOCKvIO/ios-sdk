@@ -2,8 +2,6 @@ PODS:
   - Alamofire (4.7.2)
   - BLOCKv (0.9.5):
     - Alamofire (~> 4.7)
-    - Starscream (~> 3.0.2)
-  - Starscream (3.0.5)
 
 DEPENDENCIES:
   - BLOCKv (from `../`)
@@ -11,7 +9,6 @@ DEPENDENCIES:
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Alamofire
-    - Starscream
 
 EXTERNAL SOURCES:
   BLOCKv:
@@ -19,8 +16,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Alamofire: e4fa87002c137ba2d8d634d2c51fabcda0d5c223
-  BLOCKv: 89886de13ff7faacfdc95ac8b5a82ecc3c19258d
-  Starscream: faf918b2f2eff7d5dd21180646bf015a669673bd
+  BLOCKv: 92298933247960e84152075d605d56a72c1cf206
 
 PODFILE CHECKSUM: 607654f8b0435c8536102866fa4fb9ba2ddddd6c
 

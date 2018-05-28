@@ -26,6 +26,13 @@ extension UpdateStream {
     
 }
 
+/*
+ Refactor the Web socket to work off the access token supplied when the connection was made.
+ 
+ This token contains the user id. This user id should be used to determin if vatoms were added o
+ removed from the user's inventory.
+ */
+
 
 /// This class is responsible for managing the connection to the Web socket service,
 /// and processing the events it receives from that service.

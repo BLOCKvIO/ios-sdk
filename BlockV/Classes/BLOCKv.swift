@@ -116,9 +116,7 @@ public final class BLOCKv {
         // ensure a valid jwt
         guard let refreshJWT = try? decode(jwt: refreshToken) else { return false }
         // ensure still valid
-        if refreshJWT.expired { return false }
-        // user has a valid refresh token, i.e. they are logged in
-        return true
+        return !refreshJWT.expired
     }
     
     @available(*, deprecated, message: "This is an unsupported feature of the SDK and may be removed in a future release.")

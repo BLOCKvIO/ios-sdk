@@ -401,7 +401,7 @@ extension BLOCKv {
     
     /// Log out the current user.
     ///
-    /// The current user will not longer be authorized to perform user scoped requests on the
+    /// The current user will no longer be authorized to perform user scoped requests on the
     /// BLOCKv platfrom.
     ///
     /// - Parameter completion: The completion handler to call when the request is completed.

@@ -2,6 +2,8 @@ PODS:
   - Alamofire (4.7.2)
   - BLOCKv (0.9.6):
     - Alamofire (~> 4.7)
+    - JWTDecode (~> 2.1)
+  - JWTDecode (2.1.1)
 
 DEPENDENCIES:
   - BLOCKv (from `../`)
@@ -9,6 +11,7 @@ DEPENDENCIES:
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Alamofire
+    - JWTDecode
 
 EXTERNAL SOURCES:
   BLOCKv:
@@ -16,7 +19,8 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Alamofire: e4fa87002c137ba2d8d634d2c51fabcda0d5c223
-  BLOCKv: 26d637c5b07a2f69efb8e70d3cf8f94b69352839
+  BLOCKv: 46a4f292172ea1be4f5b8166ac7698555d5b84c0
+  JWTDecode: 83e8b381aafe27158d9f692cbdca2b12d61d460c
 
 PODFILE CHECKSUM: 607654f8b0435c8536102866fa4fb9ba2ddddd6c
 

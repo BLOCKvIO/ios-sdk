@@ -90,10 +90,29 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
         // check for an unauthorised response
         if let response = request.task?.response as? HTTPURLResponse, response.statusCode == 401 {
             
-            // store the completion closures until a refresh and token update has been performed
-            requestsToRetry.append(completion)
+            // ensure request are retried only once
+            guard request.retryCount == 0 else {
+                // don't retry the request
+                completion(false, 0.0)
+                return
+            }
             
-            //TODO: If refresh fails, refreshTokens will be called continiously. A backoff policy should be implemented.
+            // ensure the error payload indicates a token refresh is required
+            guard
+                let data = request.delegate.data,
+                let json = try? JSONSerialization.jsonObject(with: data, options: []),
+                let errorDictionary = json as? [String : String],
+                // Important to check for both "token expired" and "Unauthorized" messages.
+                (errorDictionary["exp"] == "token expired" || errorDictionary["message"] == "Unauthorized") else {
+                    printBV(info: "401 received. Access token is still valid. Retry declined.")
+                    // don't retry the request
+                    completion(false, 0.0)
+                    return
+            }
+            
+            // store the completion hanlder
+            requestsToRetry.append(completion)
+            // attemp to fetch a new access token
             refreshAndUpdate()
             
         } else {
@@ -101,10 +120,7 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
             completion(false, 0.0)
         }
         
-        // check for rate limiting
-        if let response = request.task?.response as? HTTPURLResponse, response.statusCode == 403 {
-            print("\n◦◦◦ BV SDK ◦ Warning: Server is rate limiting.")
-        }
+        //TODO: Inform viewer they may be rate limited 403
         
     }
     
@@ -234,5 +250,4 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
         
     }
 
-    
 }

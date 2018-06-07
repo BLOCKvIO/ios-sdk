@@ -11,6 +11,7 @@
 
 import Foundation
 import Alamofire
+import JWTDecode
 
 // Beta 0.9
 //TODO: Inpect the `expires_in` before a request is made. Refresh the access token if necessary.
@@ -35,10 +36,10 @@ public final class BLOCKv {
     /// Must be set once by the host app.
     fileprivate static var appID: String? {
         // willSet is only called outside of the initialisation context, i.e.
-        // setting the appID after its init will case a fatal error.
+        // setting the appID after its init will cause a fatal error.
         willSet {
             if appID != nil {
-                fatalError("The App ID may be set only once.")
+                assertionFailure("The App ID may be set only once.")
             }
         }
     }
@@ -111,11 +112,11 @@ public final class BLOCKv {
     /// Boolean indicating whether a user is logged in. `true` if logged in. `false` otherwise.
     public static var isLoggedIn: Bool {
         // ensure a token is present
-        guard let token = CredentialStore.refreshToken else { return false }
-        
-        //FIXME: Check expiry before returning true. If expired, remove.
-
-        return true
+        guard let refreshToken = CredentialStore.refreshToken?.token else { return false }
+        // ensure a valid jwt
+        guard let refreshJWT = try? decode(jwt: refreshToken) else { return false }
+        // ensure still valid
+        return !refreshJWT.expired
     }
     
     @available(*, deprecated, message: "This is an unsupported feature of the SDK and may be removed in a future release.")

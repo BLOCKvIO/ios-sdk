@@ -17,4 +17,5 @@ Pod::Spec.new do |s|
   s.swift_version         = '4.1'
   
   s.dependency 'Alamofire', '~> 4.7'
+  s.dependency 'JWTDecode', '~> 2.1'
 end

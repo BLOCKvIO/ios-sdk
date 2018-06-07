@@ -113,9 +113,9 @@ public final class BLOCKv {
     public static var isLoggedIn: Bool {
         // ensure a token is present
         guard let refreshToken = CredentialStore.refreshToken?.token else { return false }
-        // ensure is it a valid jwt
+        // ensure a valid jwt
         guard let refreshJWT = try? decode(jwt: refreshToken) else { return false }
-        // check still valid
+        // ensure still valid
         if refreshJWT.expired { return false }
         // user has a valid refresh token, i.e. they are logged in
         return true

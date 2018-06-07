@@ -145,19 +145,19 @@ extension API {
             )
         }
         
-        /* POST Beta 0.5
-         
-         /// Endpoint to add a token to the current user.
-         public static func addToken(_ token: UserToken, isPrimary: Bool) -> Endpoint<Void> {
-         return Endpoint(method: .post,
-         path: currentUserPath + "/user/tokens",
-         parameters: [
-         "token": token.value,
-         "token_type": token.type.rawValue,
-         "is_primary": isPrimary
-         ]
-         )
-         }
+        /// Endpoint to add a token to the current user.
+        public static func addToken(_ token: UserToken, isPrimary: Bool) -> Endpoint<BaseModel<FullTokenModel>> {
+            return Endpoint(method: .post,
+                            path: currentUserPath + "/user/tokens",
+                            parameters: [
+                                "token": token.value,
+                                "token_type": token.type.rawValue,
+                                "is_primary": isPrimary
+                ]
+            )
+        }
+        
+           /* POST Beta 0.5
          
          /// Endpoint to delete a token.
          public static func deleteToken(id: String) -> Endpoint<Void> {

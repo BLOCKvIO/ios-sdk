@@ -53,6 +53,7 @@ public enum BVError: Error {
         case authenticationFailed(Int, String)
         case invalidToken(Int, String)
         case avatarUploadFailed(Int, String)
+        case userRefreshTokenInvalid(Int, String)
         case authenticationLimit(Int, String)
         case unableToRetrieveToken(Int, String)
         case tokenAlreadyConfirmed(Int, String)
@@ -86,6 +87,7 @@ public enum BVError: Error {
             case 2032: self = .authenticationFailed(code, message)
             case 2034: self = .invalidToken(code, message)
             case 2037: self = .avatarUploadFailed(code, message)
+            case 2049: self = .userRefreshTokenInvalid(code, message)
             case 2051: self = .authenticationLimit(code, message)
             case 2552: self = .unableToRetrieveToken(code, message)
             
@@ -164,6 +166,8 @@ extension BVError.PlatformErrorReason {
         case let .invalidPayload(code, message):
             return "BLOCKv Platform Error: (\(code)) Message: \(message)"
         case let .invalidDateFormat(code, message):
+            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
+        case let .userRefreshTokenInvalid(code, message):
             return "BLOCKv Platform Error: (\(code)) Message: \(message)"
         }
     }

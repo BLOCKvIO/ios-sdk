@@ -104,7 +104,7 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
                 let errorDictionary = json as? [String : String],
                 // Important to check for both "token expired" and "Unauthorized" messages.
                 (errorDictionary["exp"] == "token expired" || errorDictionary["message"] == "Unauthorized") else {
-                    printBV(info: "401 received. Access token is still valid. Retry declined.")
+                    printBV(info: "401 received. Access token is still valid. Access token refresh declined.")
                     // don't retry the request
                     completion(false, 0.0)
                     return
@@ -202,7 +202,6 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
                 printBV(error: "Access token - Refresh failed")
                 printBV(error: err.localizedDescription)
                 completion(false, nil, nil)
- 
             }
 
             strongSelf.isRefreshing = false

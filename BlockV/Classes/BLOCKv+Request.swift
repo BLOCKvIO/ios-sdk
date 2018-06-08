@@ -295,7 +295,7 @@ extension BLOCKv {
         
     }
     
-    /// Fetches the current user's token from the BlockV Platform.
+    /// Fetches the current user's token description from the BLOCKv Platform.
     ///
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
@@ -322,6 +322,64 @@ extension BLOCKv {
         
     }
     
+    /// Removes the token from the current user's token list on the BLOCKv Platform.
+    ///
+    /// - Parameters:
+    ///   - tokenId: Unique identifier of the token to be deleted.
+    ///   - completion: The completion handler to call when the request is completed.
+    ///                 This handler is executed on the main queue.
+    public static func deleteCurrentUserToken(_ tokenId: String, completion: @escaping (BVError?) -> Void) {
+        
+        let endpoint = API.CurrentUser.deleteToken(id: tokenId)
+        
+        self.client.request(endpoint) { (baseModel, error) in
+            
+            guard let _ = baseModel?.payload, error == nil else {
+                DispatchQueue.main.async {
+                    completion(error)
+                }
+                return
+            }
+            
+            // call was successful
+            DispatchQueue.main.async {
+                completion(nil)
+            }
+            
+        }
+        
+    }
+    
+    /// Updates the specified token to be the current user's default token on the BLOCKv Platform.
+    ///
+    /// Setting a token as the default causes //FIXME
+    ///
+    /// - Parameters:
+    ///   - tokenId: Unique identiifer of the token.
+    ///   - completion: The completion handler to call when the request is completed.
+    ///                 This handler is executed on the main queue.
+    public static func setCurrentUserDefaultToken(_ tokenId: String, completion: @escaping (BVError?) -> Void) {
+        
+        let endpoint = API.CurrentUser.setDefaultToken(id: tokenId)
+        
+        self.client.request(endpoint) { (baseModel, error) in
+            
+            //
+            guard let _ = baseModel?.payload, error == nil else {
+                DispatchQueue.main.async {
+                    completion(error)
+                }
+                return
+            }
+            
+            // call was succesful
+            DispatchQueue.main.async {
+                completion(nil)
+            }
+            
+        }
+        
+    }
     
     /// Updates the current user's profile on the BLOCKv Platform.
     ///

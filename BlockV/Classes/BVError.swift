@@ -57,6 +57,7 @@ public enum BVError: Error {
         case authenticationLimit(Int, String)
         
         case tokenNotFound(Int, String)
+        case cannotDeletePrimaryToken(Int, String)
         case unableToRetrieveToken(Int, String)
         case tokenAlreadyConfirmed(Int, String)
         case invalidVerificationCode(Int, String)
@@ -93,6 +94,7 @@ public enum BVError: Error {
             case 2051: self = .authenticationLimit(code, message)
             case 2552: self = .unableToRetrieveToken(code, message)
             case 2553: self = .tokenNotFound(code, message)
+            case 2562: self = .cannotDeletePrimaryToken(code, message)
             case 2564: self = .tokenAlreadyConfirmed(code, message)
             case 2565: self = .invalidVerificationCode(code, message)
             case 2569: self = .invalidPhoneNumber(code, message)
@@ -149,7 +151,8 @@ extension BVError.PlatformErrorReason {
              let .invalidPayload(code, message),
              let .invalidDateFormat(code, message),
              let .userRefreshTokenInvalid(code, message),
-             let .tokenNotFound(code, message):
+             let .tokenNotFound(code, message),
+             let .cannotDeletePrimaryToken(code, message):
             return "BLOCKv Platform Error: (\(code)) Message: \(message)"
             
         }

@@ -165,26 +165,34 @@ extension VerifyTableViewController {
         // don't show actions in register flow
         if origin == .register { return [] }
         
+        // action to delete the token
         let delete = UITableViewRowAction(style: .destructive, title: "Delete") { (action, indexPath) in
-            // delete item at index
-            let tokenId = "asdfasdfadadsfadsfad"
             
-            BLOCKv.deleteCurrentUserToken(tokenId) { [weak self] error in
+            // get the token
+            let token = self.allTokens[indexPath.row]
+            // make request
+            BLOCKv.deleteCurrentUserToken(token.id) { [weak self] error in
                 if let error = error {
                     self?.present(UIAlertController.errorAlert(error), animated: true)
                 }
+                // refresh local token list
+                self?.fetchAllUserTokens()
             }
             
         }
         
+        // action to set the token as primary
         let primary = UITableViewRowAction(style: .normal, title: "Primary") { (action, indexPath) in
-            // set the token as primary
-            let tokenId = "asdfasdfadadsfadsfad"
-            
-            BLOCKv.setCurrentUserDefaultToken(tokenId) { [weak self] error in
+
+            // get the token
+            let token = self.allTokens[indexPath.row]
+            // make request
+            BLOCKv.setCurrentUserDefaultToken(token.id) { [weak self] error in
                 if let error = error {
                     self?.present(UIAlertController.errorAlert(error), animated: true)
                 }
+                // refresh local token list
+                self?.fetchAllUserTokens()
             }
             
         }
@@ -192,6 +200,20 @@ extension VerifyTableViewController {
         return [delete, primary]
         
     }
+    
+    /*
+     Add this to do the delete locally before going out to network. This will give good feedback locally.
+     */
+    
+//    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+//
+//        if editingStyle == .delete {
+//
+//            // remove the row locally
+//
+//        }
+//
+//    }
     
 }
 

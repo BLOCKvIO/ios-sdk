@@ -54,7 +54,7 @@ class VerifyTableViewController: UITableViewController {
     // MARK: - Properties
     
     fileprivate let tokenCellID = "cell.token.id"
-
+    
     /// This view controller shows a different set of data based on its presentation origin.
     var origin: Origin!
     
@@ -79,16 +79,16 @@ class VerifyTableViewController: UITableViewController {
         
         // check the orgin of presentation
         if origin == .profile {
-
+            
             // remove the 'next' button
             nextBarButton = nil
-
+            
             // fetch all tokens
             fetchAllUserTokens()
         }
         
         self.tableView.reloadData()
-
+        
     }
     
     // MARK: - Networking
@@ -106,7 +106,7 @@ class VerifyTableViewController: UITableViewController {
             
             // hide loader
             self?.hideNavBarActivityRight()
-        
+            
             // handle error
             guard let model = fullTokens, error == nil else {
                 print(">>> Error > Viewer: \(error!.localizedDescription)")
@@ -127,7 +127,7 @@ class VerifyTableViewController: UITableViewController {
     
 }
 
-// MARK: - Table view data source
+// MARK: - Table view delegate and data source
 
 extension VerifyTableViewController {
     
@@ -157,6 +157,39 @@ extension VerifyTableViewController {
             cell.configure(fullToken: fullToken)
             return cell
         }
+        
+    }
+    
+    override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        
+        // don't show actions in register flow
+        if origin == .register { return [] }
+        
+        let delete = UITableViewRowAction(style: .destructive, title: "Delete") { (action, indexPath) in
+            // delete item at index
+            let tokenId = "asdfasdfadadsfadsfad"
+            
+            BLOCKv.deleteCurrentUserToken(tokenId) { [weak self] error in
+                if let error = error {
+                    self?.present(UIAlertController.errorAlert(error), animated: true)
+                }
+            }
+            
+        }
+        
+        let primary = UITableViewRowAction(style: .normal, title: "Primary") { (action, indexPath) in
+            // set the token as primary
+            let tokenId = "asdfasdfadadsfadsfad"
+            
+            BLOCKv.setCurrentUserDefaultToken(tokenId) { [weak self] error in
+                if let error = error {
+                    self?.present(UIAlertController.errorAlert(error), animated: true)
+                }
+            }
+            
+        }
+        
+        return [delete, primary]
         
     }
     

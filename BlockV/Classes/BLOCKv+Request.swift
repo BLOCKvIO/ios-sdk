@@ -352,7 +352,10 @@ extension BLOCKv {
     
     /// Updates the specified token to be the current user's default token on the BLOCKv Platform.
     ///
-    /// Setting a token as the default causes //FIXME
+    /// Backend description:
+    /// Flag to indicate if this token is the primary token. The primary token is used when no other
+    /// token is explicitly selected, for example to send messages. This will automatically set the
+    /// is_primary flag of an existing token to false , because only one token can be the primary token.
     ///
     /// - Parameters:
     ///   - tokenId: Unique identiifer of the token.

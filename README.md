@@ -58,6 +58,10 @@ The example app lets you try out the BLOCKv SDK. It's a great place to start if 
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
+## Versioning
+
+The BLOCKv SDK for iOS is still in pre-release and so may introduce breaking changes. Once the release is official, the SDK will follow [semantic versioning](https://semver.org), starting with release 1.0.0.
+
 ## Security Disclosure
 
 If you believe you have identified a security vulnerability with BLOCKv, you should report it as soon as possible via email to support@blockv.io. Please do not post it to a public issue tracker.

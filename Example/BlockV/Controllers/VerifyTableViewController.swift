@@ -159,9 +159,7 @@ extension VerifyTableViewController {
         }
         
     }
-    
-    //TODO: Verify this all works with multiple tokens.
-    
+        
     override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
         
         // don't show actions in register flow

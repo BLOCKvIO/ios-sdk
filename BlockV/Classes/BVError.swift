@@ -70,20 +70,17 @@ public enum BVError: Error {
         init(code: Int, message: String) {
             switch code {
                 
-            case -1: self = .unknownWithMissingCode(code, message)
+            case -1:  self = .unknownWithMissingCode(code, message)
                 
-            case 401: self  = .tokenExpired(code, message)
-            case 516: self  = .invalidPayload(code, message)
-            case 521: self  = .tokenUnavailable(code, message)
-            case 527: self  = .invalidDateFormat(code, message)
+            case 401: self = .tokenExpired(code, message) //FIXME: 400 range custom server codes do not appear anymore - remove.
+            case 516: self = .invalidPayload(code, message)
+            case 521: self = .tokenUnavailable(code, message)
+            case 527: self = .invalidDateFormat(code, message)
                 
             case 1004: self = .malformedRequestBody(code, message)
             case 1041: self = .invalidDataValidation(code, message)
                 
             case 1701: self = .vatomNotFound(code, message)
-                
-                // User management
-                //case 11: self = .tokenAlreadyTaken(code, message)
                 
             case 2030: self = .cannotFindUser(code, message)
             case 2031: self = .authenticationFailed(code, message)
@@ -92,9 +89,10 @@ public enum BVError: Error {
             case 2037: self = .avatarUploadFailed(code, message)
             case 2049: self = .userRefreshTokenInvalid(code, message)
             case 2051: self = .authenticationLimit(code, message)
+                
             case 2552: self = .unableToRetrieveToken(code, message)
-            case 2553: self = .tokenNotFound(code, message)
             case 2562: self = .cannotDeletePrimaryToken(code, message)
+            case 2563: self = .tokenNotFound(code, message)
             case 2564: self = .tokenAlreadyConfirmed(code, message)
             case 2565: self = .invalidVerificationCode(code, message)
             case 2569: self = .invalidPhoneNumber(code, message)
@@ -130,9 +128,9 @@ extension BVError.PlatformErrorReason {
             
         //TODO: Is there a better way to do this with pattern matching?
         case let .unknownWithMissingCode(_, message):
-            return "UNKNOWN: BLOCKv Platform Error: (Missing Code) - Message: \(message)"
+            return "Unrecogonized: BLOCKv Platform Error: (Missing Code) - Message: \(message)"
         case let .unknown(code, message):
-            return "UNKNOWN: BLOCKv Platform Error: (\(code)) Message: \(message)"
+            return "Unrecogonized: BLOCKv Platform Error: (\(code)) - Message: \(message)"
             
         case let .malformedRequestBody(code, message),
              let .invalidDataValidation(code, message),

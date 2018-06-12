@@ -62,6 +62,7 @@ public enum BVError: Error {
         case tokenAlreadyConfirmed(Int, String)
         case invalidVerificationCode(Int, String)
         case invalidPhoneNumber(Int, String)
+        case invalidEmailAddress(Int, String)
         
         case unknownWithMissingCode(Int, String) //TODO: Remove. Temporary until all error responses return a code key-value pair.
         case unknown(Int, String) //TODO: Remove. All errors should be mapped.
@@ -95,7 +96,10 @@ public enum BVError: Error {
             case 2563: self = .tokenNotFound(code, message)
             case 2564: self = .tokenAlreadyConfirmed(code, message)
             case 2565: self = .invalidVerificationCode(code, message)
-            case 2569: self = .invalidPhoneNumber(code, message)
+                
+            case 2571: self = .invalidEmailAddress(code, message)
+            case 2572: self = .invalidPhoneNumber(code, message)
+                
             default:
                 // useful for debugging
                 //assertionFailure("Unhandled error: \(code) \(message)")
@@ -146,13 +150,13 @@ extension BVError.PlatformErrorReason {
              let .tokenAlreadyConfirmed(code, message),
              let .invalidVerificationCode(code, message),
              let .invalidPhoneNumber(code, message),
+             let .invalidEmailAddress(code, message),
              let .invalidPayload(code, message),
              let .invalidDateFormat(code, message),
              let .userRefreshTokenInvalid(code, message),
              let .tokenNotFound(code, message),
              let .cannotDeletePrimaryToken(code, message):
             return "BLOCKv Platform Error: (\(code)) Message: \(message)"
-            
         }
     }
     

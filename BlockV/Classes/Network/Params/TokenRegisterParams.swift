@@ -29,7 +29,7 @@ public struct UserInfo: Encodable {
                 isNamePublic: Bool? = true,
                 password: String? = nil,
                 birthday: String? = nil,
-                isAvatarPublic: Bool? = false,
+                isAvatarPublic: Bool? = true,
                 language: String? = nil) {
         
         self.firstName = firstName

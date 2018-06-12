@@ -155,114 +155,42 @@ extension BLOCKv {
         
     }
     
-    // MARK: Verify
+    // MARK: - Logout
     
-    /// Verifies ownership of a token by submitting the verification code to the BLOCKv Platform.
+    /// Log out the current user.
     ///
-    /// - Parameters:
-    ///   - token: A user token value, i.e. phone number or email.
-    ///   - type: The type of the token `phone` or `email`.
-    ///   - code: The verification code send to the user's token (phone or email).
-    ///   - completion: The completion handler to call when the request is completed.
+    /// The current user will no longer be authorized to perform user scoped requests on the
+    /// BLOCKv platfrom.
+    ///
+    /// - Parameter completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
-    public static func verifyUserToken(_ token: String, type: UserTokenType, code: String,
-                                       completion: @escaping (UserToken?, BVError?) -> Void) {
+    public static func logout(completion: @escaping (BVError?) -> Void) {
         
-        let userToken = UserToken(value: token, type: type)
-        let endpoint = API.CurrentUser.verifyToken(userToken, code: code)
+        let endpoint = API.CurrentUser.logOut()
         
         self.client.request(endpoint) { (baseModel, error) in
+            
+            // reset
+            reset()
             
             // extract model, ensure no error
-            guard let userTokenModel = baseModel?.payload, error == nil else {
+            guard let _ = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
-                    completion(nil, error)
+                    completion(error!)
                 }
                 return
             }
             
             // model is available
             DispatchQueue.main.async {
-                completion(userTokenModel, nil)
+                completion(nil)
             }
             
         }
         
     }
     
-    // MARK: Token Code
-    
-    /// Resets a user token. This will remove the user's password and trigger
-    /// a One-Time-Pin (OTP) to be sent to the supplied user token.
-    ///
-    /// Note: This OTP may be used in place of a password to login.
-    ///
-    /// - Parameters:
-    ///   - token: A user token value, i.e. phone number or email.
-    ///   - type: The type of the token `phone` or `email`.
-    ///   - completion: The completion handler to call when the request is completed.
-    ///                 This handler is executed on the main queue.
-    public static func resetToken(_ token: String, type: UserTokenType,
-                                  completion: @escaping (UserToken?, BVError?) -> Void) {
-        
-        let userToken = UserToken(value: token, type: type)
-        let endpoint = API.CurrentUser.resetToken(userToken)
-        
-        self.client.request(endpoint) { (baseModel, error) in
-            
-            // extract model, ensure no error
-            guard let userTokenModel = baseModel?.payload, error == nil else {
-                DispatchQueue.main.async {
-                    completion(nil, error)
-                }
-                return
-            }
-            
-            // model is available
-            DispatchQueue.main.async {
-                completion(userTokenModel, nil)
-            }
-            
-        }
-        
-    }
-    
-    /// Resets the verification process. Sends a verification item to the user's token (phone or email).
-    ///
-    /// This verification item should be used to verifiy the user's ownership of the token (phone or email).
-    /// Note: the type of verification is dependent on the configuration of the app id on the developer portal.
-    ///
-    /// - Parameters:
-    ///   - token: A user token value, i.e. phone number or email.
-    ///   - type: The type of the token `phone` or `email`.
-    ///   - completion: The completion handler to call when the request is completed.
-    ///                 This handler is executed on the main queue.
-    public static func resetVerification(forUserToken token: String, type: UserTokenType,
-                                         completion: @escaping (UserToken?, BVError?) -> Void) {
-        
-        let userToken = UserToken(value: token, type: type)
-        let endpoint = API.CurrentUser.resetTokenVerification(forToken: userToken)
-        
-        self.client.request(endpoint) { (baseModel, error) in
-            
-            // extract model, handle error
-            guard let userTokenModel = baseModel?.payload, error == nil else {
-                DispatchQueue.main.async {
-                    completion(nil, error)
-                }
-                return
-            }
-            
-            // model is available
-            DispatchQueue.main.async {
-                completion(userTokenModel, nil)
-            }
-            
-        }
-        
-    }
-    
-    // MARK: User
+    // MARK: - User
     
     /// Fetches the current user's profile information from the BLOCKv Platform.
     ///
@@ -289,95 +217,6 @@ extension BLOCKv {
                 userModel.encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
                 
                 completion(userModel, nil)
-            }
-            
-        }
-        
-    }
-    
-    /// Fetches the current user's token description from the BLOCKv Platform.
-    ///
-    ///   - completion: The completion handler to call when the request is completed.
-    ///                 This handler is executed on the main queue.
-    public static func getCurrentUserTokens(completion: @escaping ([FullTokenModel]?, BVError?) -> Void) {
-        
-        let endpoint = API.CurrentUser.getTokens()
-        
-        self.client.request(endpoint) { (baseModel, error) in
-            
-            // extract model, handle error
-            guard let fullTokens = baseModel?.payload, error == nil else {
-                DispatchQueue.main.async {
-                    completion(nil, error)
-                }
-                return
-            }
-            
-            // model is available
-            DispatchQueue.main.async {
-                completion(fullTokens, nil)
-            }
-            
-        }
-        
-    }
-    
-    /// Removes the token from the current user's token list on the BLOCKv Platform.
-    ///
-    /// - Parameters:
-    ///   - tokenId: Unique identifier of the token to be deleted.
-    ///   - completion: The completion handler to call when the request is completed.
-    ///                 This handler is executed on the main queue.
-    public static func deleteCurrentUserToken(_ tokenId: String, completion: @escaping (BVError?) -> Void) {
-        
-        let endpoint = API.CurrentUser.deleteToken(id: tokenId)
-        
-        self.client.request(endpoint) { (baseModel, error) in
-            
-            guard let _ = baseModel?.payload, error == nil else {
-                DispatchQueue.main.async {
-                    completion(error)
-                }
-                return
-            }
-            
-            // call was successful
-            DispatchQueue.main.async {
-                completion(nil)
-            }
-            
-        }
-        
-    }
-    
-    /// Updates the specified token to be the current user's default token on the BLOCKv Platform.
-    ///
-    /// Backend description:
-    /// Flag to indicate if this token is the primary token. The primary token is used when no other
-    /// token is explicitly selected, for example to send messages. This will automatically set the
-    /// is_primary flag of an existing token to false , because only one token can be the primary token.
-    ///
-    /// - Parameters:
-    ///   - tokenId: Unique identiifer of the token.
-    ///   - completion: The completion handler to call when the request is completed.
-    ///                 This handler is executed on the main queue.
-    public static func setCurrentUserDefaultToken(_ tokenId: String, completion: @escaping (BVError?) -> Void) {
-        
-        let endpoint = API.CurrentUser.setDefaultToken(id: tokenId)
-        
-        self.client.request(endpoint) { (baseModel, error) in
-            
-            //
-            guard let _ = baseModel?.payload, error == nil else {
-                DispatchQueue.main.async {
-                    completion(error)
-                }
-                return
-            }
-            
-            // call was succesful
-            DispatchQueue.main.async {
-                completion(nil)
             }
             
         }
@@ -458,33 +297,192 @@ extension BLOCKv {
         
     }
     
-    // MARK: Logout
+    // MARK: - Token Verification
     
-    /// Log out the current user.
+    /// Verifies ownership of a token by submitting the verification code to the BLOCKv Platform.
     ///
-    /// The current user will no longer be authorized to perform user scoped requests on the
-    /// BLOCKv platfrom.
-    ///
-    /// - Parameter completion: The completion handler to call when the request is completed.
+    /// - Parameters:
+    ///   - token: A user token value, i.e. phone number or email.
+    ///   - type: The type of the token `phone` or `email`.
+    ///   - code: The verification code send to the user's token (phone or email).
+    ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
-    public static func logout(completion: @escaping (BVError?) -> Void) {
+    public static func verifyUserToken(_ token: String, type: UserTokenType, code: String,
+                                       completion: @escaping (UserToken?, BVError?) -> Void) {
         
-        let endpoint = API.CurrentUser.logOut()
+        let userToken = UserToken(value: token, type: type)
+        let endpoint = API.CurrentUser.verifyToken(userToken, code: code)
         
         self.client.request(endpoint) { (baseModel, error) in
             
-            // reset
-            reset()
-            
             // extract model, ensure no error
-            guard let _ = baseModel?.payload, error == nil else {
+            guard let userTokenModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
-                    completion(error!)
+                    completion(nil, error)
                 }
                 return
             }
             
             // model is available
+            DispatchQueue.main.async {
+                completion(userTokenModel, nil)
+            }
+            
+        }
+        
+    }
+    
+    /// Resets the verification process. Sends a verification item to the user's token (phone or email).
+    ///
+    /// This verification item should be used to verifiy the user's ownership of the token (phone or email).
+    /// Note: the type of verification is dependent on the configuration of the app id on the developer portal.
+    ///
+    /// - Parameters:
+    ///   - token: A user token value, i.e. phone number or email.
+    ///   - type: The type of the token `phone` or `email`.
+    ///   - completion: The completion handler to call when the request is completed.
+    ///                 This handler is executed on the main queue.
+    public static func resetVerification(forUserToken token: String, type: UserTokenType,
+                                         completion: @escaping (UserToken?, BVError?) -> Void) {
+        
+        let userToken = UserToken(value: token, type: type)
+        let endpoint = API.CurrentUser.resetTokenVerification(forToken: userToken)
+        
+        self.client.request(endpoint) { (baseModel, error) in
+            
+            // extract model, handle error
+            guard let userTokenModel = baseModel?.payload, error == nil else {
+                DispatchQueue.main.async {
+                    completion(nil, error)
+                }
+                return
+            }
+            
+            // model is available
+            DispatchQueue.main.async {
+                completion(userTokenModel, nil)
+            }
+            
+        }
+        
+    }
+    
+    /// Resets a user token. This will remove the user's password and trigger
+    /// a One-Time-Pin (OTP) to be sent to the supplied user token.
+    ///
+    /// Note: This OTP may be used in place of a password to login.
+    ///
+    /// - Parameters:
+    ///   - token: A user token value, i.e. phone number or email.
+    ///   - type: The type of the token `phone` or `email`.
+    ///   - completion: The completion handler to call when the request is completed.
+    ///                 This handler is executed on the main queue.
+    public static func resetToken(_ token: String, type: UserTokenType,
+                                  completion: @escaping (UserToken?, BVError?) -> Void) {
+        
+        let userToken = UserToken(value: token, type: type)
+        let endpoint = API.CurrentUser.resetToken(userToken)
+        
+        self.client.request(endpoint) { (baseModel, error) in
+            
+            // extract model, ensure no error
+            guard let userTokenModel = baseModel?.payload, error == nil else {
+                DispatchQueue.main.async {
+                    completion(nil, error)
+                }
+                return
+            }
+            
+            // model is available
+            DispatchQueue.main.async {
+                completion(userTokenModel, nil)
+            }
+            
+        }
+        
+    }
+    
+    // MARK: Token Management
+    
+    /// Adds a user token to the current user.
+    ///
+    /// - Parameters:
+    ///   - token: The user token to be linked to the current user.
+    ///   - isDefault: Boolean controlling whether the token is the primary token on this account.
+    ///   - completion: The completion handler to call when the request is completed.
+    ///                 This handler is executed on the main queue.
+    public static func addCurrentUserToken(token: UserToken, isPrimary: Bool = false, completion: @escaping (FullTokenModel?, BVError?) -> Void) {
+        
+        let endpoint = API.CurrentUser.addToken(token, isPrimary: isPrimary)
+        
+        self.client.request(endpoint) { (baseModel, error) in
+            
+            // extract model, handle error
+            guard let fullToken = baseModel?.payload, error == nil else {
+                DispatchQueue.main.async {
+                    completion(nil, error)
+                }
+                return
+            }
+            
+            // model is available
+            DispatchQueue.main.async {
+                completion(fullToken, nil)
+            }
+            
+        }
+        
+    }
+    
+    /// Fetches the current user's token description from the BLOCKv Platform.
+    ///
+    ///   - completion: The completion handler to call when the request is completed.
+    ///                 This handler is executed on the main queue.
+    public static func getCurrentUserTokens(completion: @escaping ([FullTokenModel]?, BVError?) -> Void) {
+        
+        let endpoint = API.CurrentUser.getTokens()
+        
+        self.client.request(endpoint) { (baseModel, error) in
+            
+            // extract model, handle error
+            guard let fullTokens = baseModel?.payload, error == nil else {
+                DispatchQueue.main.async {
+                    completion(nil, error)
+                }
+                return
+            }
+            
+            // model is available
+            DispatchQueue.main.async {
+                completion(fullTokens, nil)
+            }
+            
+        }
+        
+    }
+    
+    /// Removes the token from the current user's token list on the BLOCKv Platform.
+    ///
+    /// Note: Primary tokens may not be deleted.
+    ///
+    /// - Parameters:
+    ///   - tokenId: Unique identifier of the token to be deleted.
+    ///   - completion: The completion handler to call when the request is completed.
+    ///                 This handler is executed on the main queue.
+    public static func deleteCurrentUserToken(_ tokenId: String, completion: @escaping (BVError?) -> Void) {
+        
+        let endpoint = API.CurrentUser.deleteToken(id: tokenId)
+        
+        self.client.request(endpoint) { (baseModel, error) in
+            
+            guard let _ = baseModel?.payload, error == nil else {
+                DispatchQueue.main.async {
+                    completion(error)
+                }
+                return
+            }
+            
+            // call was successful
             DispatchQueue.main.async {
                 completion(nil)
             }
@@ -493,7 +491,70 @@ extension BLOCKv {
         
     }
     
-    // MARK: Vatoms
+    /// Updates the specified token to be the current user's default token on the BLOCKv Platform.
+    ///
+    /// Backend description:
+    /// Boolean to indicate if this token is the primary token. The primary token is used when no other
+    /// token is explicitly selected, for example to send messages. This will automatically set the
+    /// is_primary flag of an existing token to false , because only one token can be the primary token.
+    ///
+    /// - Parameters:
+    ///   - tokenId: Unique identiifer of the token.
+    ///   - completion: The completion handler to call when the request is completed.
+    ///                 This handler is executed on the main queue.
+    public static func setCurrentUserDefaultToken(_ tokenId: String, completion: @escaping (BVError?) -> Void) {
+        
+        let endpoint = API.CurrentUser.setDefaultToken(id: tokenId)
+        
+        self.client.request(endpoint) { (baseModel, error) in
+            
+            //
+            guard let _ = baseModel?.payload, error == nil else {
+                DispatchQueue.main.async {
+                    completion(error)
+                }
+                return
+            }
+            
+            // call was succesful
+            DispatchQueue.main.async {
+                completion(nil)
+            }
+            
+        }
+        
+    }
+    
+    // MARK: - Public User
+    
+    public static func getPublicUser(withID userId: String, completion: @escaping (PublicUserModel?, BVError?) -> Void) {
+        
+        let endpoint = API.PublicUser.get(id: userId)
+        
+        self.client.request(endpoint) { (baseModel, error) in
+            
+            // extract model, ensure no error
+            guard var userModel = baseModel?.payload, error == nil else {
+                DispatchQueue.main.async {
+                    completion(nil, error)
+                }
+                return
+            }
+            
+            // model is available
+            DispatchQueue.main.async {
+                
+                // encode the model's urls
+                userModel.encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
+                
+                completion(userModel, nil)
+            }
+            
+        }
+        
+    }
+    
+    // MARK: - Vatoms
     
     /// Fetches the current user's inventory of vAtoms. The completion handler is passed in a
     /// `GroupModel` which  includes the returned vAtoms as well as the configured Faces and Actions.
@@ -630,7 +691,7 @@ extension BLOCKv {
         
     }
     
-    // MARK: Actions
+    // MARK: - Actions
     
     /// Fetches all the actions configured for a template.
     ///

@@ -11,6 +11,17 @@
 
 import Foundation
 
+/*
+ FIXME:
+ Adding `id` as a case to this enum is useful for certain functions, like transfering a vatom
+ where `id` is permitted.
+ 
+ The drawback is that is make some apis ambigious. For example, login now permits a token type of
+ `id` which does not make sense.
+ 
+ This should potentially be split into two enums to avoid ambiguity.
+ */
+
 /// Models types of user tokens supported on the BLOCKv platform.
 public enum UserTokenType: String, Codable {
     case phone = "phone_number"

@@ -14,17 +14,32 @@ import Foundation
 /// Public user response model.
 public struct PublicUserModel: Codable, Equatable {
     
-    public let id : String
-    public let meta : MetaModel
-    public let properties : Properties
+    //public let id : String //TODO: Backend will add the id to the payload soon.
+    public var properties: Properties
     
-    public struct Properties : Codable, Equatable {
-        public let firstName : String
-        public let lastName : String
+    public struct Properties: Codable, Equatable {
+        public let firstName: String
+        public let lastName: String
+        public var avatarURL: URL?
         
         enum CodingKeys: String, CodingKey {
             case firstName = "first_name"
-            case lastName = "last_name"
+            case lastName  = "last_name"
+            case avatarURL = "avatar_uri"
+        }
+    }
+    
+}
+
+
+// MARK: - AssetProviderEncodable
+
+extension PublicUserModel: AssetProviderEncodable {
+    
+    mutating func encodeEachURL(using encoder: URLEncoder, assetProviders: [AssetProvider]) {
+        // encode url
+        if let url = self.properties.avatarURL {
+            self.properties.avatarURL = encoder(url, assetProviders)
         }
     }
     

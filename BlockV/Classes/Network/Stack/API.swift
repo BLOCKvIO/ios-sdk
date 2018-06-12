@@ -150,7 +150,7 @@ extension API {
         /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
         public static func addToken(_ token: UserToken, isPrimary: Bool) -> Endpoint<BaseModel<FullTokenModel>> {
             return Endpoint(method: .post,
-                            path: currentUserPath + "/user/tokens",
+                            path: currentUserPath + "/tokens",
                             parameters: [
                                 "token": token.value,
                                 "token_type": token.type.rawValue,

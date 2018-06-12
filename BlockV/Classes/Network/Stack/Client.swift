@@ -123,8 +123,8 @@ public final class Client: ClientProtocol {
     /// NOTE: Raw requests do not partake in OAuth and general lifecycle handling.
     ///
     /// - Parameters:
-    ///   - endpoint: <#endpoint description#>
-    ///   - completion: <#completion description#>
+    ///   - endpoint: Endpoint for the request
+    ///   - completion: The completion handler to call when the request is completed.
     func request(_ endpoint: Endpoint<Void>, completion: @escaping (Data?, BVError?) -> Void) {
         
         // create request
@@ -161,8 +161,8 @@ public final class Client: ClientProtocol {
     /// Performs a request on a given endpoint.
     ///
     /// - Parameters:
-    ///   - endpoint: <#endpoint description#>
-    ///   - completion: <#completion description#>
+    ///   - endpoint: Endpoint for the request
+    ///   - completion: The completion handler to call when the request is completed.
     public func request<Response>(_ endpoint: Endpoint<Response>,
                                   completion: @escaping (Response?, BVError?) -> Void ) where Response: Decodable {
         
@@ -240,11 +240,10 @@ public final class Client: ClientProtocol {
     ///
     /// Reponse parsing works differently for upload. The `responseJSONDecodable` method transfroms the reponse with the completion closure.
     ///
-    ///
     /// - Parameters:
-    ///   - endpoint: <#endpoint description#>
-    ///   - progressCompletion: <#progressCompletion description#>
-    ///   - completion: <#completion description#>
+    ///   - endpoint: Upload endpoint
+    ///   - progressCompletion: Percent completed
+    ///   - completion: The completion handler to call when the request is completed.
     public func upload<Response>(_ endpoint: UploadEndpoint<Response>,
                                  progressCompletion: @escaping (_ percent: Float) -> Void,
                                  completion: @escaping (Response?, BVError?) -> Void ) where Response: Decodable {

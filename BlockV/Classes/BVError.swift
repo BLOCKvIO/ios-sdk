@@ -53,11 +53,16 @@ public enum BVError: Error {
         case authenticationFailed(Int, String)
         case invalidToken(Int, String)
         case avatarUploadFailed(Int, String)
+        case userRefreshTokenInvalid(Int, String)
         case authenticationLimit(Int, String)
+        
+        case tokenNotFound(Int, String)
+        case cannotDeletePrimaryToken(Int, String)
         case unableToRetrieveToken(Int, String)
         case tokenAlreadyConfirmed(Int, String)
         case invalidVerificationCode(Int, String)
         case invalidPhoneNumber(Int, String)
+        case invalidEmailAddress(Int, String)
         
         case unknownWithMissingCode(Int, String) //TODO: Remove. Temporary until all error responses return a code key-value pair.
         case unknown(Int, String) //TODO: Remove. All errors should be mapped.
@@ -66,32 +71,35 @@ public enum BVError: Error {
         init(code: Int, message: String) {
             switch code {
                 
-            case -1: self = .unknownWithMissingCode(code, message)
+            case -1:  self = .unknownWithMissingCode(code, message)
                 
-            case 401: self  = .tokenExpired(code, message)
-            case 516: self  = .invalidPayload(code, message)
-            case 521: self  = .tokenUnavailable(code, message)
-            case 527: self  = .invalidDateFormat(code, message)
+            case 401: self = .tokenExpired(code, message) //FIXME: 400 range custom server codes do not appear anymore - remove.
+            case 516: self = .invalidPayload(code, message)
+            case 521: self = .tokenUnavailable(code, message)
+            case 527: self = .invalidDateFormat(code, message)
                 
             case 1004: self = .malformedRequestBody(code, message)
             case 1041: self = .invalidDataValidation(code, message)
-            
+                
             case 1701: self = .vatomNotFound(code, message)
-            
-            // User management
-            //case 11: self = .tokenAlreadyTaken(code, message)
-
+                
             case 2030: self = .cannotFindUser(code, message)
             case 2031: self = .authenticationFailed(code, message)
             case 2032: self = .authenticationFailed(code, message)
             case 2034: self = .invalidToken(code, message)
             case 2037: self = .avatarUploadFailed(code, message)
+            case 2049: self = .userRefreshTokenInvalid(code, message)
             case 2051: self = .authenticationLimit(code, message)
+                
             case 2552: self = .unableToRetrieveToken(code, message)
-            
+            case 2562: self = .cannotDeletePrimaryToken(code, message)
+            case 2563: self = .tokenNotFound(code, message)
             case 2564: self = .tokenAlreadyConfirmed(code, message)
             case 2565: self = .invalidVerificationCode(code, message)
-            case 2569: self = .invalidPhoneNumber(code, message)
+                
+            case 2571: self = .invalidEmailAddress(code, message)
+            case 2572: self = .invalidPhoneNumber(code, message)
+                
             default:
                 // useful for debugging
                 //assertionFailure("Unhandled error: \(code) \(message)")
@@ -124,46 +132,30 @@ extension BVError.PlatformErrorReason {
             
         //TODO: Is there a better way to do this with pattern matching?
         case let .unknownWithMissingCode(_, message):
-            return "UNKNOWN: BLOCKv Platform Error: (Missing Code) - Message: \(message)"
+            return "Unrecogonized: BLOCKv Platform Error: (Missing Code) - Message: \(message)"
         case let .unknown(code, message):
-            return "UNKNOWN: BLOCKv Platform Error: (\(code)) Message: \(message)"
-        
-        //
-        case let .malformedRequestBody(code, message):
-            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
-        case let .invalidDataValidation(code, message):
-            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
+            return "Unrecogonized: BLOCKv Platform Error: (\(code)) - Message: \(message)"
             
-        //
-        case let .vatomNotFound(code, message):
-            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
-
-        //
-        case let .cannotFindUser(code, message):
-            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
-        case let .authenticationFailed(code, message):
-            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
-        case let .tokenExpired(code, message):
-            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
-        case let .invalidToken(code, message):
-            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
-        case let .avatarUploadFailed(code, message):
-            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
-        case let .unableToRetrieveToken(code, message):
-            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
-        case let .tokenUnavailable(code, message):
-            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
-        case let .authenticationLimit(code, message):
-            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
-        case let .tokenAlreadyConfirmed(code, message):
-            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
-        case let .invalidVerificationCode(code, message):
-            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
-        case let .invalidPhoneNumber(code, message):
-            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
-        case let .invalidPayload(code, message):
-            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
-        case let .invalidDateFormat(code, message):
+        case let .malformedRequestBody(code, message),
+             let .invalidDataValidation(code, message),
+             let .vatomNotFound(code, message),
+             let .cannotFindUser(code, message),
+             let .authenticationFailed(code, message),
+             let .tokenExpired(code, message),
+             let .invalidToken(code, message),
+             let .avatarUploadFailed(code, message),
+             let .unableToRetrieveToken(code, message),
+             let .tokenUnavailable(code, message),
+             let .authenticationLimit(code, message),
+             let .tokenAlreadyConfirmed(code, message),
+             let .invalidVerificationCode(code, message),
+             let .invalidPhoneNumber(code, message),
+             let .invalidEmailAddress(code, message),
+             let .invalidPayload(code, message),
+             let .invalidDateFormat(code, message),
+             let .userRefreshTokenInvalid(code, message),
+             let .tokenNotFound(code, message),
+             let .cannotDeletePrimaryToken(code, message):
             return "BLOCKv Platform Error: (\(code)) Message: \(message)"
         }
     }

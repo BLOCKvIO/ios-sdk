@@ -145,37 +145,46 @@ extension API {
             )
         }
         
-        /* POST Beta 0.5
-         
-         /// Endpoint to add a token to the current user.
-         public static func addToken(_ token: UserToken, isPrimary: Bool) -> Endpoint<Void> {
-         return Endpoint(method: .post,
-         path: currentUserPath + "/user/tokens",
-         parameters: [
-         "token": token.value,
-         "token_type": token.type.rawValue,
-         "is_primary": isPrimary
-         ]
-         )
-         }
-         
-         /// Endpoint to delete a token.
-         public static func deleteToken(id: String) -> Endpoint<Void> {
-         return Endpoint(method: .delete,
-         path: currentUserPath + "/tokens/\(id)")
-         }
-         
-         /// Endpoint to set a default token.
-         public static func setDefaultToken(id: String) -> Endpoint<Void> {
-         return Endpoint(method: .put,
-         path: currentUserPath + "/tokens/\(id)/default")
-         }
-         
+        /// Endpoint to add a token to the current user.
+        ///
+        /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
+        public static func addToken(_ token: UserToken, isPrimary: Bool) -> Endpoint<BaseModel<FullTokenModel>> {
+            return Endpoint(method: .post,
+                            path: currentUserPath + "/tokens",
+                            parameters: [
+                                "token": token.value,
+                                "token_type": token.type.rawValue,
+                                "is_primary": isPrimary
+                ]
+            )
+        }
+        
+        /// Endpoint to delete a token.
+        ///
+        /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
+        public static func deleteToken(id: String) -> Endpoint<BaseModel<GeneralModel>> {
+            return Endpoint(method: .delete,
+                            path: currentUserPath + "/tokens/\(id)")
+        }
+        
+        /// Endpoint to set a default token.
+        ///
+        /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
+        public static func setDefaultToken(id: String) -> Endpoint<BaseModel<GeneralModel>> {
+            return Endpoint(method: .put,
+                            path: currentUserPath + "/tokens/\(id)/default")
+        }
+        
+        // MARK: Redemption
+        
+        /*
          /// Endpoint to fetch redeemables.
          public static func getRedeemables() -> Endpoint<Void> {
          return Endpoint(path: currentUserPath + "/redeemables")
          }
          */
+        
+        // MARK: Avatar
         
         /// Upload endpoint for the user's avatar.
         ///
@@ -255,22 +264,22 @@ extension API {
     
     /// Consolidates all action endpoints.
     enum VatomAction {
-
+        
         private static let actionPath = "/v1/user/vatom/action"
         
         /*
          Each action's reactor returns it's own json payload. This does not need to be mapped as yet.
          */
-
+        
         /// Returns the endpoint to perform and action on a vAtom.
         ///
         /// The enpoint is generic over Void which means the raw data will be returned.
         static func custom(name: String, payload: [String : Any]) -> Endpoint<Void> {
             return Endpoint(method: .post,
                             path: actionPath + "/\(name)",
-                            parameters: payload)
+                parameters: payload)
         }
-
+        
     }
     
     /// Consolidates all the user actions.
@@ -287,4 +296,3 @@ extension API {
     }
     
 }
-

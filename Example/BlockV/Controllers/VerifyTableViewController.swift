@@ -54,7 +54,7 @@ class VerifyTableViewController: UITableViewController {
     // MARK: - Properties
     
     fileprivate let tokenCellID = "cell.token.id"
-
+    
     /// This view controller shows a different set of data based on its presentation origin.
     var origin: Origin!
     
@@ -79,16 +79,16 @@ class VerifyTableViewController: UITableViewController {
         
         // check the orgin of presentation
         if origin == .profile {
-
+            
             // remove the 'next' button
             nextBarButton = nil
-
+            
             // fetch all tokens
             fetchAllUserTokens()
         }
         
         self.tableView.reloadData()
-
+        
     }
     
     // MARK: - Networking
@@ -106,7 +106,7 @@ class VerifyTableViewController: UITableViewController {
             
             // hide loader
             self?.hideNavBarActivityRight()
-        
+            
             // handle error
             guard let model = fullTokens, error == nil else {
                 print(">>> Error > Viewer: \(error!.localizedDescription)")
@@ -127,7 +127,7 @@ class VerifyTableViewController: UITableViewController {
     
 }
 
-// MARK: - Table view data source
+// MARK: - Table view delegate and data source
 
 extension VerifyTableViewController {
     
@@ -159,6 +159,61 @@ extension VerifyTableViewController {
         }
         
     }
+        
+    override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        
+        // don't show actions in register flow
+        if origin == .register { return [] }
+        
+        // action to delete the token
+        let delete = UITableViewRowAction(style: .destructive, title: "Delete") { (action, indexPath) in
+            
+            // get the token
+            let token = self.allTokens[indexPath.row]
+            // make request
+            BLOCKv.deleteCurrentUserToken(token.id) { [weak self] error in
+                if let error = error {
+                    self?.present(UIAlertController.errorAlert(error), animated: true)
+                }
+                // refresh local token list
+                self?.fetchAllUserTokens()
+            }
+            
+        }
+        
+        // action to set the token as primary
+        let primary = UITableViewRowAction(style: .normal, title: "Primary") { (action, indexPath) in
+
+            // get the token
+            let token = self.allTokens[indexPath.row]
+            // make request
+            BLOCKv.setCurrentUserDefaultToken(token.id) { [weak self] error in
+                if let error = error {
+                    self?.present(UIAlertController.errorAlert(error), animated: true)
+                }
+                // refresh local token list
+                self?.fetchAllUserTokens()
+            }
+            
+        }
+        
+        return [delete, primary]
+        
+    }
+    
+    /*
+     Add this to do the delete locally before going out to network. This will give good feedback locally.
+     */
+    
+//    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+//
+//        if editingStyle == .delete {
+//
+//            // remove the row locally
+//
+//        }
+//
+//    }
     
 }
 

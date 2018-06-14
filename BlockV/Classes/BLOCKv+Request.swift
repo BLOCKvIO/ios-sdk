@@ -527,6 +527,15 @@ extension BLOCKv {
     
     // MARK: - Public User
     
+    /// Fetches the publicly available attributes of any user given their user id.
+    ///
+    /// Since users are given control over which attributes they make public, you should make
+    /// provision for receiving all, some, or none of their public attributes.
+    ///
+    /// - Parameters:
+    ///   - userId: Unique identifier of the user.
+    ///   - completion: The completion handler to call when the request is completed.
+    ///                 This handler is executed on the main queue.
     public static func getPublicUser(withID userId: String, completion: @escaping (PublicUserModel?, BVError?) -> Void) {
         
         let endpoint = API.PublicUser.get(id: userId)
@@ -696,7 +705,7 @@ extension BLOCKv {
     /// Fetches all the actions configured for a template.
     ///
     /// - Parameters:
-    ///   - id: Uniquie identified of the template.
+    ///   - id: Unique identified of the template.
     ///   - completion: The completion handler to call when the call is completed.
     ///                 This handler is executed on the main queue.
     public static func getActions(forTemplateID id: String,

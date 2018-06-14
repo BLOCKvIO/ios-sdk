@@ -145,7 +145,7 @@ public final class BLOCKv {
     /// Sets the BLOCKv platform environment.
     ///
     /// By setting the environment you are informing the SDK which BLOCKv
-    /// platfrom environment to interact with.
+    /// platform environment to interact with.
     ///
     /// Typically, you would call `setEnvironment` in `application(_:didFinishLaunchingWithOptions:)`.
     @available(*, deprecated, message: "BLOCKv now defaults to production. You may remove this call to set the environment.")

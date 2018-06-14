@@ -67,7 +67,7 @@ public enum BVError: Error {
         case unknownWithMissingCode(Int, String) //TODO: Remove. Temporary until all error responses return a code key-value pair.
         case unknown(Int, String) //TODO: Remove. All errors should be mapped.
         
-        /// Init using a BLOCKv platfrom error code and message.
+        /// Init using a BLOCKv platform error code and message.
         init(code: Int, message: String) {
             switch code {
                 

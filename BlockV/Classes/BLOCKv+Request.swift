@@ -11,7 +11,7 @@
 
 import Foundation
 
-/// This extension groups together all BLOCKv Platform requests.
+/// This extension groups together all BLOCKv platform requests.
 extension BLOCKv {
     
     // MARK: Register
@@ -160,7 +160,7 @@ extension BLOCKv {
     /// Log out the current user.
     ///
     /// The current user will no longer be authorized to perform user scoped requests on the
-    /// BLOCKv platfrom.
+    /// BLOCKv platform.
     ///
     /// - Parameter completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
@@ -192,7 +192,7 @@ extension BLOCKv {
     
     // MARK: - User
     
-    /// Fetches the current user's profile information from the BLOCKv Platform.
+    /// Fetches the current user's profile information from the BLOCKv platform.
     ///
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
@@ -223,7 +223,7 @@ extension BLOCKv {
         
     }
     
-    /// Updates the current user's profile on the BLOCKv Platform.
+    /// Updates the current user's profile on the BLOCKv platform.
     ///
     /// - Parameters:
     ///   - userInfo: A simple struct that holds the properties of the user, e.g. their first name.
@@ -254,7 +254,7 @@ extension BLOCKv {
         
     }
     
-    /// Uploads an avatar image to the BlockV Platform.
+    /// Uploads an avatar image to the BlockV platform.
     ///
     /// It is recommended that scalling and cropping be done before calling this method.
     ///
@@ -299,7 +299,7 @@ extension BLOCKv {
     
     // MARK: - Token Verification
     
-    /// Verifies ownership of a token by submitting the verification code to the BLOCKv Platform.
+    /// Verifies ownership of a token by submitting the verification code to the BLOCKv platform.
     ///
     /// - Parameters:
     ///   - token: A user token value, i.e. phone number or email.
@@ -434,7 +434,7 @@ extension BLOCKv {
         
     }
     
-    /// Fetches the current user's token description from the BLOCKv Platform.
+    /// Fetches the current user's token description from the BLOCKv platform.
     ///
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
@@ -461,7 +461,7 @@ extension BLOCKv {
         
     }
     
-    /// Removes the token from the current user's token list on the BLOCKv Platform.
+    /// Removes the token from the current user's token list on the BLOCKv platform.
     ///
     /// Note: Primary tokens may not be deleted.
     ///
@@ -491,7 +491,7 @@ extension BLOCKv {
         
     }
     
-    /// Updates the specified token to be the current user's default token on the BLOCKv Platform.
+    /// Updates the specified token to be the current user's default token on the BLOCKv platform.
     ///
     /// Backend description:
     /// Boolean to indicate if this token is the primary token. The primary token is used when no other
@@ -650,7 +650,7 @@ extension BLOCKv {
         
     }
     
-    /// Searches for vAtoms on the BLOCKv Platform.
+    /// Searches for vAtoms on the BLOCKv platform.
     ///
     /// - Parameters:
     ///   - builder: A discover query builder object. Use the builder to simplify constructing
@@ -661,7 +661,7 @@ extension BLOCKv {
         self.discover(payload: builder.toDictionary(), completion: completion)
     }
     
-    /// Searches for vAtoms on the BLOCKv Platform.
+    /// Searches for vAtoms on the BLOCKv platform.
     ///
     /// - Parameters:
     ///   - payload: Dictionary
@@ -732,7 +732,7 @@ extension BLOCKv {
         
     }
     
-    /// Performs an action on the BLOCKv Platform.
+    /// Performs an action on the BLOCKv platform.
     ///
     /// This is the most flexible of the action calls and should be used as a last resort.
     ///

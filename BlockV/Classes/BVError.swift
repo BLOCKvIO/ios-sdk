@@ -77,7 +77,7 @@ public enum BVError: Error {
             switch code {
                 
             case -1:  self = .unknownWithMissingCode(code, message)
-            
+                
             case 2:   self = .unknownAppId(code, message) // App Id is unacceptable.
             case 11:  self = .internalServerIssue(code, message) // Server encountered an error processing the request.
             case 17:  self = .unknownAppId(code, message) // App Id is unacceptable.
@@ -144,10 +144,6 @@ extension BVError.PlatformErrorReason {
         case let .malformedRequestBody(code, message),
              let .invalidDataValidation(code, message),
              let .vatomNotFound(code, message),
-             let .cannotFindUser(code, message),
-             let .authenticationFailed(code, message),
-             let .tokenExpired(code, message),
-             let .invalidToken(code, message),
              let .avatarUploadFailed(code, message),
              let .unableToRetrieveToken(code, message),
              let .tokenUnavailable(code, message),
@@ -160,8 +156,17 @@ extension BVError.PlatformErrorReason {
              let .invalidDateFormat(code, message),
              let .userRefreshTokenInvalid(code, message),
              let .tokenNotFound(code, message),
-             let .cannotDeletePrimaryToken(code, message):
-            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
+             let .cannotDeletePrimaryToken(code, message),
+             let .unknownAppId(code, message),
+             let .internalServerIssue(code, message),
+             let .tokenExpired(code, message),
+             let .unknownUserToken(code, message),
+             let .authenticationFailed(code, message),
+             let .invalidToken(code, message),
+             let .unknownTokenType(code, message),
+             let .unknownTokenId(code, message):
+             return "BLOCKv Platform Error: (\(code)) Message: \(message)"
+            
         }
     }
     

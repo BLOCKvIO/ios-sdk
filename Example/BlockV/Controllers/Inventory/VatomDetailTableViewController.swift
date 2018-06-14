@@ -104,7 +104,7 @@ class VatomDetailTableViewController: UITableViewController {
         fetchVatom()
     }
     
-    /// Fetches the input vatom's properties from the Blockv Platform.
+    /// Fetches the input vatom's properties from the Blockv platform.
     fileprivate func fetchVatom() {
         
         BLOCKv.getVatoms(withIDs: [vatom.id]) { [weak self] (groupModel, error) in

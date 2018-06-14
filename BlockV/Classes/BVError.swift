@@ -11,14 +11,14 @@
 
 import Foundation
 
-/// `BVError` is the error type returned by BlockvSDK. These errors should not be
-/// presented to users. Rather, they provide technical descriptions of the Platform
+/// `BVError` is the error type returned by BLOCKv SDK. These errors should not be
+/// presented to users. Rather, they provide technical descriptions of the platform
 /// error.
 ///
 /// It encompasses a few different types of errors, each with their own associated
 /// errors or reasons.
 ///
-/// NB: The BLOCKv Platform is in the process of unifying error codes.
+/// NB: The BLOCKv platform is in the process of unifying error codes.
 /// BVError is subject to change in future releases.
 public enum BVError: Error {
     

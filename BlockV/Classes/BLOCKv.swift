@@ -31,7 +31,7 @@ public final class BLOCKv {
     
     // MARK: - Properties
     
-    /// The App ID to be passed to the BlockV platform.
+    /// The App ID to be passed to the BLOCKv platform.
     ///
     /// Must be set once by the host app.
     fileprivate static var appID: String? {
@@ -46,7 +46,7 @@ public final class BLOCKv {
     
     //TODO: Detect an environment switch, e.g. dev to prod, reset the client.
     
-    /// The BlockV platform environment to use.
+    /// The BLOCKv platform environment to use.
     ///
     /// Must be set by the host app.
     fileprivate static var environment: BVEnvironment? {
@@ -76,7 +76,7 @@ public final class BLOCKv {
     /// Backing networking client instance variable.
     fileprivate static var _client: Client?
     
-    /// Blockv networking client.
+    /// BLOCKv networking client.
     ///
     /// The networking client must support a platform environment change after app launch.
     ///
@@ -127,7 +127,7 @@ public final class BLOCKv {
     /// access token.
     ///
     /// - Parameter completion: The closure to call once an access token has been obtained
-    /// form the BLOCKv Platform.
+    /// form the BLOCKv platform.
     public static func getAccessToken(completion: @escaping (_ success: Bool, _ accessToken: String?) -> Void) {
         BLOCKv.client.getAccessToken(completion: completion)
     }

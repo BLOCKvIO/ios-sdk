@@ -11,7 +11,7 @@
 
 import Foundation
 
-/// Represents the top-level JSON structure for success (200...299) BlockV Platform responses.
+/// Represents the top-level JSON structure for success (200...299) BLOCKv platform responses.
 public struct BaseModel<T: Decodable>: Decodable {
     let payload: T
 }

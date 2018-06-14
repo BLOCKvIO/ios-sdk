@@ -106,7 +106,7 @@ class InventoryCollectionViewController: UICollectionViewController {
              It is sometimes useful to order vAtoms by their `whenModified` date. This will
              ensure new vAtoms appear at the top of the user's inventory.
              
-             Additionally, if a vAtom's state changes on the BLOCKv Platform so to will its
+             Additionally, if a vAtom's state changes on the BLOCKv platform so to will its
              `whenModifed` date. For example, if a vAtom is picked up off the map, its
              `droppped` flag is set as `false` and the `whenModified` date updated.
              */

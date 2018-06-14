@@ -245,7 +245,7 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
     /// Retrieves and refreshes the SDKs access token.
     ///
     /// - Parameter completion: The closure to call once an access token has been obtained
-    /// form the BLOCKv Platform.
+    /// form the BLOCKv platform.
     func getAccessToken(completion: @escaping TokenCompletion) {
         
         /*

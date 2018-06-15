@@ -713,14 +713,14 @@ extension BLOCKv {
     ///   - bottomLeftLon: Bottom left longitude coordinate.
     ///   - topRightLat: Top right latitude coordinate.
     ///   - topRightLon: Top right longitude coordinte.
-    ///   - filter: The vAtom filter option to apply.
+    ///   - filter: The vAtom filter option to apply. Defaults to "vatoms".
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
     public static func geoDiscover(bottomLeftLat: Double,
                                    bottomLeftLon: Double,
                                    topRightLat: Double,
                                    topRightLon: Double,
-                                   filter: VatomGeoFilter,
+                                   filter: VatomGeoFilter = .vatoms,
                                    completion: @escaping (GroupModel?, BVError?) -> Void) {
         
         let endpoint = API.VatomDiscover.geoDiscover(bottomLeftLat: bottomLeftLat,
@@ -758,7 +758,53 @@ extension BLOCKv {
         
     }
     
-    public static func geoDiscoverGroups() {}
+    /// - Parameters:
+    ///   - bottomLeftLat: Bottom left latitude coordinate.
+    ///   - bottomLeftLon: Bottom left longitude coordinate.
+    ///   - topRightLat: Top right latitude coordinate.
+    ///   - topRightLon: Top right longitude coordinte.
+    ///   - precision: Controls the density of the group distribution. Defaults to 3.
+    ///                Lower values return fewer groups (with a higher vatom count) — less dense.
+    ///                Higher values return more groups (with a lower vatom count) - more dense.
+    ///   - filter: The vAtom filter option to apply. Defaults to "vatoms".
+    ///   - completion: The completion handler to call when the request is completed.
+    ///                 This handler is executed on the main queue.
+    public static func geoDiscoverGroups(bottomLeftLat: Double,
+                                         bottomLeftLon: Double,
+                                         topRightLat: Double,
+                                         topRightLon: Double,
+                                         precision: Int = 3,
+                                         filter: VatomGeoFilter = .vatoms,
+                                         completion: @escaping (GeoGroupModel?, BVError?) -> Void) {
+        
+        let endpoint = API.VatomDiscover.geoDiscoverGroups(bottomLeftLat: bottomLeftLat,
+                                                           bottomLeftLon: bottomLeftLon,
+                                                           topRightLat: topRightLat,
+                                                           topRightLon: topRightLon,
+                                                           precision: precision,
+                                                           filter: filter.rawValue)
+        
+        BLOCKv.client.request(endpoint) { (baseModel, error) in
+            
+            // extract model, handle error
+            guard let geoGroupModel = baseModel?.payload, error == nil else {
+                DispatchQueue.main.async {
+                    print(error!.localizedDescription)
+                    completion(nil, error!)
+                }
+                return
+            }
+            
+            // model is available
+            DispatchQueue.main.async {
+                //print(model)
+                completion(geoGroupModel, nil)
+            }
+            
+        }
+        
+    }
+    
     
     // MARK: - Actions
     

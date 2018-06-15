@@ -87,13 +87,13 @@ public final class BLOCKv {
     /// receive a new networking client instance.
     internal static var client: Client {
         get {
-            /// check if a new instance must be initialized
+            // check if a new instance must be initialized
             if _client == nil {
-                /// init a new instance
+                // init a new instance
                 _client = Client(config: BLOCKv.clientConfiguration)
                 return _client!
             } else {
-                /// return the backing instance
+                // return the backing instance
                 return _client!
             }
         }
@@ -103,7 +103,7 @@ public final class BLOCKv {
     internal static func reset() {
         // remove all credentials
         CredentialStore.clear()
-        // remove client instance - force recompute
+        // remove client instance - force re-init on next access
         self._client = nil
     }
     

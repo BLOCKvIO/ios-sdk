@@ -328,7 +328,7 @@ extension API {
                                       topRightLat: Double,
                                       topRightLon: Double,
                                       precision: Int,
-                                      filter: String) -> Endpoint<BaseModel<GeoGroupModel>> {
+                                      filter: String) -> Endpoint<BaseModel<GeoModel>> {
             
             // create the payload
             let payload: [String : Any] =

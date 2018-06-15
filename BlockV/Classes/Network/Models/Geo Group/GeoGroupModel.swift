@@ -12,6 +12,10 @@
 import Foundation
 import CoreLocation
 
+public struct GeoModel: Decodable {
+    let groups: [GeoGroupModel]
+}
+
 public struct GeoGroupModel: Equatable {
     
     /// Geo hash. Useful for URLs etc.
@@ -53,7 +57,7 @@ extension GeoGroupModel: Codable {
     
 }
 
-// MARK: - CLLocationCoordinate2D Equatable
+// MARK: - Equatable
 
 extension CLLocationCoordinate2D: Equatable {}
 

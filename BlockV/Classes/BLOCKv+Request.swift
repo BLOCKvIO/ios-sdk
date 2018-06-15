@@ -775,7 +775,7 @@ extension BLOCKv {
                                          topRightLon: Double,
                                          precision: Int,
                                          filter: VatomGeoFilter = .vatoms,
-                                         completion: @escaping (GeoGroupModel?, BVError?) -> Void) {
+                                         completion: @escaping (GeoModel?, BVError?) -> Void) {
         
         let endpoint = API.VatomDiscover.geoDiscoverGroups(bottomLeftLat: bottomLeftLat,
                                                            bottomLeftLon: bottomLeftLon,
@@ -787,7 +787,7 @@ extension BLOCKv {
         BLOCKv.client.request(endpoint) { (baseModel, error) in
             
             // extract model, handle error
-            guard let geoGroupModel = baseModel?.payload, error == nil else {
+            guard let geoGroupModels = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
                     print(error!.localizedDescription)
                     completion(nil, error!)
@@ -797,8 +797,8 @@ extension BLOCKv {
             
             // model is available
             DispatchQueue.main.async {
-                //print(model)
-                completion(geoGroupModel, nil)
+                //print(model) 
+                completion(geoGroupModels, nil)
             }
             
         }

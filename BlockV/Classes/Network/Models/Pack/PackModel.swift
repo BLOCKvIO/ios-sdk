@@ -50,7 +50,7 @@ public struct GroupModel: Decodable, Equatable {
          
          self.vatoms = try container
          .decode([Safe<Vatom>].self, forKey: .vatoms)
-         .flatMap { $0.value }
+         .compactMap { $0.value }
          
          */
         

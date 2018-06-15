@@ -499,7 +499,7 @@ extension BLOCKv {
     /// is_primary flag of an existing token to false , because only one token can be the primary token.
     ///
     /// - Parameters:
-    ///   - tokenId: Unique identiifer of the token.
+    ///   - tokenId: Unique identifer of the token.
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
     public static func setCurrentUserDefaultToken(_ tokenId: String, completion: @escaping (BVError?) -> Void) {

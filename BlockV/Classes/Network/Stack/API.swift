@@ -343,6 +343,7 @@ extension API {
                             "lat": topRightLat,
                             "lon": topRightLon
                     ],
+                    "precision": precision,
                     "filter": filter
             ]
             

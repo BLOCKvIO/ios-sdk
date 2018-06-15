@@ -758,6 +758,8 @@ extension BLOCKv {
         
     }
     
+    public static func geoDiscoverGroups() {}
+    
     // MARK: - Actions
     
     /// Fetches all the actions configured for a template.

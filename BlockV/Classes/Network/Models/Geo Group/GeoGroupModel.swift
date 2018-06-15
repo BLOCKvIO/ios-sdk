@@ -12,10 +12,28 @@
 import Foundation
 import CoreLocation
 
+/// Represents a geo discover groups response.
 public struct GeoModel: Decodable {
     let groups: [GeoGroupModel]
+    
+    enum CodingKeys: String, CodingKey {
+        case groups
+    }
+    
+    public init(from decoder: Decoder) throws {
+        
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        // decode the array safely
+        if let groups = try container.decodeIfPresent([Safe<GeoGroupModel>].self, forKey: .groups) {
+            self.groups = groups.compactMap { $0.value }
+        } else {
+            self.groups = [] // unable to decode
+        }
+    }
+    
 }
 
+/// Represents a geo discover group item.
 public struct GeoGroupModel: Equatable {
     
     /// Geo hash. Useful for URLs etc.

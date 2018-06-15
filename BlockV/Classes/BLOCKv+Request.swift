@@ -773,7 +773,7 @@ extension BLOCKv {
                                          bottomLeftLon: Double,
                                          topRightLat: Double,
                                          topRightLon: Double,
-                                         precision: Int = 3,
+                                         precision: Int,
                                          filter: VatomGeoFilter = .vatoms,
                                          completion: @escaping (GeoGroupModel?, BVError?) -> Void) {
         
@@ -804,7 +804,6 @@ extension BLOCKv {
         }
         
     }
-    
     
     // MARK: - Actions
     

@@ -330,6 +330,8 @@ extension API {
                                       precision: Int,
                                       filter: String) -> Endpoint<BaseModel<GeoModel>> {
             
+            assert(1...12 ~= precision, "You must specify a value in the open range [1...12].")
+            
             // create the payload
             let payload: [String : Any] =
                 [

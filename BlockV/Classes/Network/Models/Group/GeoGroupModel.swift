@@ -12,7 +12,7 @@
 import Foundation
 import CoreLocation
 
-public struct GeoGroupModel: Equatable, Codable {
+public struct GeoGroupModel: Equatable {
     
     /// Geo hash. Useful for URLs etc.
     public let geoHash: String
@@ -23,26 +23,32 @@ public struct GeoGroupModel: Equatable, Codable {
 
 }
 
-// MARK: - CLLocationCoordinate2D Codable
+// MARK: - GeoGroupModel Codable
 
-extension CLLocationCoordinate2D: Codable {
+extension GeoGroupModel: Codable {
     
     enum CodingKeys: String, CodingKey {
-        case latitude
-        case longitude
+        case geoHash   = "key"
+        case longitude = "lon"
+        case latitude  = "lat"
+        case count     = "count"
     }
     
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.init()
-        latitude = try container.decode(CLLocationDegrees.self, forKey: .latitude)
-        longitude = try container.decode(CLLocationDegrees.self, forKey: .longitude)
+        geoHash = try container.decode(String.self, forKey: .geoHash)
+        count = try container.decode(Int.self, forKey: .count)
+        let lon = try container.decode(Double.self, forKey: .longitude)
+        let lat = try container.decode(Double.self, forKey: .latitude)
+        location = CLLocationCoordinate2DMake(lat, lon)
     }
     
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(latitude, forKey: .latitude)
-        try container.encode(longitude, forKey: .longitude)
+        try container.encode(geoHash, forKey: .geoHash)
+        try container.encode(count, forKey: .count)
+        try container.encode(location.latitude, forKey: .latitude)
+        try container.encode(location.longitude, forKey: .longitude)
     }
     
 }

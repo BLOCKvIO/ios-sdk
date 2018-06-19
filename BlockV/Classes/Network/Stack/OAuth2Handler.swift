@@ -90,10 +90,29 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
         // check for an unauthorised response
         if let response = request.task?.response as? HTTPURLResponse, response.statusCode == 401 {
             
-            // store the completion closures until a refresh and token update has been performed
-            requestsToRetry.append(completion)
+            // ensure request are retried only once
+            guard request.retryCount == 0 else {
+                // don't retry the request
+                completion(false, 0.0)
+                return
+            }
             
-            //TODO: If refresh fails, refreshTokens will be called continiously. A backoff policy should be implemented.
+            // ensure the error payload indicates a token refresh is required
+            guard
+                let data = request.delegate.data,
+                let json = try? JSONSerialization.jsonObject(with: data, options: []),
+                let errorDictionary = json as? [String : String],
+                // Important to check for both "token expired" and "Unauthorized" messages.
+                (errorDictionary["exp"] == "token expired" || errorDictionary["message"] == "Unauthorized") else {
+                    printBV(info: "401 received. Access token is still valid. Access token refresh declined.")
+                    // don't retry the request
+                    completion(false, 0.0)
+                    return
+            }
+            
+            // store the completion hanlder
+            requestsToRetry.append(completion)
+            // attemp to fetch a new access token
             refreshAndUpdate()
             
         } else {
@@ -101,10 +120,7 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
             completion(false, 0.0)
         }
         
-        // check for rate limiting
-        if let response = request.task?.response as? HTTPURLResponse, response.statusCode == 403 {
-            print("\n◦◦◦ BV SDK ◦ Warning: Server is rate limiting.")
-        }
+        //TODO: Inform viewer they may be rate limited 403
         
     }
     
@@ -186,7 +202,16 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
                 printBV(error: "Access token - Refresh failed")
                 printBV(error: err.localizedDescription)
                 completion(false, nil, nil)
- 
+                
+                /*
+                 As agreed, the response from the refresh should be inspected. If the refresh failed
+                 due to the refresh token being blacklisted or expired. Then the client application
+                 should be notified. This could be in the form of a notification or invoking a closure
+                 etc.
+                 
+                 The SDK' internal `reset()` method should also be called to ensure state clean up.
+                 */
+                
             }
 
             strongSelf.isRefreshing = false
@@ -220,7 +245,7 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
     /// Retrieves and refreshes the SDKs access token.
     ///
     /// - Parameter completion: The closure to call once an access token has been obtained
-    /// form the BLOCKv Platform.
+    /// form the BLOCKv platform.
     func getAccessToken(completion: @escaping TokenCompletion) {
         
         /*
@@ -234,5 +259,4 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
         
     }
 
-    
 }

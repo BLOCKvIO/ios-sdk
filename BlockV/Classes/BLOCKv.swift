@@ -11,6 +11,7 @@
 
 import Foundation
 import Alamofire
+import JWTDecode
 
 // Beta 0.9
 //TODO: Inpect the `expires_in` before a request is made. Refresh the access token if necessary.
@@ -26,26 +27,27 @@ public final class BLOCKv {
     /// - production
     public enum BVEnvironment: String {
         case production = "https://api.blockv.io"
+        case development = "https://apidev.blockv.net"
     }
     
     // MARK: - Properties
     
-    /// The App ID to be passed to the BlockV platform.
+    /// The App ID to be passed to the BLOCKv platform.
     ///
     /// Must be set once by the host app.
     fileprivate static var appID: String? {
         // willSet is only called outside of the initialisation context, i.e.
-        // setting the appID after its init will case a fatal error.
+        // setting the appID after its init will cause a fatal error.
         willSet {
             if appID != nil {
-                fatalError("The App ID may be set only once.")
+                assertionFailure("The App ID may be set only once.")
             }
         }
     }
     
     //TODO: Detect an environment switch, e.g. dev to prod, reset the client.
     
-    /// The BlockV platform environment to use.
+    /// The BLOCKv platform environment to use.
     ///
     /// Must be set by the host app.
     fileprivate static var environment: BVEnvironment? {
@@ -75,7 +77,7 @@ public final class BLOCKv {
     /// Backing networking client instance variable.
     fileprivate static var _client: Client?
     
-    /// Blockv networking client.
+    /// BLOCKv networking client.
     ///
     /// The networking client must support a platform environment change after app launch.
     ///
@@ -86,13 +88,13 @@ public final class BLOCKv {
     /// receive a new networking client instance.
     internal static var client: Client {
         get {
-            /// check if a new instance must be initialized
+            // check if a new instance must be initialized
             if _client == nil {
-                /// init a new instance
+                // init a new instance
                 _client = Client(config: BLOCKv.clientConfiguration)
                 return _client!
             } else {
-                /// return the backing instance
+                // return the backing instance
                 return _client!
             }
         }
@@ -102,7 +104,7 @@ public final class BLOCKv {
     internal static func reset() {
         // remove all credentials
         CredentialStore.clear()
-        // remove client instance - force recompute
+        // remove client instance - force re-init on next access
         self._client = nil
     }
     
@@ -111,11 +113,11 @@ public final class BLOCKv {
     /// Boolean indicating whether a user is logged in. `true` if logged in. `false` otherwise.
     public static var isLoggedIn: Bool {
         // ensure a token is present
-        guard let token = CredentialStore.refreshToken else { return false }
-        
-        //FIXME: Check expiry before returning true. If expired, remove.
-
-        return true
+        guard let refreshToken = CredentialStore.refreshToken?.token else { return false }
+        // ensure a valid jwt
+        guard let refreshJWT = try? decode(jwt: refreshToken) else { return false }
+        // ensure still valid
+        return !refreshJWT.expired
     }
     
     @available(*, deprecated, message: "This is an unsupported feature of the SDK and may be removed in a future release.")
@@ -126,7 +128,7 @@ public final class BLOCKv {
     /// access token.
     ///
     /// - Parameter completion: The closure to call once an access token has been obtained
-    /// form the BLOCKv Platform.
+    /// form the BLOCKv platform.
     public static func getAccessToken(completion: @escaping (_ success: Bool, _ accessToken: String?) -> Void) {
         BLOCKv.client.getAccessToken(completion: completion)
     }
@@ -144,12 +146,15 @@ public final class BLOCKv {
     /// Sets the BLOCKv platform environment.
     ///
     /// By setting the environment you are informing the SDK which BLOCKv
-    /// platfrom environment to interact with.
+    /// platform environment to interact with.
     ///
     /// Typically, you would call `setEnvironment` in `application(_:didFinishLaunchingWithOptions:)`.
     @available(*, deprecated, message: "BLOCKv now defaults to production. You may remove this call to set the environment.")
     public static func setEnvironment(_ environment: BVEnvironment) {
         self.environment = environment
+        
+        //FIXME: *Changing* the environment should nil out the client and access credentials.
+        
     }
     
     // MARK: - Resources

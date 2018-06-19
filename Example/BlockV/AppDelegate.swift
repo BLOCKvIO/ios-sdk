@@ -39,6 +39,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Set app id
         BLOCKv.configure(appID: MyApiKey)
         
+        BLOCKv.setEnvironment(.development)
+                
         print("\nViewer > isLoggedIn: \(BLOCKv.isLoggedIn)")
         
         // Set window's vc based on the login state

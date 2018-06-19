@@ -247,5 +247,3 @@ extension DiscoverQueryBuilder {
     }
     
 }
-
-

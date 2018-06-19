@@ -499,7 +499,7 @@ extension BLOCKv {
     /// is_primary flag of an existing token to false , because only one token can be the primary token.
     ///
     /// - Parameters:
-    ///   - tokenId: Unique identiifer of the token.
+    ///   - tokenId: Unique identifer of the token.
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
     public static func setCurrentUserDefaultToken(_ tokenId: String, completion: @escaping (BVError?) -> Void) {
@@ -661,10 +661,12 @@ extension BLOCKv {
         self.discover(payload: builder.toDictionary(), completion: completion)
     }
     
-    /// Searches for vAtoms on the BLOCKv platform.
+    /// Performs a search for vAtoms on the BLOCKv platform.
+    ///
+    /// This overload of `discover` allows a raw request payload to be passed in.
     ///
     /// - Parameters:
-    ///   - payload: Dictionary
+    ///   - payload: Raw request payload in the form of a dictionary.
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
     public static func discover(payload: [String: Any], completion: @escaping (GroupModel?, BVError?) -> Void) {
@@ -694,6 +696,109 @@ extension BLOCKv {
             DispatchQueue.main.async {
                 //print(model)
                 completion(groupModel, nil)
+            }
+            
+        }
+        
+    }
+    
+    /// Performs a geo-search for vAtoms on the BLOCKv platform (i.e. vAtoms that have been
+    /// dropped by the vAtom owners).
+    ///
+    /// You must supply two coordinates (bottom-left and top-right) which from a rectangle.
+    /// This rectangle defines  the geo search region.
+    ///
+    /// - Parameters:
+    ///   - bottomLeftLat: Bottom left latitude coordinate.
+    ///   - bottomLeftLon: Bottom left longitude coordinate.
+    ///   - topRightLat: Top right latitude coordinate.
+    ///   - topRightLon: Top right longitude coordinte.
+    ///   - filter: The vAtom filter option to apply. Defaults to "vatoms".
+    ///   - completion: The completion handler to call when the request is completed.
+    ///                 This handler is executed on the main queue.
+    public static func geoDiscover(bottomLeftLat: Double,
+                                   bottomLeftLon: Double,
+                                   topRightLat: Double,
+                                   topRightLon: Double,
+                                   filter: VatomGeoFilter = .vatoms,
+                                   completion: @escaping (GroupModel?, BVError?) -> Void) {
+        
+        let endpoint = API.VatomDiscover.geoDiscover(bottomLeftLat: bottomLeftLat,
+                                                     bottomLeftLon: bottomLeftLon,
+                                                     topRightLat: topRightLat,
+                                                     topRightLon: topRightLon,
+                                                     filter: filter.rawValue)
+        
+        self.client.request(endpoint) { (baseModel, error) in
+            
+            // extract model, handle error
+            guard var groupModel = baseModel?.payload, error == nil else {
+                DispatchQueue.main.async {
+                    print(error!.localizedDescription)
+                    completion(nil, error!)
+                }
+                return
+            }
+            
+            // model is available
+            
+            // url encoding - this is awful. maybe encode on init?
+            for vatomIndex in 0..<groupModel.vatoms.count {
+                for resourceIndex in 0..<groupModel.vatoms[vatomIndex].resources.count {
+                    groupModel.vatoms[vatomIndex].resources[resourceIndex].encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
+                }
+            }
+            
+            DispatchQueue.main.async {
+                //print(model)
+                completion(groupModel, nil)
+            }
+            
+        }
+        
+    }
+    
+    /// - Parameters:
+    ///   - bottomLeftLat: Bottom left latitude coordinate.
+    ///   - bottomLeftLon: Bottom left longitude coordinate.
+    ///   - topRightLat: Top right latitude coordinate.
+    ///   - topRightLon: Top right longitude coordinte.
+    ///   - precision: Controls the density of the group distribution. Defaults to 3.
+    ///                Lower values return fewer groups (with a higher vatom count) — less dense.
+    ///                Higher values return more groups (with a lower vatom count) - more dense.
+    ///   - filter: The vAtom filter option to apply. Defaults to "vatoms".
+    ///   - completion: The completion handler to call when the request is completed.
+    ///                 This handler is executed on the main queue.
+    public static func geoDiscoverGroups(bottomLeftLat: Double,
+                                         bottomLeftLon: Double,
+                                         topRightLat: Double,
+                                         topRightLon: Double,
+                                         precision: Int,
+                                         filter: VatomGeoFilter = .vatoms,
+                                         completion: @escaping (GeoModel?, BVError?) -> Void) {
+        
+        let endpoint = API.VatomDiscover.geoDiscoverGroups(bottomLeftLat: bottomLeftLat,
+                                                           bottomLeftLon: bottomLeftLon,
+                                                           topRightLat: topRightLat,
+                                                           topRightLon: topRightLon,
+                                                           precision: precision,
+                                                           filter: filter.rawValue)
+        
+        BLOCKv.client.request(endpoint) { (baseModel, error) in
+            
+            // extract model, handle error
+            guard let geoGroupModels = baseModel?.payload, error == nil else {
+                DispatchQueue.main.async {
+                    print(error!.localizedDescription)
+                    completion(nil, error!)
+                }
+                return
+            }
+            
+            // model is available
+            DispatchQueue.main.async {
+                //print(model) 
+                completion(geoGroupModels, nil)
             }
             
         }

@@ -11,32 +11,11 @@
 
 import Foundation
 import Starscream
+import Signals
 
 /*
  - Web socket should handle enexpected disconnect. Maybe retry with exponential back off?
  */
-
-extension Notification.Name {
-    
-    
-    //Hopefully, this is the only broadcast message needed.
-    
-    public struct WebSocket {
-        
-        /// Broadcast to indicate the Web socket received a new messsage.
-        ///
-        /// The `UserInfo` object contains `messageType` and `payload` keys.
-        public static let MessageReceivedRaw = Notification.Name("com.blockv.webSocket.rawEvent")
-        
-    }
-    
-}
-
-protocol BlockvWebSocketDelegate {
-    
-    func didReceiveEvent(_ inventory: WSInventoryEvent)
-}
-
 
 /// Responsible for communitating with Web socket server.
 ///
@@ -45,6 +24,8 @@ public class WebSocketManager {
         
     /// Models the type of events sent over the Web socket.
     enum WSMessageType: String {
+        /// INTERNAL: Broadcast on initial connection to the socket.
+        case info           = "info"
         /// Inventory event
         case inventory      = "inventory"
         /// Vatom state update event
@@ -59,6 +40,22 @@ public class WebSocketManager {
         decoder.dateDecodingStrategy = .iso8601
         return decoder
     }()
+    
+    // MARK: - Signals
+    
+    /// Fires when the Web socket receives **any** message.
+    ///
+    /// The Signal is generic over a dictionary which contains the raw message.
+    public static let onMessageReceivedRaw = Signal<[String : Any]>()
+    
+    /// Fires when the Web socket receives an **inventory** event.
+    public static let onInventoryEvent = Signal<WSInventoryEvent>()
+    
+    /// Fires when the Web socket recevies a **state update** event.
+    public static let onVatomStateUpdateEvent = Signal<WSStateUpdateEvent>()
+    
+    /// Fires when the Web socket receives an **activity** event.
+    public static let onActivityEvent = Signal<WSActivityEvent>()
     
     // MARK: - Properties
     
@@ -124,9 +121,7 @@ extension WebSocketManager: WebSocketDelegate {
     
     public func websocketDidReceiveMessage(socket: WebSocketClient, text: String) {
         printBV(info: "Web socket - Did receive message: \(text)")
-        
-       
-        
+        parseMessage(text)
     }
     
     public func websocketDidReceiveData(socket: WebSocketClient, data: Data) {
@@ -134,40 +129,45 @@ extension WebSocketManager: WebSocketDelegate {
         //NOTE: Our web socket only returns String type.
     }
     
-    func parseMessage(_ text: String) {
+    // MARK: - Parsing
+    
+    private func parseMessage(_ text: String) {
         
         // parse to data
-        guard let data = text.data(using: .utf8) else {
+        guard
+            let data = text.data(using: .utf8) else {
             printBV(error: "Web socket - Parse error - Unable to convert string to data: \(text)")
             return
         }
         
         // parse data to JSON
-        guard let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String : Any] else {
+        guard
+            let anyThing = try? JSONSerialization.jsonObject(with: data, options: []),
+            let json = anyThing as? [String : Any] else {
             printBV(error: "Web socket - Unable to parse JSON data.")
             return
         }
         
         // find message type
-        guard let typeString = json?["msg_type"] as? String,
-            let payload = json?["payload"] as? [String : Any] else {
+        guard
+            let typeString = json["msg_type"] as? String,
+            let payload = json["payload"] as? [String : Any] else {
                 printBV(error:"Web socket - Cannot parse 'msg_type'.")
                 return
         }
         
-        // Broadcast the message in it's 'raw' form.
-        // This will allow viewers to handle the web socket messages as they please.
-        NotificationCenter.default.post(name: Notification.Name.WebSocket.MessageReceivedRaw, object:
-            [
-                "messageType": typeString,
-                "payload": payload
-            ]
-        )
+        /*
+         Fire the signal with the web socket message in it's 'raw' form.
+         This allows viewers to handle the web socket messages as they please.
+         */
+        WebSocketManager.onMessageReceivedRaw.fire(json)
         
         // ensure the type is known
         switch WSMessageType(rawValue: typeString) {
         case .some(let type):
             switch type {
+            case .info:
+                printBV(info: payload.description)
             case .inventory:
                 let inventoryEvent = try? jsonDecoder.decode(WSInventoryEvent.self, from: data)
                 print(inventoryEvent.debugDescription)
@@ -175,12 +175,12 @@ extension WebSocketManager: WebSocketDelegate {
                 
             case .stateUpdate:
                 let stateUpdateEvent = try? jsonDecoder.decode(WSStateUpdateEvent.self, from: data)
-                print(stateUpdateEvent)
+                print(stateUpdateEvent.debugDescription)
                 // TODO: Broadcast / inform delegate
 
             case .activity:
                 let activityEvent = try? jsonDecoder.decode(WSActivityEvent.self, from: data)
-                print(activityEvent)
+                print(activityEvent.debugDescription)
                 // TODO: Broadcast / inform delegate
 
             }

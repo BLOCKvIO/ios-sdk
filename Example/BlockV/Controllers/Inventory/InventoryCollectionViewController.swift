@@ -74,6 +74,14 @@ class InventoryCollectionViewController: UICollectionViewController {
         self.collectionView?.refreshControl = self.refreshControl
         self.fetchInventory()
         //self.performDiscoverQuery()
+        
+        WebSocketManager.onMessageReceivedRaw.subscribe(with: self) { jsonDictionary in
+            
+            print(jsonDictionary)
+            self.fetchInventory()
+            
+        }
+        
     }
     
     deinit {

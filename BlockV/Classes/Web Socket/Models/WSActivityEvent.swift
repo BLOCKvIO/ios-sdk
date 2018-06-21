@@ -39,7 +39,7 @@ import Foundation
 */
 
 /// Web socket response model - Inventory Event.
-struct WSActivityEvent: WSEvent, Equatable {
+public struct WSActivityEvent: WSEvent, Equatable {
     
     // MARK: - Properties
     

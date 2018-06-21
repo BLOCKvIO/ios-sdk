@@ -38,7 +38,7 @@ import Foundation
  */
 
 /// Web socket response model - Inventory Event.
-struct WSInventoryEvent: WSEvent, Equatable, Hashable {
+public struct WSInventoryEvent: WSEvent, Equatable, Hashable {
     
     // MARK: - Properties
     

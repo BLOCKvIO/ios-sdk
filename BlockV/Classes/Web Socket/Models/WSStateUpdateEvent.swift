@@ -12,7 +12,7 @@
 import Foundation
 
 /// Web socket response model - Inventory Event.
-struct WSStateUpdateEvent: WSEvent, Equatable, Hashable {
+public struct WSStateUpdateEvent: WSEvent, Equatable, Hashable {
     
     // MARK: - Properties
     

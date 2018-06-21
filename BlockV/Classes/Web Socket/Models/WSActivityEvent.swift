@@ -57,7 +57,7 @@ public struct WSActivityEvent: WSEvent, Equatable {
     /// Array of ActivateImage resources.
     ///
     /// For each associated vAtom, there may be zero or one ActivatedImage resources.
-    public var resources: [VatomResource] // `var` only to allow for resource encoding
+    public let resources: [VatomResource]
     /// The user-facing contents of the event.
     public let message: String
     /// Name of the action which triggered this event.
@@ -83,10 +83,10 @@ extension WSActivityEvent: Decodable {
         case targetUserId    = "user_id"
         case triggerUserId   = "triggered_by"
         case vatomIds        = "vatoms"
-        case resources       = "resources"
         case message         = "msg"
         case actionName      = "action_name"
         case whenCreated     = "when_created"
+        case generic         = "generic"
     }
     
     public init(from decoder: Decoder) throws {
@@ -98,7 +98,7 @@ extension WSActivityEvent: Decodable {
         targetUserId  = try payloadContainer.decode(String.self, forKey: .targetUserId)
         triggerUserId = try payloadContainer.decode(String.self, forKey: .triggerUserId)
         vatomIds      = try payloadContainer.decode([String].self, forKey: .vatomIds)
-        resources     = try payloadContainer.decode([VatomResource].self, forKey: .resources)
+        resources     = try payloadContainer.decodeIfPresent([VatomResource].self, forKey: .generic) ?? []
         message       = try payloadContainer.decode(String.self, forKey: .message)
         actionName    = try payloadContainer.decode(String.self, forKey: .actionName)
         whenCreated   = try payloadContainer.decode(Date.self, forKey: .whenCreated)

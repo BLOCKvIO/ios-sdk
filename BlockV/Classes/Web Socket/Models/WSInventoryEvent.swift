@@ -31,11 +31,11 @@ public struct WSInventoryEvent: WSEvent, Equatable, Hashable {
     
     // MARK: - Properties
 
-    /// Unique identifier of the inventory event.
+    /// Unique identifier of this inventory event.
     public let eventId: String
     /// Database operation.
     public let operation: String
-    /// Unique identifier of the vAtom that generated this event.
+    /// Unique identifier of the vAtom which generated this event.
     public let vatomId: String
     /// Unique identifier of the new owner of the vAtom.
     public let newOwnerId: String
@@ -49,7 +49,7 @@ public struct WSInventoryEvent: WSEvent, Equatable, Hashable {
     
     // Client-side
     
-    /// Timestamp of when the event was received (client-side).
+    /// Timestamp of when this event was received (client-side).
     let timestamp: Date
     
     // MARK: - Helpers

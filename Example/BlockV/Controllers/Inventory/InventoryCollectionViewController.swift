@@ -75,11 +75,10 @@ class InventoryCollectionViewController: UICollectionViewController {
         self.fetchInventory()
         //self.performDiscoverQuery()
         
-        WebSocketManager.onMessageReceivedRaw.subscribe(with: self) { jsonDictionary in
-            
-            print(jsonDictionary)
+        // subscribe to inventory events
+        WebSocketManager.onInventoryEvent.subscribe(with: self) { (inventoryEvent) in
+            print(inventoryEvent)
             self.fetchInventory()
-            
         }
         
     }

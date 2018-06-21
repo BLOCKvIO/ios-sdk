@@ -45,7 +45,7 @@ public class WebSocketManager {
     
     /// Fires when the Web socket receives **any** message.
     ///
-    /// The Signal is generic over a dictionary which contains the raw message.
+    /// The Signal is generic over a JSON Dictinary which contains the raw message.
     public static let onMessageReceivedRaw = Signal<[String : Any]>()
     
     /// Fires when the Web socket receives an **inventory** event.
@@ -126,10 +126,10 @@ extension WebSocketManager: WebSocketDelegate {
     
     public func websocketDidReceiveData(socket: WebSocketClient, data: Data) {
         printBV(info: "Web socket - Did receive data: \(data.count)")
-        //NOTE: Our web socket only returns String type.
+        // BLOCKv Web socket does not send data messages.
     }
     
-    // MARK: - Parsing
+    // MARK: Message Parsing
     
     private func parseMessage(_ text: String) {
         
@@ -140,52 +140,65 @@ extension WebSocketManager: WebSocketDelegate {
             return
         }
         
-        // parse data to JSON
+        // parse data to dictionary
         guard
-            let anyThing = try? JSONSerialization.jsonObject(with: data, options: []),
-            let json = anyThing as? [String : Any] else {
+            let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []),
+            let jsonDictionary = jsonObject as? [String : Any] else {
             printBV(error: "Web socket - Unable to parse JSON data.")
             return
         }
         
-        // find message type
-        guard
-            let typeString = json["msg_type"] as? String,
-            let payload = json["payload"] as? [String : Any] else {
-                printBV(error:"Web socket - Cannot parse 'msg_type'.")
-                return
-        }
+        print(jsonDictionary.prettyPrintedJSON!)
         
         /*
          Fire the signal with the web socket message in it's 'raw' form.
          This allows viewers to handle the web socket messages as they please.
          */
+        WebSocketManager.onMessageReceivedRaw.fire(jsonDictionary)
         
-        printBV(info: "Raw web socket message:\n \(json.prettyPrintedJSON!)")
+        // - Parse event models
         
-        WebSocketManager.onMessageReceivedRaw.fire(json)
+        guard
+            // find message type
+            let typeString = jsonDictionary["msg_type"] as? String,
+            let payload = jsonDictionary["payload"] as? [String : Any] else {
+                printBV(error:"Web socket - Cannot parse 'msg_type'.")
+                return
+        }
         
-        // ensure the type is known
+        // ensure message type is known
         switch WSMessageType(rawValue: typeString) {
-        case .some(let type):
-            switch type {
+        case .some(let messageType):
+            
+            switch messageType {
             case .info:
                 printBV(info: payload.description)
+                
             case .inventory:
-                let inventoryEvent = try? jsonDecoder.decode(WSInventoryEvent.self, from: data)
-                print(inventoryEvent.debugDescription)
-                // TODO: Broadcast / inform delegate
+                do {
+                    let inventoryEvent = try jsonDecoder.decode(WSInventoryEvent.self, from: data)
+                    WebSocketManager.onInventoryEvent.fire(inventoryEvent)
+                } catch {
+                    printBV(error: error.localizedDescription)
+                }
                 
             case .stateUpdate:
-                let stateUpdateEvent = try? jsonDecoder.decode(WSStateUpdateEvent.self, from: data)
-                print(stateUpdateEvent.debugDescription)
-                // TODO: Broadcast / inform delegate
-
+                do {
+                    let stateUpdateEvent = try jsonDecoder.decode(WSStateUpdateEvent.self, from: data)
+                    WebSocketManager.onVatomStateUpdateEvent.fire(stateUpdateEvent)
+                } catch {
+                    printBV(error: error.localizedDescription)
+                }
+                
             case .activity:
-                let activityEvent = try? jsonDecoder.decode(WSActivityEvent.self, from: data)
-                print(activityEvent.debugDescription)
-                // TODO: Broadcast / inform delegate
-
+                do {
+                    // FIXME: Allow resources to be encoded.
+                    let activityEvent = try jsonDecoder.decode(WSActivityEvent.self, from: data)
+                    WebSocketManager.onActivityEvent.fire(activityEvent)
+                } catch {
+                    printBV(error: error.localizedDescription)
+                }
+                
             }
         default:
             printBV(error:"Unrecognised message type: \(typeString).")

@@ -66,7 +66,7 @@ import Foundation
 */
 
 /// Web socket response model - Inventory Event.
-public struct WSStateUpdateEvent: WSEvent, Equatable, Hashable {
+public struct WSStateUpdateEvent: WSEvent {
     
     // MARK: - Properties
     /// Unique identifier of this state update event.
@@ -76,7 +76,9 @@ public struct WSStateUpdateEvent: WSEvent, Equatable, Hashable {
     /// Unique identifier of the vAtom which generated this event.
     public let vatomId: String
     /// JSON object containing the only updated properties of the vAtom.
-    //public let updatedProperties: JSON
+    //public let vatomProperties: JSON
+    /// JSON object containing the only updated properties of the vAtom.
+    public let vatomProperties: [String : Any] // Forces manual Equatable conformance
     /// Timestamp of when the vAtom was modified.
     public let whenModified: Date
     
@@ -87,6 +89,9 @@ public struct WSStateUpdateEvent: WSEvent, Equatable, Hashable {
 
 }
 
+/*
+ Decodable does not play nice because of the 'flexible' payload of the state update...
+ */
 extension WSStateUpdateEvent: Decodable {
     
     enum CodingKeys: String, CodingKey {
@@ -94,11 +99,15 @@ extension WSStateUpdateEvent: Decodable {
     }
     
     enum PayloadCodingKeys: String, CodingKey {
-        case eventId         = "event_id"
-        case operation       = "op"
-        case vatomId         = "id"
+        case eventId   = "event_id"
+        case operation = "op"
+        case vatomId   = "id"
+        case newObject = "new_object"
+    }
+    
+    enum NewObjectCodingKeys: String, CodingKey {
+        case vatomProperties = "vAtom::vAtomType"
         case whenModified    = "when_modified"
-
     }
     
     public init(from decoder: Decoder) throws {
@@ -109,11 +118,53 @@ extension WSStateUpdateEvent: Decodable {
         eventId       = try payloadContainer.decode(String.self, forKey: .eventId)
         operation     = try payloadContainer.decode(String.self, forKey: .operation)
         vatomId       = try payloadContainer.decode(String.self, forKey: .vatomId)
-        whenModified  = try payloadContainer.decode(Date.self, forKey: .whenModified)
+        
+        let newObjectContainer = try payloadContainer.nestedContainer(keyedBy: NewObjectCodingKeys.self, forKey: .newObject)
+        //vatomProperties = try newObjectContainer.decode(JSON.self, forKey: .vatomProperties)
+        vatomProperties = [:]
+        whenModified    = try newObjectContainer.decode(Date.self, forKey: .whenModified)
         
         // stamp this event with the current time
         timestamp = Date()
         
     }
     
+}
+
+extension WSStateUpdateEvent {
+    
+    public init(form dictionary: [String : Any]) throws {
+        
+        guard
+            let payload = dictionary["payload"] as? [String : Any],
+            let eventId = payload["event_id"] as? String,
+            let operation = payload["op"] as? String,
+            let vatomID = payload["id"] as? String,
+            let newObject = payload["new_object"] as? [String : Any],
+            let vatomProperties = newObject["vAtom::vAtomType"] as? [String : Any],
+            let whenModifiedString = newObject["when_modified"] as? String else {
+                printBV(error: "Model decoding failed.")
+                throw BVJSONError.decodingError //FIXME: Throw proper error
+        }
+        
+        self.eventId = eventId
+        self.operation = operation
+        self.vatomId = vatomID
+        self.vatomProperties = vatomProperties
+        guard let whenModifiedDate = DateFormatter.blockvDateFormatter.date(from: whenModifiedString) else {
+            printBV(error: "Model decoding failed.")
+            throw BVJSONError.decodingError //FIXME: Throw proper error
+        }
+        self.whenModified = whenModifiedDate
+        
+        // stamp this event with the current time
+        timestamp = Date()
+    }
+    
+}
+
+extension WSStateUpdateEvent: Equatable { }
+
+public func ==(lhs: WSStateUpdateEvent, rhs: WSStateUpdateEvent) -> Bool {
+    return lhs.eventId == rhs.eventId
 }

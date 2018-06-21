@@ -185,6 +185,31 @@ extension WebSocketManager: WebSocketDelegate {
             case .stateUpdate:
                 do {
                     let stateUpdateEvent = try jsonDecoder.decode(WSStateUpdateEvent.self, from: data)
+                    
+//                    switch stateUpdateEvent.vatomProperties {
+//                    case .object(let object):
+//
+//                        if let parentId = object["parent_id"] {
+//                            
+//                        }
+//
+//                        if let dropped = object["dropped"] {
+//
+//                        }
+//
+//                        if let geoPos = object["geo_pos"] {
+//
+//                        }
+//
+//                        if let visibility = object["visibility"] {
+//
+//                        }
+//                    default:
+//                        printBV(error: "")
+//                    }
+                    
+                    print(stateUpdateEvent.vatomProperties as? [String : Any])
+                    
                     WebSocketManager.onVatomStateUpdateEvent.fire(stateUpdateEvent)
                 } catch {
                     printBV(error: error.localizedDescription)

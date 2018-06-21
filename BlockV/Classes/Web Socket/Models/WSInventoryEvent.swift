@@ -11,31 +11,20 @@
 
 import Foundation
 
-//
-//  WSInventoryEvent.swift
-//  VatomicSDK
-//
-//  Created by Cameron McOnie on 2018/05/24.
-//
-
-import Foundation
-
-// MARK: -
-
 /*
- {
- "msg_type": "inventory",
- "payload": {
- "event_id": "inv_7ce99327-ceb8-4eb5-8482-71275b3b770a:2018-05-24T06:32:11Z",
- "op": "insert",
- "id": "7ce99327-ceb8-4eb5-8482-71275b3b770a",
- "new_owner": "0f1a7a8b-bcce-4594-8ed5-64cd7d374235",
- "old_owner": "2e1038f8-ffcd-4e91-aa81-ccfc74ae9d79",
- "template_variation": "vatomic.prototyping::AnimatedCrate::v1::HeinekenCrate::v2",
- "parent_id": "."
- }
- }
- */
+{
+  "msg_type": "inventory",
+  "payload": {
+    "event_id": "inv_7ce99327-ceb8-4eb5-8482-71275b3b770a:2018-05-24T06:32:11Z",
+    "op": "insert",
+    "id": "7ce99327-ceb8-4eb5-8482-71275b3b770a",
+    "new_owner": "0f1a7a8b-bcce-4594-8ed5-64cd7d374235",
+    "old_owner": "2e1038f8-ffcd-4e91-aa81-ccfc74ae9d79",
+    "template_variation": "vatomic.prototyping::AnimatedCrate::v1::HeinekenCrate::v2",
+    "parent_id": "."
+  }
+}
+*/
 
 /// Web socket response model - Inventory Event.
 public struct WSInventoryEvent: WSEvent, Equatable, Hashable {
@@ -44,6 +33,8 @@ public struct WSInventoryEvent: WSEvent, Equatable, Hashable {
     
     /// Timestamp of when the event was received (client-side).
     let timestamp: Date
+    /// Unique identifier of the inventory event.
+    let eventId: String
     /// Database operation.
     private let operation: String
     /// Unique identifier of the vAtom that generated this event.
@@ -88,6 +79,7 @@ extension WSInventoryEvent: Decodable {
     }
     
     enum PayloadCodingKeys: String, CodingKey {
+        case eventId             = "event_id"
         case operation           = "op"
         case vatomId             = "id"
         case newOwnerId          = "new_owner"
@@ -101,6 +93,7 @@ extension WSInventoryEvent: Decodable {
         let items = try decoder.container(keyedBy: CodingKeys.self)
         // de-nest payload to top level
         let payloadContainer = try items.nestedContainer(keyedBy: PayloadCodingKeys.self, forKey: .payload)
+        eventId             = try payloadContainer.decode(String.self, forKey: .eventId)
         operation           = try payloadContainer.decode(String.self, forKey: .operation)
         vatomId             = try payloadContainer.decode(String.self, forKey: .vatomId)
         newOwnerId          = try payloadContainer.decode(String.self, forKey: .newOwnerId)

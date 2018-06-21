@@ -11,7 +11,7 @@
 
 import Foundation
 
-/// This extension groups together all BLOCKv Platform requests.
+/// This extension groups together all BLOCKv platform requests.
 extension BLOCKv {
     
     // MARK: Register
@@ -160,7 +160,7 @@ extension BLOCKv {
     /// Log out the current user.
     ///
     /// The current user will no longer be authorized to perform user scoped requests on the
-    /// BLOCKv platfrom.
+    /// BLOCKv platform.
     ///
     /// - Parameter completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
@@ -192,7 +192,7 @@ extension BLOCKv {
     
     // MARK: - User
     
-    /// Fetches the current user's profile information from the BLOCKv Platform.
+    /// Fetches the current user's profile information from the BLOCKv platform.
     ///
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
@@ -223,7 +223,7 @@ extension BLOCKv {
         
     }
     
-    /// Updates the current user's profile on the BLOCKv Platform.
+    /// Updates the current user's profile on the BLOCKv platform.
     ///
     /// - Parameters:
     ///   - userInfo: A simple struct that holds the properties of the user, e.g. their first name.
@@ -254,7 +254,7 @@ extension BLOCKv {
         
     }
     
-    /// Uploads an avatar image to the BlockV Platform.
+    /// Uploads an avatar image to the BlockV platform.
     ///
     /// It is recommended that scalling and cropping be done before calling this method.
     ///
@@ -299,7 +299,7 @@ extension BLOCKv {
     
     // MARK: - Token Verification
     
-    /// Verifies ownership of a token by submitting the verification code to the BLOCKv Platform.
+    /// Verifies ownership of a token by submitting the verification code to the BLOCKv platform.
     ///
     /// - Parameters:
     ///   - token: A user token value, i.e. phone number or email.
@@ -434,7 +434,7 @@ extension BLOCKv {
         
     }
     
-    /// Fetches the current user's token description from the BLOCKv Platform.
+    /// Fetches the current user's token description from the BLOCKv platform.
     ///
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
@@ -461,7 +461,7 @@ extension BLOCKv {
         
     }
     
-    /// Removes the token from the current user's token list on the BLOCKv Platform.
+    /// Removes the token from the current user's token list on the BLOCKv platform.
     ///
     /// Note: Primary tokens may not be deleted.
     ///
@@ -491,7 +491,7 @@ extension BLOCKv {
         
     }
     
-    /// Updates the specified token to be the current user's default token on the BLOCKv Platform.
+    /// Updates the specified token to be the current user's default token on the BLOCKv platform.
     ///
     /// Backend description:
     /// Boolean to indicate if this token is the primary token. The primary token is used when no other
@@ -499,7 +499,7 @@ extension BLOCKv {
     /// is_primary flag of an existing token to false , because only one token can be the primary token.
     ///
     /// - Parameters:
-    ///   - tokenId: Unique identiifer of the token.
+    ///   - tokenId: Unique identifer of the token.
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
     public static func setCurrentUserDefaultToken(_ tokenId: String, completion: @escaping (BVError?) -> Void) {
@@ -527,6 +527,15 @@ extension BLOCKv {
     
     // MARK: - Public User
     
+    /// Fetches the publicly available attributes of any user given their user id.
+    ///
+    /// Since users are given control over which attributes they make public, you should make
+    /// provision for receiving all, some, or none of their public attributes.
+    ///
+    /// - Parameters:
+    ///   - userId: Unique identifier of the user.
+    ///   - completion: The completion handler to call when the request is completed.
+    ///                 This handler is executed on the main queue.
     public static func getPublicUser(withID userId: String, completion: @escaping (PublicUserModel?, BVError?) -> Void) {
         
         let endpoint = API.PublicUser.get(id: userId)
@@ -641,7 +650,7 @@ extension BLOCKv {
         
     }
     
-    /// Searches for vAtoms on the BLOCKv Platform.
+    /// Searches for vAtoms on the BLOCKv platform.
     ///
     /// - Parameters:
     ///   - builder: A discover query builder object. Use the builder to simplify constructing
@@ -652,10 +661,12 @@ extension BLOCKv {
         self.discover(payload: builder.toDictionary(), completion: completion)
     }
     
-    /// Searches for vAtoms on the BLOCKv Platform.
+    /// Performs a search for vAtoms on the BLOCKv platform.
+    ///
+    /// This overload of `discover` allows a raw request payload to be passed in.
     ///
     /// - Parameters:
-    ///   - payload: Dictionary
+    ///   - payload: Raw request payload in the form of a dictionary.
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
     public static func discover(payload: [String: Any], completion: @escaping (GroupModel?, BVError?) -> Void) {
@@ -691,12 +702,115 @@ extension BLOCKv {
         
     }
     
+    /// Performs a geo-search for vAtoms on the BLOCKv platform (i.e. vAtoms that have been
+    /// dropped by the vAtom owners).
+    ///
+    /// You must supply two coordinates (bottom-left and top-right) which from a rectangle.
+    /// This rectangle defines  the geo search region.
+    ///
+    /// - Parameters:
+    ///   - bottomLeftLat: Bottom left latitude coordinate.
+    ///   - bottomLeftLon: Bottom left longitude coordinate.
+    ///   - topRightLat: Top right latitude coordinate.
+    ///   - topRightLon: Top right longitude coordinte.
+    ///   - filter: The vAtom filter option to apply. Defaults to "vatoms".
+    ///   - completion: The completion handler to call when the request is completed.
+    ///                 This handler is executed on the main queue.
+    public static func geoDiscover(bottomLeftLat: Double,
+                                   bottomLeftLon: Double,
+                                   topRightLat: Double,
+                                   topRightLon: Double,
+                                   filter: VatomGeoFilter = .vatoms,
+                                   completion: @escaping (GroupModel?, BVError?) -> Void) {
+        
+        let endpoint = API.VatomDiscover.geoDiscover(bottomLeftLat: bottomLeftLat,
+                                                     bottomLeftLon: bottomLeftLon,
+                                                     topRightLat: topRightLat,
+                                                     topRightLon: topRightLon,
+                                                     filter: filter.rawValue)
+        
+        self.client.request(endpoint) { (baseModel, error) in
+            
+            // extract model, handle error
+            guard var groupModel = baseModel?.payload, error == nil else {
+                DispatchQueue.main.async {
+                    print(error!.localizedDescription)
+                    completion(nil, error!)
+                }
+                return
+            }
+            
+            // model is available
+            
+            // url encoding - this is awful. maybe encode on init?
+            for vatomIndex in 0..<groupModel.vatoms.count {
+                for resourceIndex in 0..<groupModel.vatoms[vatomIndex].resources.count {
+                    groupModel.vatoms[vatomIndex].resources[resourceIndex].encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
+                }
+            }
+            
+            DispatchQueue.main.async {
+                //print(model)
+                completion(groupModel, nil)
+            }
+            
+        }
+        
+    }
+    
+    /// - Parameters:
+    ///   - bottomLeftLat: Bottom left latitude coordinate.
+    ///   - bottomLeftLon: Bottom left longitude coordinate.
+    ///   - topRightLat: Top right latitude coordinate.
+    ///   - topRightLon: Top right longitude coordinte.
+    ///   - precision: Controls the density of the group distribution. Defaults to 3.
+    ///                Lower values return fewer groups (with a higher vatom count) — less dense.
+    ///                Higher values return more groups (with a lower vatom count) - more dense.
+    ///   - filter: The vAtom filter option to apply. Defaults to "vatoms".
+    ///   - completion: The completion handler to call when the request is completed.
+    ///                 This handler is executed on the main queue.
+    public static func geoDiscoverGroups(bottomLeftLat: Double,
+                                         bottomLeftLon: Double,
+                                         topRightLat: Double,
+                                         topRightLon: Double,
+                                         precision: Int,
+                                         filter: VatomGeoFilter = .vatoms,
+                                         completion: @escaping (GeoModel?, BVError?) -> Void) {
+        
+        let endpoint = API.VatomDiscover.geoDiscoverGroups(bottomLeftLat: bottomLeftLat,
+                                                           bottomLeftLon: bottomLeftLon,
+                                                           topRightLat: topRightLat,
+                                                           topRightLon: topRightLon,
+                                                           precision: precision,
+                                                           filter: filter.rawValue)
+        
+        BLOCKv.client.request(endpoint) { (baseModel, error) in
+            
+            // extract model, handle error
+            guard let geoGroupModels = baseModel?.payload, error == nil else {
+                DispatchQueue.main.async {
+                    print(error!.localizedDescription)
+                    completion(nil, error!)
+                }
+                return
+            }
+            
+            // model is available
+            DispatchQueue.main.async {
+                //print(model) 
+                completion(geoGroupModels, nil)
+            }
+            
+        }
+        
+    }
+    
     // MARK: - Actions
     
     /// Fetches all the actions configured for a template.
     ///
     /// - Parameters:
-    ///   - id: Uniquie identified of the template.
+    ///   - id: Unique identified of the template.
     ///   - completion: The completion handler to call when the call is completed.
     ///                 This handler is executed on the main queue.
     public static func getActions(forTemplateID id: String,
@@ -723,7 +837,7 @@ extension BLOCKv {
         
     }
     
-    /// Performs an action on the BLOCKv Platform.
+    /// Performs an action on the BLOCKv platform.
     ///
     /// This is the most flexible of the action calls and should be used as a last resort.
     ///

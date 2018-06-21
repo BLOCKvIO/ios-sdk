@@ -196,6 +196,7 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
             switch dataResponse.result {
             case let .success(val):
                 printBV(info: "Access token - Refresh successful")
+                // invoke with success
                 completion(true, val.payload.accessToken.token, nil)
                 
             case let .failure(err):
@@ -204,23 +205,11 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
                 
                 // check if the error payload indicates the refresh token is invlaid
                 if let statusCode = dataResponse.response?.statusCode, (400...499) ~= statusCode {
-                    
-                    /*
-                     As agreed, the response from the refresh should be inspected. If the refresh failed
-                     due to the refresh token being blacklisted or expired. Then the client application
-                     should be notified. This could be in the form of a notification or invoking a closure
-                     etc.
-                     
-                     The SDK' internal `reset()` method should also be called to ensure state clean up.
-                     */
-                    
-                    // BROADCAST LOGOUT
-                    NotificationCenter.default.post(name: Notification.Name.BLOCKv.AuthorizationRequried, object: nil)
-                    
-                    printBV(error: "Refresh token invalid - Client must logout!")
-                    
+                    // broadcast to inform user authorization is required
+                    NotificationCenter.default.post(name: Notification.Name.BVInternal.UserAuthorizationRequried, object: nil)
                 }
                 
+                // invoke with failure
                 completion(false, nil, nil)
                 
             }
@@ -270,16 +259,4 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
         
     }
 
-}
-
-
-extension Notification.Name {
-    
-    public struct BLOCKv {
-        
-        /// Broadcast to indicate authorization is required.
-        public static let AuthorizationRequried = Notification.Name("com.blockv.auth.required")
-
-    }
-    
 }

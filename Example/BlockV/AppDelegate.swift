@@ -37,7 +37,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
         // Set app id
-        BLOCKv.configure(appID: MyApiKey)
+        BLOCKv.configure(appID: MyAppID)
         
         print("\nViewer > isLoggedIn: \(BLOCKv.isLoggedIn)")
         

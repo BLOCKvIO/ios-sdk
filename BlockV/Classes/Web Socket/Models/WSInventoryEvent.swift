@@ -30,24 +30,27 @@ import Foundation
 public struct WSInventoryEvent: WSEvent, Equatable, Hashable {
     
     // MARK: - Properties
+
+    /// Unique identifier of the inventory event.
+    public let eventId: String
+    /// Database operation.
+    public let operation: String
+    /// Unique identifier of the vAtom that generated this event.
+    public let vatomId: String
+    /// Unique identifier of the new owner of the vAtom.
+    public let newOwnerId: String
+    /// Unique identifier of the old owner of the vAtom
+    public let oldOwnerId: String
+    /// Unique identifier of the temlate variation of the vAtom.
+    public let templateVariationId: String
+    /// Unique identifier of the vAtom's parent.
+    /// "." indicates the vAtom is at the root level.
+    public let parentId: String
+    
+    // Client-side
     
     /// Timestamp of when the event was received (client-side).
     let timestamp: Date
-    /// Unique identifier of the inventory event.
-    let eventId: String
-    /// Database operation.
-    private let operation: String
-    /// Unique identifier of the vAtom that generated this event.
-    let vatomId: String
-    /// Unique identifier of the new owner of the vAtom.
-    let newOwnerId: String
-    /// Unique identifier of the old owner of the vAtom
-    let oldOwnerId: String
-    /// Unique identifier of the temlate variation of the vAtom.
-    let templateVariationId: String
-    /// Unique identifier of the vAtom's parent.
-    /// "." indicates the vAtom is at the root level.
-    let parentId: String
     
     // MARK: - Helpers
     

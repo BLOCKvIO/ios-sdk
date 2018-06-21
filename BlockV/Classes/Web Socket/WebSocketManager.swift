@@ -160,6 +160,9 @@ extension WebSocketManager: WebSocketDelegate {
          Fire the signal with the web socket message in it's 'raw' form.
          This allows viewers to handle the web socket messages as they please.
          */
+        
+        printBV(info: "Raw web socket message:\n \(json.prettyPrintedJSON!)")
+        
         WebSocketManager.onMessageReceivedRaw.fire(json)
         
         // ensure the type is known

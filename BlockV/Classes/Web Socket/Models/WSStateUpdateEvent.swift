@@ -16,12 +16,10 @@ public struct WSStateUpdateEvent: WSEvent, Equatable, Hashable {
     
     // MARK: - Properties
     
-    /// Unique identifier of the inventory event.
-    let eventId: String
+    
+    // Client-side
+
     /// Timestamp of when the event was received (client-side).
     let timestamp: Date
-    
-
-    /// ???
 
 }

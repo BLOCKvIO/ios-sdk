@@ -25,3 +25,16 @@ extension DateFormatter {
     }()
     
 }
+
+extension Collection {
+    
+    internal var prettyPrintedJSON: String? {
+        do {
+            let data: Data = try JSONSerialization.data(withJSONObject: self, options: .prettyPrinted)
+            return String(data: data, encoding: .utf8)
+        } catch _ {
+            return nil
+        }
+    }
+    
+}

@@ -81,6 +81,8 @@ public enum BVError: Error {
             case 1004: self = .malformedRequestBody(code, message)
             case 1041: self = .invalidDataValidation(code, message)
                 
+            //case 1065: self = .invalidGeoDiscoverInputData // maybe map to malformed request body
+                
             case 1701: self = .vatomNotFound(code, message)
                 
             case 2030: self = .cannotFindUser(code, message)

@@ -108,8 +108,22 @@ public final class BLOCKv {
         self._client = nil
     }
     
-    // - Public
+    // - Public Lifecycle
     
+    /*
+     Maybe the credential store should be responsible for broadcasting when authorisation changes?
+     */
+    
+    /// Called when authorisation occurs.
+    internal func onLogin() {
+        
+    }
+    
+    /// Called when authorisation is revoked.
+    internal func onLogout() {
+        
+    }
+        
     /// Boolean indicating whether a user is logged in. `true` if logged in. `false` otherwise.
     public static var isLoggedIn: Bool {
         // ensure a token is present
@@ -149,7 +163,7 @@ public final class BLOCKv {
     /// platform environment to interact with.
     ///
     /// Typically, you would call `setEnvironment` in `application(_:didFinishLaunchingWithOptions:)`.
-    @available(*, deprecated, message: "BLOCKv now defaults to production. You may remove this call to set the environment.")
+    @available(*, deprecated, message: "BLOCKv now defaults to production. You may remove this call.")
     public static func setEnvironment(_ environment: BVEnvironment) {
         self.environment = environment
         

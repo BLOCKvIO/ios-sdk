@@ -16,7 +16,8 @@ Pod::Spec.new do |s|
   s.source_files          = 'BlockV/Classes/**/*'
   s.swift_version         = '4.1'
   
-  s.dependency 'Alamofire', '~> 4.7'
-  s.dependency 'JWTDecode', '~> 2.1'
-  s.dependency 'Starscream', '~> 3.0'
+  s.dependency 'Alamofire',  '~> 4.7' # Networking
+  s.dependency 'Starscream', '~> 3.0' # Web socket
+  s.dependency 'JWTDecode',  '~> 2.1' # JWT decoding
+  s.dependency 'Signals',    '~> 5.0' # Elegant eventing
 end

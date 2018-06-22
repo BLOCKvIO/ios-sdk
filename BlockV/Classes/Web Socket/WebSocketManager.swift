@@ -9,19 +9,16 @@
 //  governing permissions and limitations under the License.
 //
 
+
 import Foundation
 import Starscream
 import Signals
-
-/*
- - Web socket should handle enexpected disconnect. Maybe retry with exponential back off?
- */
 
 /// Responsible for communitating with Web socket server.
 ///
 ///
 public class WebSocketManager {
-        
+    
     /// Models the type of events sent over the Web socket.
     enum WSMessageType: String {
         /// INTERNAL: Broadcast on initial connection to the socket.
@@ -34,31 +31,38 @@ public class WebSocketManager {
         case activity       = "my_events"
     }
     
-    // JSON decoder
-    let jsonDecoder: JSONDecoder = {
-       let decoder = JSONDecoder()
+    
+    /// JSON decoder configured for the BLOCKv Web socket server.
+    private lazy var blockvJSONDecoder: JSONDecoder = {
+        let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         return decoder
     }()
     
     // MARK: - Signals
     
+    /*
+     Signals fire with an error when the Web socket disconnects.
+     */
+    
     /// Fires when the Web socket receives **any** message.
     ///
-    /// The Signal is generic over a JSON Dictinary which contains the raw message.
-    public static let onMessageReceivedRaw = Signal<[String : Any]>()
+    /// The Signal is generic over a dictionary [String : Any] which contains the raw message.
+    /// An error will be fired if the Web socket encounters and error.
+    public static let onMessageReceivedRaw = Signal<([String : Any]?, Error?)>()
     
     /// Fires when the Web socket receives an **inventory** event.
-    public static let onInventoryEvent = Signal<WSInventoryEvent>()
+    public static let onInventoryUpdate = Signal<(WSInventoryEvent?, Error?)>()
     
     /// Fires when the Web socket recevies a **state update** event.
-    public static let onVatomStateUpdateEvent = Signal<WSStateUpdateEvent>()
+    public static let onVatomStateUpdate = Signal<(WSStateUpdateEvent?, Error?)>()
     
     /// Fires when the Web socket receives an **activity** event.
-    public static let onActivityEvent = Signal<WSActivityEvent>()
+    public static let onActivityEvent = Signal<(WSActivityEvent?, Error?)>()
     
     // MARK: - Properties
     
+    /// Web socket instance
     fileprivate var socket: WebSocket
     
     /// Boolean indicating whether the socket is connected.
@@ -75,13 +79,6 @@ public class WebSocketManager {
         socket.delegate = self
         connect()
         
-        // OLD
-        //        var request = URLRequest(url: URL(string: "wss://wsdev.blockv.net")!)
-        //        request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        //        socket = WebSocket(request: request, protocols: ["vatomic"])
-        //        socket.delegate = self
-        //        socket.connect()
-        
     }
     
     // MARK: - Lifecycle
@@ -94,15 +91,42 @@ public class WebSocketManager {
         socket.disconnect()
     }
     
+    // Experiment with backoff retry
+    //
+    
+    /*
+     -(void)start
+     {
+     _timeInterval = 0.0;
+     [NSTimer scheduledTimerWithTimeInterval:_timeInterval target:self
+     selector:@selector(startWithTimer:) userInfo:nil repeats:NO];
+     }
+     
+     -(void)startWithTimer:(NSTimer *)timer
+     {
+     if (!data.ready) {
+     _timeInterval = _timeInterval >= 0.1 ? _timeInterval * 2 : 0.1;
+     _timeInterval = MIN(60.0, _timeInterval);
+     NSLog(@"Data provider not ready. Will try again in %f seconds.", _timeInterval);
+     NSTimer * startTimer = [NSTimer scheduledTimerWithTimeInterval:_timeInterval target:self
+     selector:@selector(startWithTimer:) userInfo:nil repeats:NO];
+     return;
+     }
+     ...
+     }
+     */
+    
 }
 
 // MARK: - Extension WebSocket Delegate
 
 extension WebSocketManager: WebSocketDelegate {
     
+    
     public func websocketDidConnect(socket: WebSocketClient) {
         printBV(info: "Web socket - Connected")
     }
+    
     
     public func websocketDidDisconnect(socket: WebSocketClient, error: Error?) {
         
@@ -113,6 +137,12 @@ extension WebSocketManager: WebSocketDelegate {
         } else {
             print("Web socket -  Disconnected")
         }
+        
+        // Fire an error informing the observer that the Web socket is down.
+        WebSocketManager.onMessageReceivedRaw.fire((nil, error))
+        WebSocketManager.onInventoryUpdate.fire((nil, error))
+        WebSocketManager.onVatomStateUpdate.fire((nil, error))
+        WebSocketManager.onActivityEvent.fire((nil, error))
         
         //TODO: The Web socket should reconnect here:
         // The app may fire this message when entering the foreground (after the Web socket was disconnected after entering the background).
@@ -136,25 +166,25 @@ extension WebSocketManager: WebSocketDelegate {
         // parse to data
         guard
             let data = text.data(using: .utf8) else {
-            printBV(error: "Web socket - Parse error - Unable to convert string to data: \(text)")
-            return
+                printBV(error: "Web socket - Parse error - Unable to convert string to data: \(text)")
+                return
         }
         
         // parse data to dictionary
         guard
             let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []),
             let jsonDictionary = jsonObject as? [String : Any] else {
-            printBV(error: "Web socket - Unable to parse JSON data.")
-            return
+                printBV(error: "Web socket - Unable to parse JSON data.")
+                return
         }
         
-        print(jsonDictionary.prettyPrintedJSON!)
+        //print(jsonDictionary.prettyPrintedJSON!)
         
         /*
          Fire the signal with the web socket message in it's 'raw' form.
          This allows viewers to handle the web socket messages as they please.
          */
-        WebSocketManager.onMessageReceivedRaw.fire(jsonDictionary)
+        WebSocketManager.onMessageReceivedRaw.fire((jsonDictionary, nil))
         
         // - Parse event models
         
@@ -176,41 +206,17 @@ extension WebSocketManager: WebSocketDelegate {
                 
             case .inventory:
                 do {
-                    let inventoryEvent = try jsonDecoder.decode(WSInventoryEvent.self, from: data)
-                    WebSocketManager.onInventoryEvent.fire(inventoryEvent)
+                    let inventoryEvent = try blockvJSONDecoder.decode(WSInventoryEvent.self, from: data)
+                    WebSocketManager.onInventoryUpdate.fire((inventoryEvent, nil))
                 } catch {
                     printBV(error: error.localizedDescription)
                 }
                 
             case .stateUpdate:
                 do {
-                    let stateUpdateEvent = try jsonDecoder.decode(WSStateUpdateEvent.self, from: data)
-                    
-//                    switch stateUpdateEvent.vatomProperties {
-//                    case .object(let object):
-//
-//                        if let parentId = object["parent_id"] {
-//                            
-//                        }
-//
-//                        if let dropped = object["dropped"] {
-//
-//                        }
-//
-//                        if let geoPos = object["geo_pos"] {
-//
-//                        }
-//
-//                        if let visibility = object["visibility"] {
-//
-//                        }
-//                    default:
-//                        printBV(error: "")
-//                    }
-                    
-                    print(stateUpdateEvent.vatomProperties as? [String : Any])
-                    
-                    WebSocketManager.onVatomStateUpdateEvent.fire(stateUpdateEvent)
+                    let stateUpdateEvent = try blockvJSONDecoder.decode(WSStateUpdateEvent.self, from: data)
+                    print(stateUpdateEvent.vatomProperties)
+                    WebSocketManager.onVatomStateUpdate.fire((stateUpdateEvent, nil))
                 } catch {
                     printBV(error: error.localizedDescription)
                 }
@@ -218,8 +224,8 @@ extension WebSocketManager: WebSocketDelegate {
             case .activity:
                 do {
                     // FIXME: Allow resources to be encoded.
-                    let activityEvent = try jsonDecoder.decode(WSActivityEvent.self, from: data)
-                    WebSocketManager.onActivityEvent.fire(activityEvent)
+                    let activityEvent = try blockvJSONDecoder.decode(WSActivityEvent.self, from: data)
+                    WebSocketManager.onActivityEvent.fire((activityEvent, nil))
                 } catch {
                     printBV(error: error.localizedDescription)
                 }

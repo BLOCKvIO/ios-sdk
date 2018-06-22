@@ -78,3 +78,66 @@ extension JSON: CustomDebugStringConvertible {
     }
 }
 
+extension JSON {
+    
+    /// Returns a value of type `String` if available.
+    public var string: String? {
+        switch self {
+        case .string(let value):
+            return value
+        default:
+            return nil
+        }
+    }
+    
+    /// Returns a value of type `Float` if available.
+    public var float: Float? {
+        switch self {
+        case .number(let value):
+            return value
+        default:
+            return nil
+        }
+    }
+    
+    /// Returns a value of type `Bool` if available.
+    public var bool: Bool? {
+        switch self {
+        case .bool(let value):
+            return value
+        default:
+            return nil
+        }
+    }
+    
+    /// Returns a value of type `[String : JSON]` if available.
+    public var object: [String : JSON]? {
+        switch self {
+        case .object(let value):
+            return value
+        default:
+            return nil
+        }
+    }
+    
+    /// Returns a value of type `[JSON]` if available.
+    public var array: [JSON]? {
+        switch self {
+        case .array(let value):
+            return value
+        default:
+            return nil
+        }
+    }
+    
+    /// Returns a value of type `Bool` if available.
+    public var isNull: Bool {
+        switch self {
+        case .null:
+            return true
+        default:
+            return false
+        }
+    }
+    
+}

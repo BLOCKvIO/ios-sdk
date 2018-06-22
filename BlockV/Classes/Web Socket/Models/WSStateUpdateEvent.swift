@@ -76,9 +76,7 @@ public struct WSStateUpdateEvent: WSEvent {
     /// Unique identifier of the vAtom which generated this event.
     public let vatomId: String
     /// JSON object containing the only updated properties of the vAtom.
-    //public let vatomProperties: JSON
-    /// JSON object containing the only updated properties of the vAtom.
-    public let vatomProperties: [String : Any] // Forces manual Equatable conformance
+    public let vatomProperties: [String : JSON]
     /// Timestamp of when the vAtom was modified.
     public let whenModified: Date
     
@@ -86,7 +84,9 @@ public struct WSStateUpdateEvent: WSEvent {
 
     /// Timestamp of when the event was received (client-side).
     let timestamp: Date
-
+    
+    // MARK: - Helpers
+    
 }
 
 /*
@@ -120,8 +120,7 @@ extension WSStateUpdateEvent: Decodable {
         vatomId       = try payloadContainer.decode(String.self, forKey: .vatomId)
         
         let newObjectContainer = try payloadContainer.nestedContainer(keyedBy: NewObjectCodingKeys.self, forKey: .newObject)
-        //vatomProperties = try newObjectContainer.decode(JSON.self, forKey: .vatomProperties)
-        vatomProperties = [:]
+        vatomProperties = try newObjectContainer.decode([String : JSON].self, forKey: .vatomProperties)
         whenModified    = try newObjectContainer.decode(Date.self, forKey: .whenModified)
         
         // stamp this event with the current time
@@ -131,37 +130,37 @@ extension WSStateUpdateEvent: Decodable {
     
 }
 
-extension WSStateUpdateEvent {
-    
-    public init(form dictionary: [String : Any]) throws {
-        
-        guard
-            let payload = dictionary["payload"] as? [String : Any],
-            let eventId = payload["event_id"] as? String,
-            let operation = payload["op"] as? String,
-            let vatomID = payload["id"] as? String,
-            let newObject = payload["new_object"] as? [String : Any],
-            let vatomProperties = newObject["vAtom::vAtomType"] as? [String : Any],
-            let whenModifiedString = newObject["when_modified"] as? String else {
-                printBV(error: "Model decoding failed.")
-                throw BVJSONError.decodingError //FIXME: Throw proper error
-        }
-        
-        self.eventId = eventId
-        self.operation = operation
-        self.vatomId = vatomID
-        self.vatomProperties = vatomProperties
-        guard let whenModifiedDate = DateFormatter.blockvDateFormatter.date(from: whenModifiedString) else {
-            printBV(error: "Model decoding failed.")
-            throw BVJSONError.decodingError //FIXME: Throw proper error
-        }
-        self.whenModified = whenModifiedDate
-        
-        // stamp this event with the current time
-        timestamp = Date()
-    }
-    
-}
+//extension WSStateUpdateEvent {
+//
+//    public init(from dictionary: [String : Any]) throws {
+//
+//        guard
+//            let payload = dictionary["payload"] as? [String : Any],
+//            let eventId = payload["event_id"] as? String,
+//            let operation = payload["op"] as? String,
+//            let vatomID = payload["id"] as? String,
+//            let newObject = payload["new_object"] as? [String : Any],
+//            let vatomProperties = newObject["vAtom::vAtomType"] as? [String : Any],
+//            let whenModifiedString = newObject["when_modified"] as? String else {
+//                printBV(error: "Model decoding failed.")
+//                throw BVJSONError.decodingError //FIXME: Throw proper error
+//        }
+//
+//        self.eventId = eventId
+//        self.operation = operation
+//        self.vatomId = vatomID
+//        self.vatomProperties = vatomProperties
+//        guard let whenModifiedDate = DateFormatter.blockvDateFormatter.date(from: whenModifiedString) else {
+//            printBV(error: "Model decoding failed.")
+//            throw BVJSONError.decodingError //FIXME: Throw proper error
+//        }
+//        self.whenModified = whenModifiedDate
+//
+//        // stamp this event with the current time
+//        timestamp = Date()
+//    }
+//
+//}
 
 extension WSStateUpdateEvent: Equatable { }
 

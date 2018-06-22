@@ -100,6 +100,14 @@ public final class BLOCKv {
         }
     }
     
+//    fileprivate static var _socketClient: WebSocketManager?
+//    
+//    internal static var socketClient {
+//        get {
+//            
+//        }
+//    }
+    
     /// Called to reset the SDK.
     internal static func reset() {
         // remove all credentials

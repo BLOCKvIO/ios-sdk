@@ -136,11 +136,44 @@ public final class BLOCKv {
     
     /// Configures the SDK with your issued app id.
     ///
-    /// Note, as a viewer, `configure` should be the first method call you make  on the BLOCKv SDK.
+    /// Note, as a viewer, `configure` should be the first method call you make on the BLOCKv SDK.
     /// Typically, you would call `configure` in `application(_:didFinishLaunchingWithOptions:)`
+    ///
+    /// This method must be called ONLY once.
     public static func configure(appID: String) {
         self.appID = appID
+        
+        // NOTE: Since `configure` is called only once in the app's lifecycle. We do not need to worry about multiple registrations.
+        NotificationCenter.default.addObserver(BLOCKv.self,
+                                               selector: #selector(handleUserAuthorisationRequired),
+                                               name: Notification.Name.BVInternal.UserAuthorizationRequried,
+                                               object: nil)
     }
+    
+    /// Called when the networking client detects the user is unathorized.
+    ///
+    /// This method perfroms a clean up operation before notifying the viewer that the SDK requires
+    /// user authorization.
+    ///
+    /// - important: This method may be called multiple times. For example, consider the case where
+    /// multiple requests fail due to the refresh token being invalid.
+    @objc
+    private static func handleUserAuthorisationRequired() {
+        
+        printBV(info: "Authorization - User is unauthorized.")
+        
+        // only notify the viewer if the user is currently authorized
+        if isLoggedIn {
+            // perform interal clean up
+            reset()
+            // call the closure stored in `onLogout`
+            onLogout?()
+        }
+        
+    }
+    
+    /// Holds a closure to call on logout
+    public static var onLogout: (() -> Void)?
     
     /// Sets the BLOCKv platform environment.
     ///

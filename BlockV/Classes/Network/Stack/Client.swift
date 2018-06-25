@@ -348,6 +348,10 @@ extension DataRequest {
                     let error = BVError.platformError(reason: BVError.PlatformErrorReason(code: errorModel.code, message: errorModel.message))
                     return .failure(error) //TODO: Alamofire error is lost in this case.
                     
+                } catch let DecodingError.keyNotFound(key, context) {
+                    return .failure(BVError.modelDecoding(reason: "Key not found: \(key) in context: \(context.debugDescription)"))
+                } catch let DecodingError.valueNotFound(value, context) {
+                    return .failure(BVError.modelDecoding(reason: "Value not found: \(value) in context: \(context.debugDescription)"))
                 } catch {
                     return .failure(BVError.modelDecoding(reason: error.localizedDescription))
                 }
@@ -368,6 +372,10 @@ extension DataRequest {
             do {
                 let object = try decoder.decode(T.self, from: validData)
                 return .success(object)
+            } catch let DecodingError.keyNotFound(key, context) {
+                return .failure(BVError.modelDecoding(reason: "Key not found: \(key) in context: \(context)"))
+            } catch let DecodingError.valueNotFound(value, context) {
+                return .failure(BVError.modelDecoding(reason: "Value not found: \(value) in context: \(context.debugDescription)"))
             } catch {
                 return .failure(BVError.modelDecoding(reason: error.localizedDescription))
             }

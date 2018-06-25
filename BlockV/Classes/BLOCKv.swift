@@ -160,11 +160,9 @@ public final class BLOCKv {
     @objc
     private static func handleUserAuthorisationRequired() {
         
-        printBV(info: "XXXXXXX Authorization - User is unauthorized.")
+        printBV(info: "Authorization - User is unauthorized.")
         
-        // FIXME: Will this cover all cases?
-        
-        // only notify the viewer if the user is currently thought to be authorized
+        // only notify the viewer if the user is currently authorized
         if isLoggedIn {
             // perform interal clean up
             reset()

@@ -124,12 +124,12 @@ class InventoryCollectionViewController: UICollectionViewController {
             print(stateEvent)
             
             // example of extracting bool
-            if let isDropped = stateEvent.vatomProperties["dropped"]?.bool {
+            if let isDropped = stateEvent.vatomProperties["dropped"]?.boolValue {
                 print("isDropped \(isDropped)")
             }
             
             // example of extracting array of floats
-            if let coordinates = stateEvent.vatomProperties["geo_pos"]?.object?["coordinates"]?.array?.compactMap({ $0.float }) {
+            if let coordinates = stateEvent.vatomProperties["geo_pos"]?["coordinates"]?.arrayValue?.compactMap({ $0.floatValue }) {
                 print("Coordinates: \(coordinates)")
             }
             

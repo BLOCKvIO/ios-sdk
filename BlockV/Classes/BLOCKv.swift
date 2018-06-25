@@ -108,6 +108,22 @@ public final class BLOCKv {
 //        }
 //    }
     
+    //static let socket = WebSocketManager()
+    
+    // This may fail if we don't yet have a refresh token.
+    
+//    BLOCKv.getAccessToken { (success, accessToken) in
+//    guard success, let token = accessToken else {
+//    print("ERROR! Cannot fetch access token.")
+//    return
+//    }
+//    
+//    self.webSocketManager = WebSocketManager(serverHost: "wss://ws.blockv.net/ws",
+//    appId: MyAppID,
+//    accessToken: token)
+//    }
+    
+    
     /// Called to reset the SDK.
     internal static func reset() {
         // remove all credentials

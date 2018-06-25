@@ -43,21 +43,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // ------------- TEMP -------------
         BLOCKv.setEnvironment(.development)
-        
-        // This may fail if we don't yet have a refresh token.
-        
-        BLOCKv.getAccessToken { (success, accessToken) in
-            guard success, let token = accessToken else {
-                print("ERROR! Cannot fetch access token.")
-                return
-            }
-            
-            self.webSocketManager = WebSocketManager(serverHost: "wss://ws.blockv.net/ws",
-                                                     appId: MyAppID,
-                                                     accessToken: token)
-        }
-        
-        
         // ------------- TEMP -------------
 
         print("\nViewer > isLoggedIn: \(BLOCKv.isLoggedIn)")

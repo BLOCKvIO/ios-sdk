@@ -134,21 +134,20 @@ public class WebSocketManager {
     /// establishes a connection.
     public func connect() {
         
-        // flag that the viewer
+        /*
+         There are 2 challenges to solve here:
+         1. What to do if fetching a refreshed access token fails?
+         2. Retrying the connection in the event the connection drops (but not if access token related?)
+         */
+        
+        DispatchQueue.mainThreadPrecondition()
+
+        // raise the flag that the viewer has attemped to connect
         self.shouldAutoConnect = true
         // prevent unnecessary reconnects
         if socket?.isConnected == true { return }
         
-        // 1. Grab a new access token
-        
-        // - how do I get trigger a refresh of the access token?
-        // - what if fetching a new access token fails?
-        
-        // 2. Call connect() on the web socket
-        
-        // - what if the connection fails to establish?
-        
-        // Fetch a new access token.
+        // fetch a refreshed access token.
         self.oauthHandler.forceAccessTokenRefresh { (success, accessToken) in
             
             // ensure no error
@@ -156,8 +155,7 @@ public class WebSocketManager {
                 printBV(error: "Web socket - Cannot fetch access token.")
                 return
                 
-                //FIXME: Should an error be thrown?
-                // 2 scenarios: 1) user had not auth'd 2) 
+                //FIXME: Should connect pass an error back to the caller?
             }
             
             // initialise an instance of a web socket
@@ -165,14 +163,15 @@ public class WebSocketManager {
             self.socket?.delegate = self
             self.socket?.connect()
             
-            //FIXME: connect will **attempt** a connection - if it fails, the retry mechanism should kick in.
-    
         }
         
     }
     
     /// Attempts to disconnect from the Web socket server.
     public func disconnect() {
+        
+        DispatchQueue.mainThreadPrecondition()
+        
         self.shouldAutoConnect = false
         socket?.disconnect()
     }

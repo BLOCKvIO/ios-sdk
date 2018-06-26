@@ -147,7 +147,7 @@ class InventoryCollectionViewController: UICollectionViewController {
         
         BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { (vatomStateEvent, error) in
             
-            print("\nViewer > State Update - Only drop events")
+            print("\nViewer > State Update - Filters in only Drop/Pick-Up events")
             
         }.filter {
             // check the properties for the 'dropped' flag.

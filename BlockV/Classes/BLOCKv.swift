@@ -96,6 +96,7 @@ public final class BLOCKv {
     
     // MARK: - Client
     
+    // FIXME: Should this be nil on logout?
     // FIXME: This MUST become a singleton (since only a single instance should ever exist).
     private static let oauthHandler = OAuth2Handler(appID: BLOCKv.appID!,
                                      baseURLString: BLOCKv.environment!.apiServerURLString,
@@ -197,20 +198,6 @@ public final class BLOCKv {
     }
     
     // - Public Lifecycle
-    
-    /*
-     Maybe the credential store should be responsible for broadcasting when authorisation changes?
-     */
-    
-    /// Called when authorisation occurs.
-    internal func onLogin() {
-        
-    }
-    
-    /// Called when authorisation is revoked.
-    internal func onLogout() {
-        
-    }
         
     /// Boolean indicating whether a user is logged in. `true` if logged in. `false` otherwise.
     public static var isLoggedIn: Bool {
@@ -223,7 +210,7 @@ public final class BLOCKv {
     }
     
     @available(*, deprecated, message: "This is an unsupported feature of the SDK and may be removed in a future release.")
-    /// Retrieves and refreshes the SDKs access token.
+    /// Retrieves a refreshed access token.
     ///
     /// - Important:
     /// This function should only be called if you have a well defined reason for obtaining an

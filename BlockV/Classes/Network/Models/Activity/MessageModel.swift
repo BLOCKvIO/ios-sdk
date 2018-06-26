@@ -36,14 +36,14 @@ public struct MessageModel {
     
     // - Auxillary
     
-    /// Array of associated vAtoms.
-    public let vatoms: [Vatom]
+    /// Array of associated vAtom identifiers.
+    public let vatomIds: [String]
     /// Array of templated variation identifiers (for each associated vAtom).
     public let templateVariationIds: [String]
     /// Array of resources (for each associated vAtom).
     public let resources: [VatomResource]
     ///
-    public let geoPosition: [Double]
+    public let geoPosition: [Double]? //FIXME: Convert to CLLocationCoordinate2D?
     
     enum CodingKeys: String, CodingKey {
         case message      = "message"
@@ -53,7 +53,7 @@ public struct MessageModel {
     enum MessageCodingKeys: String, CodingKey {
         case id                   = "msg_id"
         case userId               = "user_id"
-        case vatoms               = "vatoms"
+        case vatomIds             = "vatoms"
         case templateVariationIds = "templ_vars"
         case message              = "msg"
         case actionName           = "action_name"
@@ -67,7 +67,31 @@ public struct MessageModel {
 
 extension MessageModel: Codable {
 
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        whenModifed = try container.decode(Date.self, forKey: .whenModified)
+        
+        // de-nest properties to top level
+        let messageContainer = try container.nestedContainer(keyedBy: MessageCodingKeys.self, forKey: .message)
+        id                   = try messageContainer.decode(String.self, forKey: .id)
+        userId               = try messageContainer.decode(String.self, forKey: .userId)
+        message              = try messageContainer.decode(String.self, forKey: .message)
+        actionName           = try messageContainer.decode(String.self, forKey: .actionName)
+        whenCreated          = try messageContainer.decode(Date.self, forKey: .whenCreated)
+        triggeredBy          = try messageContainer.decode(String.self, forKey: .triggeredBy)
+        
+        // potentially `null`
+        geoPosition          = try messageContainer.decodeIfPresent([Double].self, forKey: .geoPosition)
+        templateVariationIds = try messageContainer.decodeIfPresent([String].self, forKey: .templateVariationIds) ?? []
+        vatomIds             = try messageContainer.decodeIfPresent([String].self, forKey: .vatomIds) ?? []
+        resources            = try messageContainer.decodeIfPresent([VatomResource].self, forKey: .resources) ?? []
 
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+    }
 
 }
 
@@ -125,8 +149,15 @@ let message2 = """
 
 var test: MessageModel = {
    
-    let jsonDecoder = JSONDecoder()
-    jsonDecoder.da
+    do {
+        let jsonDecoder = JSONDecoder()
+        let a = try jsonDecoder.decode(MessageModel.self, from: message1)
+        print(a)
+        let b = try jsonDecoder.decode(MessageModel.self, from: message2)
+        print(b)
+    } catch {
+        print(error)
+    }
     
 }()
 

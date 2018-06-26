@@ -15,8 +15,8 @@ import Foundation
  Caveat: `when_modified` is returned as a double.
  */
 
-/// Represents a message thread.
-public struct MessageThreadModel {
+/// Represents a collection of threads.
+public struct ThreadModel {
     
     /// Struct containing a few user properties.
     public struct UserInfo: Codable {
@@ -54,7 +54,7 @@ public struct MessageThreadModel {
 /*
  Custom decoding is required due to the `when_modified` property being a double.
  */
-extension MessageThreadModel: Codable {
+extension ThreadModel: Codable {
     
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)

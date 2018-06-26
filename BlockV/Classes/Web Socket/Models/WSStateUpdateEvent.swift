@@ -78,7 +78,7 @@ public struct WSStateUpdateEvent: WSEvent {
     /// JSON object containing the only updated properties of the vAtom.
     public let vatomProperties: [String : JSON]
     /// Timestamp of when the vAtom was modified.
-    public let whenModified: Date
+    public let whenModified: Date //FIXME: This is a vAtom property - it should not be mapped.
     
     // Client-side
 

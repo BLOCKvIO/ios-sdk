@@ -9,14 +9,35 @@
 //  governing permissions and limitations under the License.
 //
 
-
 import Foundation
 import Starscream
 import Signals
 
-/// Responsible for communitating with Web socket server.
+/*
+ Importants points:
+ 
+ - Viewer may subscribe to singals before the Web socket has connected.
+ - A single shared OAuth2Handler instance is used to handle access token refresh.
+ - Attempting to connect to the Web socket before the user has authenticated (i.e. is able
+   to fetch access tokens) will result a connection error. Beware of a loop!
+ - When the viewer changes users, the Web socket MUST reconnect using the new user's access token.
+ */
+
+/// Responsible for communitating with BLOCKv Web socket server.
 ///
+/// Important: There should only ever be a single instance within the BLOCKv SDK.
 ///
+/// Features:
+///
+/// - Create and manages the socket connection.
+/// - Built-in retry mechanism using exponential backoff.
+///
+/// Consumers may subscribe to the following events:
+///
+/// - onMessageReceivedRaw
+/// - onInventoryUpdate
+/// - onVatomStateUpdate
+/// - onActivityEvent
 public class WebSocketManager {
     
     /// Models the type of events sent over the Web socket.
@@ -31,6 +52,35 @@ public class WebSocketManager {
         case activity       = "my_events"
     }
     
+    // MARK: - Signals
+    
+    // - Events
+    
+    /// Fires when the Web socket receives **any** message.
+    ///
+    /// The Signal is generic over a dictionary [String : Any] which contains the raw message.
+    /// An error will be fired if the Web socket encounters an error.
+    public let onMessageReceivedRaw = Signal<([String : Any]?, Error?)>()
+    /// Fires when the Web socket receives an **inventory** event.
+    public let onInventoryUpdate = Signal<(WSInventoryEvent?, Error?)>()
+    /// Fires when the Web socket recevies a vAtom **state update** event.
+    public let onVatomStateUpdate = Signal<(WSStateUpdateEvent?, Error?)>()
+    /// Fires when the Web socket receives an **activity** event.
+    public let onActivityEvent = Signal<(WSActivityEvent?, Error?)>()
+    
+    // - Lifecycle
+    
+    /// Fires when the Web socket has established a connection.
+    public let onConnected = Signal<Void>()
+    /// Fires when the Web socket has disconnected.
+    public let onDisconnected = Signal<Void>()
+    
+    // MARK: - Properties
+    
+    /// Boolean indicating whether the socket is connected.
+    public var isConnected: Bool {
+        return socket?.isConnected ?? false
+    }
     
     /// JSON decoder configured for the BLOCKv Web socket server.
     private lazy var blockvJSONDecoder: JSONDecoder = {
@@ -39,60 +89,134 @@ public class WebSocketManager {
         return decoder
     }()
     
-    // MARK: - Signals
-    
-    /*
-     Signals fire with an error when the Web socket disconnects.
-     */
-    
-    /// Fires when the Web socket receives **any** message.
-    ///
-    /// The Signal is generic over a dictionary [String : Any] which contains the raw message.
-    /// An error will be fired if the Web socket encounters and error.
-    public static let onMessageReceivedRaw = Signal<([String : Any]?, Error?)>()
-    
-    /// Fires when the Web socket receives an **inventory** event.
-    public static let onInventoryUpdate = Signal<(WSInventoryEvent?, Error?)>()
-    
-    /// Fires when the Web socket recevies a **state update** event.
-    public static let onVatomStateUpdate = Signal<(WSStateUpdateEvent?, Error?)>()
-    
-    /// Fires when the Web socket receives an **activity** event.
-    public static let onActivityEvent = Signal<(WSActivityEvent?, Error?)>()
-    
-    // MARK: - Properties
-    
     /// Web socket instance
-    fileprivate var socket: WebSocket
+    private var socket: WebSocket?
+    private let baseURLString: String
+    private let appID: String
+    private let oauthHandler: OAuth2Handler
     
-    /// Boolean indicating whether the socket is connected.
-    var isConnected: Bool {
-        return socket.isConnected
-    }
+    /// Boolean controlling whether this manager will automatically and opportunistically
+    /// attempt to re-establish a connection. For example, after the app receives a
+    /// `UIApplicationDidBecomeActive` event.
+    ///
+    /// This is in an attempt to improve the reliability of the Web socket by attempting
+    /// to ensure the Web socket is connected (if the Viewer expects it to be).
+    ///
+    /// Logic:
+    /// Should be set to `true` when the viewer calls `connect()`.
+    /// Should be set to `false` when the viewer calls `disconnect()`
+    private var shouldAutoConnect: Bool = false
     
     // MARK: - Initialisation
     
-    public init(serverHost: String, appId: String, accessToken: String) {
+    internal init(baseURLString: String, appID: String, oauthHandler: OAuth2Handler) {
+        self.baseURLString = baseURLString
+        self.appID = appID
+        self.oauthHandler = oauthHandler
         
-        // initialise an instance of a web socket
-        socket = WebSocket(url: URL(string: serverHost + "?app_id=\(appId)" + "&token=\(accessToken)")!)
-        socket.delegate = self
-        connect()
+        // Listen for notifications for when the app becomes active
+        NotificationCenter.default.addObserver(self, selector: #selector(handleApplicationDidBecomeActive),
+                                               name: .UIApplicationDidBecomeActive, object: nil)
         
     }
     
     // MARK: - Lifecycle
     
-    func connect() {
-        socket.connect()
+    /// Attempts to establish a connection to the Web socket server.
+    ///
+    /// A connection can only be established if the user has an authenticated session.
+    ///
+    /// It is safe to call this method multiple times. The connection will
+    /// only be retried if the socket is currenlty disconnected.
+    ///
+    /// Establishing a connection is typically in the order of seconds, but is of course network
+    /// dependent. Subscribe to `onConnected()` to receive an event when the Web socket
+    /// establishes a connection.
+    public func connect() {
+        
+        // flag that the viewer
+        self.shouldAutoConnect = true
+        // prevent unnecessary reconnects
+        if socket?.isConnected == true { return }
+        
+        // 1. Grab a new access token
+        
+        // - how do I get trigger a refresh of the access token?
+        // - what if fetching a new access token fails?
+        
+        // 2. Call connect() on the web socket
+        
+        // - what if the connection fails to establish?
+        
+        // Fetch a new access token.
+        self.oauthHandler.forceAccessTokenRefresh { (success, accessToken) in
+            
+            // ensure no error
+            guard success, let token = accessToken else {
+                printBV(error: "Web socket - Cannot fetch access token.")
+                return
+                
+                //FIXME: Should an error be thrown?
+                // 2 scenarios: 1) user had not auth'd 2) 
+            }
+            
+            // initialise an instance of a web socket
+            self.socket = WebSocket(url: URL(string: self.baseURLString + "?app_id=\(self.appID)" + "&token=\(token)")!)
+            self.socket?.delegate = self
+            self.socket?.connect()
+            
+            //FIXME: connect will **attempt** a connection - if it fails, the retry mechanism should kick in.
+    
+        }
+        
     }
     
-    func disconnect() {
-        socket.disconnect()
+    /// Attempts to disconnect from the Web socket server.
+    public func disconnect() {
+        self.shouldAutoConnect = false
+        socket?.disconnect()
     }
     
-    // Experiment with backoff retry
-    //
+    @objc
+    private func handleApplicationDidBecomeActive() {
+        // reset exponential backoff variables
+        _retryTimeInterval = 1
+        _retryCount = 0
+        // connect (if not already connected)
+        self.connect()
+    }
+    
+    // MARK: - Retry + Exponential Backoff
+    
+    /// Time interval between retries (measured in seconds).
+    private var _retryTimeInterval: TimeInterval = 1
+    /// Count of the number of retries.
+    private var _retryCount: Int = 0
+    
+    /// Attempts to connect to the Web socket.
+    ///
+    /// - Parameter shouldRetry: Flag determining whether to retry the connection in the event of a connection failure.
+    ///
+    /// Exponential Backoff Policy
+    /// Start:      1 second
+    /// Muliplier:  2
+    /// Maximum:    8 seconds
+    private func connect(shouldRetry: Bool = true) {
+        
+        //TODO: Maybe
+        
+    }
+    
+    
+    /*
+     Exponential backoff
+     
+     Business rule:
+     Start 1 sec
+     Multiplier 2
+     Max:
+     
+     */
     
     /*
      -(void)start
@@ -122,27 +246,27 @@ public class WebSocketManager {
 
 extension WebSocketManager: WebSocketDelegate {
     
-    
     public func websocketDidConnect(socket: WebSocketClient) {
-        printBV(info: "Web socket - Connected")
+        printBV(info: "Web socket > Connected")
+        self.onConnected.fire(())
     }
-    
     
     public func websocketDidDisconnect(socket: WebSocketClient, error: Error?) {
         
         if let e = error as? WSError {
-            print("Web socket -  Disconnected: \(e.message)")
+            printBV(info:"Web socket > Disconnected: \(e.message)")
         } else if let e = error {
-            print("Web socket -  Disconnected: \(e.localizedDescription)")
+            printBV(info:"Web socket > Disconnected: \(e.localizedDescription)")
         } else {
-            print("Web socket -  Disconnected")
+            printBV(info:"Web socket > Disconnected")
         }
         
-        // Fire an error informing the observer that the Web socket is down.
-        WebSocketManager.onMessageReceivedRaw.fire((nil, error))
-        WebSocketManager.onInventoryUpdate.fire((nil, error))
-        WebSocketManager.onVatomStateUpdate.fire((nil, error))
-        WebSocketManager.onActivityEvent.fire((nil, error))
+        // Fire an error informing the observers that the Web socket has disconnected.
+        self.onDisconnected.fire(())
+        self.onMessageReceivedRaw.fire((nil, error))
+        self.onInventoryUpdate.fire((nil, error))
+        self.onVatomStateUpdate.fire((nil, error))
+        self.onActivityEvent.fire((nil, error))
         
         //TODO: The Web socket should reconnect here:
         // The app may fire this message when entering the foreground (after the Web socket was disconnected after entering the background).
@@ -150,13 +274,12 @@ extension WebSocketManager: WebSocketDelegate {
     }
     
     public func websocketDidReceiveMessage(socket: WebSocketClient, text: String) {
-        printBV(info: "Web socket - Did receive message: \(text)")
+        //printBV(info: "Web socket - Did receive text: \(text)")
         parseMessage(text)
     }
     
     public func websocketDidReceiveData(socket: WebSocketClient, data: Data) {
-        printBV(info: "Web socket - Did receive data: \(data.count)")
-        // BLOCKv Web socket does not send data messages.
+        // N/A - Web socket does not send data messages.
     }
     
     // MARK: Message Parsing
@@ -184,16 +307,14 @@ extension WebSocketManager: WebSocketDelegate {
          Fire the signal with the web socket message in it's 'raw' form.
          This allows viewers to handle the web socket messages as they please.
          */
-        WebSocketManager.onMessageReceivedRaw.fire((jsonDictionary, nil))
+        self.onMessageReceivedRaw.fire((jsonDictionary, nil))
         
         // - Parse event models
         
-        guard
-            // find message type
-            let typeString = jsonDictionary["msg_type"] as? String,
-            let payload = jsonDictionary["payload"] as? [String : Any] else {
-                printBV(error:"Web socket - Cannot parse 'msg_type'.")
-                return
+        // find message type
+        guard let typeString = jsonDictionary["msg_type"] as? String else {
+            printBV(error:"Web socket - Cannot parse 'msg_type'.")
+            return
         }
         
         // ensure message type is known
@@ -202,12 +323,16 @@ extension WebSocketManager: WebSocketDelegate {
             
             switch messageType {
             case .info:
-                printBV(info: payload.description)
+                break
+                //printBV(info: payload.description)
                 
             case .inventory:
                 do {
                     let inventoryEvent = try blockvJSONDecoder.decode(WSInventoryEvent.self, from: data)
-                    WebSocketManager.onInventoryUpdate.fire((inventoryEvent, nil))
+                    
+                    //TODO: Set an enum `event` = .added or .removed - this will require the user id (decode the jwt).
+                    
+                    self.onInventoryUpdate.fire((inventoryEvent, nil))
                 } catch {
                     printBV(error: error.localizedDescription)
                 }
@@ -216,7 +341,7 @@ extension WebSocketManager: WebSocketDelegate {
                 do {
                     let stateUpdateEvent = try blockvJSONDecoder.decode(WSStateUpdateEvent.self, from: data)
                     print(stateUpdateEvent.vatomProperties)
-                    WebSocketManager.onVatomStateUpdate.fire((stateUpdateEvent, nil))
+                    self.onVatomStateUpdate.fire((stateUpdateEvent, nil))
                 } catch {
                     printBV(error: error.localizedDescription)
                 }
@@ -225,7 +350,7 @@ extension WebSocketManager: WebSocketDelegate {
                 do {
                     // FIXME: Allow resources to be encoded.
                     let activityEvent = try blockvJSONDecoder.decode(WSActivityEvent.self, from: data)
-                    WebSocketManager.onActivityEvent.fire((activityEvent, nil))
+                    self.onActivityEvent.fire((activityEvent, nil))
                 } catch {
                     printBV(error: error.localizedDescription)
                 }

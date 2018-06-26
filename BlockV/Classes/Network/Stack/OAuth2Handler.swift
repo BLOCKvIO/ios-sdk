@@ -41,6 +41,8 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
     private var isRefreshing = false
     private var requestsToRetry: [RequestRetryCompletion] = []
     
+    
+    
     // MARK: - Initialization
     
     init(appID: String, baseURLString: String, accessToken: String = "", refreshToken: String = "") {
@@ -232,12 +234,6 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
     
     // MARK: - Manual Access Token Refresh
     
-    /*
-     NOTE:
-     This ability to refresh and obtain the access token from the viewer is not officialy supported
-     and may be removed in a futrure release.
-     */
-    
     typealias TokenCompletion = (_ success: Bool, _ accessToken: String?) -> Void
     
     private var manualTokenCallbacks: [TokenCompletion] = []
@@ -246,7 +242,9 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
     ///
     /// - Parameter completion: The closure to call once an access token has been obtained
     /// form the BLOCKv platform.
-    func getAccessToken(completion: @escaping TokenCompletion) {
+    func forceAccessTokenRefresh(completion: @escaping TokenCompletion) {
+        
+        //FIXME: If the refresh fails - should a typed error be passed to the closure (in stead of bool = false)?
         
         /*
          This lock ensures exclusive access to `manualTokenCallbacks` and `isRefreshing` variables.

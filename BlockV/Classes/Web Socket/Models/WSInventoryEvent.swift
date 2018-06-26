@@ -54,6 +54,11 @@ public struct WSInventoryEvent: WSEvent, Equatable, Hashable {
     
     // MARK: - Helpers
     
+    /*
+     Note: Still deciding if these helpers should be public API. Maybe an enum .added or .removed
+     is simpler?
+     */
+    
     /// Boolean indicating whether, accoring to this event, the vatom was added to
     /// the inventory of the specified user.
     ///

@@ -89,8 +89,18 @@ class InventoryCollectionViewController: UICollectionViewController {
         self.fetchInventory()
         //self.performDiscoverQuery()
         
+        BLOCKv.socket.connect()
+        
+        BLOCKv.socket.onConnected.subscribe(with: self) {
+            print("\nViewer > Web socket connected")
+        }
+        
+        BLOCKv.socket.onDisconnected.subscribe(with: self) {
+            print("\nViewer > Web socket disconnected")
+        }
+        
         // subscribe to inventory update events
-        WebSocketManager.onInventoryUpdate.subscribe(with: self) { (inventoryEvent, error) in
+        BLOCKv.socket.onInventoryUpdate.subscribe(with: self) { (inventoryEvent, error) in
             
             // ensure no errors
             guard let inventoryEvent = inventoryEvent, error == nil else {
@@ -103,12 +113,12 @@ class InventoryCollectionViewController: UICollectionViewController {
              Refreshing the inventory is inefficient.
              */
             self.fetchInventory()
-            print(inventoryEvent)
+            //print(inventoryEvent)
 
         }
         
         // subscribe to vatom state update events
-        WebSocketManager.onVatomStateUpdate.subscribe(with: self) { (vatomStateEvent, error) in
+        BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { (vatomStateEvent, error) in
             
             // ensure no errors
             guard let stateEvent = vatomStateEvent, error == nil else {
@@ -121,18 +131,27 @@ class InventoryCollectionViewController: UICollectionViewController {
              Refreshing the inventory is inefficient.
              */
             self.fetchInventory()
-            print(stateEvent)
+            //print(stateEvent)
             
             // example of extracting bool
             if let isDropped = stateEvent.vatomProperties["dropped"]?.boolValue {
-                print("isDropped \(isDropped)")
+                print("\nViewer > State Update: isDropped \(isDropped)")
             }
             
             // example of extracting array of floats
             if let coordinates = stateEvent.vatomProperties["geo_pos"]?["coordinates"]?.arrayValue?.compactMap({ $0.floatValue }) {
-                print("Coordinates: \(coordinates)")
+                print("\nViewer > State Update: Coordinates: \(coordinates)")
             }
             
+        }
+        
+        BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { (vatomStateEvent, error) in
+            
+            print("\nViewer > State Update - Only drop events")
+            
+        }.filter {
+            // check the properties for the 'dropped' flag.
+            $0.0?.vatomProperties.contains(where: { $0.key == "dropped" })  ?? false
         }
         
     }
@@ -159,7 +178,7 @@ class InventoryCollectionViewController: UICollectionViewController {
             }
             
             // handle success
-            print("\nViewer > Fetched inventory group model")
+            print("\nViewer > Fetched inventory GroupModel")
             
             /*
              NOTE

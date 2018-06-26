@@ -83,8 +83,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             showWelcome()
         }
         
-        //: ## Other
-        
         // Theme
         window?.tintColor = UIColor.seafoamBlue
         

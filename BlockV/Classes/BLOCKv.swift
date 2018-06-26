@@ -13,8 +13,11 @@ import Foundation
 import Alamofire
 import JWTDecode
 
-// Beta 0.9
-//TODO: Inpect the `expires_in` before a request is made. Refresh the access token if necessary.
+/*
+ Goal:
+ BLOCKv should be invariant over App ID and Environment. In other words, the properties should
+ change, once set. Possibly targets for each environemnt?
+ */
 
 /// Primary interface into the the BLOCKv SDK.
 public final class BLOCKv {
@@ -22,12 +25,28 @@ public final class BLOCKv {
     // MARK: - Enums
     
     /// Models the BLOCKv platform environments.
-    ///
-    /// Options:
-    /// - production
-    public enum BVEnvironment: String {
-        case production = "https://api.blockv.io"
-        case development = "https://apidev.blockv.net"
+    public enum BVEnvironment {
+        /// Stable production environment.
+        case production
+        /// Unstable development environement (DO NOT USE).
+        case development
+        
+        /// BLOCKv server base url
+        var apiServerURLString: String {
+            switch self {
+            case .production:  return "https://api.blockv.io"
+            case .development: return "https://apidev.blockv.net"
+            }
+        }
+        
+        /// BLOCKv Web socket server base url
+        var webSocketURLString: String {
+            switch self {
+            case .production:  return "wss//newws.blockv.io/ws"
+            case .development: return "wss://ws.blockv.net/ws"
+            }
+        }
+        
     }
     
     // MARK: - Properties
@@ -57,7 +76,33 @@ public final class BLOCKv {
         didSet { printBV(info: "Environment updated: \(environment!)") }
     }
     
-    /// Computes the configuration object needed to initialise the networking client.
+    // MARK: - Configuration
+    
+    /// Configures the SDK with your issued app id.
+    ///
+    /// Note, as a viewer, `configure` should be the first method call you make on the BLOCKv SDK.
+    /// Typically, you would call `configure` in `application(_:didFinishLaunchingWithOptions:)`
+    ///
+    /// This method must be called ONLY once.
+    public static func configure(appID: String) {
+        self.appID = appID
+        
+        // NOTE: Since `configure` is called only once in the app's lifecycle. We do not need to worry about multiple registrations.
+        NotificationCenter.default.addObserver(BLOCKv.self,
+                                               selector: #selector(handleUserAuthorisationRequired),
+                                               name: Notification.Name.BVInternal.UserAuthorizationRequried,
+                                               object: nil)
+    }
+    
+    // MARK: - Client
+    
+    // FIXME: This MUST become a singleton (since only a single instance should ever exist).
+    private static let oauthHandler = OAuth2Handler(appID: BLOCKv.appID!,
+                                     baseURLString: BLOCKv.environment!.apiServerURLString,
+                                     refreshToken: CredentialStore.refreshToken?.token ?? "")
+    
+    
+    /// Computes the configuration object needed to initialise clients and sockets.
     fileprivate static var clientConfiguration: Client.Configuration {
         get {
             // ensure host app has set an app id
@@ -68,13 +113,13 @@ public final class BLOCKv {
             }
             
             // return the configuration (inexpensive object)
-            return Client.Configuration(baseURLString: BLOCKv.environment!.rawValue,
-                                        appID: BLOCKv.appID!,
-                                        refreshToken: CredentialStore.refreshToken?.token)
+            return Client.Configuration(baseURLString: BLOCKv.environment!.apiServerURLString,
+                                        appID: BLOCKv.appID!)
+            
         }
     }
     
-    /// Backing networking client instance variable.
+    /// Backing networking client instance.
     fileprivate static var _client: Client?
     
     /// BLOCKv networking client.
@@ -91,7 +136,8 @@ public final class BLOCKv {
             // check if a new instance must be initialized
             if _client == nil {
                 // init a new instance
-                _client = Client(config: BLOCKv.clientConfiguration)
+                _client = Client(config: BLOCKv.clientConfiguration,
+                                 oauthHandler: self.oauthHandler)
                 return _client!
             } else {
                 // return the backing instance
@@ -100,36 +146,54 @@ public final class BLOCKv {
         }
     }
     
-//    fileprivate static var _socketClient: WebSocketManager?
-//    
-//    internal static var socketClient {
-//        get {
-//            
-//        }
-//    }
+    // MARK: - Web socket
     
-    //static let socket = WebSocketManager()
+    /*
+     Client and Socket are mutually exclusive. That is, one can be created with out the other.
+     Both relay on the ability to retrieve an access token. This is provided by a shared instance
+     of OAuth2Handler.
+     
+     
+     Even though client and socket are independent, the socket is dependent on the user having an
+     authenticated session.
+     
+     The socket must handle the case where the user is unauthenticated. Particularly around logout.
+     */
     
-    // This may fail if we don't yet have a refresh token.
+    /// Backing Web socket instance.
+    ///
+    /// Must be torn down when the user logs out.
+    ///
+    /// The Web socket is independent of the `client`. However, it is bound to
+    /// the user being authenticaated.
+    fileprivate static var _socket: WebSocketManager?
     
-//    BLOCKv.getAccessToken { (success, accessToken) in
-//    guard success, let token = accessToken else {
-//    print("ERROR! Cannot fetch access token.")
-//    return
-//    }
-//    
-//    self.webSocketManager = WebSocketManager(serverHost: "wss://ws.blockv.net/ws",
-//    appId: MyAppID,
-//    accessToken: token)
-//    }
+    //TODO: What if this is accessed before the client is accessed?
+    //TODO: What if the viewer suscribes to an event before auth (login/reg) has occured?
+    public static var socket: WebSocketManager {
+        get {
+            if _socket == nil {
+                _socket = WebSocketManager(baseURLString: self.environment!.webSocketURLString,
+                                           appID: self.appID!,
+                                           oauthHandler: self.oauthHandler)
+                return _socket!
+            } else {
+                return _socket!
+            }
+        }
+    }
+
+    // MARK: - Lifecycle
     
-    
-    /// Called to reset the SDK.
+    /// Call to reset the SDK.
     internal static func reset() {
         // remove all credentials
         CredentialStore.clear()
-        // remove client instance - force re-init on next access
+        // remove client & socket instances
         self._client = nil
+        self._socket = nil
+        
+        printBV(info: "Reset")
     }
     
     // - Public Lifecycle
@@ -169,24 +233,6 @@ public final class BLOCKv {
     /// form the BLOCKv platform.
     public static func getAccessToken(completion: @escaping (_ success: Bool, _ accessToken: String?) -> Void) {
         BLOCKv.client.getAccessToken(completion: completion)
-    }
-    
-    // MARK: - Configuration
-    
-    /// Configures the SDK with your issued app id.
-    ///
-    /// Note, as a viewer, `configure` should be the first method call you make on the BLOCKv SDK.
-    /// Typically, you would call `configure` in `application(_:didFinishLaunchingWithOptions:)`
-    ///
-    /// This method must be called ONLY once.
-    public static func configure(appID: String) {
-        self.appID = appID
-        
-        // NOTE: Since `configure` is called only once in the app's lifecycle. We do not need to worry about multiple registrations.
-        NotificationCenter.default.addObserver(BLOCKv.self,
-                                               selector: #selector(handleUserAuthorisationRequired),
-                                               name: Notification.Name.BVInternal.UserAuthorizationRequried,
-                                               object: nil)
     }
     
     /// Called when the networking client detects the user is unathorized.

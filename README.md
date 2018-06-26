@@ -25,7 +25,7 @@ pod 'BLOCKv'
 
 Within the `AppDelegate` be sure to set the App ID.
 
-```Swift
+```swift
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
@@ -39,6 +39,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } else {
             // show authentication ui
         }
+        
+        // Handle user re-authentication
+        BLOCKv.onLogout = {
+            // show authentication ui
+        }
+        
         return true
     }
 }

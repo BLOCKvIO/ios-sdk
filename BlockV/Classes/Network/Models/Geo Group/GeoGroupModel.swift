@@ -39,7 +39,7 @@ public struct GeoGroupModel: Equatable {
     /// Geo hash. Useful for URLs etc.
     public let geoHash: String
     /// Coordinate of the group.
-    public let location: CLLocationCoordinate2D
+    public let coordinate: CLLocationCoordinate2D
     /// Number of vAtoms in the group.
     public let count: Int
 
@@ -62,15 +62,15 @@ extension GeoGroupModel: Codable {
         count = try container.decode(Int.self, forKey: .count)
         let lon = try container.decode(Double.self, forKey: .longitude)
         let lat = try container.decode(Double.self, forKey: .latitude)
-        location = CLLocationCoordinate2DMake(lat, lon)
+        coordinate = CLLocationCoordinate2DMake(lat, lon)
     }
     
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(geoHash, forKey: .geoHash)
         try container.encode(count, forKey: .count)
-        try container.encode(location.latitude, forKey: .latitude)
-        try container.encode(location.longitude, forKey: .longitude)
+        try container.encode(coordinate.latitude, forKey: .latitude)
+        try container.encode(coordinate.longitude, forKey: .longitude)
     }
     
 }

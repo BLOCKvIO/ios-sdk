@@ -89,76 +89,25 @@ extension MessageModel: Codable {
     }
     
     public func encode(to encoder: Encoder) throws {
+        // top-level
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(id, forKey: .id)
+        try container.encode(whenModifed, forKey: .whenModified)
+        
+        // nest properties one level
+        var messageContainer = container.nestedContainer(keyedBy: MessageCodingKeys.self, forKey: .message)
+        try messageContainer.encode(id, forKey: .id)
+        try messageContainer.encode(userId, forKey: .userId)
+        try messageContainer.encode(message, forKey: .message)
+        try messageContainer.encode(actionName, forKey: .actionName)
+        try messageContainer.encode(whenCreated, forKey: .whenCreated)
+        try messageContainer.encode(triggeredBy, forKey: .triggeredBy)
+        
+        try messageContainer.encode(templateVariationIds, forKey: .templateVariationIds)
+        try messageContainer.encode(vatomIds, forKey: .vatomIds)
+        try messageContainer.encode(resources, forKey: .resources)
+        
+        try messageContainer.encodeIfPresent(geoPosition, forKey: .geoPosition)
+
     }
 
 }
-
-let message1 = """
-    {
-        "message": {
-            "msg_id": 1522251946067536131,
-            "user_id": "bb162d66-bfef-401e-ad89-3edf8388e01c",
-            "vatoms": [],
-            "templ_vars": null,
-            "msg": "hey man",
-            "action_name": "User Message",
-            "when_created": "2018-03-28T15:45:46Z",
-            "triggered_by": "b9e6581c-bb70-48d1-85eb-6657ee1a3bef",
-            "generic": null,
-            "geo_pos": null,
-            "to_data_lake": false,
-            "no_message": false
-        },
-        "when_modified": 1522251946067536128
-    }
-    """.data(using: .utf8)!
-
-let message2 = """
-    {
-        "message": {
-            "msg_id": 1522250650907474423,
-            "user_id": "bb162d66-bfef-401e-ad89-3edf8388e01c",
-            "vatoms": [
-                "2ef141aa-1b91-4576-a7d0-a5db791a5da0"
-            ],
-            "templ_vars": null,
-            "msg": "<b>test van duffelen</b> sent you a <b>Drink Menu</b> vAtom.",
-            "action_name": "Transfer",
-            "when_created": "2018-03-28T15:24:10Z",
-            "triggered_by": "b9e6581c-bb70-48d1-85eb-6657ee1a3bef",
-            "generic": [
-                {
-                    "name": "ActivatedImage",
-                    "resourceType": "ResourceTypes::Image::PNG",
-                    "value": {
-                        "resourceValueType": "ResourceValueType::URI",
-                        "value": "https://cdndev.blockv.net/vatomic.prototyping/MenuCard/v2/Harvelles/v1/harvelles_menu_icon.png"
-                    }
-                }
-            ],
-            "geo_pos": null,
-            "to_data_lake": false,
-            "no_message": false
-        },
-        "when_modified": 1522250650907474432
-    }
-    """.data(using: .utf8)!
-
-
-var test: MessageModel = {
-   
-    do {
-        let jsonDecoder = JSONDecoder()
-        let a = try jsonDecoder.decode(MessageModel.self, from: message1)
-        print(a)
-        let b = try jsonDecoder.decode(MessageModel.self, from: message2)
-        print(b)
-    } catch {
-        print(error)
-    }
-    
-}()
-
-

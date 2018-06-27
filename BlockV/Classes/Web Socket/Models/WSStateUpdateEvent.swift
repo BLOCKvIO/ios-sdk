@@ -69,6 +69,7 @@ import Foundation
 public struct WSStateUpdateEvent: WSEvent {
     
     // MARK: - Properties
+    
     /// Unique identifier of this state update event.
     public let eventId: String
     /// Database operation.

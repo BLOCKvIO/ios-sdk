@@ -15,25 +15,35 @@ import Signals
 
 /*
  Important points:
- 
  - Viewer may subscribe to singals before the Web socket has connected.
  - A single shared OAuth2Handler instance is used to handle access token refresh.
  - Attempting to connect to the Web socket before the user has authenticated (i.e. is able
  to fetch access tokens) will result a connection error. Beware of a loop!
  - When the viewer changes users, the Web socket MUST reconnect using the new user's access token.
+ 
+ Future items:
+ - Parse socket messages into native models on a background queue.
+ - Ensure cleaned up after web socket disconnect. Possibly remove subscribers to signals?
  */
 
-/// Responsible for communitating with BLOCKv Web socket server.
+/// Responsible for communitating with the BLOCKv Web socket server.
 ///
-/// Important: There should only ever be a single instance within the BLOCKv SDK.
+/// - important: There should only ever be a single instance within the BLOCKv SDK.
 ///
-/// Features:
+/// ## Features
 ///
 /// - Create and manages the socket connection.
 /// - Built-in retry mechanism using exponential backoff.
 ///
+/// ## Consumers
+///
 /// Consumers may subscribe to the following events:
 ///
+/// Lifecycle events:
+/// - onConnected
+/// - onDisconnected
+///
+/// Platform events:
 /// - onMessageReceivedRaw
 /// - onInventoryUpdate
 /// - onVatomStateUpdate
@@ -54,7 +64,7 @@ public class WebSocketManager {
     
     // MARK: - Signals
     
-    // - Events
+    // - Platform Events
     
     /// Fires when the Web socket receives **any** message.
     ///
@@ -137,7 +147,7 @@ public class WebSocketManager {
         /*
          There are 2 challenges to solve here (if needed):
          
-         1. The connect method is syncronous - therefore, this means the caller does not know when the socket
+         1. The connect method is syncronous - this means the caller does not know when the socket
          actually connects. For this, they need to listen for `onConnected()` - I am happy with this.
          2. Retrying the connection in the event the connection drops
          - Should the connection be retired if there is a problem with the auth (i.e. a 400 range error)?
@@ -162,8 +172,6 @@ public class WebSocketManager {
             guard success, let token = accessToken else {
                 printBV(error: "Web socket - Cannot fetch access token. Socket connection cannot be established.")
                 return
-                
-                //FIXME: Should connect pass an error back to the caller?
             }
             
             // initialise an instance of a web socket
@@ -243,6 +251,8 @@ extension WebSocketManager: WebSocketDelegate {
     
     private func parseMessage(_ text: String) {
         
+        //TODO: Move parsing to a background thread.
+        
         // parse to data
         guard
             let data = text.data(using: .utf8) else {
@@ -261,8 +271,8 @@ extension WebSocketManager: WebSocketDelegate {
         //print(jsonDictionary.prettyPrintedJSON!)
         
         /*
-         Fire the signal with the web socket message in it's 'raw' form.
-         This allows viewers to handle the web socket messages as they please.
+         Fire the signal using the message in it's 'raw' form.
+         Allows viewers to handle the socket messages as they please.
          */
         self.onMessageReceivedRaw.fire((jsonDictionary, nil))
         

@@ -117,7 +117,8 @@ public enum BVError: Error {
     
     ///
     public enum WebSocketErrorReason {
-        case disconnected
+        case connectionFailed
+        case connectionDisconnected
     }
     
 }
@@ -144,7 +145,8 @@ extension BVError: LocalizedError {
 extension BVError.WebSocketErrorReason {
     var localizedDescription: String {
         switch self {
-        case .disconnected: return "The Web socket disconnected."
+        case .connectionFailed: return "Failed to connect to the Web socket."
+        case .connectionDisconnected: return "The Web socket disconnected unexpectedly."
         }
     }
 }

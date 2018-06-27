@@ -1,6 +1,6 @@
 PODS:
   - Alamofire (4.7.2)
-  - BLOCKv (0.9.9):
+  - BLOCKv (0.9.10):
     - Alamofire (~> 4.7)
     - JWTDecode (~> 2.1)
   - JWTDecode (2.1.1)
@@ -19,7 +19,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Alamofire: e4fa87002c137ba2d8d634d2c51fabcda0d5c223
-  BLOCKv: 9857ed459a9950a6c652522cddd2608b3de8aec4
+  BLOCKv: c84a733c3f97d31228a49a4bfc510b77644576ac
   JWTDecode: 83e8b381aafe27158d9f692cbdca2b12d61d460c
 
 PODFILE CHECKSUM: 607654f8b0435c8536102866fa4fb9ba2ddddd6c

@@ -30,9 +30,13 @@ public enum BVError: Error {
     case platformError(reason: PlatformErrorReason)
     /// Models any underlying networking library errors.
     case networkingError(error: Error)
+    /// Models a Web socket error.
+    case webSocketError(error: WebSocketErrorReason)
+    
+    //FIXME: REMOVE AT SOME POINT
     /// Models a custom error. This should be used in very limited circumstances.
     /// A more defined error is preferred.
-    case custom(reason: String) //FIXME: Remove
+    case custom(reason: String)
     
     // MARK: Reasons
     
@@ -114,11 +118,19 @@ public enum BVError: Error {
         
     }
     
+    ///
+    public enum WebSocketErrorReason {
+        case connectionFailed
+        case connectionDisconnected
+    }
+    
 }
 
 extension BVError: LocalizedError {
     public var errorDescription: String? {
         switch self {
+        case .webSocketError(let error):
+            return "Web socket error: \(error.localizedDescription)"
         case .networkingError(let error):
             return "Networking failed with error: \(error.localizedDescription)"
         case .platformError(let reason):
@@ -127,6 +139,17 @@ extension BVError: LocalizedError {
             return "Model decoding failed with error: \(reason)"
         case .custom(reason: let reason):
             return reason
+        }
+    }
+}
+
+// MARK: - Localized Description
+
+extension BVError.WebSocketErrorReason {
+    var localizedDescription: String {
+        switch self {
+        case .connectionFailed: return "Failed to connect to the Web socket."
+        case .connectionDisconnected: return "The Web socket disconnected unexpectedly."
         }
     }
 }

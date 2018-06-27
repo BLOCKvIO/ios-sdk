@@ -37,44 +37,103 @@ public enum JSON {
 }
 
 extension JSON: Equatable {
-
+    
     public static func == (lhs: JSON, rhs: JSON) -> Bool {
         switch (lhs, rhs) {
-            case (.string(let s1), .string(let s2)):
-                return s1 == s2
-            case (.number(let n1), .number(let n2)):
-                return n1 == n2
-            case (.object(let o1), .object(let o2)):
-                return o1 == o2
-            case (.array(let a1), .array(let a2)):
-                return a1 == a2
-            case (.bool(let b1), .bool(let b2)):
-                return b1 == b2
-            case (.null, .null):
-                return true
-            default:
-                return false
+        case (.string(let s1), .string(let s2)):
+            return s1 == s2
+        case (.number(let n1), .number(let n2)):
+            return n1 == n2
+        case (.object(let o1), .object(let o2)):
+            return o1 == o2
+        case (.array(let a1), .array(let a2)):
+            return a1 == a2
+        case (.bool(let b1), .bool(let b2)):
+            return b1 == b2
+        case (.null, .null):
+            return true
+        default:
+            return false
         }
     }
 }
 
 extension JSON: CustomDebugStringConvertible {
-
+    
     public var debugDescription: String {
         switch self {
-            case .string(let str):
-                return str.debugDescription
-            case .number(let num):
-                return num.debugDescription
-            case .bool(let bool):
-                return bool.description
-            case .null:
-                return "null"
-            default:
-                let encoder = JSONEncoder()
-                encoder.outputFormatting = [.prettyPrinted]
-                return try! String(data: encoder.encode(self), encoding: .utf8)!
+        case .string(let str):
+            return str.debugDescription
+        case .number(let num):
+            return num.debugDescription
+        case .bool(let bool):
+            return bool.description
+        case .null:
+            return "null"
+        default:
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.prettyPrinted]
+            return try! String(data: encoder.encode(self), encoding: .utf8)!
         }
     }
 }
 
+extension JSON {
+    
+    public var stringValue: String? {
+        if case .string(let value) = self {
+            return value
+        }
+        return nil
+    }
+    
+    public var floatValue: Float? {
+        if case .number(let value) = self {
+            return value
+        }
+        return nil
+    }
+    
+    public var boolValue: Bool? {
+        if case .bool(let value) = self {
+            return value
+        }
+        return nil
+    }
+    
+    public var objectValue: [String : JSON]? {
+        if case .object(let value) = self {
+            return value
+        }
+        return nil
+    }
+    
+    public var arrayValue: [JSON]? {
+        if case .array(let value) = self {
+            return value
+        }
+        return nil
+    }
+    
+    public var isNull: Bool {
+        if case .null = self {
+            return true
+        }
+        return false
+    }
+    
+    public subscript(index: Int) -> JSON? {
+        if case .array(let arr) = self {
+            return index < arr.count ? arr[index] : nil
+        }
+        return nil
+    }
+    
+    public subscript(key: String) -> JSON? {
+        if case .object(let dict) = self {
+            return dict[key]
+        }
+        return nil
+    }
+    
+}

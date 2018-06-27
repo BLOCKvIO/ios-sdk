@@ -10,7 +10,7 @@
 //
 
 import Foundation
-import Alamofire
+import Alamofire 
 
 /// This class handles BLOCKv OAuth2 and implements a credential refresh system.
 ///
@@ -40,6 +40,8 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
 
     private var isRefreshing = false
     private var requestsToRetry: [RequestRetryCompletion] = []
+    
+    
     
     // MARK: - Initialization
     
@@ -196,21 +198,21 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
             switch dataResponse.result {
             case let .success(val):
                 printBV(info: "Access token - Refresh successful")
+                // invoke with success
                 completion(true, val.payload.accessToken.token, nil)
                 
             case let .failure(err):
                 printBV(error: "Access token - Refresh failed")
                 printBV(error: err.localizedDescription)
-                completion(false, nil, nil)
                 
-                /*
-                 As agreed, the response from the refresh should be inspected. If the refresh failed
-                 due to the refresh token being blacklisted or expired. Then the client application
-                 should be notified. This could be in the form of a notification or invoking a closure
-                 etc.
-                 
-                 The SDK' internal `reset()` method should also be called to ensure state clean up.
-                 */
+                // check if the error payload indicates the refresh token is invlaid
+                if let statusCode = dataResponse.response?.statusCode, (400...499) ~= statusCode {
+                    // broadcast to inform user authorization is required
+                    NotificationCenter.default.post(name: Notification.Name.BVInternal.UserAuthorizationRequried, object: nil)
+                }
+                
+                // invoke with failure
+                completion(false, nil, nil)
                 
             }
 
@@ -232,12 +234,6 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
     
     // MARK: - Manual Access Token Refresh
     
-    /*
-     NOTE:
-     This ability to refresh and obtain the access token from the viewer is not officialy supported
-     and may be removed in a futrure release.
-     */
-    
     typealias TokenCompletion = (_ success: Bool, _ accessToken: String?) -> Void
     
     private var manualTokenCallbacks: [TokenCompletion] = []
@@ -246,16 +242,20 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
     ///
     /// - Parameter completion: The closure to call once an access token has been obtained
     /// form the BLOCKv platform.
-    func getAccessToken(completion: @escaping TokenCompletion) {
+    func forceAccessTokenRefresh(completion: @escaping TokenCompletion) {
         
-        /*
-         This lock ensures exclusive access to `manualTokenCallbacks` and `isRefreshing` variables.
-         */
-        lock.lock() ; defer { lock.unlock() }
-
-        manualTokenCallbacks.append(completion)
-
-        refreshAndUpdate()
+        //FIXME: If the refresh fails - should a typed error be passed to the closure (in stead of bool = false)?
+        
+        // move to a background queue (this method may be called on the main thread - which we don't want to block)
+        internalQueue.async {
+            
+            /*
+             This lock ensures exclusive access to `manualTokenCallbacks` and `isRefreshing` variables.
+             */
+            self.lock.lock() ; defer { self.lock.unlock() }
+            self.manualTokenCallbacks.append(completion)
+            self.refreshAndUpdate()
+        }
         
     }
 

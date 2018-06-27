@@ -181,7 +181,7 @@ class InventoryCollectionViewController: UICollectionViewController {
         // MARK: - Activity
         
         // subcribe to an activity event
-        BLOCKv.socket.onActivityEvent.subscribe(with: self) { (activityEvent, error) in
+        BLOCKv.socket.onActivityUpdate.subscribe(with: self) { (activityEvent, error) in
             
             // ensure no errors
             guard let activityEvent = activityEvent, error == nil else {

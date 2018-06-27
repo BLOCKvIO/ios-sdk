@@ -61,12 +61,12 @@ public class WebSocketManager {
     /// The Signal is generic over a dictionary [String : Any] which contains the raw message.
     /// An error will be fired if the Web socket encounters an error.
     public let onMessageReceivedRaw = Signal<([String : Any]?, Error?)>()
-    /// Fires when the Web socket receives an **inventory** event.
+    /// Fires when the Web socket receives an **inventory** update event.
     public let onInventoryUpdate = Signal<(WSInventoryEvent?, Error?)>()
     /// Fires when the Web socket recevies a vAtom **state update** event.
     public let onVatomStateUpdate = Signal<(WSStateUpdateEvent?, Error?)>()
-    /// Fires when the Web socket receives an **activity** event.
-    public let onActivityEvent = Signal<(WSActivityEvent?, Error?)>()
+    /// Fires when the Web socket receives an **activity** update event.
+    public let onActivityUpdate = Signal<(WSActivityEvent?, Error?)>()
     
     // - Lifecycle
     
@@ -223,7 +223,7 @@ extension WebSocketManager: WebSocketDelegate {
         self.onMessageReceivedRaw.fire((nil, error))
         self.onInventoryUpdate.fire((nil, error))
         self.onVatomStateUpdate.fire((nil, error))
-        self.onActivityEvent.fire((nil, error))
+        self.onActivityUpdate.fire((nil, error))
         
         //TODO: The Web socket should reconnect here:
         // The app may fire this message when entering the foreground (after the Web socket was disconnected after entering the background).
@@ -307,7 +307,7 @@ extension WebSocketManager: WebSocketDelegate {
                 do {
                     // FIXME: Allow resources to be encoded.
                     let activityEvent = try blockvJSONDecoder.decode(WSActivityEvent.self, from: data)
-                    self.onActivityEvent.fire((activityEvent, nil))
+                    self.onActivityUpdate.fire((activityEvent, nil))
                 } catch {
                     printBV(error: error.localizedDescription)
                 }

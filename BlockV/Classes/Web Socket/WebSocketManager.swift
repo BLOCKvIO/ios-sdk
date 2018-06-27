@@ -23,6 +23,7 @@ import Signals
  
  Future items:
  - Parse socket messages into native models on a background queue.
+ ... - See: https://github.com/daltoniam/Starscream#custom-queue
  - Ensure cleaned up after web socket disconnect. Possibly remove subscribers to signals?
  */
 
@@ -296,9 +297,7 @@ extension WebSocketManager: WebSocketDelegate {
             case .inventory:
                 do {
                     let inventoryEvent = try blockvJSONDecoder.decode(WSInventoryEvent.self, from: data)
-                    
                     //TODO: Set an enum `event` = .added or .removed - this will require the user id (decode the jwt).
-                    
                     self.onInventoryUpdate.fire((inventoryEvent, nil))
                 } catch {
                     printBV(error: error.localizedDescription)
@@ -307,7 +306,6 @@ extension WebSocketManager: WebSocketDelegate {
             case .stateUpdate:
                 do {
                     let stateUpdateEvent = try blockvJSONDecoder.decode(WSStateUpdateEvent.self, from: data)
-                    print(stateUpdateEvent.vatomProperties)
                     self.onVatomStateUpdate.fire((stateUpdateEvent, nil))
                 } catch {
                     printBV(error: error.localizedDescription)

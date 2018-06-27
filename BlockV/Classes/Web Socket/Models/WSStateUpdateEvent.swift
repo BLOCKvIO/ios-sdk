@@ -66,7 +66,7 @@ import Foundation
 */
 
 /// Web socket response model - Inventory Event.
-public struct WSStateUpdateEvent: WSEvent {
+public struct WSStateUpdateEvent: WSEvent, Equatable {
     
     // MARK: - Properties
     
@@ -76,10 +76,10 @@ public struct WSStateUpdateEvent: WSEvent {
     public let operation: String
     /// Unique identifier of the vAtom which generated this event.
     public let vatomId: String
-    /// JSON object containing the only updated properties of the vAtom.
+    /// JSON object containing the only changed properties of the vAtom.
+    ///
+    /// In other words, this member contains a *diff* of of the previous version of the vAtom.
     public let vatomProperties: [String : JSON]
-    /// Timestamp of when the vAtom was modified.
-    public let whenModified: Date
     
     // Client-side
 
@@ -100,15 +100,10 @@ extension WSStateUpdateEvent: Decodable {
     }
     
     enum PayloadCodingKeys: String, CodingKey {
-        case eventId   = "event_id"
-        case operation = "op"
-        case vatomId   = "id"
-        case newObject = "new_object"
-    }
-    
-    enum NewObjectCodingKeys: String, CodingKey {
-        case vatomProperties = "vAtom::vAtomType"
-        case whenModified    = "when_modified"
+        case eventId         = "event_id"
+        case operation       = "op"
+        case vatomId         = "id"
+        case vatomProperties = "new_object"
     }
     
     public init(from decoder: Decoder) throws {
@@ -116,55 +111,14 @@ extension WSStateUpdateEvent: Decodable {
         let items = try decoder.container(keyedBy: CodingKeys.self)
         // de-nest payload to top level
         let payloadContainer = try items.nestedContainer(keyedBy: PayloadCodingKeys.self, forKey: .payload)
-        eventId       = try payloadContainer.decode(String.self, forKey: .eventId)
-        operation     = try payloadContainer.decode(String.self, forKey: .operation)
-        vatomId       = try payloadContainer.decode(String.self, forKey: .vatomId)
-        
-        let newObjectContainer = try payloadContainer.nestedContainer(keyedBy: NewObjectCodingKeys.self, forKey: .newObject)
-        vatomProperties = try newObjectContainer.decode([String : JSON].self, forKey: .vatomProperties)
-        whenModified    = try newObjectContainer.decode(Date.self, forKey: .whenModified)
+        eventId         = try payloadContainer.decode(String.self, forKey: .eventId)
+        operation       = try payloadContainer.decode(String.self, forKey: .operation)
+        vatomId         = try payloadContainer.decode(String.self, forKey: .vatomId)
+        vatomProperties = try payloadContainer.decode([String : JSON].self, forKey: .vatomProperties)
         
         // stamp this event with the current time
         timestamp = Date()
         
     }
     
-}
-
-//extension WSStateUpdateEvent {
-//
-//    public init(from dictionary: [String : Any]) throws {
-//
-//        guard
-//            let payload = dictionary["payload"] as? [String : Any],
-//            let eventId = payload["event_id"] as? String,
-//            let operation = payload["op"] as? String,
-//            let vatomID = payload["id"] as? String,
-//            let newObject = payload["new_object"] as? [String : Any],
-//            let vatomProperties = newObject["vAtom::vAtomType"] as? [String : Any],
-//            let whenModifiedString = newObject["when_modified"] as? String else {
-//                printBV(error: "Model decoding failed.")
-//                throw BVJSONError.decodingError //FIXME: Throw proper error
-//        }
-//
-//        self.eventId = eventId
-//        self.operation = operation
-//        self.vatomId = vatomID
-//        self.vatomProperties = vatomProperties
-//        guard let whenModifiedDate = DateFormatter.blockvDateFormatter.date(from: whenModifiedString) else {
-//            printBV(error: "Model decoding failed.")
-//            throw BVJSONError.decodingError //FIXME: Throw proper error
-//        }
-//        self.whenModified = whenModifiedDate
-//
-//        // stamp this event with the current time
-//        timestamp = Date()
-//    }
-//
-//}
-
-extension WSStateUpdateEvent: Equatable { }
-
-public func ==(lhs: WSStateUpdateEvent, rhs: WSStateUpdateEvent) -> Bool {
-    return lhs.eventId == rhs.eventId
 }

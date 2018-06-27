@@ -70,13 +70,19 @@ public class WebSocketManager {
     /// Fires when the Web socket receives **any** message.
     ///
     /// The Signal is generic over a dictionary [String : Any] which contains the raw message.
-    /// An error will be fired if the Web socket encounters an error.
+    /// An error will be fired if the Web socket unexpectedly disconnects.
     public let onMessageReceivedRaw = Signal<([String : Any]?, Error?)>()
+    
     /// Fires when the Web socket receives an **inventory** update event.
+    /// An error will be fired if the Web socket unexpectedly disconnects.
     public let onInventoryUpdate = Signal<(WSInventoryEvent?, Error?)>()
+    
     /// Fires when the Web socket recevies a vAtom **state update** event.
+    /// An error will be fired if the Web socket unexpectedly disconnects.
     public let onVatomStateUpdate = Signal<(WSStateUpdateEvent?, Error?)>()
+    
     /// Fires when the Web socket receives an **activity** update event.
+    /// An error will be fired if the Web socket unexpectedly disconnects.
     public let onActivityUpdate = Signal<(WSActivityEvent?, Error?)>()
     
     // - Lifecycle
@@ -117,6 +123,9 @@ public class WebSocketManager {
     /// Should be set to `true` when the viewer calls `connect()`.
     /// Should be set to `false` when the viewer calls `disconnect()`
     private var shouldAutoConnect: Bool = false
+    
+    /// Boolean indicating whether the access token is beign refreshed.
+    private var isRefreshingAccessToken: Bool = false
     
     // MARK: - Initialisation
     
@@ -161,13 +170,19 @@ public class WebSocketManager {
         
         // raise the flag that the viewer has requested a connection
         self.shouldAutoConnect = true
-        // prevent unnecessary reconnects
+        // prevent connection attempt if connected
         if socket?.isConnected == true { return }
+        
+        // prevent connection attempt if connection is in progress
+        if self.isRefreshingAccessToken == true { return }
+        isRefreshingAccessToken = true
         
         printBV(info: "Web socket - Establishing a connection.")
         
         // fetch a refreshed access token
         self.oauthHandler.forceAccessTokenRefresh { (success, accessToken) in
+
+            self.isRefreshingAccessToken = false
             
             // ensure no error
             guard success, let token = accessToken else {
@@ -179,6 +194,7 @@ public class WebSocketManager {
             self.socket = WebSocket(url: URL(string: self.baseURLString + "?app_id=\(self.appID)" + "&token=\(token)")!)
             self.socket?.delegate = self
             self.socket?.connect()
+            
             
         }
         

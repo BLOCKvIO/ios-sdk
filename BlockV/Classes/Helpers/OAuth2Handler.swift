@@ -246,14 +246,16 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
         
         //FIXME: If the refresh fails - should a typed error be passed to the closure (in stead of bool = false)?
         
-        /*
-         This lock ensures exclusive access to `manualTokenCallbacks` and `isRefreshing` variables.
-         */
-        lock.lock() ; defer { lock.unlock() }
-
-        manualTokenCallbacks.append(completion)
-
-        refreshAndUpdate()
+        // move to a background queue (this method may be called on the main thread - which we don't want to block)
+        internalQueue.async {
+            
+            /*
+             This lock ensures exclusive access to `manualTokenCallbacks` and `isRefreshing` variables.
+             */
+            self.lock.lock() ; defer { self.lock.unlock() }
+            self.manualTokenCallbacks.append(completion)
+            self.refreshAndUpdate()
+        }
         
     }
 

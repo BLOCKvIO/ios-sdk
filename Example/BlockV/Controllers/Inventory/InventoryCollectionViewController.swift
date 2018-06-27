@@ -89,6 +89,21 @@ class InventoryCollectionViewController: UICollectionViewController {
         self.fetchInventory()
         //self.performDiscoverQuery()
         
+        // connect and subscribe to update stream
+        self.subscribeToUpdateStream()
+    }
+    
+    deinit {
+        self.downloadQueue.cancelAllOperations()
+    }
+    
+    // MARK: - Helpers
+    
+    /// This method shows a few examples of subscribing to events from the update stream.
+    private func subscribeToUpdateStream() {
+        
+        // MARK: - Web Socket Lifecycle
+        
         BLOCKv.socket.connect()
         
         BLOCKv.socket.onConnected.subscribe(with: self) {
@@ -99,6 +114,8 @@ class InventoryCollectionViewController: UICollectionViewController {
             print("\nViewer > Web socket - Disconnected")
         }
         
+        // MARK: - Inventory
+        
         // subscribe to inventory update events
         BLOCKv.socket.onInventoryUpdate.subscribe(with: self) { (inventoryEvent, error) in
             
@@ -107,15 +124,19 @@ class InventoryCollectionViewController: UICollectionViewController {
                 return
             }
             
-            // refresh inventory
+            print("\nViewer > Inventory Update Event: \n\(inventoryEvent)")
+            
             /*
              Typically you would perfrom a localized update using the info inside of the event.
-             Refreshing the inventory is inefficient.
+             Refreshing the inventory off the back of the Web socket event is inefficient.
              */
+            
+            // refresh inventory
             self.fetchInventory()
-            //print(inventoryEvent)
-
+            
         }
+        
+        // MARK: - State Update
         
         // subscribe to vatom state update events
         BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { (vatomStateEvent, error) in
@@ -125,42 +146,53 @@ class InventoryCollectionViewController: UICollectionViewController {
                 return
             }
             
-            // refresh inventory
+            print("\nViewer > State Update Event: \n\(stateEvent)")
+            
             /*
              Typically you would perfrom a localized update using the info inside of the event.
-             Refreshing the inventory is inefficient.
+             Refreshing the inventory off the back of the Web socket event is inefficient.
              */
-            self.fetchInventory()
-            //print(stateEvent)
             
-            // example of extracting bool
+            // refresh inventory
+            self.fetchInventory()
+            
+            // example of extracting some bool value
             if let isDropped = stateEvent.vatomProperties["dropped"]?.boolValue {
                 print("\nViewer > State Update - isDropped \(isDropped)")
             }
             
-            // example of extracting array of floats
+            // example of extracting array of float values
             if let coordinates = stateEvent.vatomProperties["geo_pos"]?["coordinates"]?.arrayValue?.compactMap({ $0.floatValue }) {
                 print("\nViewer > State Update - vAtom coordinates: \(coordinates)")
             }
             
         }
         
+        // subcribe to vatom state updates (where the event was either a drop or pick-up)
         BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { (vatomStateEvent, error) in
             
             print("\nViewer > State Update - Filters in only Drop/Pick-Up events")
             
-        }.filter {
-            // check the properties for the 'dropped' flag.
-            $0.0?.vatomProperties.contains(where: { $0.key == "dropped" })  ?? false
+            }.filter {
+                // check the properties for the 'dropped' flag.
+                $0.0?.vatomProperties.contains(where: { $0.key == "dropped" })  ?? false
+        }
+        
+        // MARK: - Activity
+        
+        // subcribe to an activity event
+        BLOCKv.socket.onActivityEvent.subscribe(with: self) { (activityEvent, error) in
+            
+            // ensure no errors
+            guard let activityEvent = activityEvent, error == nil else {
+                return
+            }
+            
+            print("\nViewer > Activity Event: \n\(activityEvent)")
+            
         }
         
     }
-    
-    deinit {
-        self.downloadQueue.cancelAllOperations()
-    }
-    
-    // MARK: - Helpers
     
     /// Fetches the current user's inventory.
     ///

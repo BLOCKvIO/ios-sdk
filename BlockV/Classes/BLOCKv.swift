@@ -190,8 +190,10 @@ public final class BLOCKv {
     internal static func reset() {
         // remove all credentials
         CredentialStore.clear()
-        // remove client & socket instances
+        // nil out client
         self._client = nil
+        // disconnect and nil out socekt
+        self._socket?.disconnect()
         self._socket = nil
         
         printBV(info: "Reset")

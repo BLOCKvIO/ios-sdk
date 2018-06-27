@@ -171,7 +171,9 @@ extension BLOCKv {
         self.client.request(endpoint) { (baseModel, error) in
             
             // reset
-            reset()
+            DispatchQueue.main.async {
+                reset()
+            }
             
             // extract model, ensure no error
             guard let _ = baseModel?.payload, error == nil else {

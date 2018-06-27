@@ -60,21 +60,17 @@ public final class Client: ClientProtocol {
     class Configuration {
         let baseURLString: String
         let appID: String
-        let accessToken: String
-        let refreshToken: String
         
-        init(baseURLString: String, appID: String, accessToken: String? = nil, refreshToken: String? = nil) {
+        init(baseURLString: String, appID: String) {
             self.baseURLString = baseURLString
             self.appID = appID
-            self.accessToken = accessToken ?? ""
-            self.refreshToken = refreshToken ?? ""
         }
         
     }
     
     //TODO: The decoder should be passed into the client by it's owner - this would make it more flexible.
     /// JSON decoder configured for the blockv server.
-    lazy var blockvJSONDecoder: JSONDecoder = {
+    private lazy var blockvJSONDecoder: JSONDecoder = {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         return decoder
@@ -82,7 +78,7 @@ public final class Client: ClientProtocol {
     
     // MARK: - Initialization
     
-    init(config: Configuration) {
+    init(config: Configuration, oauthHandler: OAuth2Handler) {
         
         self.baseURL = URL(string: config.baseURLString)!
         
@@ -93,24 +89,17 @@ public final class Client: ClientProtocol {
         configuration.httpAdditionalHeaders = defaultHeaders
         
         // Uncomment to disable cache
-        //        configuration.urlCache = nil
+        // configuration.urlCache = nil
         
         self.sessionManager = Alamofire.SessionManager(configuration: configuration)
-        
-        oauthHandler = OAuth2Handler(
-            appID: config.appID,
-            baseURLString: config.baseURLString,
-            accessToken: config.accessToken,
-            refreshToken: config.refreshToken
-        )
-        
+        self.oauthHandler = oauthHandler
         self.sessionManager.adapter = oauthHandler
         self.sessionManager.retrier = oauthHandler
         
     }
     
     func getAccessToken(completion: @escaping (_ success: Bool, _ accessToken: String?) -> Void) {
-        self.oauthHandler.getAccessToken(completion: completion)
+        self.oauthHandler.forceAccessTokenRefresh(completion: completion)
     }
     
     // MARK: - Requests

@@ -48,7 +48,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         BLOCKv.setEnvironment(.development)
         // ------------- TEMP -------------
 
-        print("\nViewer > isLoggedIn: \(BLOCKv.isLoggedIn)")
+        print("\nViewer > isLoggedIn - \(BLOCKv.isLoggedIn)")
         
         func showWelcome() {
             // show 'welcome' view controller

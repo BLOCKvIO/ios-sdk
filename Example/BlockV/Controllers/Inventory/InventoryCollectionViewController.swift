@@ -92,11 +92,11 @@ class InventoryCollectionViewController: UICollectionViewController {
         BLOCKv.socket.connect()
         
         BLOCKv.socket.onConnected.subscribe(with: self) {
-            print("\nViewer > Web socket connected")
+            print("\nViewer > Web socket - Connected")
         }
         
         BLOCKv.socket.onDisconnected.subscribe(with: self) {
-            print("\nViewer > Web socket disconnected")
+            print("\nViewer > Web socket - Disconnected")
         }
         
         // subscribe to inventory update events
@@ -135,12 +135,12 @@ class InventoryCollectionViewController: UICollectionViewController {
             
             // example of extracting bool
             if let isDropped = stateEvent.vatomProperties["dropped"]?.boolValue {
-                print("\nViewer > State Update: isDropped \(isDropped)")
+                print("\nViewer > State Update - isDropped \(isDropped)")
             }
             
             // example of extracting array of floats
             if let coordinates = stateEvent.vatomProperties["geo_pos"]?["coordinates"]?.arrayValue?.compactMap({ $0.floatValue }) {
-                print("\nViewer > State Update: Coordinates: \(coordinates)")
+                print("\nViewer > State Update - vATom coordinates: \(coordinates)")
             }
             
         }

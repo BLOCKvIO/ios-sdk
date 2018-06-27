@@ -19,7 +19,7 @@ import Signals
  - Viewer may subscribe to singals before the Web socket has connected.
  - A single shared OAuth2Handler instance is used to handle access token refresh.
  - Attempting to connect to the Web socket before the user has authenticated (i.e. is able
-   to fetch access tokens) will result a connection error. Beware of a loop!
+ to fetch access tokens) will result a connection error. Beware of a loop!
  - When the viewer changes users, the Web socket MUST reconnect using the new user's access token.
  */
 
@@ -122,37 +122,45 @@ public class WebSocketManager {
     
     // MARK: - Lifecycle
     
-    /// Attempts to establish a connection to the Web socket server.
+    /// Starts the process of establishing a connection to the Web socket server.
     ///
-    /// A connection can only be established if the user has an authenticated session.
+    /// It is safe to call this method multiple times. The connection will only be re-established if the
+    /// socket is currenlty *disconnected*.
     ///
-    /// It is safe to call this method multiple times. The connection will
-    /// only be retried if the socket is currenlty disconnected.
+    /// - note: Establishing a network connection is an asynchronous task — typically in the order of
+    /// seconds, but is of course, network dependent. Subscribe to `onConnected()` to receive a signal
+    /// when the socket establishes a connection.
     ///
-    /// Establishing a connection is typically in the order of seconds, but is of course network
-    /// dependent. Subscribe to `onConnected()` to receive an event when the Web socket
-    /// establishes a connection.
+    /// - important: A connection can only be established if the user has an **authenticated** session.
     public func connect() {
         
         /*
-         There are 2 challenges to solve here:
-         1. What to do if fetching a refreshed access token fails?
-         2. Retrying the connection in the event the connection drops (but not if access token related?)
+         There are 2 challenges to solve here (if needed):
+         
+         1. The connect method is syncronous - therefore, this means the caller does not know when the socket
+         actually connects. For this, they need to listen for `onConnected()` - I am happy with this.
+         2. Retrying the connection in the event the connection drops
+         - Should the connection be retired if there is a problem with the auth (i.e. a 400 range error)?
+         ... - This may cause an infinte loop.
+         ... - The caller should rather be informed of a problem (e.g. user must be authenticated).
+         - Maybe the connection should only be retried on 500s (i.e. the server is offline).
          */
         
         DispatchQueue.mainThreadPrecondition()
-
-        // raise the flag that the viewer has attemped to connect
+        
+        // raise the flag that the viewer has requested a connection
         self.shouldAutoConnect = true
         // prevent unnecessary reconnects
         if socket?.isConnected == true { return }
         
-        // fetch a refreshed access token.
+        printBV(info: "Web socket - Establishing a connection.")
+        
+        // fetch a refreshed access token
         self.oauthHandler.forceAccessTokenRefresh { (success, accessToken) in
             
             // ensure no error
             guard success, let token = accessToken else {
-                printBV(error: "Web socket - Cannot fetch access token.")
+                printBV(error: "Web socket - Cannot fetch access token. Socket connection cannot be established.")
                 return
                 
                 //FIXME: Should connect pass an error back to the caller?
@@ -168,6 +176,10 @@ public class WebSocketManager {
     }
     
     /// Attempts to disconnect from the Web socket server.
+    ///
+    /// - note: Disconnecting a network connection is an asynchronous task — typically in the order of
+    /// seconds, but is of course, network dependent. Subscribe to `onDisconnected()` to receive a signal
+    /// when the socket closes the connection.
     public func disconnect() {
         
         DispatchQueue.mainThreadPrecondition()
@@ -179,65 +191,11 @@ public class WebSocketManager {
     @objc
     private func handleApplicationDidBecomeActive() {
         // reset exponential backoff variables
-        _retryTimeInterval = 1
-        _retryCount = 0
+//        _retryTimeInterval = 1
+//        _retryCount = 0
         // connect (if not already connected)
         self.connect()
     }
-    
-    // MARK: - Retry + Exponential Backoff
-    
-    /// Time interval between retries (measured in seconds).
-    private var _retryTimeInterval: TimeInterval = 1
-    /// Count of the number of retries.
-    private var _retryCount: Int = 0
-    
-    /// Attempts to connect to the Web socket.
-    ///
-    /// - Parameter shouldRetry: Flag determining whether to retry the connection in the event of a connection failure.
-    ///
-    /// Exponential Backoff Policy
-    /// Start:      1 second
-    /// Muliplier:  2
-    /// Maximum:    8 seconds
-    private func connect(shouldRetry: Bool = true) {
-        
-        //TODO: Maybe
-        
-    }
-    
-    
-    /*
-     Exponential backoff
-     
-     Business rule:
-     Start 1 sec
-     Multiplier 2
-     Max:
-     
-     */
-    
-    /*
-     -(void)start
-     {
-     _timeInterval = 0.0;
-     [NSTimer scheduledTimerWithTimeInterval:_timeInterval target:self
-     selector:@selector(startWithTimer:) userInfo:nil repeats:NO];
-     }
-     
-     -(void)startWithTimer:(NSTimer *)timer
-     {
-     if (!data.ready) {
-     _timeInterval = _timeInterval >= 0.1 ? _timeInterval * 2 : 0.1;
-     _timeInterval = MIN(60.0, _timeInterval);
-     NSLog(@"Data provider not ready. Will try again in %f seconds.", _timeInterval);
-     NSTimer * startTimer = [NSTimer scheduledTimerWithTimeInterval:_timeInterval target:self
-     selector:@selector(startWithTimer:) userInfo:nil repeats:NO];
-     return;
-     }
-     ...
-     }
-     */
     
 }
 
@@ -246,18 +204,18 @@ public class WebSocketManager {
 extension WebSocketManager: WebSocketDelegate {
     
     public func websocketDidConnect(socket: WebSocketClient) {
-        printBV(info: "Web socket > Connected")
+        printBV(info: "Web socket - Connected")
         self.onConnected.fire(())
     }
     
     public func websocketDidDisconnect(socket: WebSocketClient, error: Error?) {
         
         if let e = error as? WSError {
-            printBV(info:"Web socket > Disconnected: \(e.message)")
+            printBV(info:"Web socket - Disconnected: \(e.message)")
         } else if let e = error {
-            printBV(info:"Web socket > Disconnected: \(e.localizedDescription)")
+            printBV(info:"Web socket - Disconnected: \(e.localizedDescription)")
         } else {
-            printBV(info:"Web socket > Disconnected")
+            printBV(info:"Web socket - Disconnected")
         }
         
         // Fire an error informing the observers that the Web socket has disconnected.

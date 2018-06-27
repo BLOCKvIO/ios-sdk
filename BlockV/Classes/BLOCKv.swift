@@ -73,7 +73,7 @@ public final class BLOCKv {
         willSet {
             if environment != nil { reset() }
         }
-        didSet { printBV(info: "Environment updated: \(environment!)") }
+        didSet { printBV(info: "Environment updated - \(environment!)") }
     }
     
     // MARK: - Configuration

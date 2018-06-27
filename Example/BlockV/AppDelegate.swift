@@ -42,11 +42,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         BLOCKv.configure(appID: MyAppID)
         
-        //: ## Flow Control
-        
-        // ------------- TEMP -------------
-        BLOCKv.setEnvironment(.development)
-        // ------------- TEMP -------------
+        //: ## Control Flow
 
         print("\nViewer > isLoggedIn - \(BLOCKv.isLoggedIn)")
         

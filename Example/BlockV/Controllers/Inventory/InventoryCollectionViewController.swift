@@ -140,7 +140,7 @@ class InventoryCollectionViewController: UICollectionViewController {
             
             // example of extracting array of floats
             if let coordinates = stateEvent.vatomProperties["geo_pos"]?["coordinates"]?.arrayValue?.compactMap({ $0.floatValue }) {
-                print("\nViewer > State Update - vATom coordinates: \(coordinates)")
+                print("\nViewer > State Update - vAtom coordinates: \(coordinates)")
             }
             
         }

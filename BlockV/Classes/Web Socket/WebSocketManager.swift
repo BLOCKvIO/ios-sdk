@@ -14,7 +14,7 @@ import Starscream
 import Signals
 
 /*
- Importants points:
+ Important points:
  
  - Viewer may subscribe to singals before the Web socket has connected.
  - A single shared OAuth2Handler instance is used to handle access token refresh.
@@ -37,19 +37,19 @@ import Signals
 /// - onMessageReceivedRaw
 /// - onInventoryUpdate
 /// - onVatomStateUpdate
-/// - onActivityEvent
+/// - onActivityUpdate
 public class WebSocketManager {
     
     /// Models the type of events sent over the Web socket.
     enum WSMessageType: String {
         /// INTERNAL: Broadcast on initial connection to the socket.
-        case info           = "info"
+        case info        = "info"
         /// Inventory event
-        case inventory      = "inventory"
+        case inventory   = "inventory"
         /// Vatom state update event
-        case stateUpdate    = "state_update"
+        case stateUpdate = "state_update"
         /// Activity event
-        case activity       = "my_events"
+        case activity    = "my_events"
     }
     
     // MARK: - Signals
@@ -191,8 +191,8 @@ public class WebSocketManager {
     @objc
     private func handleApplicationDidBecomeActive() {
         // reset exponential backoff variables
-//        _retryTimeInterval = 1
-//        _retryCount = 0
+        //        _retryTimeInterval = 1
+        //        _retryCount = 0
         // connect (if not already connected)
         self.connect()
     }

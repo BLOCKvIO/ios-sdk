@@ -11,7 +11,7 @@
 
 import Foundation
 
-typealias URLEncoder = (_ url: URL, _ assetProviders: [AssetProvider]) -> URL
+typealias URLEncoder = (_ url: URL, _ assetProviders: [AssetProviderModel]) -> URL
 
 /// A type that can encode it's URLs for a designated asset provider.
 protocol AssetProviderEncodable {
@@ -19,7 +19,7 @@ protocol AssetProviderEncodable {
     /// Option 1
     ///
     /// Types adopting this protocol should encode each of their urls using the provided encoder.
-    mutating func encodeEachURL(using encoder: URLEncoder, assetProviders: [AssetProvider])
+    mutating func encodeEachURL(using encoder: URLEncoder, assetProviders: [AssetProviderModel])
     
 //    /// Option 2
 //    ///
@@ -65,7 +65,7 @@ protocol AssetProviderEncodable {
 //
 //}
 
-struct AssetProvider: Codable, Equatable {
+struct AssetProviderModel: Codable, Equatable {
     
     let name: String
     let uri: URL

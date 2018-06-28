@@ -23,7 +23,7 @@ protocol OAuthTokenModel {
 public struct AuthModel: Decodable, Equatable, OAuthTokenModel {
     
     var user: UserModel
-    let assetProviders: [AssetProvider]
+    let assetProviders: [AssetProviderModel]
     let accessToken: BVToken
     let refreshToken: BVToken
     

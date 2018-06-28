@@ -11,7 +11,7 @@
 
 import Foundation
 
-public struct VatomResource: Equatable {
+public struct VatomResourceModel: Equatable {
     
     //TODO: Split type into type and format: "3D" and "Scene"
     
@@ -33,9 +33,9 @@ public struct VatomResource: Equatable {
 
 // MARK: - AssetProviderEncodable
 
-extension VatomResource: AssetProviderEncodable {
+extension VatomResourceModel: AssetProviderEncodable {
     
-    mutating func encodeEachURL(using encoder: URLEncoder, assetProviders: [AssetProvider]) {
+    mutating func encodeEachURL(using encoder: URLEncoder, assetProviders: [AssetProviderModel]) {
         // encode url
         self.url = encoder(url, assetProviders)
     }
@@ -44,7 +44,7 @@ extension VatomResource: AssetProviderEncodable {
 
 // MARK: Codable
 
-extension VatomResource: Codable {
+extension VatomResourceModel: Codable {
     
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
@@ -70,7 +70,7 @@ extension VatomResource: Codable {
 
 // MARK: Hashable
 
-extension VatomResource: Hashable {
+extension VatomResourceModel: Hashable {
     
     public var hashValue: Int {
         return name.hashValue ^ type.hashValue ^ url.hashValue

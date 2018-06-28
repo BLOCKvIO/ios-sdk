@@ -19,11 +19,11 @@ import Foundation
 ///   Technically, an array of all the faces linked to the parent templates of the vAtoms in the vAtoms array.
 /// 3. Array of all the actions associated with the vAtoms.
 ///   Technically, an array of all the actions linked to the parent templates of the vAtoms in the vAtoms array.
-public struct GroupModel: Decodable, Equatable {
+public struct PackModel: Decodable, Equatable {
     
     public var vatoms: [Vatom]
-    public var faces: [Face]
-    public var actions: [Action]
+    public var faces: [FaceModel]
+    public var actions: [ActionModel]
     public var count: Int?
     
     /// These coding keys accomadate both the inventory and discover calls.
@@ -63,10 +63,10 @@ public struct GroupModel: Decodable, Equatable {
         }
         
         self.faces = try container
-            .decode([Safe<Face>].self, forKey: .faces)
+            .decode([Safe<FaceModel>].self, forKey: .faces)
             .compactMap { $0.value }
         self.actions = try container
-            .decode([Safe<Action>].self, forKey: .actions)
+            .decode([Safe<ActionModel>].self, forKey: .actions)
             .compactMap { $0.value }
         self.count = try container.decodeIfPresent(Int.self, forKey: .count)
         

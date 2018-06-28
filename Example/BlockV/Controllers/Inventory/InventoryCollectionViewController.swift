@@ -200,17 +200,17 @@ class InventoryCollectionViewController: UICollectionViewController {
     /// Note: Input parameters are left to their defautls.
     fileprivate func fetchInventory() {
         
-        BLOCKv.getInventory { [weak self] (groupModel, error) in
+        BLOCKv.getInventory { [weak self] (packModel, error) in
             
             // handle error
-            guard let model = groupModel, error == nil else {
+            guard let model = packModel, error == nil else {
                 print("\n>>> Error > Viewer: \(error!.localizedDescription)")
                 self?.present(UIAlertController.errorAlert(error!), animated: true)
                 return
             }
             
             // handle success
-            print("\nViewer > Fetched inventory GroupModel")
+            print("\nViewer > Fetched inventory PackModel")
             
             /*
              NOTE
@@ -242,10 +242,10 @@ class InventoryCollectionViewController: UICollectionViewController {
         builder.addDefinedFilter(forField: .templateID, filterOperator: .equal, value: "vatomic.prototyping::DrinkCoupon::v1", combineOperator: .and)
         
         // execute the discover call
-        BLOCKv.discover(builder) { [weak self] (groupModel, error) in
+        BLOCKv.discover(builder) { [weak self] (packModel, error) in
             
             // handle error
-            guard let model = groupModel, error == nil else {
+            guard let model = packModel, error == nil else {
                 print("\n>>> Error > Viewer: \(error!.localizedDescription)")
                 self?.present(UIAlertController.errorAlert(error!), animated: true)
                 return

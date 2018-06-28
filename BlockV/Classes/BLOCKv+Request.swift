@@ -568,7 +568,7 @@ extension BLOCKv {
     // MARK: - Vatoms
     
     /// Fetches the current user's inventory of vAtoms. The completion handler is passed in a
-    /// `GroupModel` which  includes the returned vAtoms as well as the configured Faces and Actions.
+    /// `PackModel` which  includes the returned vAtoms as well as the configured Faces and Actions.
     ///
     /// - Parameters:
     ///   - parentID: Allows you to specify a parent ID. If a period "." is supplied the root
@@ -583,14 +583,14 @@ extension BLOCKv {
     public static func getInventory(parentID: String = ".",
                                     page: Int = 0,
                                     limit: Int = 0,
-                                    completion: @escaping (GroupModel?, BVError?) -> Void) {
+                                    completion: @escaping (PackModel?, BVError?) -> Void) {
         
         let endpoint = API.UserVatom.getInventory(parentID: parentID, page: page, limit: limit)
         
         self.client.request(endpoint) { (baseModel, error) in
             
             // extract model, ensure no error
-            guard var groupModel = baseModel?.payload, error == nil else {
+            guard var packModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
                     completion(nil, error!)
                 }
@@ -600,14 +600,14 @@ extension BLOCKv {
             // model is available
             
             // url encoding - this is awful. maybe encode on init?
-            for vatomIndex in 0..<groupModel.vatoms.count {
-                for resourceIndex in 0..<groupModel.vatoms[vatomIndex].resources.count {
-                    groupModel.vatoms[vatomIndex].resources[resourceIndex].encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
+            for vatomIndex in 0..<packModel.vatoms.count {
+                for resourceIndex in 0..<packModel.vatoms[vatomIndex].resources.count {
+                    packModel.vatoms[vatomIndex].resources[resourceIndex].encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
                 }
             }
             
             DispatchQueue.main.async {
-                completion(groupModel, nil)
+                completion(packModel, nil)
             }
             
         }
@@ -615,20 +615,20 @@ extension BLOCKv {
     }
     
     /// Fetches vAtoms by providing an array of vAtom IDs. The response includes the vAtoms as well
-    /// as the configured Faces and Actions in a `GroupModel`.
+    /// as the configured Faces and Actions in a `PackModel`.
     ///
     /// - Parameters:
     ///   - ids: Array of vAtom IDs
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
-    public static func getVatoms(withIDs ids: [String], completion: @escaping (GroupModel?, BVError?) -> Void) {
+    public static func getVatoms(withIDs ids: [String], completion: @escaping (PackModel?, BVError?) -> Void) {
         
         let endpoint = API.UserVatom.getVatoms(withIDs: ids)
         
         self.client.request(endpoint) { (baseModel, error) in
             
             // extract model, ensure no error
-            guard var groupModel = baseModel?.payload, error == nil else {
+            guard var packModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
                     completion(nil, error!)
                 }
@@ -638,14 +638,14 @@ extension BLOCKv {
             // model is available
             
             // url encoding - this is awful. maybe encode on init?
-            for vatomIndex in 0..<groupModel.vatoms.count {
-                for resourceIndex in 0..<groupModel.vatoms[vatomIndex].resources.count {
-                    groupModel.vatoms[vatomIndex].resources[resourceIndex].encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
+            for vatomIndex in 0..<packModel.vatoms.count {
+                for resourceIndex in 0..<packModel.vatoms[vatomIndex].resources.count {
+                    packModel.vatoms[vatomIndex].resources[resourceIndex].encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
                 }
             }
             
             DispatchQueue.main.async {
-                completion(groupModel, nil)
+                completion(packModel, nil)
             }
             
         }
@@ -659,7 +659,7 @@ extension BLOCKv {
     ///              discover queries.
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
-    public static func discover(_ builder: DiscoverQueryBuilder, completion: @escaping (GroupModel?, BVError?) -> Void) {
+    public static func discover(_ builder: DiscoverQueryBuilder, completion: @escaping (PackModel?, BVError?) -> Void) {
         self.discover(payload: builder.toDictionary(), completion: completion)
     }
     
@@ -671,14 +671,14 @@ extension BLOCKv {
     ///   - payload: Raw request payload in the form of a dictionary.
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
-    public static func discover(payload: [String: Any], completion: @escaping (GroupModel?, BVError?) -> Void) {
+    public static func discover(payload: [String: Any], completion: @escaping (PackModel?, BVError?) -> Void) {
         
         let endpoint = API.VatomDiscover.discover(payload)
         
         self.client.request(endpoint) { (baseModel, error) in
             
             // extract model, handle error
-            guard var groupModel = baseModel?.payload, error == nil else {
+            guard var packModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
                     print(error!.localizedDescription)
                     completion(nil, error!)
@@ -689,15 +689,15 @@ extension BLOCKv {
             // model is available
             
             // url encoding - this is awful. maybe encode on init?
-            for vatomIndex in 0..<groupModel.vatoms.count {
-                for resourceIndex in 0..<groupModel.vatoms[vatomIndex].resources.count {
-                    groupModel.vatoms[vatomIndex].resources[resourceIndex].encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
+            for vatomIndex in 0..<packModel.vatoms.count {
+                for resourceIndex in 0..<packModel.vatoms[vatomIndex].resources.count {
+                    packModel.vatoms[vatomIndex].resources[resourceIndex].encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
                 }
             }
             
             DispatchQueue.main.async {
                 //print(model)
-                completion(groupModel, nil)
+                completion(packModel, nil)
             }
             
         }
@@ -723,7 +723,7 @@ extension BLOCKv {
                                    topRightLat: Double,
                                    topRightLon: Double,
                                    filter: VatomGeoFilter = .vatoms,
-                                   completion: @escaping (GroupModel?, BVError?) -> Void) {
+                                   completion: @escaping (PackModel?, BVError?) -> Void) {
         
         let endpoint = API.VatomDiscover.geoDiscover(bottomLeftLat: bottomLeftLat,
                                                      bottomLeftLon: bottomLeftLon,
@@ -734,7 +734,7 @@ extension BLOCKv {
         self.client.request(endpoint) { (baseModel, error) in
             
             // extract model, handle error
-            guard var groupModel = baseModel?.payload, error == nil else {
+            guard var packModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
                     print(error!.localizedDescription)
                     completion(nil, error!)
@@ -745,15 +745,15 @@ extension BLOCKv {
             // model is available
             
             // url encoding - this is awful. maybe encode on init?
-            for vatomIndex in 0..<groupModel.vatoms.count {
-                for resourceIndex in 0..<groupModel.vatoms[vatomIndex].resources.count {
-                    groupModel.vatoms[vatomIndex].resources[resourceIndex].encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
+            for vatomIndex in 0..<packModel.vatoms.count {
+                for resourceIndex in 0..<packModel.vatoms[vatomIndex].resources.count {
+                    packModel.vatoms[vatomIndex].resources[resourceIndex].encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
                 }
             }
             
             DispatchQueue.main.async {
                 //print(model)
-                completion(groupModel, nil)
+                completion(packModel, nil)
             }
             
         }
@@ -816,7 +816,7 @@ extension BLOCKv {
     ///   - completion: The completion handler to call when the call is completed.
     ///                 This handler is executed on the main queue.
     public static func getActions(forTemplateID id: String,
-                                  completion: @escaping ([Action]?, BVError?) -> Void) {
+                                  completion: @escaping ([ActionModel]?, BVError?) -> Void) {
         
         let endpoint = API.UserActions.getActions(forTemplateID: id)
         

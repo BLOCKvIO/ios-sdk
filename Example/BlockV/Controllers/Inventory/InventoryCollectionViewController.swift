@@ -266,14 +266,19 @@ class InventoryCollectionViewController: UICollectionViewController {
         
         for vatom in filteredVatoms {
             
-            // find the vatom's activate image url
+            // find the vatom's activated image url
             guard let activatedImageURL = vatom.resources.first(where: { $0.name == "ActivatedImage"} )?.url else {
                 // oops, not found, skip this vatom
                 continue
             }
             
+            // encode the url
+            guard let encodedURL = try? BLOCKv.encodeURL(activatedImageURL) else {
+                continue
+            }
+            
             // create network operation
-            let operation = NetworkDataOperation(urlString: activatedImageURL.absoluteString) { [weak self] (data, error) in
+            let operation = NetworkDataOperation(urlString: encodedURL.absoluteString) { [weak self] (data, error) in
                 
                 // unwrap data, handle error
                 guard let data = data, error == nil else {

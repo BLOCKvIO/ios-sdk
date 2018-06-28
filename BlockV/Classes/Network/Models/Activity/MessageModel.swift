@@ -24,8 +24,10 @@ public struct MessageModel: Equatable {
     public let actionName: String
     /// Timestamp of when the message was created.
     public let whenCreated: Date
+    /// HACK - server returns the date as a Double.
+    private let _whenModified: Double
     /// Timestamp of when the message was modified.
-    public let whenModifed: Date
+    public let whenModified: Date
     
     // - Users
     
@@ -69,7 +71,10 @@ extension MessageModel: Codable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        whenModifed = try container.decode(Date.self, forKey: .whenModified)
+        
+        // convert the double to date
+        _whenModified = try container.decode(Double.self, forKey: .whenModified)
+        whenModified = Date(timeIntervalSince1970: _whenModified / 1000)
         
         // de-nest properties to top level
         let messageContainer = try container.nestedContainer(keyedBy: MessageCodingKeys.self, forKey: .message)
@@ -91,7 +96,7 @@ extension MessageModel: Codable {
     public func encode(to encoder: Encoder) throws {
         // top-level
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(whenModifed, forKey: .whenModified)
+        try container.encode(_whenModified, forKey: .whenModified)
         
         // nest properties one level
         var messageContainer = container.nestedContainer(keyedBy: MessageCodingKeys.self, forKey: .message)

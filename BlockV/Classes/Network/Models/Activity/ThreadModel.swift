@@ -44,7 +44,7 @@ public struct ThreadModel: Equatable {
     
     enum CodingKeys: String, CodingKey {
         case id = "name"
-        case _whenModified = "when_modified"
+        case whenModified = "when_modified"
         case latestMessage = "last_message"
         case latestMessageUserInfo = "last_message_user_info"
     }
@@ -63,7 +63,7 @@ extension ThreadModel: Codable {
         latestMessageUserInfo = try container.decode(UserInfo.self, forKey: .latestMessageUserInfo)
         
         // convert the double to date
-        _whenModified = try container.decode(Double.self, forKey: ._whenModified)
+        _whenModified = try container.decode(Double.self, forKey: .whenModified)
         whenModified = Date(timeIntervalSince1970: _whenModified / 1000)
     }
     
@@ -72,7 +72,7 @@ extension ThreadModel: Codable {
         try container.encode(id, forKey: .id)
         try container.encode(latestMessage, forKey: .latestMessage)
         try container.encode(latestMessageUserInfo, forKey: .latestMessageUserInfo)
-        try container.encode(_whenModified, forKey: ._whenModified)
+        try container.encode(_whenModified, forKey: .whenModified)
     }
     
 }

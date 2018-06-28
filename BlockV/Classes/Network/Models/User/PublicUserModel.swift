@@ -30,17 +30,3 @@ public struct PublicUserModel: Codable, Equatable {
     }
     
 }
-
-
-// MARK: - AssetProviderEncodable
-
-extension PublicUserModel: AssetProviderEncodable {
-    
-    mutating func encodeEachURL(using encoder: URLEncoder, assetProviders: [AssetProviderModel]) {
-        // encode url
-        if let url = self.properties.avatarURL {
-            self.properties.avatarURL = encoder(url, assetProviders)
-        }
-    }
-    
-}

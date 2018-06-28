@@ -59,7 +59,7 @@ extension BLOCKv {
         self.client.request(endpoint) { (baseModel, error) in
             
             // extract model, ensure no error
-            guard var authModel = baseModel?.payload, error == nil else {
+            guard let authModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
                     completion(nil, error)
                 }
@@ -71,9 +71,6 @@ extension BLOCKv {
                 // persist credentials
                 CredentialStore.saveRefreshToken(authModel.refreshToken)
                 CredentialStore.saveAssetProviders(authModel.assetProviders)
-                
-                // encode the model's urls
-                authModel.user.encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
                 
                 completion(authModel.user, nil)
             }
@@ -131,7 +128,7 @@ extension BLOCKv {
         self.client.request(endpoint) { (baseModel, error) in
             
             // extract model, ensure no error
-            guard var authModel = baseModel?.payload, error == nil else {
+            guard let authModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
                     completion(nil, error)
                 }
@@ -145,8 +142,6 @@ extension BLOCKv {
                 CredentialStore.saveRefreshToken(authModel.refreshToken)
                 CredentialStore.saveAssetProviders(authModel.assetProviders)
                 
-                // encode the model's urls
-                authModel.user.encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
                 // completion
                 completion(authModel.user, nil)
             }
@@ -205,7 +200,7 @@ extension BLOCKv {
         self.client.request(endpoint) { (baseModel, error) in
             
             // extract model, ensure no error
-            guard var userModel = baseModel?.payload, error == nil else {
+            guard let userModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
                     completion(nil, error)
                 }
@@ -214,10 +209,6 @@ extension BLOCKv {
             
             // model is available
             DispatchQueue.main.async {
-                
-                // encode the model's urls
-                userModel.encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
-                
                 completion(userModel, nil)
             }
             
@@ -545,7 +536,7 @@ extension BLOCKv {
         self.client.request(endpoint) { (baseModel, error) in
             
             // extract model, ensure no error
-            guard var userModel = baseModel?.payload, error == nil else {
+            guard let userModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
                     completion(nil, error)
                 }
@@ -554,10 +545,6 @@ extension BLOCKv {
             
             // model is available
             DispatchQueue.main.async {
-                
-                // encode the model's urls
-                userModel.encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
-                
                 completion(userModel, nil)
             }
             
@@ -590,7 +577,7 @@ extension BLOCKv {
         self.client.request(endpoint) { (baseModel, error) in
             
             // extract model, ensure no error
-            guard var packModel = baseModel?.payload, error == nil else {
+            guard let packModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
                     completion(nil, error!)
                 }
@@ -598,14 +585,6 @@ extension BLOCKv {
             }
             
             // model is available
-            
-            // url encoding - this is awful. maybe encode on init?
-            for vatomIndex in 0..<packModel.vatoms.count {
-                for resourceIndex in 0..<packModel.vatoms[vatomIndex].resources.count {
-                    packModel.vatoms[vatomIndex].resources[resourceIndex].encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
-                }
-            }
-            
             DispatchQueue.main.async {
                 completion(packModel, nil)
             }
@@ -628,7 +607,7 @@ extension BLOCKv {
         self.client.request(endpoint) { (baseModel, error) in
             
             // extract model, ensure no error
-            guard var packModel = baseModel?.payload, error == nil else {
+            guard let packModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
                     completion(nil, error!)
                 }
@@ -636,14 +615,6 @@ extension BLOCKv {
             }
             
             // model is available
-            
-            // url encoding - this is awful. maybe encode on init?
-            for vatomIndex in 0..<packModel.vatoms.count {
-                for resourceIndex in 0..<packModel.vatoms[vatomIndex].resources.count {
-                    packModel.vatoms[vatomIndex].resources[resourceIndex].encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
-                }
-            }
-            
             DispatchQueue.main.async {
                 completion(packModel, nil)
             }
@@ -678,7 +649,7 @@ extension BLOCKv {
         self.client.request(endpoint) { (baseModel, error) in
             
             // extract model, handle error
-            guard var packModel = baseModel?.payload, error == nil else {
+            guard let packModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
                     print(error!.localizedDescription)
                     completion(nil, error!)
@@ -687,14 +658,6 @@ extension BLOCKv {
             }
             
             // model is available
-            
-            // url encoding - this is awful. maybe encode on init?
-            for vatomIndex in 0..<packModel.vatoms.count {
-                for resourceIndex in 0..<packModel.vatoms[vatomIndex].resources.count {
-                    packModel.vatoms[vatomIndex].resources[resourceIndex].encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
-                }
-            }
-            
             DispatchQueue.main.async {
                 //print(model)
                 completion(packModel, nil)
@@ -734,7 +697,7 @@ extension BLOCKv {
         self.client.request(endpoint) { (baseModel, error) in
             
             // extract model, handle error
-            guard var packModel = baseModel?.payload, error == nil else {
+            guard let packModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
                     print(error!.localizedDescription)
                     completion(nil, error!)
@@ -743,14 +706,6 @@ extension BLOCKv {
             }
             
             // model is available
-            
-            // url encoding - this is awful. maybe encode on init?
-            for vatomIndex in 0..<packModel.vatoms.count {
-                for resourceIndex in 0..<packModel.vatoms[vatomIndex].resources.count {
-                    packModel.vatoms[vatomIndex].resources[resourceIndex].encodeEachURL(using: blockvURLEncoder, assetProviders: CredentialStore.assetProviders)
-                }
-            }
-            
             DispatchQueue.main.async {
                 //print(model)
                 completion(packModel, nil)

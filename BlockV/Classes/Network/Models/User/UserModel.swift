@@ -72,19 +72,6 @@ public struct UserModel: Equatable {
     
 }
 
-// MARK: - AssetProviderEncodable
-
-extension UserModel: AssetProviderEncodable {
-    
-    mutating func encodeEachURL(using encoder: URLEncoder, assetProviders: [AssetProviderModel]) {
-        // encode url
-        if let url = self.avatarURL {
-            self.avatarURL = encoder(url, assetProviders)
-        }
-    }
-    
-}
-
 // MARK: - Codable
 
 extension UserModel: Codable {

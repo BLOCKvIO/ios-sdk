@@ -31,17 +31,6 @@ public struct VatomResourceModel: Equatable {
     
 }
 
-// MARK: - AssetProviderEncodable
-
-extension VatomResourceModel: AssetProviderEncodable {
-    
-    mutating func encodeEachURL(using encoder: URLEncoder, assetProviders: [AssetProviderModel]) {
-        // encode url
-        self.url = encoder(url, assetProviders)
-    }
-    
-}
-
 // MARK: Codable
 
 extension VatomResourceModel: Codable {

@@ -14,7 +14,7 @@ import Foundation
 /// Represent a list of threads.
 public struct ThreadListModel: Equatable {
     
-    /// 
+    /// Filters out all threads more recent than the cursor (useful for paging).
     public let cursor: String
     /// Array of threads
     public let threads: [ThreadModel]

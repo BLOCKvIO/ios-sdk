@@ -24,6 +24,8 @@ public struct MessageModel: Equatable {
     public let actionName: String
     /// Timestamp of when the message was created.
     public let whenCreated: Date
+    /// Timestamp of then the message was modified.
+    //public let whenModified: Date
     
     // - Users
     
@@ -44,10 +46,6 @@ public struct MessageModel: Equatable {
     public let geoPosition: [Double]? //FIXME: Convert to CLLocationCoordinate2D?
     
     enum CodingKeys: String, CodingKey {
-        case message      = "message"
-    }
-    
-    enum MessageCodingKeys: String, CodingKey {
         case id                   = "msg_id"
         case userId               = "user_id"
         case vatomIds             = "vatoms"
@@ -65,41 +63,37 @@ public struct MessageModel: Equatable {
 extension MessageModel: Codable {
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        // de-nest properties to top level
-        let messageContainer = try container.nestedContainer(keyedBy: MessageCodingKeys.self, forKey: .message)
-        id                   = try messageContainer.decode(Double.self, forKey: .id)
-        userId               = try messageContainer.decode(String.self, forKey: .userId)
-        message              = try messageContainer.decode(String.self, forKey: .message)
-        actionName           = try messageContainer.decode(String.self, forKey: .actionName)
-        whenCreated          = try messageContainer.decode(Date.self, forKey: .whenCreated)
-        triggeredBy          = try messageContainer.decode(String.self, forKey: .triggeredBy)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id                   = try container.decode(Double.self, forKey: .id)
+        userId               = try container.decode(String.self, forKey: .userId)
+        message              = try container.decode(String.self, forKey: .message)
+        actionName           = try container.decode(String.self, forKey: .actionName)
+        whenCreated          = try container.decode(Date.self, forKey: .whenCreated)
+        triggeredBy          = try container.decode(String.self, forKey: .triggeredBy)
         
         // potentially `null`
-        geoPosition          = try messageContainer.decodeIfPresent([Double].self, forKey: .geoPosition)
-        templateVariationIds = try messageContainer.decodeIfPresent([String].self, forKey: .templateVariationIds) ?? []
-        vatomIds             = try messageContainer.decodeIfPresent([String].self, forKey: .vatomIds) ?? []
-        resources            = try messageContainer.decodeIfPresent([VatomResource].self, forKey: .resources) ?? []
+        geoPosition          = try container.decodeIfPresent([Double].self, forKey: .geoPosition)
+        templateVariationIds = try container.decodeIfPresent([String].self, forKey: .templateVariationIds) ?? []
+        vatomIds             = try container.decodeIfPresent([String].self, forKey: .vatomIds) ?? []
+        resources            = try container.decodeIfPresent([VatomResource].self, forKey: .resources) ?? []
 
     }
     
     public func encode(to encoder: Encoder) throws {
+        
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(userId, forKey: .userId)
+        try container.encode(message, forKey: .message)
+        try container.encode(actionName, forKey: .actionName)
+        try container.encode(whenCreated, forKey: .whenCreated)
+        try container.encode(triggeredBy, forKey: .triggeredBy)
+        try container.encode(templateVariationIds, forKey: .templateVariationIds)
+        try container.encode(vatomIds, forKey: .vatomIds)
+        try container.encode(resources, forKey: .resources)
         
-        // nest properties one level
-        var messageContainer = container.nestedContainer(keyedBy: MessageCodingKeys.self, forKey: .message)
-        try messageContainer.encode(id, forKey: .id)
-        try messageContainer.encode(userId, forKey: .userId)
-        try messageContainer.encode(message, forKey: .message)
-        try messageContainer.encode(actionName, forKey: .actionName)
-        try messageContainer.encode(whenCreated, forKey: .whenCreated)
-        try messageContainer.encode(triggeredBy, forKey: .triggeredBy)
-        try messageContainer.encode(templateVariationIds, forKey: .templateVariationIds)
-        try messageContainer.encode(vatomIds, forKey: .vatomIds)
-        try messageContainer.encode(resources, forKey: .resources)
-        
-        try messageContainer.encodeIfPresent(geoPosition, forKey: .geoPosition)
+        try container.encodeIfPresent(geoPosition, forKey: .geoPosition)
 
     }
 

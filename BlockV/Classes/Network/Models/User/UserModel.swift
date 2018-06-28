@@ -26,8 +26,7 @@ public struct UserModel: Equatable {
     public let nonPushNotification: Bool
     public let language: String
     public let meta: MetaModel
-    
-    public var avatarURL: URL?
+    public let avatarURL: URL?
     
     // Internal
     
@@ -64,10 +63,6 @@ public struct UserModel: Equatable {
             case lastLogin   = "last_login"
             case isActivated = "activated"
         }
-    }
-    
-    mutating func setURL(_ url: URL) {
-        self.avatarURL = url
     }
     
 }

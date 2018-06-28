@@ -22,7 +22,7 @@ protocol OAuthTokenModel {
 /// This model is valid for both login and register responses.
 public struct AuthModel: Decodable, Equatable, OAuthTokenModel {
     
-    var user: UserModel
+    let user: UserModel
     let assetProviders: [AssetProviderModel]
     let accessToken: BVToken
     let refreshToken: BVToken

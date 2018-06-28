@@ -20,7 +20,7 @@ public struct PublicUserModel: Codable, Equatable {
     public struct Properties: Codable, Equatable {
         public let firstName: String
         public let lastName: String
-        public var avatarURL: URL?
+        public let avatarURL: URL?
         
         enum CodingKeys: String, CodingKey {
             case firstName = "first_name"

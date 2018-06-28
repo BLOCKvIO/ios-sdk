@@ -17,7 +17,7 @@ public struct VatomResourceModel: Equatable {
     
     public let name: String // e.g. Scene
     public let type: String // e.g. ResourceTypes::3D::Scene
-    public var url: URL     // e.g. https://cdndev.blockv.net/vatomic.prototyping/MenuCard/v2/Harvelles/v1/harvelles_menu_icon.png
+    public let url: URL     // e.g. https://cdndev.blockv.net/vatomic.prototyping/MenuCard/v2/Harvelles/v1/harvelles_menu_icon.png
     
     enum CodingKeys: String, CodingKey {
         case name 

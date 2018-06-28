@@ -86,7 +86,7 @@ public class WebSocketManager {
     /// Fires when the Web socket has established a connection.
     public let onConnected = Signal<Void>()
     /// Fires when the Web socket has disconnected.
-    public let onDisconnected = Signal<Void>()
+    public let onDisconnected = Signal<Error?>()
     
     // MARK: - Properties
     
@@ -240,7 +240,7 @@ extension WebSocketManager: WebSocketDelegate {
         }
         
         // Fire an error informing the observers that the Web socket has disconnected.
-        self.onDisconnected.fire(())
+        self.onDisconnected.fire((nil))
         
         //TODO: The Web socket should reconnect here:
         // The app may fire this message when entering the foreground (after the Web socket was disconnected after entering the background).

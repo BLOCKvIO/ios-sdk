@@ -11,12 +11,12 @@
 
 import Foundation
 
-/// Represents a list of messages within a thread.
-public struct MessageListModel: Codable, Equatable {
+extension DispatchQueue {
     
-    ///
-    public let cursor: Double
-    /// Array of messages for the specifed thread.
-    public let messages: [MessageModel]
+    internal static func mainThreadPrecondition(caller: String = #function) {
+        precondition(
+            Thread.isMainThread,
+            "The BLOCKV method \"\(caller)\" may not be called from a background thread.")
+    }
     
 }

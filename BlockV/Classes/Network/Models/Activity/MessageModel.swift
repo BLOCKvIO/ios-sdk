@@ -12,7 +12,7 @@
 import Foundation
 
 /// Represents a message.
-public struct MessageModel {
+public struct MessageModel: Equatable {
     
     /// Unique identifier of the message.
     public let id: String

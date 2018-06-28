@@ -12,7 +12,7 @@
 import Foundation
 
 /// Represent a list of threads.
-public struct ThreadListModel: Codable {
+public struct ThreadListModel: Codable, Equatable {
     
     /// 
     public let cursor: Double

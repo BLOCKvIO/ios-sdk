@@ -16,10 +16,10 @@ import Foundation
  */
 
 /// Represents a collection of threads.
-public struct ThreadModel {
+public struct ThreadModel: Equatable {
     
     /// Struct containing a few user properties.
-    public struct UserInfo: Codable {
+    public struct UserInfo: Codable,Equatable {
         public let name: String
         public let avatarURL: URL
         

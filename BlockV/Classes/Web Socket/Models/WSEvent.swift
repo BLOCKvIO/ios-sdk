@@ -11,12 +11,10 @@
 
 import Foundation
 
-/// Represents a list of messages within a thread.
-public struct MessageListModel: Codable, Equatable {
+/// Protocol representing a Web socket event.
+protocol WSEvent: Decodable {
     
-    ///
-    public let cursor: Double
-    /// Array of messages for the specifed thread.
-    public let messages: [MessageModel]
+    /// Timestamp of when the event was received on-device (client-side).
+    var timestamp: Date { get }
     
 }

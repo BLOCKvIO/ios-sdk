@@ -34,15 +34,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     
+    internal var webSocketManager: WebSocketManager?
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
         //: ## Setup
         
         BLOCKv.configure(appID: MyAppID)
         
-        //: ## Flow Control
-        
-        print("\nViewer > isLoggedIn: \(BLOCKv.isLoggedIn)")
+        //: ## Control Flow
+
+        print("\nViewer > isLoggedIn - \(BLOCKv.isLoggedIn)")
         
         func showWelcome() {
             // show 'welcome' view controller
@@ -76,8 +78,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // store a closure in the `onLogout` variable.
             showWelcome()
         }
-        
-        //: ## Other
         
         // Theme
         window?.tintColor = UIColor.seafoamBlue

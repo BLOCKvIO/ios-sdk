@@ -13,8 +13,11 @@ import Foundation
 import Alamofire
 import JWTDecode
 
-// Beta 0.9
-//TODO: Inpect the `expires_in` before a request is made. Refresh the access token if necessary.
+/*
+ Goal:
+ BLOCKv should be invariant over App ID and Environment. In other words, the properties should
+ change, once set. Possibly targets for each environemnt?
+ */
 
 /// Primary interface into the the BLOCKv SDK.
 public final class BLOCKv {
@@ -22,11 +25,28 @@ public final class BLOCKv {
     // MARK: - Enums
     
     /// Models the BLOCKv platform environments.
-    ///
-    /// Options:
-    /// - production
-    public enum BVEnvironment: String {
-        case production = "https://api.blockv.io"
+    public enum BVEnvironment {
+        /// Stable production environment.
+        case production
+        /// Unstable development environement (DO NOT USE).
+        case development
+        
+        /// BLOCKv server base url
+        var apiServerURLString: String {
+            switch self {
+            case .production:  return "https://api.blockv.io"
+            case .development: return "https://apidev.blockv.net"
+            }
+        }
+        
+        /// BLOCKv Web socket server base url
+        var webSocketURLString: String {
+            switch self {
+            case .production:  return "wss://newws.blockv.io/ws"
+            case .development: return "wss://ws.blockv.net/ws"
+            }
+        }
+        
     }
     
     // MARK: - Properties
@@ -53,83 +73,7 @@ public final class BLOCKv {
         willSet {
             if environment != nil { reset() }
         }
-        didSet { printBV(info: "Environment updated: \(environment!)") }
-    }
-    
-    /// Computes the configuration object needed to initialise the networking client.
-    fileprivate static var clientConfiguration: Client.Configuration {
-        get {
-            // ensure host app has set an app id
-            precondition(BLOCKv.appID != nil, "Please call 'BLOCKv.configure(appID:)' with your issued app ID before making network requests.")
-            
-            if environment == nil {
-                self.environment = .production // default to production
-            }
-            
-            // return the configuration (inexpensive object)
-            return Client.Configuration(baseURLString: BLOCKv.environment!.rawValue,
-                                        appID: BLOCKv.appID!,
-                                        refreshToken: CredentialStore.refreshToken?.token)
-        }
-    }
-    
-    /// Backing networking client instance variable.
-    fileprivate static var _client: Client?
-    
-    /// BLOCKv networking client.
-    ///
-    /// The networking client must support a platform environment change after app launch.
-    ///
-    /// This requirement is met by using a computed property that dynamically initialises a
-    /// new client if the instance variable `_client` has been set to `nil`.
-    ///
-    /// The affords the caller the ability to set the platform environment and be sure to
-    /// receive a new networking client instance.
-    internal static var client: Client {
-        get {
-            // check if a new instance must be initialized
-            if _client == nil {
-                // init a new instance
-                _client = Client(config: BLOCKv.clientConfiguration)
-                return _client!
-            } else {
-                // return the backing instance
-                return _client!
-            }
-        }
-    }
-    
-    /// Called to reset the SDK.
-    internal static func reset() {
-        // remove all credentials
-        CredentialStore.clear()
-        // remove client instance - force re-init on next access
-        self._client = nil
-    }
-    
-    // - Public
-    
-    /// Boolean indicating whether a user is logged in. `true` if logged in. `false` otherwise.
-    public static var isLoggedIn: Bool {
-        // ensure a token is present
-        guard let refreshToken = CredentialStore.refreshToken?.token else { return false }
-        // ensure a valid jwt
-        guard let refreshJWT = try? decode(jwt: refreshToken) else { return false }
-        // ensure still valid
-        return !refreshJWT.expired
-    }
-    
-    @available(*, deprecated, message: "This is an unsupported feature of the SDK and may be removed in a future release.")
-    /// Retrieves and refreshes the SDKs access token.
-    ///
-    /// - Important:
-    /// This function should only be called if you have a well defined reason for obtaining an
-    /// access token.
-    ///
-    /// - Parameter completion: The closure to call once an access token has been obtained
-    /// form the BLOCKv platform.
-    public static func getAccessToken(completion: @escaping (_ success: Bool, _ accessToken: String?) -> Void) {
-        BLOCKv.client.getAccessToken(completion: completion)
+        didSet { printBV(info: "Environment updated - \(environment!)") }
     }
     
     // MARK: - Configuration
@@ -148,6 +92,136 @@ public final class BLOCKv {
                                                selector: #selector(handleUserAuthorisationRequired),
                                                name: Notification.Name.BVInternal.UserAuthorizationRequried,
                                                object: nil)
+    }
+    
+    // MARK: - Client
+    
+    // FIXME: Should this be nil on logout?
+    // FIXME: This MUST become a singleton (since only a single instance should ever exist).
+    private static let oauthHandler = OAuth2Handler(appID: BLOCKv.appID!,
+                                     baseURLString: BLOCKv.environment!.apiServerURLString,
+                                     refreshToken: CredentialStore.refreshToken?.token ?? "")
+    
+    
+    /// Computes the configuration object needed to initialise clients and sockets.
+    fileprivate static var clientConfiguration: Client.Configuration {
+        get {
+            // ensure host app has set an app id
+            precondition(BLOCKv.appID != nil, "Please call 'BLOCKv.configure(appID:)' with your issued app ID before making network requests.")
+            
+            if environment == nil {
+                self.environment = .production // default to production
+            }
+            
+            // return the configuration (inexpensive object)
+            return Client.Configuration(baseURLString: BLOCKv.environment!.apiServerURLString,
+                                        appID: BLOCKv.appID!)
+            
+        }
+    }
+    
+    /// Backing networking client instance.
+    fileprivate static var _client: Client?
+    
+    /// BLOCKv networking client.
+    ///
+    /// The networking client must support a platform environment change after app launch.
+    ///
+    /// This requirement is met by using a computed property that dynamically initialises a
+    /// new client if the instance variable `_client` has been set to `nil`.
+    ///
+    /// The affords the caller the ability to set the platform environment and be sure to
+    /// receive a new networking client instance.
+    internal static var client: Client {
+        get {
+            // check if a new instance must be initialized
+            if _client == nil {
+                // init a new instance
+                _client = Client(config: BLOCKv.clientConfiguration,
+                                 oauthHandler: self.oauthHandler)
+                return _client!
+            } else {
+                // return the backing instance
+                return _client!
+            }
+        }
+    }
+    
+    // MARK: - Web socket
+    
+    /*
+     Client and Socket are mutually exclusive. That is, one can be created with out the other.
+     Both relay on the ability to retrieve an access token. This is provided by a shared instance
+     of OAuth2Handler.
+     
+     
+     Even though client and socket are independent, the socket is dependent on the user having an
+     authenticated session.
+     
+     The socket must handle the case where the user is unauthenticated. Particularly around logout.
+     */
+    
+    /// Backing Web socket instance.
+    ///
+    /// Must be torn down when the user logs out.
+    ///
+    /// The Web socket is independent of the `client`. However, it is bound to
+    /// the user being authenticaated.
+    fileprivate static var _socket: WebSocketManager?
+    
+    //TODO: What if this is accessed before the client is accessed?
+    //TODO: What if the viewer suscribes to an event before auth (login/reg) has occured?
+    public static var socket: WebSocketManager {
+        get {
+            if _socket == nil {
+                _socket = WebSocketManager(baseURLString: self.environment!.webSocketURLString,
+                                           appID: self.appID!,
+                                           oauthHandler: self.oauthHandler)
+                return _socket!
+            } else {
+                return _socket!
+            }
+        }
+    }
+
+    // MARK: - Lifecycle
+    
+    /// Call to reset the SDK.
+    internal static func reset() {
+        // remove all credentials
+        CredentialStore.clear()
+        // nil out client
+        self._client = nil
+        // disconnect and nil out socekt
+        self._socket?.disconnect()
+        self._socket = nil
+        
+        printBV(info: "Reset")
+    }
+    
+    // - Public Lifecycle
+        
+    /// Boolean indicating whether a user is logged in. `true` if logged in. `false` otherwise.
+    public static var isLoggedIn: Bool {
+        // ensure a token is present
+        guard let refreshToken = CredentialStore.refreshToken?.token else { return false }
+        // ensure a valid jwt
+        guard let refreshJWT = try? decode(jwt: refreshToken) else { return false }
+        // ensure still valid
+        return !refreshJWT.expired
+    }
+    
+    @available(*, deprecated, message: "This is an unsupported feature of the SDK and may be removed in a future release.")
+    /// Retrieves a refreshed access token.
+    ///
+    /// - Important:
+    /// This function should only be called if you have a well defined reason for obtaining an
+    /// access token.
+    ///
+    /// - Parameter completion: The closure to call once an access token has been obtained
+    /// form the BLOCKv platform.
+    public static func getAccessToken(completion: @escaping (_ success: Bool, _ accessToken: String?) -> Void) {
+        BLOCKv.client.getAccessToken(completion: completion)
     }
     
     /// Called when the networking client detects the user is unathorized.
@@ -181,16 +255,19 @@ public final class BLOCKv {
     /// platform environment to interact with.
     ///
     /// Typically, you would call `setEnvironment` in `application(_:didFinishLaunchingWithOptions:)`.
-    @available(*, deprecated, message: "BLOCKv now defaults to production. You may remove this call to set the environment.")
+    @available(*, deprecated, message: "BLOCKv now defaults to production. You may remove this call.")
     public static func setEnvironment(_ environment: BVEnvironment) {
         self.environment = environment
+        
+        //FIXME: *Changing* the environment should nil out the client and access credentials.
+        
     }
     
     // MARK: - Resources
     
     /// Closure that encodes a given url using a set of asset providers.
     ///
-    /// If non of the asset providers are able to perform encoding, the original URL is returned.
+    /// If none of the asset providers are able to perform encoding, the original URL is returned.
     internal static let blockvURLEncoder: URLEncoder = { (url, assetProviders) in
         let provider = assetProviders.first(where: { $0.isProviderForURL(url) })
         return provider?.encodedURL(url) ?? url

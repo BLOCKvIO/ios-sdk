@@ -106,7 +106,7 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
                 let errorDictionary = json as? [String : String],
                 // Important to check for both "token expired" and "Unauthorized" messages.
                 (errorDictionary["exp"] == "token expired" || errorDictionary["message"] == "Unauthorized") else {
-                    printBV(info: "401 received. Access token is still valid. Access token refresh declined.")
+                    //printBV(info: "401 received. Unrelated to access token. Access token refresh declined.")
                     // don't retry the request
                     completion(false, 0.0)
                     return

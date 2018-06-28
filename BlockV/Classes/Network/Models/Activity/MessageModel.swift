@@ -76,7 +76,7 @@ extension MessageModel: Codable {
         geoPosition          = try container.decodeIfPresent([Double].self, forKey: .geoPosition)
         templateVariationIds = try container.decodeIfPresent([String].self, forKey: .templateVariationIds) ?? []
         vatomIds             = try container.decodeIfPresent([String].self, forKey: .vatomIds) ?? []
-        resources            = try container.decodeIfPresent([VatomResource].self, forKey: .resources) ?? []
+        resources            = container.decodeSafelyIfPresentArray(of: VatomResource.self, forKey: .resources)
 
     }
     

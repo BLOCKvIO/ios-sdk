@@ -51,4 +51,10 @@ extension KeyedDecodingContainer {
         return decoded??.value
     }
     
+    ///
+    func decodeSafelyArray<T: Decodable>(of type: T.Type, forKey key: KeyedDecodingContainer.Key) -> [T] {
+        let array = decodeSafely([Safe<T>].self, forKey: key)
+        return array?.compactMap { $0.value } ?? []
+    }
+    
 }

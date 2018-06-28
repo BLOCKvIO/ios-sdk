@@ -12,11 +12,32 @@
 import Foundation
 
 /// Represents a list of messages within a thread.
-public struct MessageListModel: Codable, Equatable {
+public struct MessageListModel: Equatable {
     
     ///
-    public let cursor: Double
+    public let cursor: String
     /// Array of messages for the specifed thread.
     public let messages: [MessageModel]
+    
+    enum CodingKeys: String, CodingKey {
+        case cursor
+        case messages
+    }
+    
+}
+
+extension MessageListModel: Codable {
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.cursor = try container.decode(String.self, forKey: .cursor)
+        self.messages = container.decodeSafelyArray(of: MessageModel.self, forKey: .messages)
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(cursor, forKey: .cursor)
+        try container.encode(messages, forKey: .messages)
+    }
     
 }

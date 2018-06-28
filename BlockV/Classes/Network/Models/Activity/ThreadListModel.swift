@@ -12,11 +12,32 @@
 import Foundation
 
 /// Represent a list of threads.
-public struct ThreadListModel: Codable, Equatable {
+public struct ThreadListModel: Equatable {
     
     /// 
-    public let cursor: Double
+    public let cursor: String
     /// Array of threads
     public let threads: [ThreadModel]
+    
+    enum CodingKeys: String, CodingKey {
+        case cursor
+        case threads
+    }
+    
+}
+
+extension ThreadListModel: Codable {
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.cursor = try container.decode(String.self, forKey: .cursor)
+        self.threads = container.decodeSafelyArray(of: ThreadModel.self, forKey: .threads)
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(cursor, forKey: .cursor)
+        try container.encode(threads, forKey: .threads)
+    }
     
 }

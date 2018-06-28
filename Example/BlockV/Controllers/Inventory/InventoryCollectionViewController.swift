@@ -147,12 +147,12 @@ class InventoryCollectionViewController: UICollectionViewController {
             self.fetchInventory()
             
             // example of extracting some bool value
-            if let isDropped = vatomStateEvent.vatomProperties["dropped"]?.boolValue {
+            if let isDropped = vatomStateEvent.vatomProperties["vAtom::vAtomType"]?["dropped"]?.boolValue {
                 print("\nViewer > State Update - isDropped \(isDropped)")
             }
             
             // example of extracting array of float values
-            if let coordinates = vatomStateEvent.vatomProperties["geo_pos"]?["coordinates"]?.arrayValue?.compactMap({ $0.floatValue }) {
+            if let coordinates = vatomStateEvent.vatomProperties["vAtom::vAtomType"]?["geo_pos"]?["coordinates"]?.arrayValue?.compactMap({ $0.floatValue }) {
                 print("\nViewer > State Update - vAtom coordinates: \(coordinates)")
             }
             

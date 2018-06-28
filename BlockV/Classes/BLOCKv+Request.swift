@@ -920,13 +920,15 @@ extension BLOCKv {
     /// Only threads involving the current user are returned.
     ///
     /// - Parameters:
-    ///   - cursor: <#cursor description#>
+    ///   - cursor: Filters out all threads more recent than the cursor (useful for paging).
+    ///             If omitted or set as zero, the most recent threads are returned.
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
     public static func getActivityThreads(cursor: String = "",
+                                          count: Int = 0,
                                           completion: @escaping (ThreadListModel? , Error?) -> Void) {
         
-        let endpoint = API.UserActivity.getThreads(cursor: cursor)
+        let endpoint = API.UserActivity.getThreads(cursor: cursor, count: count)
         
         self.client.request(endpoint) { (baseModel, error) in
             
@@ -953,13 +955,15 @@ extension BLOCKv {
     ///
     /// - Parameters:
     ///   - threadId: Unique identifier of the thread (a.k.a the `name` of the thread).
-    ///   - cursor: <#cursor description#>
-    ///   - count: Defines the number of messages to return. Defaults to 50.
+    ///   - cursor: Filters out all messages more recent than the cursor (useful for paging).
+    ///             If omitted or set as zero, the most recent threads are returned.
+    ///   - count: Defines the number of messages to return.
+    ///            Defaults to 0 (i.e. all threads will be returned).
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
     public static func getActivityMessages(forThreadId threadId: String,
                                                  cursor: String = "",
-                                                 count: Int = 50,
+                                                 count: Int = 0,
                                                  completion: @escaping (MessageListModel?, Error?) -> Void) {
         
         let endpoint = API.UserActivity.getMessages(forThreadId: threadId, cursor: cursor, count: count)

@@ -427,20 +427,30 @@ extension API {
         
         /// Builds the endpoint for fetching the threads involving the current user.
         ///
-        /// - Parameter cursor: <#cursor description#>
+        /// - Parameters:
+        ///   - cursor: Filters out all threads more recent than the cursor (useful for paging).
+        ///             If omitted or set as zero, the most recent threads are returned.
+        ///   - count: Defines the number of messages to return (after the cursor).
         /// - Returns: Endpoint for fetching the thread for the current user.
-        static func getThreads(cursor: String) -> Endpoint<BaseModel<ThreadListModel>> {
+        static func getThreads(cursor: String, count: Int) -> Endpoint<BaseModel<ThreadListModel>> {
+            
+            let payload: [String : Any] = [
+                "cursor" : cursor,
+                "count" : count
+            ]
+            
             return Endpoint(method: .post,
                             path: userActivityPath + "/mythreads",
-                            parameters: ["cursor" : cursor])
+                            parameters: payload)
         }
         
         /// Builds the endpoint for fetching the message for a specified thread involving the current user.
         ///
         /// - Parameters:
         ///   - id: Unique identifier of the thread (a.k.a thread `name`).
-        ///   - cursor: <#cursor description#>
-        ///   - count: Defines the number of messages to return.
+        ///   - cursor: Filters out all message more recent than the cursor (useful for paging).
+        ///             If omitted or set as zero, the most recent threads are returned.
+        ///   - count: Defines the number of messages to return (after the cursor).
         /// - Returns: Endpoint for fetching the messages for a specific thread invoving the current user.
         static func getMessages(forThreadId threadId: String, cursor: String, count: Int) -> Endpoint<BaseModel<MessageListModel>> {
             

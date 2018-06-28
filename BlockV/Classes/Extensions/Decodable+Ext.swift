@@ -34,7 +34,7 @@ extension KeyedDecodingContainer {
         return self.decodeSafely(T.self, forKey: key)
     }
     
-    ///
+    /// Returns `nil` if the key is present, but the type cannot be decoded.
     func decodeSafely<T: Decodable>(_ type: T.Type, forKey key: KeyedDecodingContainer.Key) -> T? {
         let decoded = try? decode(Safe<T>.self, forKey: key)
         return decoded?.value
@@ -45,16 +45,22 @@ extension KeyedDecodingContainer {
         return self.decodeSafelyIfPresent(T.self, forKey: key)
     }
     
-    ///
+    /// Returns `nil` if the key is absent, or if the type cannot be decoded
     func decodeSafelyIfPresent<T: Decodable>(_ type: T.Type, forKey key: KeyedDecodingContainer.Key) -> T? {
         let decoded = try? decodeIfPresent(Safe<T>.self, forKey: key)
         return decoded??.value
     }
     
-    ///
+    /// Returns an array containing those elements that where able to be decoded. Throws if the value is `null`.
     func decodeSafelyArray<T: Decodable>(of type: T.Type, forKey key: KeyedDecodingContainer.Key) -> [T] {
         let array = decodeSafely([Safe<T>].self, forKey: key)
         return array?.compactMap { $0.value } ?? []
+    }
+    
+    /// Returns an array containd those elemets the where able to be decoded. Return an empty array if the value is `null`.
+    func decodeSafelyIfPresentArray<T: Decodable>(of type: T.Type, forKey key: KeyedDecodingContainer.Key) -> [T] {
+        let array = decodeSafelyIfPresent([Safe<T>].self, forKey: key) ?? []
+        return array.compactMap { $0.value }
     }
     
 }

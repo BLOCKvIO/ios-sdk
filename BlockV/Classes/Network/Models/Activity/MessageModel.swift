@@ -24,15 +24,13 @@ public struct MessageModel: Equatable {
     public let actionName: String
     /// Timestamp of when the message was created.
     public let whenCreated: Date
-    /// Timestamp of then the message was modified.
-    //public let whenModified: Date
     
     // - Users
     
-    ///
-    public let triggeredBy: String
-    ///
-    public let userId: String
+    /// Maps to "user_id"
+    public let triggerUserId: String
+    /// Maps to "triggered_by"
+    public let targetUserId: String
     
     // - Auxillary
     
@@ -47,13 +45,13 @@ public struct MessageModel: Equatable {
     
     enum CodingKeys: String, CodingKey {
         case id                   = "msg_id"
-        case userId               = "user_id"
+        case targetUserId         = "user_id"
         case vatomIds             = "vatoms"
         case templateVariationIds = "templ_vars"
         case message              = "msg"
         case actionName           = "action_name"
         case whenCreated          = "when_created"
-        case triggeredBy          = "triggered_by"
+        case triggerUserId        = "triggered_by"
         case resources            = "generic"
         case geoPosition          = "geo_pos"
     }
@@ -66,11 +64,11 @@ extension MessageModel: Codable {
 
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id                   = try container.decode(Double.self, forKey: .id)
-        userId               = try container.decode(String.self, forKey: .userId)
+        targetUserId         = try container.decode(String.self, forKey: .targetUserId)
         message              = try container.decode(String.self, forKey: .message)
         actionName           = try container.decode(String.self, forKey: .actionName)
         whenCreated          = try container.decode(Date.self, forKey: .whenCreated)
-        triggeredBy          = try container.decode(String.self, forKey: .triggeredBy)
+        triggerUserId        = try container.decode(String.self, forKey: .triggerUserId)
         
         // potentially `null`
         geoPosition          = try container.decodeIfPresent([Double].self, forKey: .geoPosition)
@@ -84,11 +82,11 @@ extension MessageModel: Codable {
         
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
-        try container.encode(userId, forKey: .userId)
+        try container.encode(targetUserId, forKey: .targetUserId)
         try container.encode(message, forKey: .message)
         try container.encode(actionName, forKey: .actionName)
         try container.encode(whenCreated, forKey: .whenCreated)
-        try container.encode(triggeredBy, forKey: .triggeredBy)
+        try container.encode(triggerUserId, forKey: .triggerUserId)
         try container.encode(templateVariationIds, forKey: .templateVariationIds)
         try container.encode(vatomIds, forKey: .vatomIds)
         try container.encode(resources, forKey: .resources)

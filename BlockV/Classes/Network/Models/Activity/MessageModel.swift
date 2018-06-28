@@ -15,7 +15,7 @@ import Foundation
 public struct MessageModel: Equatable {
     
     /// Unique identifier of the message.
-    public let id: String
+    public let id: Double
     /// Message content
     public let message: String
     /// Common name of the action which triggered the message.
@@ -69,7 +69,7 @@ extension MessageModel: Codable {
 
         // de-nest properties to top level
         let messageContainer = try container.nestedContainer(keyedBy: MessageCodingKeys.self, forKey: .message)
-        id                   = try messageContainer.decode(String.self, forKey: .id)
+        id                   = try messageContainer.decode(Double.self, forKey: .id)
         userId               = try messageContainer.decode(String.self, forKey: .userId)
         message              = try messageContainer.decode(String.self, forKey: .message)
         actionName           = try messageContainer.decode(String.self, forKey: .actionName)

@@ -70,20 +70,16 @@ public class WebSocketManager {
     /// Fires when the Web socket receives **any** message.
     ///
     /// The Signal is generic over a dictionary [String : Any] which contains the raw message.
-    /// An error will be fired if the Web socket unexpectedly disconnects.
-    public let onMessageReceivedRaw = Signal<([String : Any]?, Error?)>()
+    public let onMessageReceivedRaw = Signal<[String : Any]>()
     
     /// Fires when the Web socket receives an **inventory** update event.
-    /// An error will be fired if the Web socket unexpectedly disconnects.
-    public let onInventoryUpdate = Signal<(WSInventoryEvent?, Error?)>()
+    public let onInventoryUpdate = Signal<WSInventoryEvent>()
     
     /// Fires when the Web socket recevies a vAtom **state update** event.
-    /// An error will be fired if the Web socket unexpectedly disconnects.
-    public let onVatomStateUpdate = Signal<(WSStateUpdateEvent?, Error?)>()
+    public let onVatomStateUpdate = Signal<WSStateUpdateEvent>()
     
     /// Fires when the Web socket receives an **activity** update event.
-    /// An error will be fired if the Web socket unexpectedly disconnects.
-    public let onActivityUpdate = Signal<(WSActivityEvent?, Error?)>()
+    public let onActivityUpdate = Signal<WSActivityEvent>()
     
     // - Lifecycle
     
@@ -245,10 +241,6 @@ extension WebSocketManager: WebSocketDelegate {
         
         // Fire an error informing the observers that the Web socket has disconnected.
         self.onDisconnected.fire(())
-        self.onMessageReceivedRaw.fire((nil, error))
-        self.onInventoryUpdate.fire((nil, error))
-        self.onVatomStateUpdate.fire((nil, error))
-        self.onActivityUpdate.fire((nil, error))
         
         //TODO: The Web socket should reconnect here:
         // The app may fire this message when entering the foreground (after the Web socket was disconnected after entering the background).
@@ -291,7 +283,7 @@ extension WebSocketManager: WebSocketDelegate {
          Fire the signal using the message in it's 'raw' form.
          Allows viewers to handle the socket messages as they please.
          */
-        self.onMessageReceivedRaw.fire((jsonDictionary, nil))
+        self.onMessageReceivedRaw.fire(jsonDictionary)
         
         // - Parse event models
         
@@ -314,7 +306,7 @@ extension WebSocketManager: WebSocketDelegate {
                 do {
                     let inventoryEvent = try blockvJSONDecoder.decode(WSInventoryEvent.self, from: data)
                     //TODO: Set an enum `event` = .added or .removed - this will require the user id (decode the jwt).
-                    self.onInventoryUpdate.fire((inventoryEvent, nil))
+                    self.onInventoryUpdate.fire(inventoryEvent)
                 } catch {
                     printBV(error: error.localizedDescription)
                 }
@@ -322,7 +314,7 @@ extension WebSocketManager: WebSocketDelegate {
             case .stateUpdate:
                 do {
                     let stateUpdateEvent = try blockvJSONDecoder.decode(WSStateUpdateEvent.self, from: data)
-                    self.onVatomStateUpdate.fire((stateUpdateEvent, nil))
+                    self.onVatomStateUpdate.fire(stateUpdateEvent)
                 } catch {
                     printBV(error: error.localizedDescription)
                 }
@@ -331,7 +323,7 @@ extension WebSocketManager: WebSocketDelegate {
                 do {
                     // FIXME: Allow resources to be encoded.
                     let activityEvent = try blockvJSONDecoder.decode(WSActivityEvent.self, from: data)
-                    self.onActivityUpdate.fire((activityEvent, nil))
+                    self.onActivityUpdate.fire(activityEvent)
                 } catch {
                     printBV(error: error.localizedDescription)
                 }

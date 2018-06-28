@@ -19,14 +19,27 @@ import Foundation
 public struct ThreadModel: Equatable {
     
     /// Struct containing a few user properties.
-    public struct UserInfo: Codable,Equatable {
+    public struct UserInfo: Codable, Equatable {
         public let name: String
-        public let avatarURL: URL
+        public let avatarURL: URL?
         
         enum CodingKeys: String, CodingKey {
             case name = "name"
             case avatarURL = "avatar_uri"
         }
+        
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            name = try container.decode(String.self, forKey: .name)
+            avatarURL = container.decodeSafely(URL.self, forKey: .avatarURL)
+        }
+        
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(name, forKey: .name)
+            try container.encode(avatarURL, forKey: .avatarURL)
+        }
+        
     }
     
     /// Unique identifier of the message thread.

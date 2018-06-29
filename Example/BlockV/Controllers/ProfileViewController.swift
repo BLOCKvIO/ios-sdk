@@ -179,8 +179,10 @@ class ProfileViewController: UITableViewController {
         
         guard let url = self.userModel?.avatarURL else { return }
         
+        guard let encodedURL = try? BLOCKv.encodeURL(url) else { return }
+        
         // request image data
-        manager.request(url).responseData { [weak self] responseData in
+        manager.request(encodedURL).responseData { [weak self] responseData in
                         
             guard let data = responseData.data else { return }
             print("\nViewer > Avatar download successful.")

@@ -44,7 +44,7 @@ class InventoryCollectionViewController: UICollectionViewController {
     }()
     
     /// Model holding the inventory vatoms.
-    fileprivate var vatoms: [Vatom] = [] {
+    fileprivate var vatoms: [VatomModel] = [] {
         didSet {
             filteredVatoms = vatoms.filter {
                 // filter out dropped vAtoms & coin wallet
@@ -54,14 +54,14 @@ class InventoryCollectionViewController: UICollectionViewController {
     }
     
     /// Model holding the filtered vAtoms.
-    fileprivate var filteredVatoms: [Vatom] = [] {
+    fileprivate var filteredVatoms: [VatomModel] = [] {
         didSet {
             collectionView?.reloadData()
         }
     }
     
     /// vAtom to pass to detail view controller.
-    fileprivate var vatomToPass: Vatom?
+    fileprivate var vatomToPass: VatomModel?
     
     /// Dictionary mapping vatom IDs to image data (activated image).
     fileprivate var activatedImages = [String : Data]()
@@ -110,7 +110,7 @@ class InventoryCollectionViewController: UICollectionViewController {
             print("\nViewer > Web socket - Connected")
         }
         
-        BLOCKv.socket.onDisconnected.subscribe(with: self) {
+        BLOCKv.socket.onDisconnected.subscribe(with: self) { _ in
             print("\nViewer > Web socket - Disconnected")
         }
         
@@ -185,17 +185,17 @@ class InventoryCollectionViewController: UICollectionViewController {
     /// Note: Input parameters are left to their defautls.
     fileprivate func fetchInventory() {
         
-        BLOCKv.getInventory { [weak self] (groupModel, error) in
+        BLOCKv.getInventory { [weak self] (packModel, error) in
             
             // handle error
-            guard let model = groupModel, error == nil else {
+            guard let model = packModel, error == nil else {
                 print("\n>>> Error > Viewer: \(error!.localizedDescription)")
                 self?.present(UIAlertController.errorAlert(error!), animated: true)
                 return
             }
             
             // handle success
-            print("\nViewer > Fetched inventory GroupModel")
+            print("\nViewer > Fetched inventory PackModel")
             
             /*
              NOTE
@@ -227,10 +227,10 @@ class InventoryCollectionViewController: UICollectionViewController {
         builder.addDefinedFilter(forField: .templateID, filterOperator: .equal, value: "vatomic.prototyping::DrinkCoupon::v1", combineOperator: .and)
         
         // execute the discover call
-        BLOCKv.discover(builder) { [weak self] (groupModel, error) in
+        BLOCKv.discover(builder) { [weak self] (packModel, error) in
             
             // handle error
-            guard let model = groupModel, error == nil else {
+            guard let model = packModel, error == nil else {
                 print("\n>>> Error > Viewer: \(error!.localizedDescription)")
                 self?.present(UIAlertController.errorAlert(error!), animated: true)
                 return
@@ -251,14 +251,19 @@ class InventoryCollectionViewController: UICollectionViewController {
         
         for vatom in filteredVatoms {
             
-            // find the vatom's activate image url
+            // find the vatom's activated image url
             guard let activatedImageURL = vatom.resources.first(where: { $0.name == "ActivatedImage"} )?.url else {
                 // oops, not found, skip this vatom
                 continue
             }
             
+            // encode the url
+            guard let encodedURL = try? BLOCKv.encodeURL(activatedImageURL) else {
+                continue
+            }
+            
             // create network operation
-            let operation = NetworkDataOperation(urlString: activatedImageURL.absoluteString) { [weak self] (data, error) in
+            let operation = NetworkDataOperation(urlString: encodedURL.absoluteString) { [weak self] (data, error) in
                 
                 // unwrap data, handle error
                 guard let data = data, error == nil else {

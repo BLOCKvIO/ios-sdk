@@ -33,7 +33,7 @@ class TransferActionViewController: UIViewController {
     
     // MARK: - Properties
     
-    var vatom: Vatom!
+    var vatom: VatomModel!
     
     /// Type of token selected.
     var tokenType: UserTokenType {
@@ -85,7 +85,7 @@ class TransferActionViewController: UIViewController {
         
     }
     
-    /// Option 1 - This show the convenience `transfer` method on Vatom to transfer the vAtom to
+    /// Option 1 - This show the convenience `transfer` method on VatomModel to transfer the vAtom to
     /// a another user via a phone, email, or user id token.
     func performTransferConvenience(token: UserToken) {
         

@@ -11,13 +11,13 @@
 
 import Foundation
 
-public struct VatomResource: Equatable {
+public struct VatomResourceModel: Equatable {
     
     //TODO: Split type into type and format: "3D" and "Scene"
     
     public let name: String // e.g. Scene
     public let type: String // e.g. ResourceTypes::3D::Scene
-    public var url: URL     // e.g. https://cdndev.blockv.net/vatomic.prototyping/MenuCard/v2/Harvelles/v1/harvelles_menu_icon.png
+    public let url: URL     // e.g. https://cdndev.blockv.net/vatomic.prototyping/MenuCard/v2/Harvelles/v1/harvelles_menu_icon.png
     
     enum CodingKeys: String, CodingKey {
         case name 
@@ -31,20 +31,9 @@ public struct VatomResource: Equatable {
     
 }
 
-// MARK: - AssetProviderEncodable
-
-extension VatomResource: AssetProviderEncodable {
-    
-    mutating func encodeEachURL(using encoder: URLEncoder, assetProviders: [AssetProvider]) {
-        // encode url
-        self.url = encoder(url, assetProviders)
-    }
-    
-}
-
 // MARK: Codable
 
-extension VatomResource: Codable {
+extension VatomResourceModel: Codable {
     
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
@@ -70,7 +59,7 @@ extension VatomResource: Codable {
 
 // MARK: Hashable
 
-extension VatomResource: Hashable {
+extension VatomResourceModel: Hashable {
     
     public var hashValue: Int {
         return name.hashValue ^ type.hashValue ^ url.hashValue

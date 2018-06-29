@@ -39,7 +39,7 @@ public struct MessageModel: Equatable {
     /// Array of templated variation identifiers (for each associated vAtom).
     public let templateVariationIds: [String]
     /// Array of resources (for each associated vAtom).
-    public let resources: [VatomResource]
+    public let resources: [VatomResourceModel]
     ///
     public let geoPosition: [Double]? //FIXME: Convert to CLLocationCoordinate2D?
     
@@ -74,7 +74,7 @@ extension MessageModel: Codable {
         geoPosition          = try container.decodeIfPresent([Double].self, forKey: .geoPosition)
         templateVariationIds = try container.decodeIfPresent([String].self, forKey: .templateVariationIds) ?? []
         vatomIds             = try container.decodeIfPresent([String].self, forKey: .vatomIds) ?? []
-        resources            = container.decodeSafelyIfPresentArray(of: VatomResource.self, forKey: .resources)
+        resources            = container.decodeSafelyIfPresentArray(of: VatomResourceModel.self, forKey: .resources)
 
     }
     

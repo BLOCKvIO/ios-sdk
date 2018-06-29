@@ -248,7 +248,7 @@ extension API {
         /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
         static func getInventory(parentID: String = "*",
                                  page: Int = 0,
-                                 limit: Int = 0) -> Endpoint<BaseModel<GroupModel>> {
+                                 limit: Int = 0) -> Endpoint<BaseModel<PackModel>> {
             return Endpoint(method: .post,
                             path: userVatomPath + "/inventory",
                             parameters: [
@@ -262,7 +262,7 @@ extension API {
         /// Builds the endpoint to get a vAtom by its unique identifier.
         ///
         /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
-        static func getVatoms(withIDs ids: [String]) -> Endpoint<BaseModel<GroupModel>> {
+        static func getVatoms(withIDs ids: [String]) -> Endpoint<BaseModel<PackModel>> {
             return Endpoint(method: .post,
                             path: userVatomPath + "/get",
                             parameters: ["ids": ids]
@@ -279,8 +279,8 @@ extension API {
         /// Builds the endpoint to search for vAtoms.
         ///
         /// - Parameter payload: Raw request payload.
-        /// - Returns: Endpoint generic over `GroupModel`.
-        static func discover(_ payload: [String : Any]) -> Endpoint<BaseModel<GroupModel>> {
+        /// - Returns: Endpoint generic over `PackModel`.
+        static func discover(_ payload: [String : Any]) -> Endpoint<BaseModel<PackModel>> {
             
             return Endpoint(method: .post,
                             path: "/v1/vatom/discover",
@@ -297,12 +297,12 @@ extension API {
         ///   - topRightLat: Top right latitude coordinate.
         ///   - topRightLon: Top right longitude coordinte.
         ///   - filter: The vAtom filter option to apply.
-        /// - Returns: Endpoint generic over `GroupModel`.
+        /// - Returns: Endpoint generic over `PackModel`.
         static func geoDiscover(bottomLeftLat: Double,
                                 bottomLeftLon: Double,
                                 topRightLat: Double,
                                 topRightLon: Double,
-                                filter: String) -> Endpoint<BaseModel<GroupModel>> {
+                                filter: String) -> Endpoint<BaseModel<PackModel>> {
             
             // create the payload
             let payload: [String : Any] =
@@ -411,7 +411,7 @@ extension API {
         ///
         /// - Parameter id: Uniquie identifier of the template.
         /// - Returns: Endpoint for fectching actions.
-        static func getActions(forTemplateID id: String) -> Endpoint<BaseModel<[Action]>> {
+        static func getActions(forTemplateID id: String) -> Endpoint<BaseModel<[ActionModel]>> {
             return Endpoint(method: .get,
                             path: userActionsPath + "/\(id)")
         }

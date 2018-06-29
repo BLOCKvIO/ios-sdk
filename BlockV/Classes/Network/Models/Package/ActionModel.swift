@@ -14,7 +14,7 @@ import Foundation
 //TODO: Define hashable conformance
 
 /// This type models a template action.
-public struct Action: Equatable {
+public struct ActionModel: Equatable {
     
     /// Combination of the template and action name.
     ///
@@ -53,7 +53,7 @@ public struct Action: Equatable {
 
 // MARK: - Decodable
 
-extension Action: Decodable {
+extension ActionModel: Decodable {
 
     /// Initialise from a decoder, e.g. JSONDecoder
     public init(from decoder: Decoder) throws {
@@ -63,7 +63,7 @@ extension Action: Decodable {
         let properties = try container.decodeIfPresent(Properties.self, forKey: .properties)
         let meta = try container.decodeIfPresent(MetaModel.self, forKey: .meta)
         
-        let (templateID, actionName) = try Action.splitCompoundName(name)
+        let (templateID, actionName) = try ActionModel.splitCompoundName(name)
         
         self.init(compoundName: name,
                   name: actionName,
@@ -76,7 +76,7 @@ extension Action: Decodable {
 
 // MARK: - Helpers 
 
-extension Action {
+extension ActionModel {
     
     /// Extract action and template name from the compound name.
     private static func splitCompoundName(_ compoundName: String) throws -> (String, String) {

@@ -11,7 +11,7 @@
 
 import Foundation
 
-public struct Vatom: Equatable {
+public struct VatomModel: Equatable {
 
     // Top Level Properties
     
@@ -59,7 +59,7 @@ public struct Vatom: Equatable {
     public var isTransferable: Bool
     
     public var geoPosition: GeoPosition
-    public var resources: [VatomResource] // `var` only to allow for resource encoding
+    public var resources: [VatomResourceModel] // `var` only to allow for resource encoding
     public var privateProperties: JSON? // Private section may contain JSON of any structure.
     
     enum CodingKeys: String, CodingKey {
@@ -134,7 +134,7 @@ public struct Vatom: Equatable {
 
 // MARK: Codable
 
-extension Vatom: Decodable {
+extension VatomModel: Decodable {
     
     public init(from decoder: Decoder) throws {
         let items = try decoder.container(keyedBy: CodingKeys.self)
@@ -166,7 +166,7 @@ extension Vatom: Decodable {
         parentID            = try propertiesContainer.decode(String.self, forKey: .parentID)
         publisherFqdn       = try propertiesContainer.decode(String.self, forKey: .publisherFqdn)
         isRedeemable        = try propertiesContainer.decode(Bool.self, forKey: .isRedeemable)
-        resources           = try propertiesContainer.decode([Safe<VatomResource>].self, forKey: .resources).compactMap { $0.value }
+        resources           = try propertiesContainer.decode([Safe<VatomResourceModel>].self, forKey: .resources).compactMap { $0.value }
         rootType            = try propertiesContainer.decode(String.self, forKey: .rootType)
         templateID          = try propertiesContainer.decode(String.self, forKey: .templateID)
         templateVariationID = try propertiesContainer.decode(String.self, forKey: .templateVariationID)
@@ -186,7 +186,7 @@ extension Vatom: Decodable {
 
 // MARK: Hashable
 
-extension Vatom: Hashable {
+extension VatomModel: Hashable {
     
     /// vAtoms are uniquely identified by their platform identifier.
     public var hashValue: Int {

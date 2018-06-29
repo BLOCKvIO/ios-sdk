@@ -19,9 +19,9 @@ protocol CredentialManager {
     
     static func saveRefreshToken(_ token: BVToken)
     
-    static var assetProviders: [AssetProvider] { get }
+    static var assetProviders: [AssetProviderModel] { get }
     
-    static func saveAssetProviders(_ providers: [AssetProvider])
+    static func saveAssetProviders(_ providers: [AssetProviderModel])
     
 }
 
@@ -77,21 +77,21 @@ internal class CredentialStore: CredentialManager {
     // MARK: - Asset Provider
     
     /// Returns the asset providers from local storage.
-    static var assetProviders: [AssetProvider] {
+    static var assetProviders: [AssetProviderModel] {
         get {
             // extract data
             guard let data = UserDefaults.standard.data(forKey: assetProvidersKey) else {
                 return []
             }
             // decode to `AssetProvider`
-            return (try? JSONDecoder().decode([AssetProvider].self, from: data)) ?? []
+            return (try? JSONDecoder().decode([AssetProviderModel].self, from: data)) ?? []
         }
     }
     
     /// Saves the asset providers to local storage.
     ///
     /// This is an overwrite operation.
-    static func saveAssetProviders(_ providers: [AssetProvider]) {
+    static func saveAssetProviders(_ providers: [AssetProviderModel]) {
         // encode to data (ineffient, but inconsequential)
         
         // FIXME: How to handle this force unwrap?

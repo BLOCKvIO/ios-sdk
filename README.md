@@ -79,4 +79,4 @@ If you believe you have identified a security vulnerability with BLOCKv, you sho
 
 ## License
 
-BLOCKv is available under the BLOCKv AG license. See the [LICENSE](https://github.com/BLOCKvIO/ios-sdk/blob/master/LICENSE) file for more info.
+BLOCKv is available under the BLOCKv AG license. See the [LICENSE](./LICENSE) file for more info.

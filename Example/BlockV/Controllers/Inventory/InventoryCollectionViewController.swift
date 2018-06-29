@@ -117,12 +117,7 @@ class InventoryCollectionViewController: UICollectionViewController {
         // MARK: - Inventory
         
         // subscribe to inventory update events
-        BLOCKv.socket.onInventoryUpdate.subscribe(with: self) { (inventoryEvent, error) in
-            
-            // ensure no errors
-            guard let inventoryEvent = inventoryEvent, error == nil else {
-                return
-            }
+        BLOCKv.socket.onInventoryUpdate.subscribe(with: self) { inventoryEvent in
             
             print("\nViewer > Inventory Update Event: \n\(inventoryEvent)")
             
@@ -139,14 +134,9 @@ class InventoryCollectionViewController: UICollectionViewController {
         // MARK: - State Update
         
         // subscribe to vatom state update events
-        BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { (vatomStateEvent, error) in
+        BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { vatomStateEvent in
             
-            // ensure no errors
-            guard let stateEvent = vatomStateEvent, error == nil else {
-                return
-            }
-            
-            print("\nViewer > State Update Event: \n\(stateEvent)")
+            print("\nViewer > State Update Event: \n\(vatomStateEvent)")
             
             /*
              Typically you would perfrom a localized update using the info inside of the event.
@@ -157,36 +147,31 @@ class InventoryCollectionViewController: UICollectionViewController {
             self.fetchInventory()
             
             // example of extracting some bool value
-            if let isDropped = stateEvent.vatomProperties["dropped"]?.boolValue {
+            if let isDropped = vatomStateEvent.vatomProperties["vAtom::vAtomType"]?["dropped"]?.boolValue {
                 print("\nViewer > State Update - isDropped \(isDropped)")
             }
             
             // example of extracting array of float values
-            if let coordinates = stateEvent.vatomProperties["geo_pos"]?["coordinates"]?.arrayValue?.compactMap({ $0.floatValue }) {
+            if let coordinates = vatomStateEvent.vatomProperties["vAtom::vAtomType"]?["geo_pos"]?["coordinates"]?.arrayValue?.compactMap({ $0.floatValue }) {
                 print("\nViewer > State Update - vAtom coordinates: \(coordinates)")
             }
             
         }
         
         // subcribe to vatom state updates (where the event was either a drop or pick-up)
-        BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { (vatomStateEvent, error) in
+        BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { vatomStateEvent in
             
             print("\nViewer > State Update - Filters in only Drop/Pick-Up events")
             
             }.filter {
                 // check the properties for the 'dropped' flag.
-                $0.0?.vatomProperties.contains(where: { $0.key == "dropped" })  ?? false
+                $0.vatomProperties.contains(where: { $0.key == "dropped" })
         }
         
         // MARK: - Activity
         
         // subcribe to an activity event
-        BLOCKv.socket.onActivityUpdate.subscribe(with: self) { (activityEvent, error) in
-            
-            // ensure no errors
-            guard let activityEvent = activityEvent, error == nil else {
-                return
-            }
+        BLOCKv.socket.onActivityUpdate.subscribe(with: self) { activityEvent in
             
             print("\nViewer > Activity Event: \n\(activityEvent)")
             

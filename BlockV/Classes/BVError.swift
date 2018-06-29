@@ -43,6 +43,9 @@ public enum BVError: Error {
     /// Platform error. Associated values: `code` and `message`.
     public enum PlatformErrorReason {
         
+        case unknownAppId(Int, String)
+        case internalServerIssue(Int, String)
+        
         case tokenExpired(Int, String)
         case invalidPayload(Int, String)
         case tokenUnavailable(Int, String)
@@ -53,13 +56,15 @@ public enum BVError: Error {
         
         case vatomNotFound(Int, String)
         
-        case cannotFindUser(Int, String)
+        case unknownUserToken(Int, String)
         case authenticationFailed(Int, String)
         case invalidToken(Int, String)
         case avatarUploadFailed(Int, String)
         case userRefreshTokenInvalid(Int, String)
         case authenticationLimit(Int, String)
         
+        case unknownTokenType(Int, String)
+        case unknownTokenId(Int, String)
         case tokenNotFound(Int, String)
         case cannotDeletePrimaryToken(Int, String)
         case unableToRetrieveToken(Int, String)
@@ -77,34 +82,32 @@ public enum BVError: Error {
                 
             case -1:  self = .unknownWithMissingCode(code, message)
                 
-            case 401: self = .tokenExpired(code, message) //FIXME: 400 range custom server codes do not appear anymore - remove.
-            case 516: self = .invalidPayload(code, message)
-            case 521: self = .tokenUnavailable(code, message)
-            case 527: self = .invalidDateFormat(code, message)
+            case 2:   self = .unknownAppId(code, message) // App Id is unacceptable.
+            case 11:  self = .internalServerIssue(code, message) // Server encountered an error processing the request.
+            case 17:  self = .unknownAppId(code, message) // App Id is unacceptable.
+            //
+            case 516: self = .invalidPayload(code, message) // Request paylaod is invalid.
+            case 517: self = .invalidPayload(code, message) // Request paylaod is invalid.
                 
-            case 1004: self = .malformedRequestBody(code, message)
-            case 1041: self = .invalidDataValidation(code, message)
-                
-                //case 1065: self = .invalidGeoDiscoverInputData // maybe map to malformed request body
-                
-            case 1701: self = .vatomNotFound(code, message)
-                
-            case 2030: self = .cannotFindUser(code, message)
-            case 2031: self = .authenticationFailed(code, message)
-            case 2032: self = .authenticationFailed(code, message)
-            case 2034: self = .invalidToken(code, message)
-            case 2037: self = .avatarUploadFailed(code, message)
-            case 2049: self = .userRefreshTokenInvalid(code, message)
-            case 2051: self = .authenticationLimit(code, message)
-                
-            case 2552: self = .unableToRetrieveToken(code, message)
-            case 2562: self = .cannotDeletePrimaryToken(code, message)
-            case 2563: self = .tokenNotFound(code, message)
-            case 2564: self = .tokenAlreadyConfirmed(code, message)
-            case 2565: self = .invalidVerificationCode(code, message)
-                
-            case 2571: self = .invalidEmailAddress(code, message)
-            case 2572: self = .invalidPhoneNumber(code, message)
+            case 521: self = .tokenUnavailable(code, message) // User token (phone, email) is already taken.
+            case 527: self = .invalidDateFormat(code, message) // Date format is invalid (e.g. invalid birthday in update user call).
+            //
+            case 1004: self = .malformedRequestBody(code, message) // Invalid request payload on an action.
+            case 1701: self = .vatomNotFound(code, message) // vAtom is unrecognized by the platform.
+            //
+            case 2030: self = .unknownUserToken(code, message) // User token (phone, email, id) is unrecognized by the platfrom.
+            case 2032: self = .authenticationFailed(code, message) // Login phone/email wrong. password
+            case 2037: self = .avatarUploadFailed(code, message) // Uploading the avatar data. failed.
+            case 2049: self = .userRefreshTokenInvalid(code, message) // Refresh token is not on the whitelist, or the token has expired.
+            case 2051: self = .authenticationLimit(code, message) // Too many login requests.
+            case 2552: self = .unableToRetrieveToken(code, message) //???
+            case 2553: self = .unknownTokenId(code, message) // Token id does not map to a token.
+            case 2562: self = .cannotDeletePrimaryToken(code, message) // Primary token cannot be deleted.
+            case 2566: self = .tokenAlreadyConfirmed(code, message) // Attempting to verfiy an already verified token.
+            case 2567: self = .invalidVerificationCode(code, message) // Invalid verification code used when attempting to verify an account.
+            case 2569: self = .unknownTokenType(code, message) // Unrecognized token type (only `phone` and `email` are currently accepted).
+            case 2571: self = .invalidEmailAddress(code, message) // Invalid email address.
+            case 2572: self = .invalidPhoneNumber(code, message) // Invalid phone number.
                 
             default:
                 // useful for debugging
@@ -164,10 +167,6 @@ extension BVError.PlatformErrorReason {
         case let .malformedRequestBody(code, message),
              let .invalidDataValidation(code, message),
              let .vatomNotFound(code, message),
-             let .cannotFindUser(code, message),
-             let .authenticationFailed(code, message),
-             let .tokenExpired(code, message),
-             let .invalidToken(code, message),
              let .avatarUploadFailed(code, message),
              let .unableToRetrieveToken(code, message),
              let .tokenUnavailable(code, message),
@@ -180,8 +179,17 @@ extension BVError.PlatformErrorReason {
              let .invalidDateFormat(code, message),
              let .userRefreshTokenInvalid(code, message),
              let .tokenNotFound(code, message),
-             let .cannotDeletePrimaryToken(code, message):
-            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
+             let .cannotDeletePrimaryToken(code, message),
+             let .unknownAppId(code, message),
+             let .internalServerIssue(code, message),
+             let .tokenExpired(code, message),
+             let .unknownUserToken(code, message),
+             let .authenticationFailed(code, message),
+             let .invalidToken(code, message),
+             let .unknownTokenType(code, message),
+             let .unknownTokenId(code, message):
+             return "BLOCKv Platform Error: (\(code)) Message: \(message)"
+            
         }
     }
     

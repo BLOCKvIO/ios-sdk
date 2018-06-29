@@ -61,6 +61,7 @@ The example app lets you try out the BLOCKv SDK. It's a great place to start if 
 - [x] Fetching a vAtom's Activated Image
 - [x] Dispalying vAtoms in a UICollectionView
 - [x] Searching for vAtoms on the BLOCKv platform
+- [x] Responding to Web socket update stream
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 

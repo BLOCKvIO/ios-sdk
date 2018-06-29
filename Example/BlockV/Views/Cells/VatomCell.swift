@@ -30,7 +30,7 @@ class VatomCell: UICollectionViewCell {
     
     static let reuseIdentifier = "com.blockv.vatom-cell"
     
-    var vatom: Vatom?
+    var vatom: VatomModel?
     
     // MARK: - Outlets
     

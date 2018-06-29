@@ -37,7 +37,7 @@ class ActionListTableViewController: UITableViewController {
     
     // MARK: - Properties
     
-    var vatom: Vatom!
+    var vatom: VatomModel!
     
     // For now, we hardcode to display a single action.
     //

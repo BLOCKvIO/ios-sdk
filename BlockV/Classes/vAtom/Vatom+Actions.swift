@@ -11,8 +11,8 @@
 
 import Foundation
 
-/// This file adds actions to Vatom (simply for convenience).
-extension Vatom {
+/// This file adds actions to VatomModel (simply for convenience).
+extension VatomModel {
     
     /// Transfers this vAtom to the specified token.
     ///

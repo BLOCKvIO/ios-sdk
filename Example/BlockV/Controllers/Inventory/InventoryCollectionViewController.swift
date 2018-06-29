@@ -44,7 +44,7 @@ class InventoryCollectionViewController: UICollectionViewController {
     }()
     
     /// Model holding the inventory vatoms.
-    fileprivate var vatoms: [Vatom] = [] {
+    fileprivate var vatoms: [VatomModel] = [] {
         didSet {
             filteredVatoms = vatoms.filter {
                 // filter out dropped vAtoms & coin wallet
@@ -54,14 +54,14 @@ class InventoryCollectionViewController: UICollectionViewController {
     }
     
     /// Model holding the filtered vAtoms.
-    fileprivate var filteredVatoms: [Vatom] = [] {
+    fileprivate var filteredVatoms: [VatomModel] = [] {
         didSet {
             collectionView?.reloadData()
         }
     }
     
     /// vAtom to pass to detail view controller.
-    fileprivate var vatomToPass: Vatom?
+    fileprivate var vatomToPass: VatomModel?
     
     /// Dictionary mapping vatom IDs to image data (activated image).
     fileprivate var activatedImages = [String : Data]()

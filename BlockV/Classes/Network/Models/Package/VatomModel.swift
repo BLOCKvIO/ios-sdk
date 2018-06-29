@@ -11,7 +11,7 @@
 
 import Foundation
 
-public struct Vatom: Equatable {
+public struct VatomModel: Equatable {
 
     // Top Level Properties
     
@@ -134,7 +134,7 @@ public struct Vatom: Equatable {
 
 // MARK: Codable
 
-extension Vatom: Decodable {
+extension VatomModel: Decodable {
     
     public init(from decoder: Decoder) throws {
         let items = try decoder.container(keyedBy: CodingKeys.self)
@@ -186,7 +186,7 @@ extension Vatom: Decodable {
 
 // MARK: Hashable
 
-extension Vatom: Hashable {
+extension VatomModel: Hashable {
     
     /// vAtoms are uniquely identified by their platform identifier.
     public var hashValue: Int {

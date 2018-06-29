@@ -21,7 +21,7 @@ import Foundation
 ///   Technically, an array of all the actions linked to the parent templates of the vAtoms in the vAtoms array.
 public struct PackModel: Decodable, Equatable {
     
-    public var vatoms: [Vatom]
+    public var vatoms: [VatomModel]
     public var faces: [FaceModel]
     public var actions: [ActionModel]
     public var count: Int?
@@ -49,14 +49,14 @@ public struct PackModel: Decodable, Equatable {
          Ideally, should just be:
          
          self.vatoms = try container
-         .decode([Safe<Vatom>].self, forKey: .vatoms)
+         .decode([Safe<VatomModel>].self, forKey: .vatoms)
          .compactMap { $0.value }
          
          */
         
-        if let vatoms = try container.decodeIfPresent([Safe<Vatom>].self, forKey: .vatoms) {
+        if let vatoms = try container.decodeIfPresent([Safe<VatomModel>].self, forKey: .vatoms) {
             self.vatoms = vatoms.compactMap { $0.value }
-        } else if let vatoms = try container.decodeIfPresent([Safe<Vatom>].self, forKey: .results) {
+        } else if let vatoms = try container.decodeIfPresent([Safe<VatomModel>].self, forKey: .results) {
             self.vatoms = vatoms.compactMap { $0.value }
         } else {
             self.vatoms = []

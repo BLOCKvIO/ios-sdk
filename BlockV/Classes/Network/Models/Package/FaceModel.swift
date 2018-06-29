@@ -23,7 +23,7 @@ public enum ViewMode: String {
 }
 
 /// A simple struct that models a template face.
-public struct Face: Codable, Equatable {
+public struct FaceModel: Codable, Equatable {
     
     public let id: String
     public let templateName: String
@@ -66,7 +66,7 @@ public struct Face: Codable, Equatable {
 
 // MARK: - Hashable
 
-extension Face: Hashable {
+extension FaceModel: Hashable {
     
     /// Faces are uniquely identified by their platform identifier.
     public var hashValue: Int {

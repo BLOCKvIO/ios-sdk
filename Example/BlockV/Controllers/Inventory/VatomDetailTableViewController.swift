@@ -37,7 +37,7 @@ class VatomDetailTableViewController: UITableViewController {
     // MARK: - Inputs
     
     /// vAtoms passed in by the presenting view controller.
-    var vatom: Vatom!
+    var vatom: VatomModel!
     
     // MARK: - Properties
     
@@ -107,7 +107,7 @@ class VatomDetailTableViewController: UITableViewController {
     /// Fetches the input vatom's properties from the BLOCKv platform.
     fileprivate func fetchVatom() {
         
-        BLOCKv.getVatoms(withIDs: [vatom.id]) { [weak self] (groupModel, error) in
+        BLOCKv.getVatoms(withIDs: [vatom.id]) { [weak self] (packModel, error) in
             
             // end refreshing
             self?.refreshControl?.endRefreshing()
@@ -120,7 +120,7 @@ class VatomDetailTableViewController: UITableViewController {
             }
             
             // check for our vatom
-            guard let newVatom = groupModel?.vatoms.first else {
+            guard let newVatom = packModel?.vatoms.first else {
                 let message = "Unable to fetch vAtom with id: \(String(describing: self?.vatom.id))."
                 print("\n>>> Warning > \(message)")
                 self?.present(UIAlertController.infoAlert(message: message), animated: true)

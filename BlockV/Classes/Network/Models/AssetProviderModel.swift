@@ -11,61 +11,9 @@
 
 import Foundation
 
-typealias URLEncoder = (_ url: URL, _ assetProviders: [AssetProvider]) -> URL
+typealias URLEncoder = (_ url: URL, _ assetProviders: [AssetProviderModel]) -> URL
 
-/// A type that can encode it's URLs for a designated asset provider.
-protocol AssetProviderEncodable {
-    
-    /// Option 1
-    ///
-    /// Types adopting this protocol should encode each of their urls using the provided encoder.
-    mutating func encodeEachURL(using encoder: URLEncoder, assetProviders: [AssetProvider])
-    
-//    /// Option 2
-//    ///
-//    /// Encodes the supplied URL with underlying asset providers.
-//    func encodeURL(_ url: URL) -> URL
-//
-//    /// Option 3
-//    ///
-//    /// Encodes the supplied URL with the supplied asset providers.
-//    func encodeURL(_ url: URL, assetProviders: [AssetProvider]) -> URL
-
-}
-
-//extension AssetProviderEncodable {
-//
-//    /*
-//     Option 2
-//     Pros:
-//     - Can be used anywhere.
-//     Cons:
-//     - Dependecy injection fail. Pulls from a static credential store that could be in
-//     any state. This is not clean.
-//     */
-//
-//    func encodeURL(_ url: URL) -> URL {
-//        let assetProviders = CredentialStore.assetProviders
-//        let provider = assetProviders.first(where: { $0.isProviderForURL(url) })
-//        return provider?.encodedURL(url) ?? url
-//    }
-//
-//    /*
-//     Option 3
-//     Pros:
-//     - Asset providers are injected. This allows control of the input.
-//     Cons:
-//     - Asset providers will be needed at the call site.
-//     */
-//
-//    func encodeURL(_ url: URL, assetProviders: [AssetProvider]) -> URL {
-//        let provider = assetProviders.first(where: { $0.isProviderForURL(url) })
-//        return provider?.encodedURL(url) ?? url
-//    }
-//
-//}
-
-struct AssetProvider: Codable, Equatable {
+struct AssetProviderModel: Codable, Equatable {
     
     let name: String
     let uri: URL

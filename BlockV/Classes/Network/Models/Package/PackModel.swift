@@ -19,11 +19,11 @@ import Foundation
 ///   Technically, an array of all the faces linked to the parent templates of the vAtoms in the vAtoms array.
 /// 3. Array of all the actions associated with the vAtoms.
 ///   Technically, an array of all the actions linked to the parent templates of the vAtoms in the vAtoms array.
-public struct GroupModel: Decodable, Equatable {
+public struct PackModel: Decodable, Equatable {
     
-    public var vatoms: [Vatom]
-    public var faces: [Face]
-    public var actions: [Action]
+    public var vatoms: [VatomModel]
+    public var faces: [FaceModel]
+    public var actions: [ActionModel]
     public var count: Int?
     
     /// These coding keys accomadate both the inventory and discover calls.
@@ -49,24 +49,24 @@ public struct GroupModel: Decodable, Equatable {
          Ideally, should just be:
          
          self.vatoms = try container
-         .decode([Safe<Vatom>].self, forKey: .vatoms)
+         .decode([Safe<VatomModel>].self, forKey: .vatoms)
          .compactMap { $0.value }
          
          */
         
-        if let vatoms = try container.decodeIfPresent([Safe<Vatom>].self, forKey: .vatoms) {
+        if let vatoms = try container.decodeIfPresent([Safe<VatomModel>].self, forKey: .vatoms) {
             self.vatoms = vatoms.compactMap { $0.value }
-        } else if let vatoms = try container.decodeIfPresent([Safe<Vatom>].self, forKey: .results) {
+        } else if let vatoms = try container.decodeIfPresent([Safe<VatomModel>].self, forKey: .results) {
             self.vatoms = vatoms.compactMap { $0.value }
         } else {
             self.vatoms = []
         }
         
         self.faces = try container
-            .decode([Safe<Face>].self, forKey: .faces)
+            .decode([Safe<FaceModel>].self, forKey: .faces)
             .compactMap { $0.value }
         self.actions = try container
-            .decode([Safe<Action>].self, forKey: .actions)
+            .decode([Safe<ActionModel>].self, forKey: .actions)
             .compactMap { $0.value }
         self.count = try container.decodeIfPresent(Int.self, forKey: .count)
         

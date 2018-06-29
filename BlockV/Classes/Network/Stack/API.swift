@@ -152,7 +152,7 @@ extension API {
         /// Builds the endpoint to add a token to the current user.
         ///
         /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
-        public static func addToken(_ token: UserToken, isPrimary: Bool) -> Endpoint<BaseModel<FullTokenModel>> {
+        static func addToken(_ token: UserToken, isPrimary: Bool) -> Endpoint<BaseModel<FullTokenModel>> {
             return Endpoint(method: .post,
                             path: currentUserPath + "/tokens",
                             parameters: [
@@ -166,7 +166,7 @@ extension API {
         /// Builds the endpoint to delete a token.
         ///
         /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
-        public static func deleteToken(id: String) -> Endpoint<BaseModel<GeneralModel>> {
+        static func deleteToken(id: String) -> Endpoint<BaseModel<GeneralModel>> {
             return Endpoint(method: .delete,
                             path: currentUserPath + "/tokens/\(id)")
         }
@@ -174,19 +174,10 @@ extension API {
         /// Builds the endpoint to set a default token.
         ///
         /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
-        public static func setDefaultToken(id: String) -> Endpoint<BaseModel<GeneralModel>> {
+        static func setDefaultToken(id: String) -> Endpoint<BaseModel<GeneralModel>> {
             return Endpoint(method: .put,
                             path: currentUserPath + "/tokens/\(id)/default")
         }
-        
-        // MARK: Redemption
-        
-        /*
-         /// Endpoint to fetch redeemables.
-         public static func getRedeemables() -> Endpoint<Void> {
-         return Endpoint(path: currentUserPath + "/redeemables")
-         }
-         */
         
         // MARK: Avatar
         
@@ -200,6 +191,32 @@ extension API {
                                   bodyPart: bodyPart)
             
         }
+        
+        // MARK: Messaging
+        
+        /// Builds the endpoint to allow the current user to send a message to a user token.
+        ///
+        /// - Parameters:
+        ///   - message: Content of the message.
+        ///   - userId: Unique identifier of the recipient user.
+        /// - Returns: The endpoint is generic over a response model. This model is parsed on
+        /// success responses (200...299).
+        static func sendMessage(_ message: String, toUserId userId: String) -> Endpoint<BaseModel<GeneralModel>> {
+            return Endpoint(method: .post,
+                            path: currentUserPath + "/message",
+                            parameters: [
+                                "message" : message,
+                                "id" : userId])
+        }
+        
+        // MARK: Redemption
+        
+        /*
+         /// Endpoint to fetch redeemables.
+         public static func getRedeemables() -> Endpoint<Void> {
+         return Endpoint(path: currentUserPath + "/redeemables")
+         }
+         */
         
     }
     
@@ -231,7 +248,7 @@ extension API {
         /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
         static func getInventory(parentID: String = "*",
                                  page: Int = 0,
-                                 limit: Int = 0) -> Endpoint<BaseModel<GroupModel>> {
+                                 limit: Int = 0) -> Endpoint<BaseModel<PackModel>> {
             return Endpoint(method: .post,
                             path: userVatomPath + "/inventory",
                             parameters: [
@@ -245,7 +262,7 @@ extension API {
         /// Builds the endpoint to get a vAtom by its unique identifier.
         ///
         /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
-        static func getVatoms(withIDs ids: [String]) -> Endpoint<BaseModel<GroupModel>> {
+        static func getVatoms(withIDs ids: [String]) -> Endpoint<BaseModel<PackModel>> {
             return Endpoint(method: .post,
                             path: userVatomPath + "/get",
                             parameters: ["ids": ids]
@@ -262,8 +279,8 @@ extension API {
         /// Builds the endpoint to search for vAtoms.
         ///
         /// - Parameter payload: Raw request payload.
-        /// - Returns: Endpoint generic over `GroupModel`.
-        static func discover(_ payload: [String : Any]) -> Endpoint<BaseModel<GroupModel>> {
+        /// - Returns: Endpoint generic over `PackModel`.
+        static func discover(_ payload: [String : Any]) -> Endpoint<BaseModel<PackModel>> {
             
             return Endpoint(method: .post,
                             path: "/v1/vatom/discover",
@@ -280,12 +297,12 @@ extension API {
         ///   - topRightLat: Top right latitude coordinate.
         ///   - topRightLon: Top right longitude coordinte.
         ///   - filter: The vAtom filter option to apply.
-        /// - Returns: Endpoint generic over `GroupModel`.
+        /// - Returns: Endpoint generic over `PackModel`.
         static func geoDiscover(bottomLeftLat: Double,
                                 bottomLeftLon: Double,
                                 topRightLat: Double,
                                 topRightLon: Double,
-                                filter: String) -> Endpoint<BaseModel<GroupModel>> {
+                                filter: String) -> Endpoint<BaseModel<PackModel>> {
             
             // create the payload
             let payload: [String : Any] =
@@ -394,9 +411,59 @@ extension API {
         ///
         /// - Parameter id: Uniquie identifier of the template.
         /// - Returns: Endpoint for fectching actions.
-        static func getActions(forTemplateID id: String) -> Endpoint<BaseModel<[Action]>> {
+        static func getActions(forTemplateID id: String) -> Endpoint<BaseModel<[ActionModel]>> {
             return Endpoint(method: .get,
                             path: userActionsPath + "/\(id)")
+        }
+        
+    }
+    
+    // MARK: -
+    
+    /// Consolidtes all the user activity endpoints.
+    enum UserActivity {
+        
+        private static let userActivityPath = "/v1/activity"
+        
+        /// Builds the endpoint for fetching the threads involving the current user.
+        ///
+        /// - Parameters:
+        ///   - cursor: Filters out all threads more recent than the cursor (useful for paging).
+        ///             If omitted or set as zero, the most recent threads are returned.
+        ///   - count: Defines the number of messages to return (after the cursor).
+        /// - Returns: Endpoint for fetching the thread for the current user.
+        static func getThreads(cursor: String, count: Int) -> Endpoint<BaseModel<ThreadListModel>> {
+            
+            let payload: [String : Any] = [
+                "cursor" : cursor,
+                "count" : count
+            ]
+            
+            return Endpoint(method: .post,
+                            path: userActivityPath + "/mythreads",
+                            parameters: payload)
+        }
+        
+        /// Builds the endpoint for fetching the message for a specified thread involving the current user.
+        ///
+        /// - Parameters:
+        ///   - id: Unique identifier of the thread (a.k.a thread `name`).
+        ///   - cursor: Filters out all message more recent than the cursor (useful for paging).
+        ///             If omitted or set as zero, the most recent threads are returned.
+        ///   - count: Defines the number of messages to return (after the cursor).
+        /// - Returns: Endpoint for fetching the messages for a specific thread invoving the current user.
+        static func getMessages(forThreadId threadId: String, cursor: String, count: Int) -> Endpoint<BaseModel<MessageListModel>> {
+            
+            let payload: [String : Any] = [
+                "name" : threadId,
+                "cursor" : cursor,
+                "count" : count
+            ]
+            
+            return Endpoint(method: .post,
+                            path: "/mythreadmessages",
+                            parameters: payload)
+            
         }
         
     }

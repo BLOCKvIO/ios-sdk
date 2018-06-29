@@ -20,26 +20,12 @@ public struct PublicUserModel: Codable, Equatable {
     public struct Properties: Codable, Equatable {
         public let firstName: String
         public let lastName: String
-        public var avatarURL: URL?
+        public let avatarURL: URL?
         
         enum CodingKeys: String, CodingKey {
             case firstName = "first_name"
             case lastName  = "last_name"
             case avatarURL = "avatar_uri"
-        }
-    }
-    
-}
-
-
-// MARK: - AssetProviderEncodable
-
-extension PublicUserModel: AssetProviderEncodable {
-    
-    mutating func encodeEachURL(using encoder: URLEncoder, assetProviders: [AssetProvider]) {
-        // encode url
-        if let url = self.properties.avatarURL {
-            self.properties.avatarURL = encoder(url, assetProviders)
         }
     }
     

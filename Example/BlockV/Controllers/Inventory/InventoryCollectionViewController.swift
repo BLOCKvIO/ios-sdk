@@ -44,7 +44,7 @@ class InventoryCollectionViewController: UICollectionViewController {
     }()
     
     /// Model holding the inventory vatoms.
-    fileprivate var vatoms: [Vatom] = [] {
+    fileprivate var vatoms: [VatomModel] = [] {
         didSet {
             filteredVatoms = vatoms.filter {
                 // filter out dropped vAtoms & coin wallet
@@ -54,14 +54,14 @@ class InventoryCollectionViewController: UICollectionViewController {
     }
     
     /// Model holding the filtered vAtoms.
-    fileprivate var filteredVatoms: [Vatom] = [] {
+    fileprivate var filteredVatoms: [VatomModel] = [] {
         didSet {
             collectionView?.reloadData()
         }
     }
     
     /// vAtom to pass to detail view controller.
-    fileprivate var vatomToPass: Vatom?
+    fileprivate var vatomToPass: VatomModel?
     
     /// Dictionary mapping vatom IDs to image data (activated image).
     fileprivate var activatedImages = [String : Data]()
@@ -110,19 +110,14 @@ class InventoryCollectionViewController: UICollectionViewController {
             print("\nViewer > Web socket - Connected")
         }
         
-        BLOCKv.socket.onDisconnected.subscribe(with: self) {
+        BLOCKv.socket.onDisconnected.subscribe(with: self) { _ in
             print("\nViewer > Web socket - Disconnected")
         }
         
         // MARK: - Inventory
         
         // subscribe to inventory update events
-        BLOCKv.socket.onInventoryUpdate.subscribe(with: self) { (inventoryEvent, error) in
-            
-            // ensure no errors
-            guard let inventoryEvent = inventoryEvent, error == nil else {
-                return
-            }
+        BLOCKv.socket.onInventoryUpdate.subscribe(with: self) { inventoryEvent in
             
             print("\nViewer > Inventory Update Event: \n\(inventoryEvent)")
             
@@ -139,14 +134,9 @@ class InventoryCollectionViewController: UICollectionViewController {
         // MARK: - State Update
         
         // subscribe to vatom state update events
-        BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { (vatomStateEvent, error) in
+        BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { vatomStateEvent in
             
-            // ensure no errors
-            guard let stateEvent = vatomStateEvent, error == nil else {
-                return
-            }
-            
-            print("\nViewer > State Update Event: \n\(stateEvent)")
+            print("\nViewer > State Update Event: \n\(vatomStateEvent)")
             
             /*
              Typically you would perfrom a localized update using the info inside of the event.
@@ -157,36 +147,31 @@ class InventoryCollectionViewController: UICollectionViewController {
             self.fetchInventory()
             
             // example of extracting some bool value
-            if let isDropped = stateEvent.vatomProperties["dropped"]?.boolValue {
+            if let isDropped = vatomStateEvent.vatomProperties["vAtom::vAtomType"]?["dropped"]?.boolValue {
                 print("\nViewer > State Update - isDropped \(isDropped)")
             }
             
             // example of extracting array of float values
-            if let coordinates = stateEvent.vatomProperties["geo_pos"]?["coordinates"]?.arrayValue?.compactMap({ $0.floatValue }) {
+            if let coordinates = vatomStateEvent.vatomProperties["vAtom::vAtomType"]?["geo_pos"]?["coordinates"]?.arrayValue?.compactMap({ $0.floatValue }) {
                 print("\nViewer > State Update - vAtom coordinates: \(coordinates)")
             }
             
         }
         
         // subcribe to vatom state updates (where the event was either a drop or pick-up)
-        BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { (vatomStateEvent, error) in
+        BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { vatomStateEvent in
             
             print("\nViewer > State Update - Filters in only Drop/Pick-Up events")
             
             }.filter {
                 // check the properties for the 'dropped' flag.
-                $0.0?.vatomProperties.contains(where: { $0.key == "dropped" })  ?? false
+                $0.vatomProperties.contains(where: { $0.key == "dropped" })
         }
         
         // MARK: - Activity
         
         // subcribe to an activity event
-        BLOCKv.socket.onActivityUpdate.subscribe(with: self) { (activityEvent, error) in
-            
-            // ensure no errors
-            guard let activityEvent = activityEvent, error == nil else {
-                return
-            }
+        BLOCKv.socket.onActivityUpdate.subscribe(with: self) { activityEvent in
             
             print("\nViewer > Activity Event: \n\(activityEvent)")
             
@@ -200,17 +185,17 @@ class InventoryCollectionViewController: UICollectionViewController {
     /// Note: Input parameters are left to their defautls.
     fileprivate func fetchInventory() {
         
-        BLOCKv.getInventory { [weak self] (groupModel, error) in
+        BLOCKv.getInventory { [weak self] (packModel, error) in
             
             // handle error
-            guard let model = groupModel, error == nil else {
+            guard let model = packModel, error == nil else {
                 print("\n>>> Error > Viewer: \(error!.localizedDescription)")
                 self?.present(UIAlertController.errorAlert(error!), animated: true)
                 return
             }
             
             // handle success
-            print("\nViewer > Fetched inventory GroupModel")
+            print("\nViewer > Fetched inventory PackModel")
             
             /*
              NOTE
@@ -242,10 +227,10 @@ class InventoryCollectionViewController: UICollectionViewController {
         builder.addDefinedFilter(forField: .templateID, filterOperator: .equal, value: "vatomic.prototyping::DrinkCoupon::v1", combineOperator: .and)
         
         // execute the discover call
-        BLOCKv.discover(builder) { [weak self] (groupModel, error) in
+        BLOCKv.discover(builder) { [weak self] (packModel, error) in
             
             // handle error
-            guard let model = groupModel, error == nil else {
+            guard let model = packModel, error == nil else {
                 print("\n>>> Error > Viewer: \(error!.localizedDescription)")
                 self?.present(UIAlertController.errorAlert(error!), animated: true)
                 return
@@ -266,14 +251,19 @@ class InventoryCollectionViewController: UICollectionViewController {
         
         for vatom in filteredVatoms {
             
-            // find the vatom's activate image url
+            // find the vatom's activated image url
             guard let activatedImageURL = vatom.resources.first(where: { $0.name == "ActivatedImage"} )?.url else {
                 // oops, not found, skip this vatom
                 continue
             }
             
+            // encode the url
+            guard let encodedURL = try? BLOCKv.encodeURL(activatedImageURL) else {
+                continue
+            }
+            
             // create network operation
-            let operation = NetworkDataOperation(urlString: activatedImageURL.absoluteString) { [weak self] (data, error) in
+            let operation = NetworkDataOperation(urlString: encodedURL.absoluteString) { [weak self] (data, error) in
                 
                 // unwrap data, handle error
                 guard let data = data, error == nil else {

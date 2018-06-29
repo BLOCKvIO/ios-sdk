@@ -110,7 +110,7 @@ class InventoryCollectionViewController: UICollectionViewController {
             print("\nViewer > Web socket - Connected")
         }
         
-        BLOCKv.socket.onDisconnected.subscribe(with: self) {
+        BLOCKv.socket.onDisconnected.subscribe(with: self) { _ in
             print("\nViewer > Web socket - Disconnected")
         }
         

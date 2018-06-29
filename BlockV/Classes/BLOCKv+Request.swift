@@ -915,9 +915,7 @@ extension BLOCKv {
     
     // MARK: - Activity
     
-    /// Fetches the activty threads after the specifed cursor.
-    ///
-    /// Only threads involving the current user are returned.
+    /// Fetches the activty threads *after* the specifed cursor.
     ///
     /// - Parameters:
     ///   - cursor: Filters out all threads more recent than the cursor (useful for paging).
@@ -949,9 +947,7 @@ extension BLOCKv {
         
     }
     
-    /// Fetches the activity messages, for a specified thread id, after the specified cursor.
-    ///
-    /// Only messages involving the current user are returned.
+    /// Fetches the activity messages for the specified thread id and *after* the specified cursor.
     ///
     /// - Parameters:
     ///   - threadId: Unique identifier of the thread (a.k.a the `name` of the thread).

@@ -935,4 +935,33 @@ extension BLOCKv {
         
     }
     
+    /// Send a message to another BLOCKv user.
+    ///
+    /// - Parameters:
+    ///   - message: Content of the message.
+    ///   - userId: Unique identifier of the recipient user.
+    ///   - completion: The completion handler to call when the request is completed.
+    ///                 This handler is executed on the main queue.
+    public static func sendMessage(_ message: String, toUserId userId: String, completion:  @escaping (BVError?) -> Void) {
+        
+        let endpoint = API.CurrentUser.sendMessage(message, toUserId: userId)
+        
+        self.client.request(endpoint) { (baseModel, error) in
+            
+            guard let _ = baseModel?.payload, error == nil else {
+                DispatchQueue.main.async {
+                    completion(error)
+                }
+                return
+            }
+            
+            // call was successful
+            DispatchQueue.main.async {
+                completion(nil)
+            }
+            
+        }
+        
+    }
+    
 }

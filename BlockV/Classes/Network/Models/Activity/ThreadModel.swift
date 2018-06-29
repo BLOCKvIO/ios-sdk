@@ -51,15 +51,15 @@ public struct ThreadModel: Equatable {
     /// Timestamp of when the message thread was modified.
     public let whenModified: Date
     /// Lastest message within this thread.
-    public let latestMessage: MessageModel
+    public let lastMessage: MessageModel
     /// Info of the interaction user (for the latest message within this thread).
-    public let latestMessageUserInfo: UserInfo
+    public let lastMessageUserInfo: UserInfo
     
     enum CodingKeys: String, CodingKey {
-        case id = "name"
-        case whenModified = "when_modified"
-        case latestMessage = "last_message"
-        case latestMessageUserInfo = "last_message_user_info"
+        case id                  = "name"
+        case whenModified        = "when_modified"
+        case lastMessage         = "last_message"
+        case lastMessageUserInfo = "last_message_user_info"
     }
     
 }
@@ -72,8 +72,8 @@ extension ThreadModel: Codable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
-        latestMessage = try container.decode(MessageModel.self, forKey: .latestMessage)
-        latestMessageUserInfo = try container.decode(UserInfo.self, forKey: .latestMessageUserInfo)
+        lastMessage = try container.decode(MessageModel.self, forKey: .lastMessage)
+        lastMessageUserInfo = try container.decode(UserInfo.self, forKey: .lastMessageUserInfo)
         
         // convert the double to date
         _whenModified = try container.decode(Double.self, forKey: .whenModified)
@@ -83,8 +83,8 @@ extension ThreadModel: Codable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
-        try container.encode(latestMessage, forKey: .latestMessage)
-        try container.encode(latestMessageUserInfo, forKey: .latestMessageUserInfo)
+        try container.encode(lastMessage, forKey: .lastMessage)
+        try container.encode(lastMessageUserInfo, forKey: .lastMessageUserInfo)
         try container.encode(_whenModified, forKey: .whenModified)
     }
     

@@ -461,7 +461,7 @@ extension API {
             ]
             
             return Endpoint(method: .post,
-                            path: "/mythreadmessages",
+                            path: userActivityPath + "/mythreadmessages",
                             parameters: payload)
             
         }

@@ -1,4 +1,4 @@
-# BLOCKv SDK for iOS
+# BLOCKv SDK for iOS (BETA)
 
 [![Version](https://img.shields.io/cocoapods/v/BLOCKv.svg?style=flat)](http://cocoapods.org/pods/BLOCKv)
 [![License](https://img.shields.io/cocoapods/l/BLOCKv.svg?style=flat)](http://cocoapods.org/pods/BLOCKv)
@@ -65,9 +65,13 @@ The example app lets you try out the BLOCKv SDK. It's a great place to start if 
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
+## Production Support
+
+The BLOCKv SDK for iOS is currently in public **beta**. Breaking changes may still be introduced in the coming months.  This is *important* to consider if you are planning on releasing the SDK as part of your application.
+
 ## Versioning
 
-The BLOCKv SDK for iOS is still in pre-release and so may introduce breaking changes. Once the release is official, the SDK will follow [semantic versioning](https://semver.org), starting with release 1.0.0.
+Once the release is official, the SDK will adhere to [semantic versioning](https://semver.org).
 
 ## Security Disclosure
 

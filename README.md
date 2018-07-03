@@ -67,7 +67,7 @@ To run the example project, clone the repo, and run `pod install` from the Examp
 
 ## Production Support
 
-The BLOCKv SDK for iOS is currently in public **beta**. Breaking changes may still be introduced in the coming months.  This is *important* to consider if you are planning on releasing the SDK as part of a production application.
+The BLOCKv SDK for iOS is currently in public **beta**. Breaking changes may still be introduced in the coming months.  This is *important* to consider if you are planning on releasing the SDK as part of your application.
 
 ## Versioning
 

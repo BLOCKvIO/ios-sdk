@@ -12,6 +12,7 @@ whitelist_rules:
   - switch_case_alignment
   - identifier_name
   - operator_whitespace
+  - closure_parameter_position
 # disabled_rules: # rule identifiers to exclude from running
 #   - trailing_whitespace
 included: # paths to include during linting. `--path` is ignored if present.

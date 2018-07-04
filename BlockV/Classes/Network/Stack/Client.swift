@@ -168,8 +168,8 @@ public final class Client: ClientProtocol {
         //request.validate()
 
         // parse out a native model (within the base model)
-        request.validate().responseJSONDecodable(queue: self.queue, decoder: blockvJSONDecoder) {
-            (dataResponse: DataResponse<Response>) in
+        request.validate().responseJSONDecodable(queue: self.queue,
+                                                 decoder: blockvJSONDecoder) { (dataResponse: DataResponse<Response>) in
 
             // DEBUG
             //            let json = try? JSONSerialization.jsonObject(with: dataResponse.data!, options: [])
@@ -262,8 +262,9 @@ public final class Client: ClientProtocol {
 
                 // parse out a native model (within the base model)
                 //TODO: If is fine to capture self here?
-                upload.responseJSONDecodable(queue: self.queue, decoder: self.blockvJSONDecoder) {
-                    (dataResponse: DataResponse<Response>) in
+                upload.responseJSONDecodable(queue: self.queue,
+                                             decoder: self.blockvJSONDecoder) { (dataResponse: DataResponse<Response>)
+                                                in
 
                     ///
                     switch dataResponse.result {

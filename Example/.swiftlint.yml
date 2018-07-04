@@ -17,6 +17,7 @@ whitelist_rules:
   - vertical_parameter_alignment
   #- multiple_closures_with_trailing_closure
   - trailing_newline
+  - file_length
 # disabled_rules: # rule identifiers to exclude from running
 #   - trailing_whitespace
 included: # paths to include during linting. `--path` is ignored if present.

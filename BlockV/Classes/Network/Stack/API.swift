@@ -12,6 +12,8 @@
 import Foundation
 import Alamofire
 
+// swiftlint:disable file_length
+
 /// Consolidates all BlockV API endpoints.
 ///
 /// Endpoints are namespaced to furture proof.

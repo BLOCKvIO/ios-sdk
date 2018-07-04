@@ -14,11 +14,11 @@ import Foundation
 /// Possible view modes a face may define for presentation.
 public enum ViewMode: String {
 
-    case icon       = "icon"
-    case activated  = "activated"
-    case fullscreen = "fullscreen"
-    case card       = "card"
-    case background = "background"
+    case icon
+    case activated
+    case fullscreen
+    case card
+    case background
 
 }
 

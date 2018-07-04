@@ -83,7 +83,7 @@ extension WSInventoryEvent: Decodable {
 
     // discard the outer payload - we are only interesting in the payload data
     enum CodingKeys: String, CodingKey {
-        case payload = "payload"
+        case payload
     }
 
     enum PayloadCodingKeys: String, CodingKey {

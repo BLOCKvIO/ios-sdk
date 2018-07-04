@@ -75,7 +75,7 @@ public struct UserTokenLoginParams: LoginParams {
     }
 
     enum AuthDataKeys: String, CodingKey {
-        case password = "password"
+        case password
     }
 
 }

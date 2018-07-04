@@ -75,7 +75,7 @@ public struct WSActivityEvent: WSEvent, Equatable {
 extension WSActivityEvent: Decodable {
 
     enum CodingKeys: String, CodingKey {
-        case payload = "payload"
+        case payload
     }
 
     enum PayloadCodingKeys: String, CodingKey {

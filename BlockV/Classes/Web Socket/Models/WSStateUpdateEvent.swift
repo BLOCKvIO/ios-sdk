@@ -96,7 +96,7 @@ public struct WSStateUpdateEvent: WSEvent, Equatable {
 extension WSStateUpdateEvent: Decodable {
 
     enum CodingKeys: String, CodingKey {
-        case payload = "payload"
+        case payload
     }
 
     enum PayloadCodingKeys: String, CodingKey {

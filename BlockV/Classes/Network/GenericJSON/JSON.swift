@@ -58,7 +58,7 @@ extension JSON: Equatable {
         }
     }
 }
-// swiftlint:disable identifier_name
+// swiftlint:enable identifier_name
 
 extension JSON: CustomDebugStringConvertible {
 

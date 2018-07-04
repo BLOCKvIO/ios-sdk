@@ -54,8 +54,8 @@ public struct FaceModel: Codable, Equatable {
             public let viewMode: String
             public let platform: String
 
-            enum CodingKeys: String, CodingKey {
-                case viewMode = "view_mode" //TODO: Map to view mode enum
+            enum CodingKeys: String, CodingKey { // swiftlint:disable:this nesting
+                case viewMode = "view_mode"
                 case platform
             }
 

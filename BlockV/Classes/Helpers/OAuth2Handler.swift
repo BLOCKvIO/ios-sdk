@@ -135,7 +135,7 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
         // do nothing if currently refreshing
         guard !isRefreshing else { return }
 
-        refreshTokens { [weak self] (succeeded, accessToken, refreshToken) in
+        refreshTokens { [weak self] (succeeded, accessToken, _) in
             guard let strongSelf = self else { return }
 
             /*

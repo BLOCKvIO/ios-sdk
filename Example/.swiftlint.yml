@@ -6,6 +6,7 @@ whitelist_rules:
   - implicit_getter
   - line_length
   - opening_brace
+  - unused_closure_parameter
 # disabled_rules: # rule identifiers to exclude from running
 #   - trailing_whitespace
 included: # paths to include during linting. `--path` is ignored if present.

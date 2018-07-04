@@ -319,7 +319,7 @@ extension DataRequest {
         -> Self {
 
         // construct the response serializer
-        let responseSerializser = DataResponseSerializer<T> { request, response, data, error in
+        let responseSerializser = DataResponseSerializer<T> { _, _, data, error in
 
             // handle error
             if let topLevelError = error {

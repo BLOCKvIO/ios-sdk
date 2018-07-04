@@ -2,6 +2,7 @@
 whitelist_rules:
   - trailing_whitespace
   - colon
+  - comma
   - vertical_whitespace
   - redundant_string_enum_value
   - implicit_getter
@@ -10,6 +11,7 @@ whitelist_rules:
   - unused_closure_parameter
   - switch_case_alignment
   - identifier_name
+  - operator_whitespace
 # disabled_rules: # rule identifiers to exclude from running
 #   - trailing_whitespace
 included: # paths to include during linting. `--path` is ignored if present.

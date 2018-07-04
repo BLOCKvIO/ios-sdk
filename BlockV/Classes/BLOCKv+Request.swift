@@ -876,7 +876,7 @@ extension BLOCKv {
     ///                 This handler is executed on the main queue.
     public static func getActivityThreads(cursor: String = "",
                                           count: Int = 0,
-                                          completion: @escaping (ThreadListModel? , Error?) -> Void) {
+                                          completion: @escaping (ThreadListModel?, Error?) -> Void) {
 
         let endpoint = API.UserActivity.getThreads(cursor: cursor, count: count)
 

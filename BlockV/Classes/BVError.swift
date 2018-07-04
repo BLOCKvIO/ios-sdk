@@ -11,6 +11,8 @@
 
 import Foundation
 
+// swiftlint:disable cyclomatic_complexity
+
 /// `BVError` is the error type returned by BLOCKv SDK. These errors should not be
 /// presented to users. Rather, they provide technical descriptions of the platform
 /// error.

@@ -1,24 +1,25 @@
 --- 
-whitelist_rules:
-  - trailing_whitespace
-  - colon
-  - comma
-  - vertical_whitespace
-  - redundant_string_enum_value
-  - implicit_getter
-  - line_length
-  - opening_brace
-  - unused_closure_parameter
-  - switch_case_alignment
-  - identifier_name
-  - operator_whitespace
-  - closure_parameter_position
-  - unused_optional_binding
-  - vertical_parameter_alignment
-  #- multiple_closures_with_trailing_closure
-  - trailing_newline
-  - file_length
-  - superfluous_disable_command
+# whitelist_rules:
+#   - trailing_whitespace
+#   - colon
+#   - comma
+#   - vertical_whitespace
+#   - redundant_string_enum_value
+#   - implicit_getter
+#   - line_length
+#   - opening_brace
+#   - unused_closure_parameter
+#   - switch_case_alignment
+#   - identifier_name
+#   - operator_whitespace
+#   - closure_parameter_position
+#   - unused_optional_binding
+#   - vertical_parameter_alignment
+#   #- multiple_closures_with_trailing_closure
+#   - trailing_newline
+#   - file_length
+#   - superfluous_disable_command
+#   # - force_try
 # disabled_rules: # rule identifiers to exclude from running
 #   - trailing_whitespace
 included: # paths to include during linting. `--path` is ignored if present.

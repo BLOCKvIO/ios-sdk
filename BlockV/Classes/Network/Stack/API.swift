@@ -259,7 +259,7 @@ extension API {
             )
         }
         
-        /// Builds the endpoint to get a vAtom by its unique identifier.
+        /// Builds the endpoint to get a vAtom by its id.
         ///
         /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
         static func getVatoms(withIDs ids: [String]) -> Endpoint<BaseModel<PackModel>> {
@@ -267,6 +267,16 @@ extension API {
                             path: userVatomPath + "/get",
                             parameters: ["ids": ids]
             )
+        }
+        
+        /// Builds the endpoint to delete a vAtom specified by its id.
+        ///
+        /// Returns an endpoint over a BaseModel over a GeneralModel.
+        static func deleteVatom(_ id: String) -> Endpoint<BaseModel<GeneralModel>> {
+            return Endpoint(method: .post,
+                            path: "/v1/user/vatom/trash",
+                            parameters: ["this.id": id])
+            
         }
         
     }

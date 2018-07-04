@@ -14,6 +14,7 @@ whitelist_rules:
   - operator_whitespace
   - closure_parameter_position
   - unused_optional_binding
+  - vertical_parameter_alignment
 # disabled_rules: # rule identifiers to exclude from running
 #   - trailing_whitespace
 included: # paths to include during linting. `--path` is ignored if present.

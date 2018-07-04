@@ -910,9 +910,9 @@ extension BLOCKv {
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
     public static func getActivityMessages(forThreadId threadId: String,
-                                                 cursor: String = "",
-                                                 count: Int = 0,
-                                                 completion: @escaping (MessageListModel?, Error?) -> Void) {
+                                           cursor: String = "",
+                                           count: Int = 0,
+                                           completion: @escaping (MessageListModel?, Error?) -> Void) {
 
         let endpoint = API.UserActivity.getMessages(forThreadId: threadId, cursor: cursor, count: count)
 

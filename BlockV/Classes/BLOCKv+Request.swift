@@ -179,7 +179,7 @@ extension BLOCKv {
             }
 
             // extract model, ensure no error
-            guard let _ = baseModel?.payload, error == nil else {
+            guard baseModel?.payload != nil, error == nil else {
                 DispatchQueue.main.async {
                     completion(error!)
                 }
@@ -282,7 +282,7 @@ extension BLOCKv {
         self.client.upload(endpoint, progressCompletion: progressCompletion) { (baseModel, error) in
 
             // extract model, ensure no error
-            guard let _ = baseModel?.payload, error == nil else {
+            guard baseModel?.payload != nil, error == nil else {
                 DispatchQueue.main.async {
                     completion(error)
                 }
@@ -483,7 +483,7 @@ extension BLOCKv {
 
         self.client.request(endpoint) { (baseModel, error) in
 
-            guard let _ = baseModel?.payload, error == nil else {
+            guard baseModel?.payload != nil, error == nil else {
                 DispatchQueue.main.async {
                     completion(error)
                 }
@@ -518,7 +518,7 @@ extension BLOCKv {
         self.client.request(endpoint) { (baseModel, error) in
 
             //
-            guard let _ = baseModel?.payload, error == nil else {
+            guard baseModel?.payload != nil, error == nil else {
                 DispatchQueue.main.async {
                     completion(error)
                 }
@@ -949,7 +949,7 @@ extension BLOCKv {
 
         self.client.request(endpoint) { (baseModel, error) in
 
-            guard let _ = baseModel?.payload, error == nil else {
+            guard baseModel?.payload != nil, error == nil else {
                 DispatchQueue.main.async {
                     completion(error)
                 }

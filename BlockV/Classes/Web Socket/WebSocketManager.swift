@@ -191,7 +191,6 @@ public class WebSocketManager {
             self.socket?.delegate = self
             self.socket?.connect()
 
-
         }
 
     }

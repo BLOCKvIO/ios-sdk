@@ -318,7 +318,6 @@ extension DataRequest {
         // construct the response serializer
         let responseSerializser = DataResponseSerializer<T> { request, response, data, error in
 
-
             // handle error
             if let topLevelError = error {
 

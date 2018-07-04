@@ -2,6 +2,7 @@
 whitelist_rules:
   - trailing_whitespace
   - colon
+  - vertical_whitespace
 included: # paths to include during linting. `--path` is ignored if present.
   - ../BlockV/Classes
 excluded: # paths to ignore during linting. Takes precedence over `included`.

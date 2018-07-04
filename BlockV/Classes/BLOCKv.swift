@@ -102,7 +102,6 @@ public final class BLOCKv {
                                      baseURLString: BLOCKv.environment!.apiServerURLString,
                                      refreshToken: CredentialStore.refreshToken?.token ?? "")
 
-
     /// Computes the configuration object needed to initialise clients and sockets.
     fileprivate static var clientConfiguration: Client.Configuration {
         get {
@@ -295,7 +294,6 @@ public final class BLOCKv {
     fileprivate init() {}
 
 }
-
 
 // MARK: - Print Helpers
 

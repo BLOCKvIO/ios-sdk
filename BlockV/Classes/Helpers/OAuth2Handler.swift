@@ -41,8 +41,6 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
     private var isRefreshing = false
     private var requestsToRetry: [RequestRetryCompletion] = []
 
-
-
     // MARK: - Initialization
 
     init(appID: String, baseURLString: String, accessToken: String = "", refreshToken: String = "") {

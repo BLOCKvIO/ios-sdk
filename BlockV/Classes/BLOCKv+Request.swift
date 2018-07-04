@@ -942,7 +942,8 @@ extension BLOCKv {
     ///   - userId: Unique identifier of the recipient user.
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
-    public static func sendMessage(_ message: String, toUserId userId: String, completion:  @escaping (BVError?) -> Void) {
+    public static func sendMessage(_ message: String, toUserId userId: String,
+                                   completion:  @escaping (BVError?) -> Void) {
 
         let endpoint = API.CurrentUser.sendMessage(message, toUserId: userId)
 

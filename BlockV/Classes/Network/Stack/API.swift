@@ -42,7 +42,8 @@ extension API {
         /// Builds the endpoint for new user registration.
         ///
         /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
-        static func register(tokens: [RegisterTokenParams], userInfo: UserInfo? = nil) -> Endpoint<BaseModel<AuthModel>> {
+        static func register(tokens: [RegisterTokenParams], userInfo: UserInfo? = nil) ->
+            Endpoint<BaseModel<AuthModel>> {
 
             precondition(!tokens.isEmpty, "One or more tokens must be supplied for this endpoint.")
 
@@ -186,7 +187,10 @@ extension API {
         /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
         static func uploadAvatar(_ imageData: Data) -> UploadEndpoint<BaseModel<GeneralModel>> {
 
-            let bodyPart = MultiformBodyPart(data: imageData, name: "avatar", fileName: "avatar.png", mimeType: "image/png")
+            let bodyPart = MultiformBodyPart(data: imageData,
+                                             name: "avatar",
+                                             fileName: "avatar.png",
+                                             mimeType: "image/png")
             return UploadEndpoint(path: "/v1/user/avatar",
                                   bodyPart: bodyPart)
 
@@ -452,7 +456,8 @@ extension API {
         ///             If omitted or set as zero, the most recent threads are returned.
         ///   - count: Defines the number of messages to return (after the cursor).
         /// - Returns: Endpoint for fetching the messages for a specific thread invoving the current user.
-        static func getMessages(forThreadId threadId: String, cursor: String, count: Int) -> Endpoint<BaseModel<MessageListModel>> {
+        static func getMessages(forThreadId threadId: String, cursor: String, count: Int) ->
+            Endpoint<BaseModel<MessageListModel>> {
 
             let payload: [String: Any] = [
                 "name": threadId,

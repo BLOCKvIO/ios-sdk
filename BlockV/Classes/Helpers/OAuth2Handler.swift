@@ -80,7 +80,8 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
     /// configuration for the same set of web services. The implementation below allows an instance
     /// OAuth2Handler to be shared across multiple session managers to manage the single
     /// refresh flow. In other words, thread safetly is important.
-    func should(_ manager: SessionManager, retry request: Request, with error: Error, completion: @escaping RequestRetryCompletion) {
+    func should(_ manager: SessionManager, retry request: Request, with error: Error,
+                completion: @escaping RequestRetryCompletion) {
 
         /*
          This lock ensures exclusive access to `requestsToRetry` and `isRefreshing` variables.
@@ -206,7 +207,8 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
                 // check if the error payload indicates the refresh token is invlaid
                 if let statusCode = dataResponse.response?.statusCode, (400...499) ~= statusCode {
                     // broadcast to inform user authorization is required
-                    NotificationCenter.default.post(name: Notification.Name.BVInternal.UserAuthorizationRequried, object: nil)
+                    NotificationCenter.default.post(name: Notification.Name.BVInternal.UserAuthorizationRequried,
+                                                    object: nil)
                 }
 
                 // invoke with failure

@@ -166,7 +166,8 @@ extension VatomModel: Decodable {
         parentID            = try propertiesContainer.decode(String.self, forKey: .parentID)
         publisherFqdn       = try propertiesContainer.decode(String.self, forKey: .publisherFqdn)
         isRedeemable        = try propertiesContainer.decode(Bool.self, forKey: .isRedeemable)
-        resources           = try propertiesContainer.decode([Safe<VatomResourceModel>].self, forKey: .resources).compactMap { $0.value }
+        resources           = try propertiesContainer.decode([Safe<VatomResourceModel>].self,
+                                                             forKey: .resources).compactMap { $0.value }
         rootType            = try propertiesContainer.decode(String.self, forKey: .rootType)
         templateID          = try propertiesContainer.decode(String.self, forKey: .templateID)
         templateVariationID = try propertiesContainer.decode(String.self, forKey: .templateVariationID)
@@ -177,8 +178,10 @@ extension VatomModel: Decodable {
         visibility          = try propertiesContainer.decode(Visibility.self, forKey: .visibility)
 
         // potentially absent from container
-        tags                = try propertiesContainer.decodeIfPresent([String].self, forKey: .tags) ?? []
-        childPolicy         = try propertiesContainer.decodeIfPresent([VatomChildPolicy].self, forKey: .childPolicy) ?? []
+        tags                = try propertiesContainer.decodeIfPresent([String].self,
+                                                                      forKey: .tags) ?? []
+        childPolicy         = try propertiesContainer.decodeIfPresent([VatomChildPolicy].self,
+                                                                      forKey: .childPolicy) ?? []
 
     }
 

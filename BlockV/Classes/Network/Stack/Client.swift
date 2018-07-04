@@ -18,7 +18,8 @@ protocol ClientProtocol {
     func request(_ endpoint: Endpoint<Void>, completion: @escaping (Data?, BVError?) -> Void )
 
     /// Request that returns native object (must conform to decodable).
-    func request<Response>(_ endpoint: Endpoint<Response>, completion: @escaping (Response?, BVError?) -> Void ) where Response: Decodable
+    func request<Response>(_ endpoint: Endpoint<Response>,
+                           completion: @escaping (Response?, BVError?) -> Void ) where Response: Decodable
 
 }
 
@@ -53,9 +54,9 @@ public final class Client: ClientProtocol {
     private let baseURL: URL
     /// Response handlers are executed on this queue.
     private let queue = DispatchQueue(label: "com.blockv.api_request_queue", attributes: .concurrent)
-    //TODO: Possibly add a completion queue, if speicifed, completion handlers would dispatched to it before being called,
-    // or remain on the response queue if set to `nil`. This will remove the burden on the caller to change queue
-    // (typically back to the main queue).
+    //TODO: Possibly add a completion queue, if speicifed, completion handlers would dispatched to it before being
+    // called, or remain on the response queue if set to `nil`. This will remove the burden on the caller to change
+    // queue (typically back to the main queue).
 
     class Configuration {
         let baseURLString: String
@@ -184,7 +185,8 @@ public final class Client: ClientProtocol {
 
                 // extract auth tokens if available
                 if let model = val as? BaseModel<AuthModel> {
-                    self.oauthHandler.set(accessToken: model.payload.accessToken.token, refreshToken: model.payload.refreshToken.token)
+                    self.oauthHandler.set(accessToken: model.payload.accessToken.token,
+                                          refreshToken: model.payload.refreshToken.token)
                 }
 
                 // ensure the payload was parsed correctly
@@ -227,7 +229,8 @@ public final class Client: ClientProtocol {
 
     /// Performs an uplaod for a given endpoint.
     ///
-    /// Reponse parsing works differently for upload. The `responseJSONDecodable` method transfroms the reponse with the completion closure.
+    /// Reponse parsing works differently for upload. The `responseJSONDecodable` method transfroms the reponse with
+    /// the completion closure.
     ///
     /// - Parameters:
     ///   - endpoint: Upload endpoint
@@ -258,7 +261,8 @@ public final class Client: ClientProtocol {
                 upload.validate()
 
                 // parse out a native model (within the base model)
-                upload.responseJSONDecodable(queue: self.queue, decoder: self.blockvJSONDecoder) { //TODO: If is fine to capture self here?
+                //TODO: If is fine to capture self here?
+                upload.responseJSONDecodable(queue: self.queue, decoder: self.blockvJSONDecoder) {
                     (dataResponse: DataResponse<Response>) in
 
                     ///
@@ -313,7 +317,7 @@ extension DataRequest {
         decoder: JSONDecoder = JSONDecoder(),
         completionHandler: @escaping (DataResponse<T>) -> Void)
         -> Self
-    {
+{
 
         // construct the response serializer
         let responseSerializser = DataResponseSerializer<T> { request, response, data, error in
@@ -327,19 +331,23 @@ extension DataRequest {
                 // 2. The error from our server needs to be unwrapped and passed back.
 
                 guard let validData = data, validData.count > 0 else {
-                    return .failure(BVError.networkingError(error: AFError.responseSerializationFailed(reason: .inputDataNilOrZeroLength)))
+                    return .failure(BVError.networkingError(error:
+                        AFError.responseSerializationFailed(reason: .inputDataNilOrZeroLength)))
                 }
 
                 do {
                     // decode the payload into an blockv error object
                     let errorModel = try decoder.decode(ErrorModel.self, from: validData)
-                    let error = BVError.platformError(reason: BVError.PlatformErrorReason(code: errorModel.code, message: errorModel.message))
+                    let error = BVError.platformError(reason:
+                        BVError.PlatformErrorReason(code: errorModel.code, message: errorModel.message))
                     return .failure(error) //TODO: Alamofire error is lost in this case.
 
                 } catch let DecodingError.keyNotFound(key, context) {
-                    return .failure(BVError.modelDecoding(reason: "Key not found: \(key) in context: \(context.debugDescription)"))
+                    return .failure(BVError.modelDecoding(reason:
+                        "Key not found: \(key) in context: \(context.debugDescription)"))
                 } catch let DecodingError.valueNotFound(value, context) {
-                    return .failure(BVError.modelDecoding(reason: "Value not found: \(value) in context: \(context.debugDescription)"))
+                    return .failure(BVError.modelDecoding(reason:
+                        "Value not found: \(value) in context: \(context.debugDescription)"))
                 } catch {
                     return .failure(BVError.modelDecoding(reason: error.localizedDescription))
                 }
@@ -353,7 +361,8 @@ extension DataRequest {
                 //                        emptyDataStatusCodes.contains(response.statusCode) {
                 //                        return NSNull()
                 //                    }
-                return .failure(BVError.networkingError(error: AFError.responseSerializationFailed(reason: .inputDataNilOrZeroLength)))
+                return .failure(BVError.networkingError(error:
+                    AFError.responseSerializationFailed(reason: .inputDataNilOrZeroLength)))
             }
 
             // decode the payload into a blockv model object
@@ -363,7 +372,8 @@ extension DataRequest {
             } catch let DecodingError.keyNotFound(key, context) {
                 return .failure(BVError.modelDecoding(reason: "Key not found: \(key) in context: \(context)"))
             } catch let DecodingError.valueNotFound(value, context) {
-                return .failure(BVError.modelDecoding(reason: "Value not found: \(value) in context: \(context.debugDescription)"))
+                return .failure(BVError.modelDecoding(reason:
+                    "Value not found: \(value) in context: \(context.debugDescription)"))
             } catch {
                 return .failure(BVError.modelDecoding(reason: error.localizedDescription))
             }
@@ -389,7 +399,8 @@ extension DataRequest {
 //            //TODO: This may not be the best solution with threading and all?
 //            // handle oauth tokens
 //            if let model = val.payload.self as? OAuthTokenModel {
-//                self.oauthHandler.setTokens(accessToken: model.accessToken.token, refreshToken: model.refreshToken.token)
+//                self.oauthHandler.setTokens(accessToken: model.accessToken.token,
+//                      refreshToken: model.refreshToken.token)
 //            }
 //
 //            //TODO: Add some thing like this to pull back to a completion thread?

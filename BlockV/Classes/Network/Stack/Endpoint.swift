@@ -30,10 +30,11 @@ public final class Endpoint<Response> {
     let parameters: Parameters?
     let encoding: ParameterEncoding
 
+    //TODO: Does it make sense for json to be the default encoding?
     init(method: HTTPMethod = .get,
          path: Path,
          parameters: Parameters? = nil,
-         encoding: ParameterEncoding = JSONEncoding.default) { //TODO: Does it make sense for json to be the default encoding?
+         encoding: ParameterEncoding = JSONEncoding.default) {
 
         self.method = method
         self.path = path

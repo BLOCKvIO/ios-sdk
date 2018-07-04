@@ -57,7 +57,8 @@ extension KeyedDecodingContainer {
         return array?.compactMap { $0.value } ?? []
     }
 
-    /// Returns an array containd those elemets the where able to be decoded. Return an empty array if the value is `null`.
+    /// Returns an array containd those elemets the where able to be decoded. Return an empty array if the value is
+    /// `null`.
     func decodeSafelyIfPresentArray<T: Decodable>(of type: T.Type, forKey key: KeyedDecodingContainer.Key) -> [T] {
         let array = decodeSafelyIfPresent([Safe<T>].self, forKey: key) ?? []
         return array.compactMap { $0.value }

@@ -82,8 +82,12 @@ extension ActionModel {
     private static func splitCompoundName(_ compoundName: String) throws -> (String, String) {
 
         // find the marker
-        guard let markerRange = compoundName.range(of: "::action::", options: .caseInsensitive, range: nil, locale: nil) else {
-            throw  BVError.modelDecoding(reason: "Unable to split compound name into template and action names. Compound: \(compoundName)")
+        guard let markerRange = compoundName.range(of: "::action::",
+                                                   options: .caseInsensitive,
+                                                   range: nil,
+                                                   locale: nil) else {
+            throw  BVError.modelDecoding(reason:
+                "Unable to split compound name into template and action names. Compound: \(compoundName)")
         }
 
         // extract template id

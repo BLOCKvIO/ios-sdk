@@ -242,7 +242,8 @@ extension WebSocketManager: WebSocketDelegate {
         self.onDisconnected.fire((nil))
 
         //TODO: The Web socket should reconnect here:
-        // The app may fire this message when entering the foreground (after the Web socket was disconnected after entering the background).
+        // The app may fire this message when entering the foreground
+        // (after the Web socket was disconnected after entering the background).
 
     }
 

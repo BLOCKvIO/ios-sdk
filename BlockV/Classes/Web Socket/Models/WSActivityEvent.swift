@@ -28,7 +28,7 @@ import Foundation
       {
         "name": "ActivatedImage",
         "value": {
-          "value": "https://cdndev.blockv.net/vatomic.prototyping/vatomic.prototyping::v1::vAtom::3D-Object/redsneaker_card.jpg",
+          "value": "https://cdndev.blockv.net/vatomic.prototyping/redsneaker_card.jpg",
           "resourceValueType": "ResourceValueType::URI"
         },
         "resourceType": "ResourceTypes::Image::JPEG"

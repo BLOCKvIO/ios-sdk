@@ -87,7 +87,8 @@ public final class BLOCKv {
     public static func configure(appID: String) {
         self.appID = appID
 
-        // NOTE: Since `configure` is called only once in the app's lifecycle. We do not need to worry about multiple registrations.
+        // NOTE: Since `configure` is called only once in the app's lifecycle. We do not
+        // need to worry about multiple registrations.
         NotificationCenter.default.addObserver(BLOCKv.self,
                                                selector: #selector(handleUserAuthorisationRequired),
                                                name: Notification.Name.BVInternal.UserAuthorizationRequried,
@@ -105,7 +106,11 @@ public final class BLOCKv {
     /// Computes the configuration object needed to initialise clients and sockets.
     fileprivate static var clientConfiguration: Client.Configuration {
         // ensure host app has set an app id
-        precondition(BLOCKv.appID != nil, "Please call 'BLOCKv.configure(appID:)' with your issued app ID before making network requests.")
+        let warning = """
+            Please call 'BLOCKv.configure(appID:)' with your issued app ID before making network
+            requests.
+            """
+        precondition(BLOCKv.appID != nil, warning)
 
         if environment == nil {
             self.environment = .production // default to production
@@ -204,7 +209,7 @@ public final class BLOCKv {
         return !refreshJWT.expired
     }
 
-    @available(*, deprecated, message: "This is an unsupported feature of the SDK and may be removed in a future release.")
+    @available(*, deprecated, message: "Unsupported feature of the SDK and may be removed in the future.")
     /// Retrieves a refreshed access token.
     ///
     /// - Important:

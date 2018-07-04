@@ -112,10 +112,16 @@ public class DiscoverQueryBuilder {
     ///   - filterOperator: The operator to apply between the `field` and `value` items.
     ///   - value: Value for lookup.
     ///   - combineOperator: Controls the boolean operator applied between this element and the other filter elements.
-    public func addDefinedFilter(forField field: FilterElement.Field, filterOperator: FilterElement.FilterOperator, value: String, combineOperator: FilterElement.CombineOperator) {
+    public func addDefinedFilter(forField field: FilterElement.Field,
+                                 filterOperator: FilterElement.FilterOperator,
+                                 value: String,
+                                 combineOperator: FilterElement.CombineOperator) {
 
         // create element
-        let filter = FilterElement(field: field, filterOperator: filterOperator, value: value, combineOperator: combineOperator)
+        let filter = FilterElement(field: field,
+                                   filterOperator: filterOperator,
+                                   value: value,
+                                   combineOperator: combineOperator)
         self.filters.append(filter)
 
     }
@@ -129,10 +135,16 @@ public class DiscoverQueryBuilder {
     ///   - filterOperator: The operator to apply between the `field` and `value` items.
     ///   - value: Value associated with the `field`.
     ///   - combineOperator: Controls the boolean operator applied between this element and the other filter elements.
-    public func addCustomFilter(forField field: String, filterOperator: String, value: String, combineOperator: String) {
+    public func addCustomFilter(forField field: String,
+                                filterOperator: String,
+                                value: String,
+                                combineOperator: String) {
 
         // create element
-        let filter = FilterElement(field: field, filterOperator: filterOperator, value: value, combineOperator: combineOperator)
+        let filter = FilterElement(field: field,
+                                   filterOperator: filterOperator,
+                                   value: value,
+                                   combineOperator: combineOperator)
         self.filters.append(filter)
 
     }

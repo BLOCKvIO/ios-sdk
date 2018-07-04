@@ -21,7 +21,7 @@ struct AssetProviderModel: Codable, Equatable {
 
     /// The descriptor contains a dictionary whose keys correspond to resource url query keys
     /// and whose values correspond to resource url query params.
-    let descriptor: [String : String]
+    let descriptor: [String: String]
 
     /// Returns an array of `URLQueryItem` respresenting the descriptor.
     var queryItems: [URLQueryItem] {

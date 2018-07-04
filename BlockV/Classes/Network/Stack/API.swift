@@ -47,7 +47,7 @@ extension API {
             precondition(!tokens.isEmpty, "One or more tokens must be supplied for this endpoint.")
 
             // dictionary of user information
-            var params = [String : Any]()
+            var params = [String: Any]()
             if let userInfo = userInfo {
                 params = userInfo.toDictionary()
             }
@@ -205,8 +205,8 @@ extension API {
             return Endpoint(method: .post,
                             path: currentUserPath + "/message",
                             parameters: [
-                                "message" : message,
-                                "id" : userId])
+                                "message": message,
+                                "id": userId])
         }
 
         // MARK: Redemption
@@ -280,7 +280,7 @@ extension API {
         ///
         /// - Parameter payload: Raw request payload.
         /// - Returns: Endpoint generic over `PackModel`.
-        static func discover(_ payload: [String : Any]) -> Endpoint<BaseModel<PackModel>> {
+        static func discover(_ payload: [String: Any]) -> Endpoint<BaseModel<PackModel>> {
 
             return Endpoint(method: .post,
                             path: "/v1/vatom/discover",
@@ -305,7 +305,7 @@ extension API {
                                 filter: String) -> Endpoint<BaseModel<PackModel>> {
 
             // create the payload
-            let payload: [String : Any] =
+            let payload: [String: Any] =
                 [
                     "bottom_left":
                         [
@@ -350,7 +350,7 @@ extension API {
             assert(1...12 ~= precision, "You must specify a value in the open range [1...12].")
 
             // create the payload
-            let payload: [String : Any] =
+            let payload: [String: Any] =
                 [
                     "bottom_left":
                         [
@@ -392,7 +392,7 @@ extension API {
         ///   - name: Action name.
         ///   - payload: Raw payload for the action.
         /// - Returns: Returns endpoint generic over Void, i.e. caller will receive raw data.
-        static func custom(name: String, payload: [String : Any]) -> Endpoint<Void> {
+        static func custom(name: String, payload: [String: Any]) -> Endpoint<Void> {
             return Endpoint(method: .post,
                             path: actionPath + "/\(name)",
                 parameters: payload)
@@ -434,9 +434,9 @@ extension API {
         /// - Returns: Endpoint for fetching the thread for the current user.
         static func getThreads(cursor: String, count: Int) -> Endpoint<BaseModel<ThreadListModel>> {
 
-            let payload: [String : Any] = [
-                "cursor" : cursor,
-                "count" : count
+            let payload: [String: Any] = [
+                "cursor": cursor,
+                "count": count
             ]
 
             return Endpoint(method: .post,
@@ -454,10 +454,10 @@ extension API {
         /// - Returns: Endpoint for fetching the messages for a specific thread invoving the current user.
         static func getMessages(forThreadId threadId: String, cursor: String, count: Int) -> Endpoint<BaseModel<MessageListModel>> {
 
-            let payload: [String : Any] = [
-                "name" : threadId,
-                "cursor" : cursor,
-                "count" : count
+            let payload: [String: Any] = [
+                "name": threadId,
+                "cursor": cursor,
+                "count": count
             ]
 
             return Endpoint(method: .post,

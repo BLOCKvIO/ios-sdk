@@ -52,7 +52,7 @@ extension VatomModel {
     public func drop(latitude: Double, longitude: Double,
                      completion: @escaping (Data?, BVError?) -> Void) {
 
-        let body: [String : Any] = [
+        let body: [String: Any] = [
             "this.id": self.id,
             "geo.pos": [
                 "lat": latitude,

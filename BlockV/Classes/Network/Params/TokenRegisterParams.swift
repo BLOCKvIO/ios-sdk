@@ -56,7 +56,7 @@ public struct UserInfo: Encodable {
 extension UserInfo: DictionaryCodable {
 
     /// Returns a dictionary of all properties (with defaults for `nil` members).
-    public func toDictionary() -> [String : Any] {
+    public func toDictionary() -> [String: Any] {
         return [
             "first_name": firstName ?? "",
             "last_name": lastName ?? "",
@@ -70,8 +70,8 @@ extension UserInfo: DictionaryCodable {
     /// Reuturns a dictionary of all non-nil members (empty strings are permitted).
     ///
     /// Useful for PATCH requests.
-    public func toSafeDictionary() -> [String : Any] {
-        var params: [String : Any] = [:]
+    public func toSafeDictionary() -> [String: Any] {
+        var params: [String: Any] = [:]
 
         if let firstName = firstName {
             params["first_name"] = firstName
@@ -176,11 +176,11 @@ extension OAuthTokenRegisterParams: Codable {
 }
 
 extension OAuthTokenRegisterParams: DictionaryCodable {
-    public func toDictionary() -> [String : Any] {
+    public func toDictionary() -> [String: Any] {
         return [
-            "token" : userId,
-            "token_type" : provider,
-            "auth_data" : [
+            "token": userId,
+            "token_type": provider,
+            "auth_data": [
                 "auth_token": oauthToken
             ]
         ]

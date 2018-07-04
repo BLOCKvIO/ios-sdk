@@ -821,7 +821,7 @@ extension BLOCKv {
     ///   - completion: The completion handler to call when the action is completed.
     ///                 This handler is executed on the main queue.
     public static func performAction(name: String,
-                                     payload: [String : Any],
+                                     payload: [String: Any],
                                      completion: @escaping (Data?, BVError?) -> Void) {
 
         let endpoint = API.VatomAction.custom(name: name, payload: payload)

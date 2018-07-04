@@ -67,7 +67,7 @@ public class DiscoverQueryBuilder {
     // - Private
 
     /// A scope is fast due to db indexing.
-    private var scope: [String : String] = [:]
+    private var scope: [String: String] = [:]
 
     /// Filter elements are slower in-memory filters.
     private var filters: [FilterElement] = []
@@ -75,7 +75,7 @@ public class DiscoverQueryBuilder {
     /// Alters the structure of the response.
     ///
     /// Defaults to returning the full payload.
-    private var resultStructure: [String : Any] = ["type": ResultType.payload.rawValue]
+    private var resultStructure: [String: Any] = ["type": ResultType.payload.rawValue]
 
     // MARK: - Init
 
@@ -85,7 +85,7 @@ public class DiscoverQueryBuilder {
 
     /// Set the scope to the owner.
     public func setScopeToOwner() {
-        self.scope = ["key" : ScopeKey.owner.rawValue, "value": "$currentuser"]
+        self.scope = ["key": ScopeKey.owner.rawValue, "value": "$currentuser"]
     }
 
     /// Sets the scope of the search query.
@@ -97,7 +97,7 @@ public class DiscoverQueryBuilder {
     ///   - scope: Search field.
     ///   - value: Value for lookup.
     public func setScope(scope: ScopeKey, value: String) {
-        self.scope = ["key" : scope.rawValue, "value": value]
+        self.scope = ["key": scope.rawValue, "value": value]
     }
 
     /// Adds a defined filter element to the query.
@@ -152,9 +152,9 @@ public class DiscoverQueryBuilder {
 
 extension DiscoverQueryBuilder: DictionaryCodable {
 
-    public func toDictionary() -> [String : Any] {
+    public func toDictionary() -> [String: Any] {
 
-        var payload: [String : Any] = [:]
+        var payload: [String: Any] = [:]
 
         payload["scope"] = self.scope
         let filterElems = self.filters.map { $0.toDictionary() } // map the filters to dictionaries
@@ -235,7 +235,7 @@ extension DiscoverQueryBuilder {
 
         // MARK: DictionaryCodable
 
-        public func toDictionary() -> [String : Any] {
+        public func toDictionary() -> [String: Any] {
             return [
                 "field": field,
                 "filter_op": filterOperator,

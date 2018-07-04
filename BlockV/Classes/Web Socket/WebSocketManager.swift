@@ -70,7 +70,7 @@ public class WebSocketManager {
     /// Fires when the Web socket receives **any** message.
     ///
     /// The Signal is generic over a dictionary [String : Any] which contains the raw message.
-    public let onMessageReceivedRaw = Signal<[String : Any]>()
+    public let onMessageReceivedRaw = Signal<[String: Any]>()
 
     /// Fires when the Web socket receives an **inventory** update event.
     public let onInventoryUpdate = Signal<WSInventoryEvent>()
@@ -232,11 +232,11 @@ extension WebSocketManager: WebSocketDelegate {
     public func websocketDidDisconnect(socket: WebSocketClient, error: Error?) {
 
         if let e = error as? WSError {
-            printBV(info:"Web socket - Disconnected: \(e.message)")
+            printBV(info: "Web socket - Disconnected: \(e.message)")
         } else if let e = error {
-            printBV(info:"Web socket - Disconnected: \(e.localizedDescription)")
+            printBV(info: "Web socket - Disconnected: \(e.localizedDescription)")
         } else {
-            printBV(info:"Web socket - Disconnected")
+            printBV(info: "Web socket - Disconnected")
         }
 
         // Fire an error informing the observers that the Web socket has disconnected.
@@ -272,7 +272,7 @@ extension WebSocketManager: WebSocketDelegate {
         // parse data to dictionary
         guard
             let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []),
-            let jsonDictionary = jsonObject as? [String : Any] else {
+            let jsonDictionary = jsonObject as? [String: Any] else {
                 printBV(error: "Web socket - Unable to parse JSON data.")
                 return
         }
@@ -289,7 +289,7 @@ extension WebSocketManager: WebSocketDelegate {
 
         // find message type
         guard let typeString = jsonDictionary["msg_type"] as? String else {
-            printBV(error:"Web socket - Cannot parse 'msg_type'.")
+            printBV(error: "Web socket - Cannot parse 'msg_type'.")
             return
         }
 
@@ -330,7 +330,7 @@ extension WebSocketManager: WebSocketDelegate {
 
             }
         default:
-            printBV(error:"Unrecognised message type: \(typeString).")
+            printBV(error: "Unrecognised message type: \(typeString).")
             return
         }
 

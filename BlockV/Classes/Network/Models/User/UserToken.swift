@@ -47,10 +47,10 @@ public struct UserToken: Codable, Equatable {
 
 extension UserToken: DictionaryCodable {
 
-    public func toDictionary() -> [String : Any] {
+    public func toDictionary() -> [String: Any] {
         return [
-            "token" : value,
-            "token_type" : type.rawValue
+            "token": value,
+            "token_type": type.rawValue
         ]
     }
 

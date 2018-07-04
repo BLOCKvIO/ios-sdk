@@ -47,10 +47,10 @@ public struct GuestIdLoginParams: LoginParams {
 
 extension GuestIdLoginParams: DictionaryCodable {
 
-    public func toDictionary() -> [String : Any] {
+    public func toDictionary() -> [String: Any] {
         return [
-            "token" : id,
-            "token_type" : "guest_id"
+            "token": id,
+            "token_type": "guest_id"
         ]
     }
 
@@ -104,11 +104,11 @@ extension UserTokenLoginParams: Codable {
 
 extension UserTokenLoginParams: DictionaryCodable {
 
-    public func toDictionary() -> [String : Any] {
+    public func toDictionary() -> [String: Any] {
       return  [
-            "token" : userToken.value,
-            "token_type" : userToken.type.rawValue,
-            "auth_data" : [
+            "token": userToken.value,
+            "token_type": userToken.type.rawValue,
+            "auth_data": [
                 "password": password
             ]
         ]
@@ -162,7 +162,7 @@ extension OAuthTokenLoginParams: Codable {
 
 extension OAuthTokenLoginParams: DictionaryCodable {
 
-    public func toDictionary() -> [String : Any] {
+    public func toDictionary() -> [String: Any] {
         return [
             "token_type": provider,
             "auth_data": [

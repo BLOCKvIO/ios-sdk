@@ -101,7 +101,7 @@ extension JSON {
         return nil
     }
 
-    public var objectValue: [String : JSON]? {
+    public var objectValue: [String: JSON]? {
         if case .object(let value) = self {
             return value
         }

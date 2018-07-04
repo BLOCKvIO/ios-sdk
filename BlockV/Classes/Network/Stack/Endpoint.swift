@@ -14,7 +14,7 @@ import Alamofire
 
 // MARK: Defines
 
-typealias Parameters = [String : Any]
+typealias Parameters = [String: Any]
 typealias Path = String
 
 // MARK: Endpoint

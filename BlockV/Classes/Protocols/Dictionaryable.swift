@@ -31,4 +31,3 @@ public protocol DictionaryDecodable {
 public enum DictionaryDecodingError: Error {
     case failedToDecode
 }
-

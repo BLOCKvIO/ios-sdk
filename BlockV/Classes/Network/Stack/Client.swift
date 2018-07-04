@@ -243,6 +243,7 @@ public final class Client: ClientProtocol {
         let serverURL = self.baseURL.appendingPathComponent(endpoint.path)
 
         self.sessionManager.upload(multipartFormData: { formData in
+
             // build multipart form
             formData.append(endpoint.bodyPart.data,
                             withName: endpoint.bodyPart.name,
@@ -430,4 +431,3 @@ extension DataRequest {
 //    }
 //
 //}
-

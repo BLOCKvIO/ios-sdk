@@ -67,9 +67,9 @@ import Foundation
 
 /// Web socket response model - Inventory Event.
 public struct WSStateUpdateEvent: WSEvent, Equatable {
-    
+
     // MARK: - Properties
-    
+
     /// Unique identifier of this state update event.
     public let eventId: String
     /// Database operation.
@@ -80,34 +80,34 @@ public struct WSStateUpdateEvent: WSEvent, Equatable {
     ///
     /// In other words, this member contains a *diff* of of the previous version of the vAtom.
     public let vatomProperties: [String : JSON]
-    
+
     // Client-side
 
     /// Timestamp of when the event was received (client-side).
     let timestamp: Date
-    
+
     // MARK: - Helpers
-    
+
 }
 
 /*
  Decodable does not play nice because of the 'flexible' payload of the state update...
  */
 extension WSStateUpdateEvent: Decodable {
-    
+
     enum CodingKeys: String, CodingKey {
         case payload = "payload"
     }
-    
+
     enum PayloadCodingKeys: String, CodingKey {
         case eventId         = "event_id"
         case operation       = "op"
         case vatomId         = "id"
         case vatomProperties = "new_object"
     }
-    
+
     public init(from decoder: Decoder) throws {
-        
+
         let items = try decoder.container(keyedBy: CodingKeys.self)
         // de-nest payload to top level
         let payloadContainer = try items.nestedContainer(keyedBy: PayloadCodingKeys.self, forKey: .payload)
@@ -115,10 +115,10 @@ extension WSStateUpdateEvent: Decodable {
         operation       = try payloadContainer.decode(String.self, forKey: .operation)
         vatomId         = try payloadContainer.decode(String.self, forKey: .vatomId)
         vatomProperties = try payloadContainer.decode([String : JSON].self, forKey: .vatomProperties)
-        
+
         // stamp this event with the current time
         timestamp = Date()
-        
+
     }
-    
+
 }

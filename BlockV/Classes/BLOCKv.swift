@@ -21,16 +21,16 @@ import JWTDecode
 
 /// Primary interface into the the BLOCKv SDK.
 public final class BLOCKv {
-    
+
     // MARK: - Enums
-    
+
     /// Models the BLOCKv platform environments.
     public enum BVEnvironment {
         /// Stable production environment.
         case production
         /// Unstable development environement (DO NOT USE).
         case development
-        
+
         /// BLOCKv server base url
         var apiServerURLString: String {
             switch self {
@@ -38,7 +38,7 @@ public final class BLOCKv {
             case .development: return "https://apidev.blockv.net"
             }
         }
-        
+
         /// BLOCKv Web socket server base url
         var webSocketURLString: String {
             switch self {
@@ -46,11 +46,11 @@ public final class BLOCKv {
             case .development: return "wss://ws.blockv.net/ws"
             }
         }
-        
+
     }
-    
+
     // MARK: - Properties
-    
+
     /// The App ID to be passed to the BLOCKv platform.
     ///
     /// Must be set once by the host app.
@@ -63,9 +63,9 @@ public final class BLOCKv {
             }
         }
     }
-    
+
     //TODO: Detect an environment switch, e.g. dev to prod, reset the client.
-    
+
     /// The BLOCKv platform environment to use.
     ///
     /// Must be set by the host app.
@@ -75,9 +75,9 @@ public final class BLOCKv {
         }
         didSet { printBV(info: "Environment updated - \(environment!)") }
     }
-    
+
     // MARK: - Configuration
-    
+
     /// Configures the SDK with your issued app id.
     ///
     /// Note, as a viewer, `configure` should be the first method call you make on the BLOCKv SDK.
@@ -86,43 +86,43 @@ public final class BLOCKv {
     /// This method must be called ONLY once.
     public static func configure(appID: String) {
         self.appID = appID
-        
+
         // NOTE: Since `configure` is called only once in the app's lifecycle. We do not need to worry about multiple registrations.
         NotificationCenter.default.addObserver(BLOCKv.self,
                                                selector: #selector(handleUserAuthorisationRequired),
                                                name: Notification.Name.BVInternal.UserAuthorizationRequried,
                                                object: nil)
     }
-    
+
     // MARK: - Client
-    
+
     // FIXME: Should this be nil on logout?
     // FIXME: This MUST become a singleton (since only a single instance should ever exist).
     private static let oauthHandler = OAuth2Handler(appID: BLOCKv.appID!,
                                      baseURLString: BLOCKv.environment!.apiServerURLString,
                                      refreshToken: CredentialStore.refreshToken?.token ?? "")
-    
-    
+
+
     /// Computes the configuration object needed to initialise clients and sockets.
     fileprivate static var clientConfiguration: Client.Configuration {
         get {
             // ensure host app has set an app id
             precondition(BLOCKv.appID != nil, "Please call 'BLOCKv.configure(appID:)' with your issued app ID before making network requests.")
-            
+
             if environment == nil {
                 self.environment = .production // default to production
             }
-            
+
             // return the configuration (inexpensive object)
             return Client.Configuration(baseURLString: BLOCKv.environment!.apiServerURLString,
                                         appID: BLOCKv.appID!)
-            
+
         }
     }
-    
+
     /// Backing networking client instance.
     fileprivate static var _client: Client?
-    
+
     /// BLOCKv networking client.
     ///
     /// The networking client must support a platform environment change after app launch.
@@ -146,9 +146,9 @@ public final class BLOCKv {
             }
         }
     }
-    
+
     // MARK: - Web socket
-    
+
     /*
      Client and Socket are mutually exclusive. That is, one can be created with out the other.
      Both relay on the ability to retrieve an access token. This is provided by a shared instance
@@ -160,7 +160,7 @@ public final class BLOCKv {
      
      The socket must handle the case where the user is unauthenticated. Particularly around logout.
      */
-    
+
     /// Backing Web socket instance.
     ///
     /// Must be torn down when the user logs out.
@@ -168,7 +168,7 @@ public final class BLOCKv {
     /// The Web socket is independent of the `client`. However, it is bound to
     /// the user being authenticaated.
     fileprivate static var _socket: WebSocketManager?
-    
+
     //TODO: What if this is accessed before the client is accessed?
     //TODO: What if the viewer suscribes to an event before auth (login/reg) has occured?
     public static var socket: WebSocketManager {
@@ -185,7 +185,7 @@ public final class BLOCKv {
     }
 
     // MARK: - Lifecycle
-    
+
     /// Call to reset the SDK.
     internal static func reset() {
         // remove all credentials
@@ -195,12 +195,12 @@ public final class BLOCKv {
         // disconnect and nil out socekt
         self._socket?.disconnect()
         self._socket = nil
-        
+
         printBV(info: "Reset")
     }
-    
+
     // - Public Lifecycle
-        
+
     /// Boolean indicating whether a user is logged in. `true` if logged in. `false` otherwise.
     public static var isLoggedIn: Bool {
         // ensure a token is present
@@ -210,7 +210,7 @@ public final class BLOCKv {
         // ensure still valid
         return !refreshJWT.expired
     }
-    
+
     @available(*, deprecated, message: "This is an unsupported feature of the SDK and may be removed in a future release.")
     /// Retrieves a refreshed access token.
     ///
@@ -223,7 +223,7 @@ public final class BLOCKv {
     public static func getAccessToken(completion: @escaping (_ success: Bool, _ accessToken: String?) -> Void) {
         BLOCKv.client.getAccessToken(completion: completion)
     }
-    
+
     /// Called when the networking client detects the user is unathorized.
     ///
     /// This method perfroms a clean up operation before notifying the viewer that the SDK requires
@@ -233,9 +233,9 @@ public final class BLOCKv {
     /// multiple requests fail due to the refresh token being invalid.
     @objc
     private static func handleUserAuthorisationRequired() {
-        
+
         printBV(info: "Authorization - User is unauthorized.")
-        
+
         // only notify the viewer if the user is currently authorized
         if isLoggedIn {
             // perform interal clean up
@@ -243,12 +243,12 @@ public final class BLOCKv {
             // call the closure stored in `onLogout`
             onLogout?()
         }
-        
+
     }
-    
+
     /// Holds a closure to call on logout
     public static var onLogout: (() -> Void)?
-    
+
     /// Sets the BLOCKv platform environment.
     ///
     /// By setting the environment you are informing the SDK which BLOCKv
@@ -258,17 +258,17 @@ public final class BLOCKv {
     @available(*, deprecated, message: "BLOCKv now defaults to production. You may remove this call.")
     public static func setEnvironment(_ environment: BVEnvironment) {
         self.environment = environment
-        
+
         //FIXME: *Changing* the environment should nil out the client and access credentials.
-        
+
     }
-    
+
     // MARK: - Resources
-    
+
     enum URLEncodingError: Error {
         case missingAssetProviders
     }
-    
+
     /// Encodes the URL with the with the available asset providers.
     ///
     /// - note: Not all URLs require asset provider encoding.
@@ -280,7 +280,7 @@ public final class BLOCKv {
         let provider = assetProviders.first(where: { $0.isProviderForURL(url) })
         return provider?.encodedURL(url) ?? url
     }
-    
+
     /// Closure that encodes a given url using a set of asset providers.
     ///
     /// If none of the asset providers are able to perform encoding, the original URL is returned.
@@ -288,12 +288,12 @@ public final class BLOCKv {
         let provider = assetProviders.first(where: { $0.isProviderForURL(url) })
         return provider?.encodedURL(url) ?? url
     }
-    
+
     // MARK: - Init
-    
+
     /// BLOCKv follows the static pattern. Instance creation is not allowed.
     fileprivate init() {}
-    
+
 }
 
 

@@ -8,9 +8,9 @@
 import Foundation
 
 class BVConfiguration {
-    
+
     var appID: String?
-    
+
     /// Models the BLOCKv platform environments.
     ///
     /// Options:
@@ -21,7 +21,7 @@ class BVConfiguration {
         case production
         /// Unstable development environement (DO NOT USE).
         case development
-        
+
         /// BLOCKv server base url
         var apiServerURLString: String {
             switch self {
@@ -29,7 +29,7 @@ class BVConfiguration {
             case .development: return "https://apidev.blockv.net"
             }
         }
-        
+
         /// BLOCKv Web socket server base url
         var webSocketURLString: String {
             switch self {
@@ -37,7 +37,7 @@ class BVConfiguration {
             case .development: return "wss://ws.blockv.net/ws"
             }
         }
-        
+
     }
-    
+
 }

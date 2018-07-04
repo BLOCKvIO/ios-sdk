@@ -13,7 +13,7 @@ import Foundation
 
 /// Represents a message.
 public struct MessageModel: Equatable {
-    
+
     /// Unique identifier of the message.
     public let id: Double
     /// Message content
@@ -24,16 +24,16 @@ public struct MessageModel: Equatable {
     public let actionName: String
     /// Timestamp of when the message was created.
     public let whenCreated: Date
-    
+
     // - Users
-    
+
     /// Maps to "user_id"
     public let triggerUserId: String
     /// Maps to "triggered_by"
     public let targetUserId: String
-    
+
     // - Auxillary
-    
+
     /// Array of associated vAtom identifiers.
     public let vatomIds: [String]
     /// Array of templated variation identifiers (for each associated vAtom).
@@ -42,7 +42,7 @@ public struct MessageModel: Equatable {
     public let resources: [VatomResourceModel]
     ///
     public let geoPosition: [Double]? //FIXME: Convert to CLLocationCoordinate2D?
-    
+
     enum CodingKeys: String, CodingKey {
         case id                   = "msg_id"
         case targetUserId         = "user_id"
@@ -55,7 +55,7 @@ public struct MessageModel: Equatable {
         case resources            = "generic"
         case geoPosition          = "geo_pos"
     }
-    
+
 }
 
 extension MessageModel: Codable {
@@ -69,7 +69,7 @@ extension MessageModel: Codable {
         actionName           = try container.decode(String.self, forKey: .actionName)
         whenCreated          = try container.decode(Date.self, forKey: .whenCreated)
         triggerUserId        = try container.decode(String.self, forKey: .triggerUserId)
-        
+
         // potentially `null`
         geoPosition          = try container.decodeIfPresent([Double].self, forKey: .geoPosition)
         templateVariationIds = try container.decodeIfPresent([String].self, forKey: .templateVariationIds) ?? []
@@ -77,9 +77,9 @@ extension MessageModel: Codable {
         resources            = container.decodeSafelyIfPresentArray(of: VatomResourceModel.self, forKey: .resources)
 
     }
-    
+
     public func encode(to encoder: Encoder) throws {
-        
+
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
         try container.encode(targetUserId, forKey: .targetUserId)
@@ -90,7 +90,7 @@ extension MessageModel: Codable {
         try container.encode(templateVariationIds, forKey: .templateVariationIds)
         try container.encode(vatomIds, forKey: .vatomIds)
         try container.encode(resources, forKey: .resources)
-        
+
         try container.encodeIfPresent(geoPosition, forKey: .geoPosition)
 
     }

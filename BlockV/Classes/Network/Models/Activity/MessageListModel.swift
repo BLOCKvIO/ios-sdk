@@ -13,22 +13,22 @@ import Foundation
 
 /// Represents a list of messages within a thread.
 public struct MessageListModel: Equatable {
-    
+
     /*
      The InnerModel abstracts the wierd nesting that the server returns.
      This may be achieved using a CodingKey instead.
      */
-    
+
     // Inner model
     struct InnerModel: Decodable {
         let message: MessageModel
 //        let whenModified: Date
-        
+
         enum CodingKeys: String, CodingKey {
             case message
             case whenModified = "when_modified"
         }
-        
+
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             self.message = try container.decode(MessageModel.self, forKey: .message)
@@ -36,23 +36,23 @@ public struct MessageListModel: Equatable {
 //            let _whenModified = try container.decode(Double.self, forKey: .whenModified)
 //            whenModified = Date(timeIntervalSince1970: _whenModified / 1000)
         }
-        
+
     }
-    
+
     /// Filters out all threads more recent than the cursor (useful for paging).
     public let cursor: String
     /// Array of messages for the specifed thread.
     public let messages: [MessageModel]
-    
+
     enum CodingKeys: String, CodingKey {
         case cursor
         case messages
     }
-    
+
 }
 
 extension MessageListModel: Decodable {
-    
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.cursor = try container.decode(String.self, forKey: .cursor)
@@ -62,5 +62,5 @@ extension MessageListModel: Decodable {
         self.messages = inner.map { $0.message }
         print(self.messages)
     }
-    
+
 }

@@ -21,12 +21,12 @@ protocol OAuthTokenModel {
 ///
 /// This model is valid for both login and register responses.
 public struct AuthModel: Decodable, Equatable, OAuthTokenModel {
-    
+
     let user: UserModel
     let assetProviders: [AssetProviderModel]
     let accessToken: BVToken
     let refreshToken: BVToken
-    
+
     enum CodingKeys: String, CodingKey {
         case user           = "user"
         case assetProviders = "asset_provider"

@@ -13,9 +13,9 @@ import Foundation
 
 /// This extension groups together all BLOCKv platform requests.
 extension BLOCKv {
-    
+
     // MARK: Register
-    
+
     /// Registers a user on the BLOCKv platform. Accepts a user token (phone or email).
     ///
     /// - Parameters:
@@ -32,7 +32,7 @@ extension BLOCKv {
         let registerToken = UserToken(value: token, type: type)
         self.register(tokens: [registerToken], userInfo: userInfo, completion: completion)
     }
-    
+
     /// Registers a user on the BLOCKv platform. Accepts an OAuth token.
     ///
     /// - Parameters:
@@ -46,7 +46,7 @@ extension BLOCKv {
                                 completion: @escaping (UserModel?, BVError?) -> Void) {
         self.register(tokens: [oauthToken], userInfo: userInfo, completion: completion)
     }
-    
+
     /// Registers a user on the BLOCKv platform.
     ///
     /// This call allows for multiple tokens (e.g. phone, email, or OAuth) to be associated
@@ -57,11 +57,11 @@ extension BLOCKv {
     public static func register(tokens: [RegisterTokenParams],
                                 userInfo: UserInfo? = nil,
                                 completion: @escaping (UserModel?, BVError?) -> Void) {
-        
+
         let endpoint = API.Session.register(tokens: tokens, userInfo: userInfo)
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             // extract model, ensure no error
             guard let authModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -69,22 +69,22 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // model is available
             DispatchQueue.main.async {
                 // persist credentials
                 CredentialStore.saveRefreshToken(authModel.refreshToken)
                 CredentialStore.saveAssetProviders(authModel.assetProviders)
-                
+
                 completion(authModel.user, nil)
             }
-            
+
         }
-        
+
     }
-    
+
     // MARK: Login
-    
+
     /// Logs a user into the BLOCKv platform. Accepts a user token (phone or email).
     ///
     /// - Parameters:
@@ -100,7 +100,7 @@ extension BLOCKv {
         let params = UserTokenLoginParams(value: token, type: type, password: password)
         self.login(tokenParams: params, completion: completion)
     }
-    
+
     /// Logs a user into the BLOCKv platform. Accepts an OAuth token.
     ///
     /// - Parameters:
@@ -114,7 +114,7 @@ extension BLOCKv {
         let params = OAuthTokenLoginParams(provider: provider, oauthToken: oauthToken)
         self.login(tokenParams: params, completion: completion)
     }
-    
+
     /// Logs a user into the BLOCKv platform. Accepts a guest ID.
     ///
     /// - Parameters:
@@ -126,15 +126,15 @@ extension BLOCKv {
         let params = GuestIdLoginParams(id: id)
         self.login(tokenParams: params, completion: completion)
     }
-    
+
     /// Login using token params
     fileprivate static func login(tokenParams: LoginTokenParams,
                                   completion: @escaping (UserModel?, BVError?) -> Void) {
-        
+
         let endpoint = API.Session.login(tokenParams: tokenParams)
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             // extract model, ensure no error
             guard let authModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -142,24 +142,24 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // model is available
             DispatchQueue.main.async {
-                
+
                 // persist credentials
                 CredentialStore.saveRefreshToken(authModel.refreshToken)
                 CredentialStore.saveAssetProviders(authModel.assetProviders)
-                
+
                 // completion
                 completion(authModel.user, nil)
             }
-            
+
         }
-        
+
     }
-    
+
     // MARK: - Logout
-    
+
     /// Log out the current user.
     ///
     /// The current user will no longer be authorized to perform user scoped requests on the
@@ -168,16 +168,16 @@ extension BLOCKv {
     /// - Parameter completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
     public static func logout(completion: @escaping (BVError?) -> Void) {
-        
+
         let endpoint = API.CurrentUser.logOut()
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             // reset
             DispatchQueue.main.async {
                 reset()
             }
-            
+
             // extract model, ensure no error
             guard let _ = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -185,28 +185,28 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // model is available
             DispatchQueue.main.async {
                 completion(nil)
             }
-            
+
         }
-        
+
     }
-    
+
     // MARK: - User
-    
+
     /// Fetches the current user's profile information from the BLOCKv platform.
     ///
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
     public static func getCurrentUser(completion: @escaping (UserModel?, BVError?) -> Void) {
-        
+
         let endpoint = API.CurrentUser.get()
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             // extract model, ensure no error
             guard let userModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -214,16 +214,16 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // model is available
             DispatchQueue.main.async {
                 completion(userModel, nil)
             }
-            
+
         }
-        
+
     }
-    
+
     /// Updates the current user's profile on the BLOCKv platform.
     ///
     /// - Parameters:
@@ -233,11 +233,11 @@ extension BLOCKv {
     ///                 This handler is executed on the main queue.
     public static func updateCurrentUser(_ userInfo: UserInfo,
                                          completion: @escaping (UserModel?, BVError?) -> Void) {
-        
+
         let endpoint = API.CurrentUser.update(userInfo: userInfo)
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             // extract model, ensure no error
             guard let userModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -245,16 +245,16 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // model is available
             DispatchQueue.main.async {
                 completion(userModel, nil)
             }
-            
+
         }
-        
+
     }
-    
+
     /// Uploads an avatar image to the BlockV platform.
     ///
     /// It is recommended that scalling and cropping be done before calling this method.
@@ -266,21 +266,21 @@ extension BLOCKv {
     public static func uploadAvatar(_ image: UIImage,
                                     progressCompletion: @escaping (_ percent: Float) -> Void,
                                     completion: @escaping (BVError?) -> Void) {
-        
+
         //TODO: Perhaps this method should require Data instead of UIImage?
-        
+
         // create image data
         guard let imageData = UIImagePNGRepresentation(image) else {
             let error = BVError.custom(reason: "\nBV SDK >>> Error: Conversion to png respresetation returned nil.")
             completion(error)
             return
         }
-        
+
         // build endpoint
         let endpoint = API.CurrentUser.uploadAvatar(imageData)
-        
+
         self.client.upload(endpoint, progressCompletion: progressCompletion) { (baseModel, error) in
-            
+
             // extract model, ensure no error
             guard let _ = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -288,18 +288,18 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // model is available
             DispatchQueue.main.async {
                 completion(nil)
             }
-            
+
         }
-        
+
     }
-    
+
     // MARK: - Token Verification
-    
+
     /// Verifies ownership of a token by submitting the verification code to the BLOCKv platform.
     ///
     /// - Parameters:
@@ -312,12 +312,12 @@ extension BLOCKv {
                                        type: UserTokenType,
                                        code: String,
                                        completion: @escaping (UserToken?, BVError?) -> Void) {
-        
+
         let userToken = UserToken(value: token, type: type)
         let endpoint = API.CurrentUser.verifyToken(userToken, code: code)
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             // extract model, ensure no error
             guard let userTokenModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -325,16 +325,16 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // model is available
             DispatchQueue.main.async {
                 completion(userTokenModel, nil)
             }
-            
+
         }
-        
+
     }
-    
+
     /// Resets the verification process. Sends a verification item to the user's token (phone or email).
     ///
     /// This verification item should be used to verifiy the user's ownership of the token (phone or email).
@@ -348,12 +348,12 @@ extension BLOCKv {
     public static func resetVerification(forUserToken token: String,
                                          type: UserTokenType,
                                          completion: @escaping (UserToken?, BVError?) -> Void) {
-        
+
         let userToken = UserToken(value: token, type: type)
         let endpoint = API.CurrentUser.resetTokenVerification(forToken: userToken)
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             // extract model, handle error
             guard let userTokenModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -361,16 +361,16 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // model is available
             DispatchQueue.main.async {
                 completion(userTokenModel, nil)
             }
-            
+
         }
-        
+
     }
-    
+
     /// Resets a user token. This will remove the user's password and trigger
     /// a One-Time-Pin (OTP) to be sent to the supplied user token.
     ///
@@ -384,12 +384,12 @@ extension BLOCKv {
     public static func resetToken(_ token: String,
                                   type: UserTokenType,
                                   completion: @escaping (UserToken?, BVError?) -> Void) {
-        
+
         let userToken = UserToken(value: token, type: type)
         let endpoint = API.CurrentUser.resetToken(userToken)
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             // extract model, ensure no error
             guard let userTokenModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -397,18 +397,18 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // model is available
             DispatchQueue.main.async {
                 completion(userTokenModel, nil)
             }
-            
+
         }
-        
+
     }
-    
+
     // MARK: Token Management
-    
+
     /// Adds a user token to the current user.
     ///
     /// - Parameters:
@@ -419,11 +419,11 @@ extension BLOCKv {
     public static func addCurrentUserToken(token: UserToken,
                                            isPrimary: Bool = false,
                                            completion: @escaping (FullTokenModel?, BVError?) -> Void) {
-        
+
         let endpoint = API.CurrentUser.addToken(token, isPrimary: isPrimary)
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             // extract model, handle error
             guard let fullToken = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -431,26 +431,26 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // model is available
             DispatchQueue.main.async {
                 completion(fullToken, nil)
             }
-            
+
         }
-        
+
     }
-    
+
     /// Fetches the current user's token description from the BLOCKv platform.
     ///
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
     public static func getCurrentUserTokens(completion: @escaping ([FullTokenModel]?, BVError?) -> Void) {
-        
+
         let endpoint = API.CurrentUser.getTokens()
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             // extract model, handle error
             guard let fullTokens = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -458,16 +458,16 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // model is available
             DispatchQueue.main.async {
                 completion(fullTokens, nil)
             }
-            
+
         }
-        
+
     }
-    
+
     /// Removes the token from the current user's token list on the BLOCKv platform.
     ///
     /// Note: Primary tokens may not be deleted.
@@ -478,27 +478,27 @@ extension BLOCKv {
     ///                 This handler is executed on the main queue.
     public static func deleteCurrentUserToken(_ tokenId: String,
                                               completion: @escaping (BVError?) -> Void) {
-        
+
         let endpoint = API.CurrentUser.deleteToken(id: tokenId)
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             guard let _ = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
                     completion(error)
                 }
                 return
             }
-            
+
             // call was successful
             DispatchQueue.main.async {
                 completion(nil)
             }
-            
+
         }
-        
+
     }
-    
+
     /// Updates the specified token to be the current user's default token on the BLOCKv platform.
     ///
     /// Backend description:
@@ -512,11 +512,11 @@ extension BLOCKv {
     ///                 This handler is executed on the main queue.
     public static func setCurrentUserDefaultToken(_ tokenId: String,
                                                   completion: @escaping (BVError?) -> Void) {
-        
+
         let endpoint = API.CurrentUser.setDefaultToken(id: tokenId)
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             //
             guard let _ = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -524,18 +524,18 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // call was succesful
             DispatchQueue.main.async {
                 completion(nil)
             }
-            
+
         }
-        
+
     }
-    
+
     // MARK: - Public User
-    
+
     /// Fetches the publicly available attributes of any user given their user id.
     ///
     /// Since users are given control over which attributes they make public, you should make
@@ -547,11 +547,11 @@ extension BLOCKv {
     ///                 This handler is executed on the main queue.
     public static func getPublicUser(withID userId: String,
                                      completion: @escaping (PublicUserModel?, BVError?) -> Void) {
-        
+
         let endpoint = API.PublicUser.get(id: userId)
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             // extract model, ensure no error
             guard let userModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -559,18 +559,18 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // model is available
             DispatchQueue.main.async {
                 completion(userModel, nil)
             }
-            
+
         }
-        
+
     }
-    
+
     // MARK: - Vatoms
-    
+
     /// Fetches the current user's inventory of vAtoms. The completion handler is passed in a
     /// `PackModel` which  includes the returned vAtoms as well as the configured Faces and Actions.
     ///
@@ -588,11 +588,11 @@ extension BLOCKv {
                                     page: Int = 0,
                                     limit: Int = 0,
                                     completion: @escaping (PackModel?, BVError?) -> Void) {
-        
+
         let endpoint = API.UserVatom.getInventory(parentID: parentID, page: page, limit: limit)
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             // extract model, ensure no error
             guard let packModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -600,16 +600,16 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // model is available
             DispatchQueue.main.async {
                 completion(packModel, nil)
             }
-            
+
         }
-        
+
     }
-    
+
     /// Fetches vAtoms by providing an array of vAtom IDs. The response includes the vAtoms as well
     /// as the configured Faces and Actions in a `PackModel`.
     ///
@@ -618,11 +618,11 @@ extension BLOCKv {
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
     public static func getVatoms(withIDs ids: [String], completion: @escaping (PackModel?, BVError?) -> Void) {
-        
+
         let endpoint = API.UserVatom.getVatoms(withIDs: ids)
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             // extract model, ensure no error
             guard let packModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -630,16 +630,16 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // model is available
             DispatchQueue.main.async {
                 completion(packModel, nil)
             }
-            
+
         }
-        
+
     }
-    
+
     /// Searches for vAtoms on the BLOCKv platform.
     ///
     /// - Parameters:
@@ -650,7 +650,7 @@ extension BLOCKv {
     public static func discover(_ builder: DiscoverQueryBuilder, completion: @escaping (PackModel?, BVError?) -> Void) {
         self.discover(payload: builder.toDictionary(), completion: completion)
     }
-    
+
     /// Performs a search for vAtoms on the BLOCKv platform.
     ///
     /// This overload of `discover` allows a raw request payload to be passed in.
@@ -660,11 +660,11 @@ extension BLOCKv {
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
     public static func discover(payload: [String: Any], completion: @escaping (PackModel?, BVError?) -> Void) {
-        
+
         let endpoint = API.VatomDiscover.discover(payload)
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             // extract model, handle error
             guard let packModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -673,17 +673,17 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // model is available
             DispatchQueue.main.async {
                 //print(model)
                 completion(packModel, nil)
             }
-            
+
         }
-        
+
     }
-    
+
     /// Performs a geo-search for vAtoms on the BLOCKv platform (i.e. vAtoms that have been
     /// dropped by the vAtom owners).
     ///
@@ -704,15 +704,15 @@ extension BLOCKv {
                                    topRightLon: Double,
                                    filter: VatomGeoFilter = .vatoms,
                                    completion: @escaping (PackModel?, BVError?) -> Void) {
-        
+
         let endpoint = API.VatomDiscover.geoDiscover(bottomLeftLat: bottomLeftLat,
                                                      bottomLeftLon: bottomLeftLon,
                                                      topRightLat: topRightLat,
                                                      topRightLon: topRightLon,
                                                      filter: filter.rawValue)
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             // extract model, handle error
             guard let packModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -721,17 +721,17 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // model is available
             DispatchQueue.main.async {
                 //print(model)
                 completion(packModel, nil)
             }
-            
+
         }
-        
+
     }
-    
+
     /// - Parameters:
     ///   - bottomLeftLat: Bottom left latitude coordinate.
     ///   - bottomLeftLon: Bottom left longitude coordinate.
@@ -750,16 +750,16 @@ extension BLOCKv {
                                          precision: Int,
                                          filter: VatomGeoFilter = .vatoms,
                                          completion: @escaping (GeoModel?, BVError?) -> Void) {
-        
+
         let endpoint = API.VatomDiscover.geoDiscoverGroups(bottomLeftLat: bottomLeftLat,
                                                            bottomLeftLon: bottomLeftLon,
                                                            topRightLat: topRightLat,
                                                            topRightLon: topRightLon,
                                                            precision: precision,
                                                            filter: filter.rawValue)
-        
+
         BLOCKv.client.request(endpoint) { (baseModel, error) in
-            
+
             // extract model, handle error
             guard let geoGroupModels = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -768,19 +768,19 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // model is available
             DispatchQueue.main.async {
                 //print(model) 
                 completion(geoGroupModels, nil)
             }
-            
+
         }
-        
+
     }
-    
+
     // MARK: - Actions
-    
+
     /// Fetches all the actions configured for a template.
     ///
     /// - Parameters:
@@ -789,11 +789,11 @@ extension BLOCKv {
     ///                 This handler is executed on the main queue.
     public static func getActions(forTemplateID id: String,
                                   completion: @escaping ([ActionModel]?, BVError?) -> Void) {
-        
+
         let endpoint = API.UserActions.getActions(forTemplateID: id)
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             // extract array of actions, ensure no error
             guard let actions = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -801,16 +801,16 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // data is available
             DispatchQueue.main.async {
                 completion(actions, nil)
             }
-            
+
         }
-        
+
     }
-    
+
     /// Performs an action on the BLOCKv platform.
     ///
     /// This is the most flexible of the action calls and should be used as a last resort.
@@ -823,11 +823,11 @@ extension BLOCKv {
     public static func performAction(name: String,
                                      payload: [String : Any],
                                      completion: @escaping (Data?, BVError?) -> Void) {
-        
+
         let endpoint = API.VatomAction.custom(name: name, payload: payload)
-        
+
         self.client.request(endpoint) { (data, error) in
-            
+
             // extract data, ensure no error
             guard let data = data, error == nil else {
                 DispatchQueue.main.async {
@@ -835,15 +835,15 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // data is available
             DispatchQueue.main.async {
                 completion(data, nil)
             }
         }
-        
+
     }
-    
+
     /// Performs an acquire action on a vAtom.
     ///
     /// Often, only a vAtom's ID is known, e.g. scanning a QR code with an embeded vAtom
@@ -855,18 +855,18 @@ extension BLOCKv {
     ///                 This handler is executed on the main queue.
     public static func acquireVatom(withID id: String,
                                     completion: @escaping (Data?, BVError?) -> Void) {
-        
+
         let body = ["this.id": id]
-        
+
         // perform the action
         self.performAction(name: "Acquire", payload: body) { (data, error) in
             completion(data, error)
         }
-        
+
     }
-    
+
     // MARK: - Activity
-    
+
     /// Fetches the activty threads *after* the specifed cursor.
     ///
     /// - Parameters:
@@ -877,11 +877,11 @@ extension BLOCKv {
     public static func getActivityThreads(cursor: String = "",
                                           count: Int = 0,
                                           completion: @escaping (ThreadListModel? , Error?) -> Void) {
-        
+
         let endpoint = API.UserActivity.getThreads(cursor: cursor, count: count)
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             // extract model, ensure no error
             guard let threadListModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -889,16 +889,16 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // model is available
             DispatchQueue.main.async {
                 completion(threadListModel, nil)
             }
-            
+
         }
-        
+
     }
-    
+
     /// Fetches the activity messages for the specified thread id and *after* the specified cursor.
     ///
     /// - Parameters:
@@ -913,11 +913,11 @@ extension BLOCKv {
                                                  cursor: String = "",
                                                  count: Int = 0,
                                                  completion: @escaping (MessageListModel?, Error?) -> Void) {
-        
+
         let endpoint = API.UserActivity.getMessages(forThreadId: threadId, cursor: cursor, count: count)
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             // extract model, ensure no error
             guard let messageListModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -925,16 +925,16 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // model is available
             DispatchQueue.main.async {
                 completion(messageListModel, nil)
             }
-            
+
         }
-        
+
     }
-    
+
     /// Send a message to another BLOCKv user.
     ///
     /// - Parameters:
@@ -943,25 +943,25 @@ extension BLOCKv {
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
     public static func sendMessage(_ message: String, toUserId userId: String, completion:  @escaping (BVError?) -> Void) {
-        
+
         let endpoint = API.CurrentUser.sendMessage(message, toUserId: userId)
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             guard let _ = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
                     completion(error)
                 }
                 return
             }
-            
+
             // call was successful
             DispatchQueue.main.async {
                 completion(nil)
             }
-            
+
         }
-        
+
     }
-    
+
 }

@@ -21,9 +21,9 @@ import Foundation
 /// NB: The BLOCKv platform is in the process of unifying error codes.
 /// BVError is subject to change in future releases.
 public enum BVError: Error {
-    
+
     // MARK: Cases
-    
+
     /// Models a native swift model decoding error.
     case modelDecoding(reason: String)
     /// Models a BLOCKv platform error.
@@ -32,37 +32,37 @@ public enum BVError: Error {
     case networkingError(error: Error)
     /// Models a Web socket error.
     case webSocketError(error: WebSocketErrorReason)
-    
+
     //FIXME: REMOVE AT SOME POINT
     /// Models a custom error. This should be used in very limited circumstances.
     /// A more defined error is preferred.
     case custom(reason: String)
-    
+
     // MARK: Reasons
-    
+
     /// Platform error. Associated values: `code` and `message`.
     public enum PlatformErrorReason {
-        
+
         case unknownAppId(Int, String)
         case internalServerIssue(Int, String)
-        
+
         case tokenExpired(Int, String)
         case invalidPayload(Int, String)
         case tokenUnavailable(Int, String)
         case invalidDateFormat(Int, String)
-        
+
         case malformedRequestBody(Int, String)
         case invalidDataValidation(Int, String)
-        
+
         case vatomNotFound(Int, String)
-        
+
         case unknownUserToken(Int, String)
         case authenticationFailed(Int, String)
         case invalidToken(Int, String)
         case avatarUploadFailed(Int, String)
         case userRefreshTokenInvalid(Int, String)
         case authenticationLimit(Int, String)
-        
+
         case unknownTokenType(Int, String)
         case unknownTokenId(Int, String)
         case tokenNotFound(Int, String)
@@ -72,23 +72,23 @@ public enum BVError: Error {
         case invalidVerificationCode(Int, String)
         case invalidPhoneNumber(Int, String)
         case invalidEmailAddress(Int, String)
-        
+
         case unknownWithMissingCode(Int, String) //TODO: Remove. Temporary until all error responses return a code key-value pair.
         case unknown(Int, String) //TODO: Remove. All errors should be mapped.
-        
+
         /// Init using a BLOCKv platform error code and message.
         init(code: Int, message: String) {
             switch code {
-                
+
             case -1:  self = .unknownWithMissingCode(code, message)
-                
+
             case 2:   self = .unknownAppId(code, message) // App Id is unacceptable.
             case 11:  self = .internalServerIssue(code, message) // Server encountered an error processing the request.
             case 17:  self = .unknownAppId(code, message) // App Id is unacceptable.
             //
             case 516: self = .invalidPayload(code, message) // Request paylaod is invalid.
             case 517: self = .invalidPayload(code, message) // Request paylaod is invalid.
-                
+
             case 521: self = .tokenUnavailable(code, message) // User token (phone, email) is already taken.
             case 527: self = .invalidDateFormat(code, message) // Date format is invalid (e.g. invalid birthday in update user call).
             //
@@ -108,22 +108,22 @@ public enum BVError: Error {
             case 2569: self = .unknownTokenType(code, message) // Unrecognized token type (only `phone` and `email` are currently accepted).
             case 2571: self = .invalidEmailAddress(code, message) // Invalid email address.
             case 2572: self = .invalidPhoneNumber(code, message) // Invalid phone number.
-                
+
             default:
                 // useful for debugging
                 //assertionFailure("Unhandled error: \(code) \(message)")
                 self = .unknown(code, message)
             }
         }
-        
+
     }
-    
+
     ///
     public enum WebSocketErrorReason {
         case connectionFailed
         case connectionDisconnected
     }
-    
+
 }
 
 extension BVError: LocalizedError {
@@ -157,13 +157,13 @@ extension BVError.WebSocketErrorReason {
 extension BVError.PlatformErrorReason {
     var localizedDescription: String {
         switch self {
-            
+
         //TODO: Is there a better way to do this with pattern matching?
         case let .unknownWithMissingCode(_, message):
             return "Unrecogonized: BLOCKv Platform Error: (Missing Code) - Message: \(message)"
         case let .unknown(code, message):
             return "Unrecogonized: BLOCKv Platform Error: (\(code)) - Message: \(message)"
-            
+
         case let .malformedRequestBody(code, message),
              let .invalidDataValidation(code, message),
              let .vatomNotFound(code, message),
@@ -189,8 +189,8 @@ extension BVError.PlatformErrorReason {
              let .unknownTokenType(code, message),
              let .unknownTokenId(code, message):
              return "BLOCKv Platform Error: (\(code)) Message: \(message)"
-            
+
         }
     }
-    
+
 }

@@ -13,20 +13,20 @@ import Foundation
 
 /// Public user response model.
 public struct PublicUserModel: Codable, Equatable {
-    
+
     //public let id : String //TODO: Backend will add the id to the payload soon.
     public var properties: Properties
-    
+
     public struct Properties: Codable, Equatable {
         public let firstName: String
         public let lastName: String
         public let avatarURL: URL?
-        
+
         enum CodingKeys: String, CodingKey {
             case firstName = "first_name"
             case lastName  = "last_name"
             case avatarURL = "avatar_uri"
         }
     }
-    
+
 }

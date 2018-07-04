@@ -21,9 +21,9 @@ import Foundation
 /// NB: The BLOCKv platform is in the process of unifying error codes.
 /// BVError is subject to change in future releases.
 public enum BVError: Error {
-    
+
     // MARK: Cases
-    
+
     /// Models a native swift model decoding error.
     case modelDecoding(reason: String)
     /// Models a BLOCKv platform error.
@@ -32,17 +32,17 @@ public enum BVError: Error {
     case networkingError(error: Error)
     /// Models a Web socket error.
     case webSocketError(error: WebSocketErrorReason)
-    
+
     //FIXME: REMOVE AT SOME POINT
     /// Models a custom error. This should be used in very limited circumstances.
     /// A more defined error is preferred.
     case custom(reason: String)
-    
+
     // MARK: Reasons
-    
+
     /// Platform error. Associated values: `code` and `message`.
     public enum PlatformErrorReason {
-        
+
         case unknownAppId(Int, String)
         case internalServerIssue(Int, String)
         //
@@ -172,13 +172,13 @@ extension BVError.WebSocketErrorReason {
 extension BVError.PlatformErrorReason {
     var localizedDescription: String {
         switch self {
-            
+
         //TODO: Is there a better way to do this with pattern matching?
         case let .unknownWithMissingCode(_, message):
             return "Unrecogonized: BLOCKv Platform Error: (Missing Code) - Message: \(message)"
         case let .unknown(code, message):
             return "Unrecogonized: BLOCKv Platform Error: (\(code)) - Message: \(message)"
-            
+
         case let .malformedRequestBody(code, message),
              let .invalidDataValidation(code, message),
              let .vatomNotFound(code, message),
@@ -204,8 +204,8 @@ extension BVError.PlatformErrorReason {
              let .unknownTokenType(code, message),
              let .unknownTokenId(code, message):
             return "BLOCKv Platform Error: (\(code)) Message: \(message)"
-            
+
         }
     }
-    
+
 }

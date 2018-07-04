@@ -24,11 +24,11 @@
 import Foundation
 
 extension JSON: Encodable {
-    
+
     public func encode(to encoder: Encoder) throws {
-        
+
         var container = encoder.singleValueContainer()
-        
+
         switch self {
         case let .array(array):
             try container.encode(array)

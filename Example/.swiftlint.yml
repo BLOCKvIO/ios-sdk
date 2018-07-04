@@ -7,6 +7,7 @@ whitelist_rules:
   - line_length
   - opening_brace
   - unused_closure_parameter
+  - switch_case_alignment
 # disabled_rules: # rule identifiers to exclude from running
 #   - trailing_whitespace
 included: # paths to include during linting. `--path` is ignored if present.

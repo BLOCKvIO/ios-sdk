@@ -46,14 +46,12 @@ internal class CredentialStore: CredentialManager {
 
     /// Returns the refresh token from local storage.
     static var refreshToken: BVToken? {
-        get {
-            // extract data
-            guard let data = UserDefaults.standard.data(forKey: refreshTokenKey) else {
-                return nil
-            }
-            // decode to `BVToken`
-            return try? JSONDecoder().decode(BVToken.self, from: data)
+        // extract data
+        guard let data = UserDefaults.standard.data(forKey: refreshTokenKey) else {
+            return nil
         }
+        // decode to `BVToken`
+        return try? JSONDecoder().decode(BVToken.self, from: data)
     }
 
     /// Saves the refresh token to local storage.
@@ -78,14 +76,12 @@ internal class CredentialStore: CredentialManager {
 
     /// Returns the asset providers from local storage.
     static var assetProviders: [AssetProviderModel] {
-        get {
-            // extract data
-            guard let data = UserDefaults.standard.data(forKey: assetProvidersKey) else {
-                return []
-            }
-            // decode to `AssetProvider`
-            return (try? JSONDecoder().decode([AssetProviderModel].self, from: data)) ?? []
+        // extract data
+        guard let data = UserDefaults.standard.data(forKey: assetProvidersKey) else {
+            return []
         }
+        // decode to `AssetProvider`
+        return (try? JSONDecoder().decode([AssetProviderModel].self, from: data)) ?? []
     }
 
     /// Saves the asset providers to local storage.

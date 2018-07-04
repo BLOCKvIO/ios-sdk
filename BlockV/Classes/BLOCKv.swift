@@ -104,19 +104,17 @@ public final class BLOCKv {
 
     /// Computes the configuration object needed to initialise clients and sockets.
     fileprivate static var clientConfiguration: Client.Configuration {
-        get {
-            // ensure host app has set an app id
-            precondition(BLOCKv.appID != nil, "Please call 'BLOCKv.configure(appID:)' with your issued app ID before making network requests.")
+        // ensure host app has set an app id
+        precondition(BLOCKv.appID != nil, "Please call 'BLOCKv.configure(appID:)' with your issued app ID before making network requests.")
 
-            if environment == nil {
-                self.environment = .production // default to production
-            }
-
-            // return the configuration (inexpensive object)
-            return Client.Configuration(baseURLString: BLOCKv.environment!.apiServerURLString,
-                                        appID: BLOCKv.appID!)
-
+        if environment == nil {
+            self.environment = .production // default to production
         }
+
+        // return the configuration (inexpensive object)
+        return Client.Configuration(baseURLString: BLOCKv.environment!.apiServerURLString,
+                                    appID: BLOCKv.appID!)
+
     }
 
     /// Backing networking client instance.
@@ -132,17 +130,15 @@ public final class BLOCKv {
     /// The affords the caller the ability to set the platform environment and be sure to
     /// receive a new networking client instance.
     internal static var client: Client {
-        get {
-            // check if a new instance must be initialized
-            if _client == nil {
-                // init a new instance
-                _client = Client(config: BLOCKv.clientConfiguration,
-                                 oauthHandler: self.oauthHandler)
-                return _client!
-            } else {
-                // return the backing instance
-                return _client!
-            }
+        // check if a new instance must be initialized
+        if _client == nil {
+            // init a new instance
+            _client = Client(config: BLOCKv.clientConfiguration,
+                             oauthHandler: self.oauthHandler)
+            return _client!
+        } else {
+            // return the backing instance
+            return _client!
         }
     }
 
@@ -171,15 +167,13 @@ public final class BLOCKv {
     //TODO: What if this is accessed before the client is accessed?
     //TODO: What if the viewer suscribes to an event before auth (login/reg) has occured?
     public static var socket: WebSocketManager {
-        get {
-            if _socket == nil {
-                _socket = WebSocketManager(baseURLString: self.environment!.webSocketURLString,
-                                           appID: self.appID!,
-                                           oauthHandler: self.oauthHandler)
-                return _socket!
-            } else {
-                return _socket!
-            }
+        if _socket == nil {
+            _socket = WebSocketManager(baseURLString: self.environment!.webSocketURLString,
+                                       appID: self.appID!,
+                                       oauthHandler: self.oauthHandler)
+            return _socket!
+        } else {
+            return _socket!
         }
     }
 

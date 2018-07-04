@@ -230,10 +230,10 @@ extension WebSocketManager: WebSocketDelegate {
 
     public func websocketDidDisconnect(socket: WebSocketClient, error: Error?) {
 
-        if let e = error as? WSError {
-            printBV(info: "Web socket - Disconnected: \(e.message)")
-        } else if let e = error {
-            printBV(info: "Web socket - Disconnected: \(e.localizedDescription)")
+        if let err = error as? WSError {
+            printBV(info: "Web socket - Disconnected: \(err.message)")
+        } else if let err = error {
+            printBV(info: "Web socket - Disconnected: \(err.localizedDescription)")
         } else {
             printBV(info: "Web socket - Disconnected")
         }

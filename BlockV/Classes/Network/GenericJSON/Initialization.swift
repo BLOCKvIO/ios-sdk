@@ -84,7 +84,7 @@ extension JSON: ExpressibleByDictionaryLiteral {
 
     public init(dictionaryLiteral elements: (String, JSON)...) {
         var object: [String: JSON] = [:]
-        for (k, v) in elements {
+        for (k, v) in elements { // swiftlint:disable:this identifier_name
             object[k] = v
         }
         self = .object(object)

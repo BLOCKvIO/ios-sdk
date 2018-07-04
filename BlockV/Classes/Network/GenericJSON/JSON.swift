@@ -36,6 +36,7 @@ public enum JSON {
     case null
 }
 
+// swiftlint:disable identifier_name
 extension JSON: Equatable {
 
     public static func == (lhs: JSON, rhs: JSON) -> Bool {
@@ -57,6 +58,7 @@ extension JSON: Equatable {
         }
     }
 }
+// swiftlint:disable identifier_name
 
 extension JSON: CustomDebugStringConvertible {
 

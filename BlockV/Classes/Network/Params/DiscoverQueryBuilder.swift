@@ -218,7 +218,7 @@ extension DiscoverQueryBuilder {
         /// Filter combine operator
         public enum CombineOperator: String {
             case and = "And"
-            case or  = "Or"
+            case or  = "Or" // swiftlint:disable:this identifier_name
         }
 
         // MARK: Properties

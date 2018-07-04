@@ -316,8 +316,7 @@ extension DataRequest {
         queue: DispatchQueue? = nil,
         decoder: JSONDecoder = JSONDecoder(),
         completionHandler: @escaping (DataResponse<T>) -> Void)
-        -> Self
-{
+        -> Self {
 
         // construct the response serializer
         let responseSerializser = DataResponseSerializer<T> { request, response, data, error in

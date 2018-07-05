@@ -28,7 +28,7 @@ import Foundation
 
 /// Web socket response model - Inventory Event.
 public struct WSInventoryEvent: WSEvent, Equatable {
-    
+
     // MARK: - Properties
 
     /// Unique identifier of this inventory event.
@@ -46,19 +46,19 @@ public struct WSInventoryEvent: WSEvent, Equatable {
     /// Unique identifier of the vAtom's parent.
     /// "." indicates the vAtom is at the root level.
     public let parentId: String
-    
+
     // Client-side
-    
+
     /// Timestamp of when this event was received (client-side).
     let timestamp: Date
-    
+
     // MARK: - Helpers
-    
+
     /*
      Note: Still deciding if these helpers should be public API. Maybe an enum .added or .removed
      is simpler?
      */
-    
+
     /// Boolean indicating whether, accoring to this event, the vatom was added to
     /// the inventory of the specified user.
     ///
@@ -67,7 +67,7 @@ public struct WSInventoryEvent: WSEvent, Equatable {
     func didAddVatomToInventory(ofUser comparisonUserId: String) -> Bool {
         return (newOwnerId == comparisonUserId) && (oldOwnerId != comparisonUserId)
     }
-    
+
     /// Boolean indicating whether, accoring to this event, the vatom was removed
     /// from the inventory of the specified user.
     ///
@@ -76,16 +76,16 @@ public struct WSInventoryEvent: WSEvent, Equatable {
     func didRemoveVatomFromInventory(ofUser comparisonUserId: String) -> Bool {
         return (oldOwnerId == comparisonUserId) && (newOwnerId != comparisonUserId)
     }
-    
+
 }
 
 extension WSInventoryEvent: Decodable {
-    
+
     // discard the outer payload - we are only interesting in the payload data
     enum CodingKeys: String, CodingKey {
-        case payload = "payload"
+        case payload
     }
-    
+
     enum PayloadCodingKeys: String, CodingKey {
         case eventId             = "event_id"
         case operation           = "op"
@@ -95,9 +95,9 @@ extension WSInventoryEvent: Decodable {
         case templateVariationId = "template_variation"
         case parentId            = "parent_id"
     }
-    
+
     public init(from decoder: Decoder) throws {
-        
+
         let items = try decoder.container(keyedBy: CodingKeys.self)
         // de-nest payload to top level
         let payloadContainer = try items.nestedContainer(keyedBy: PayloadCodingKeys.self, forKey: .payload)
@@ -108,10 +108,10 @@ extension WSInventoryEvent: Decodable {
         oldOwnerId          = try payloadContainer.decode(String.self, forKey: .oldOwnerId)
         templateVariationId = try payloadContainer.decode(String.self, forKey: .templateVariationId)
         parentId            = try payloadContainer.decode(String.self, forKey: .parentId)
-        
+
         // stamp this event with the current time
         timestamp = Date()
-        
+
     }
-    
+
 }

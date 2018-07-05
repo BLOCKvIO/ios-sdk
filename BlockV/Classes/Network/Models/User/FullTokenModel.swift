@@ -13,11 +13,11 @@ import Foundation
 
 /// Full token response model.
 public struct FullTokenModel: Codable, Equatable {
-    
+
     public let id: String
     public let meta: MetaModel
     public let properties: Properties
-    
+
     public struct Properties: Codable, Equatable {
         public let appId: String
         public let isConfirmed: Bool
@@ -26,7 +26,7 @@ public struct FullTokenModel: Codable, Equatable {
         public let tokenType: String
         public let userId: String
         public let verifyCodeExpires: Date
-        
+
         enum CodingKeys: String, CodingKey {
             case appId             = "app_id"
             case isConfirmed       = "confirmed"

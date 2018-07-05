@@ -13,8 +13,8 @@ import Foundation
 
 /// Protocol representing a Web socket event.
 protocol WSEvent: Decodable {
-    
+
     /// Timestamp of when the event was received on-device (client-side).
     var timestamp: Date { get }
-    
+
 }

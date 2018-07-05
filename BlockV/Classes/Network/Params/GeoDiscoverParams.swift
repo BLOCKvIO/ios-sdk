@@ -14,9 +14,9 @@ import Foundation
 /// Enum for filtering vAtom geo search results.
 public enum VatomGeoFilter: String {
     /// Filters in all vAtoms. Filters out all avatar vAtoms.
-    case vatoms = "vatoms"
+    case vatoms
     /// Filters in all avatar vAtoms.
-    case avatars = "avatars"
+    case avatars
     /// Applies no filter. All vAtoms are returned.
-    case all = "all"
+    case all
 }

@@ -13,9 +13,9 @@ import Foundation
 
 /// This extension groups together all BLOCKv auth requests.
 extension BLOCKv {
-    
+
     // MARK: - Register
-    
+
     /// Registers a user on the BLOCKv platform. Accepts a user token (phone or email).
     ///
     /// - Parameters:
@@ -32,7 +32,7 @@ extension BLOCKv {
         let registerToken = UserToken(value: token, type: type)
         self.register(tokens: [registerToken], userInfo: userInfo, completion: completion)
     }
-    
+
     /// Registers a user on the BLOCKv platform. Accepts an OAuth token.
     ///
     /// - Parameters:
@@ -46,7 +46,7 @@ extension BLOCKv {
                                 completion: @escaping (UserModel?, BVError?) -> Void) {
         self.register(tokens: [oauthToken], userInfo: userInfo, completion: completion)
     }
-    
+
     /// Registers a user on the BLOCKv platform.
     ///
     /// This call allows for multiple tokens (e.g. phone, email, or OAuth) to be associated
@@ -57,11 +57,11 @@ extension BLOCKv {
     public static func register(tokens: [RegisterTokenParams],
                                 userInfo: UserInfo? = nil,
                                 completion: @escaping (UserModel?, BVError?) -> Void) {
-        
+
         let endpoint = API.Session.register(tokens: tokens, userInfo: userInfo)
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             // extract model, ensure no error
             guard let authModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -69,22 +69,22 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // model is available
             DispatchQueue.main.async {
                 // persist credentials
                 CredentialStore.saveRefreshToken(authModel.refreshToken)
                 CredentialStore.saveAssetProviders(authModel.assetProviders)
-                
+
                 completion(authModel.user, nil)
             }
-            
+
         }
-        
+
     }
-    
+
     // MARK: Login
-    
+
     /// Logs a user into the BLOCKv platform. Accepts a user token (phone or email).
     ///
     /// - Parameters:
@@ -100,7 +100,7 @@ extension BLOCKv {
         let params = UserTokenLoginParams(value: token, type: type, password: password)
         self.login(tokenParams: params, completion: completion)
     }
-    
+
     /// Logs a user into the BLOCKv platform. Accepts an OAuth token.
     ///
     /// - Parameters:
@@ -114,7 +114,7 @@ extension BLOCKv {
         let params = OAuthTokenLoginParams(provider: provider, oauthToken: oauthToken)
         self.login(tokenParams: params, completion: completion)
     }
-    
+
     /// Logs a user into the BLOCKv platform. Accepts a guest ID.
     ///
     /// - Parameters:
@@ -126,15 +126,15 @@ extension BLOCKv {
         let params = GuestIdLoginParams(id: id)
         self.login(tokenParams: params, completion: completion)
     }
-    
+
     /// Login using token params
     fileprivate static func login(tokenParams: LoginTokenParams,
                                   completion: @escaping (UserModel?, BVError?) -> Void) {
-        
+
         let endpoint = API.Session.login(tokenParams: tokenParams)
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             // extract model, ensure no error
             guard let authModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -142,24 +142,24 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // model is available
             DispatchQueue.main.async {
-                
+
                 // persist credentials
                 CredentialStore.saveRefreshToken(authModel.refreshToken)
                 CredentialStore.saveAssetProviders(authModel.assetProviders)
-                
+
                 // completion
                 completion(authModel.user, nil)
             }
-            
+
         }
-        
+
     }
-    
+
     // MARK: - Logout
-    
+
     /// Log out the current user.
     ///
     /// The current user will no longer be authorized to perform user scoped requests on the
@@ -168,16 +168,16 @@ extension BLOCKv {
     /// - Parameter completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
     public static func logout(completion: @escaping (BVError?) -> Void) {
-        
+
         let endpoint = API.CurrentUser.logOut()
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             // reset
             DispatchQueue.main.async {
                 reset()
             }
-            
+
             // extract model, ensure no error
             guard baseModel?.payload != nil, error == nil else {
                 DispatchQueue.main.async {
@@ -185,14 +185,14 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // model is available
             DispatchQueue.main.async {
                 completion(nil)
             }
-            
+
         }
-        
+
     }
-    
+
 }

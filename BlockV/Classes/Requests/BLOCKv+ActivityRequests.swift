@@ -13,9 +13,9 @@ import Foundation
 
 /// This extension groups together all BLOCKv activity requests.
 extension BLOCKv {
-    
+
     // MARK: - Activity
-    
+
     /// Fetches the activty threads *after* the specifed cursor.
     ///
     /// - Parameters:
@@ -26,11 +26,11 @@ extension BLOCKv {
     public static func getActivityThreads(cursor: String = "",
                                           count: Int = 0,
                                           completion: @escaping (ThreadListModel?, Error?) -> Void) {
-        
+
         let endpoint = API.UserActivity.getThreads(cursor: cursor, count: count)
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             // extract model, ensure no error
             guard let threadListModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -38,16 +38,16 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // model is available
             DispatchQueue.main.async {
                 completion(threadListModel, nil)
             }
-            
+
         }
-        
+
     }
-    
+
     /// Fetches the activity messages for the specified thread id and *after* the specified cursor.
     ///
     /// - Parameters:
@@ -62,11 +62,11 @@ extension BLOCKv {
                                            cursor: String = "",
                                            count: Int = 0,
                                            completion: @escaping (MessageListModel?, Error?) -> Void) {
-        
+
         let endpoint = API.UserActivity.getMessages(forThreadId: threadId, cursor: cursor, count: count)
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             // extract model, ensure no error
             guard let messageListModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -74,16 +74,16 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // model is available
             DispatchQueue.main.async {
                 completion(messageListModel, nil)
             }
-            
+
         }
-        
+
     }
-    
+
     /// Send a message to another BLOCKv user.
     ///
     /// - Parameters:
@@ -93,25 +93,25 @@ extension BLOCKv {
     ///                 This handler is executed on the main queue.
     public static func sendMessage(_ message: String, toUserId userId: String,
                                    completion:  @escaping (BVError?) -> Void) {
-        
+
         let endpoint = API.CurrentUser.sendMessage(message, toUserId: userId)
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             guard baseModel?.payload != nil, error == nil else {
                 DispatchQueue.main.async {
                     completion(error)
                 }
                 return
             }
-            
+
             // call was successful
             DispatchQueue.main.async {
                 completion(nil)
             }
-            
+
         }
-        
+
     }
-    
+
 }

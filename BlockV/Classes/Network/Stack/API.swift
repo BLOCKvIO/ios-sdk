@@ -274,7 +274,7 @@ extension API {
                             parameters: ["ids": ids]
             )
         }
-        
+
         /// Builds the endpoint to delete a vAtom specified by its id.
         ///
         /// Returns an endpoint over a BaseModel over a GeneralModel.
@@ -282,9 +282,9 @@ extension API {
             return Endpoint(method: .post,
                             path: "/v1/user/vatom/trash",
                             parameters: ["this.id": id])
-            
+
         }
-        
+
     }
 
     // MARK: -

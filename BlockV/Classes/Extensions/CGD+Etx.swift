@@ -12,11 +12,11 @@
 import Foundation
 
 extension DispatchQueue {
-    
+
     internal static func mainThreadPrecondition(caller: String = #function) {
         precondition(
             Thread.isMainThread,
             "The BLOCKV method \"\(caller)\" may not be called from a background thread.")
     }
-    
+
 }

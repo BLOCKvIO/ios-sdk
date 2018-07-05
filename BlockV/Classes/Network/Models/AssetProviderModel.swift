@@ -14,40 +14,40 @@ import Foundation
 typealias URLEncoder = (_ url: URL, _ assetProviders: [AssetProviderModel]) -> URL
 
 struct AssetProviderModel: Codable, Equatable {
-    
+
     let name: String
     let uri: URL
     let type: String
-    
+
     /// The descriptor contains a dictionary whose keys correspond to resource url query keys
     /// and whose values correspond to resource url query params.
-    let descriptor: [String : String]
-    
+    let descriptor: [String: String]
+
     /// Returns an array of `URLQueryItem` respresenting the descriptor.
     var queryItems: [URLQueryItem] {
         return descriptor.map { URLQueryItem(name: $0.key, value: $0.value) }
     }
-    
+
     /// Boolean indicating whether this asset provider is the URL's designated
     /// asset provider.
     func isProviderForURL(_ url: URL) -> Bool {
         return url.absoluteString.hasPrefix(uri.absoluteString)
     }
-    
+
     /// Returns a `URL` encoded with the asset providers query params.
     ///
     /// Returns `nil` if the the URL cannot be constructed or if the asset provider is not the
     /// URL's designated asset provider.
     func encodedURL(_ url: URL) -> URL? {
-        
+
         // Example: <url>?Key-Pair-Id=<key-pair-id>&Signature=<signature>&Policy=<policy>
-        
+
         guard isProviderForURL(url) else { return nil }
-        
+
         var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
         components?.queryItems = self.queryItems
         return components?.url
-        
+
     }
-    
+
 }

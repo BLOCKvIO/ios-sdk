@@ -33,12 +33,12 @@ public enum UserTokenType: String, Codable {
 public struct UserToken: Codable, Equatable {
     public let value: String       // e.g. joshsmith@bv.com
     public let type: UserTokenType // e.g. .email
-    
+
     public init(value: String, type: UserTokenType) {
         self.value = value
         self.type = type
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case value = "token"
         case type = "token_type"
@@ -46,12 +46,12 @@ public struct UserToken: Codable, Equatable {
 }
 
 extension UserToken: DictionaryCodable {
-    
-    public func toDictionary() -> [String : Any] {
+
+    public func toDictionary() -> [String: Any] {
         return [
-            "token" : value,
-            "token_type" : type.rawValue
+            "token": value,
+            "token_type": type.rawValue
         ]
     }
-    
+
 }

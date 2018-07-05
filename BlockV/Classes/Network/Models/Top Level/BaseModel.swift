@@ -23,11 +23,11 @@ public struct MetaModel: Codable, Equatable {
     let dataType: String
     public let whenCreated: Date
     public let whenModified: Date
-    
+
     enum CodingKeys: String, CodingKey {
         case dataType = "data_type"
         case whenCreated = "when_created"
         case whenModified = "when_modified"
     }
-    
+
 }

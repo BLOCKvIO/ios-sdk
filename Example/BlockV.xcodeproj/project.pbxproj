@@ -306,6 +306,7 @@
 				607FACCD1AFB9204008FA782 /* Frameworks */,
 				607FACCE1AFB9204008FA782 /* Resources */,
 				87D80961AF3BA71999BC1BCD /* [CP] Embed Pods Frameworks */,
+				D5D111B120ECA4D40016B03C /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -461,6 +462,19 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-BlockV_Example/Pods-BlockV_Example-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		D5D111B120ECA4D40016B03C /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "${PODS_ROOT}/SwiftLint/swiftlint";
 		};
 /* End PBXShellScriptBuildPhase section */
 

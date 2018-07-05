@@ -20,12 +20,12 @@ import Foundation
 /// 3. Array of all the actions associated with the vAtoms.
 ///   Technically, an array of all the actions linked to the parent templates of the vAtoms in the vAtoms array.
 public struct PackModel: Decodable, Equatable {
-    
+
     public var vatoms: [VatomModel]
     public var faces: [FaceModel]
     public var actions: [ActionModel]
     public var count: Int?
-    
+
     /// These coding keys accomadate both the inventory and discover calls.
     ///
     /// TODO: There may be a better way of handling this. Investigate.
@@ -36,11 +36,11 @@ public struct PackModel: Decodable, Equatable {
         case actions
         case count
     }
-    
+
     public init(from decoder: Decoder) throws {
-        
+
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        
+
         /*
          Below is a workaround to accomadate both the inventory and discover calls' json keys.
          This has a pitfall in that the keys 'vatoms' and 'results' may never both appear in
@@ -53,7 +53,7 @@ public struct PackModel: Decodable, Equatable {
          .compactMap { $0.value }
          
          */
-        
+
         if let vatoms = try container.decodeIfPresent([Safe<VatomModel>].self, forKey: .vatoms) {
             self.vatoms = vatoms.compactMap { $0.value }
         } else if let vatoms = try container.decodeIfPresent([Safe<VatomModel>].self, forKey: .results) {
@@ -61,7 +61,7 @@ public struct PackModel: Decodable, Equatable {
         } else {
             self.vatoms = []
         }
-        
+
         self.faces = try container
             .decode([Safe<FaceModel>].self, forKey: .faces)
             .compactMap { $0.value }
@@ -69,7 +69,7 @@ public struct PackModel: Decodable, Equatable {
             .decode([Safe<ActionModel>].self, forKey: .actions)
             .compactMap { $0.value }
         self.count = try container.decodeIfPresent(Int.self, forKey: .count)
-        
+
         /*
          NOTE: The arrays of vatoms, faces, and actions are be decded 'safely'. In other words,
          encountering a failure when decoding an element will result in only that element not being
@@ -77,7 +77,7 @@ public struct PackModel: Decodable, Equatable {
          collections where the decoding failure of a single element throws and no elements are
          added.
          */
-        
+
     }
-    
+
 }

@@ -14,7 +14,7 @@ import Alamofire
 
 // MARK: Defines
 
-typealias Parameters = [String : Any]
+typealias Parameters = [String: Any]
 typealias Path = String
 
 // MARK: Endpoint
@@ -24,24 +24,25 @@ typealias Path = String
 /// The generic `response` parameter specifies the type of the response
 /// from the endpoint.
 public final class Endpoint<Response> {
-    
+
     let method: HTTPMethod
     let path: Path
     let parameters: Parameters?
     let encoding: ParameterEncoding
-    
+
+    //TODO: Does it make sense for json to be the default encoding?
     init(method: HTTPMethod = .get,
          path: Path,
          parameters: Parameters? = nil,
-         encoding: ParameterEncoding = JSONEncoding.default) { //TODO: Does it make sense for json to be the default encoding?
-        
+         encoding: ParameterEncoding = JSONEncoding.default) {
+
         self.method = method
         self.path = path
         self.parameters = parameters
         self.encoding = encoding
-        
+
     }
-    
+
 }
 
 /// Container for multiform data body part.
@@ -57,13 +58,13 @@ struct MultiformBodyPart {
 /// The generic `response` parameter specifies the type of the response
 /// from the endpoint.
 public final class UploadEndpoint<Response> {
-    
+
     let path: Path
     let bodyPart: MultiformBodyPart
-    
+
     init(path: Path, bodyPart: MultiformBodyPart) {
         self.path = path
         self.bodyPart = bodyPart
     }
-    
+
 }

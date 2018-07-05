@@ -1,16 +1,20 @@
 //
-//  BVConfiguration.swift
-//  BLOCKv
+//  BlockV AG. Copyright (c) 2018, all rights reserved.
 //
-//  Created by Cameron McOnie on 2018/06/26.
+//  Licensed under the BlockV SDK License (the "License"); you may not use this file or
+//  the BlockV SDK except in compliance with the License accompanying it. Unless
+//  required by applicable law or agreed to in writing, the BlockV SDK distributed under
+//  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+//  ANY KIND, either express or implied. See the License for the specific language
+//  governing permissions and limitations under the License.
 //
 
 import Foundation
 
 class BVConfiguration {
-    
+
     var appID: String?
-    
+
     /// Models the BLOCKv platform environments.
     ///
     /// Options:
@@ -21,7 +25,7 @@ class BVConfiguration {
         case production
         /// Unstable development environement (DO NOT USE).
         case development
-        
+
         /// BLOCKv server base url
         var apiServerURLString: String {
             switch self {
@@ -29,7 +33,7 @@ class BVConfiguration {
             case .development: return "https://apidev.blockv.net"
             }
         }
-        
+
         /// BLOCKv Web socket server base url
         var webSocketURLString: String {
             switch self {
@@ -37,7 +41,7 @@ class BVConfiguration {
             case .development: return "wss://ws.blockv.net/ws"
             }
         }
-        
+
     }
-    
+
 }

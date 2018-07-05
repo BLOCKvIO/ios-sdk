@@ -20,21 +20,21 @@ extension BLOCKv {
     /// `PackModel` which  includes the returned vAtoms as well as the configured Faces and Actions.
     ///
     /// - Parameters:
-    ///   - parentID: Allows you to specify a parent ID. If a period "." is supplied the root
-    ///               inventory will be retrieved (i.e. all vAtom's without a parent) - this is the
-    ///               default. If a vAtom ID is passed in, only the child vAtoms are returned.
+    ///   - id: Allows you to specify the `id` of a vAtom whose children should be returned. If a period "." is
+    ///         supplied the root inventory will be retrieved (i.e. all vAtom's without a parent) - this is the
+    ///         default. If a vAtom ID is passed in, only the child vAtoms are returned.
     ///   - page: The number of the page for which the vAtoms are returned. If omitted or set as
     ///           zero, the first page is returned.
     ///   - limit: Defines the number of vAtoms per response page (up to 100). If omitted or set as
     ///            zero, the max number is returned.
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
-    public static func getInventory(parentID: String = ".",
+    public static func getInventory(id: String = ".",
                                     page: Int = 0,
                                     limit: Int = 0,
                                     completion: @escaping (PackModel?, BVError?) -> Void) {
 
-        let endpoint = API.UserVatom.getInventory(parentID: parentID, page: page, limit: limit)
+        let endpoint = API.UserVatom.getInventory(parentID: id, page: page, limit: limit)
 
         self.client.request(endpoint) { (baseModel, error) in
 

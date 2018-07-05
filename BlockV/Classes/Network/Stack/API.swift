@@ -251,14 +251,17 @@ extension API {
 
         /// Builds the endpoint to get the current user's inventory.
         ///
+        /// The inventory call is essentially an optimized discover call. The server-pattern is from the child's
+        /// perspetive. That is, we specify the id of the parent who's children are to be retunred.
+        ///
         /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
-        static func getInventory(parentID: String = "*",
+        static func getInventory(parentID: String,
                                  page: Int = 0,
                                  limit: Int = 0) -> Endpoint<BaseModel<PackModel>> {
             return Endpoint(method: .post,
                             path: userVatomPath + "/inventory",
                             parameters: [
-                                "parent_id": ".",
+                                "parent_id": parentID,
                                 "page": page,
                                 "limit": limit
                 ]

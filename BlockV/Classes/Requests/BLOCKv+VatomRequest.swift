@@ -91,23 +91,23 @@ extension BLOCKv {
     ///   - id: Unique identifer of the vAtom.
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
-    public static func deleteVatom(_ id: String, completion: @escaping () -> Void) {
+    public static func deleteVatom(_ id: String, completion: @escaping (BVError?) -> Void) {
 
         let endpoint = API.UserVatom.deleteVatom(id)
 
         self.client.request(endpoint) { (baseModel, error) in
 
             // extract model, ensure no error
-            guard let a = baseModel?.payload, error == nil else {
+            guard baseModel?.payload.message != nil, error == nil else {
                 DispatchQueue.main.async {
-                    completion()
+                    completion(nil)
                 }
                 return
             }
 
             // model is available
             DispatchQueue.main.async {
-                completion()
+                completion(error)
             }
 
         }

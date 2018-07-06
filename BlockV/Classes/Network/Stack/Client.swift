@@ -79,7 +79,7 @@ public final class Client: ClientProtocol {
 
     // MARK: - Initialization
 
-    init(config: Configuration, oauthHandler: OAuth2Handler) {
+    internal init(config: Configuration, oauthHandler: OAuth2Handler) {
 
         self.baseURL = URL(string: config.baseURLString)!
 
@@ -99,7 +99,7 @@ public final class Client: ClientProtocol {
 
     }
 
-    func getAccessToken(completion: @escaping (_ success: Bool, _ accessToken: String?) -> Void) {
+    internal func getAccessToken(completion: @escaping (_ success: Bool, _ accessToken: String?) -> Void) {
         self.oauthHandler.forceAccessTokenRefresh(completion: completion)
     }
 
@@ -115,7 +115,7 @@ public final class Client: ClientProtocol {
     /// - Parameters:
     ///   - endpoint: Endpoint for the request
     ///   - completion: The completion handler to call when the request is completed.
-    func request(_ endpoint: Endpoint<Void>, completion: @escaping (Data?, BVError?) -> Void) {
+    public func request(_ endpoint: Endpoint<Void>, completion: @escaping (Data?, BVError?) -> Void) {
 
         // create request
         let request = self.sessionManager.request(

@@ -236,7 +236,7 @@ public final class Client: ClientProtocol {
     ///   - endpoint: Upload endpoint
     ///   - progressCompletion: Percent completed
     ///   - completion: The completion handler to call when the request is completed.
-    public func upload<Response>(_ endpoint: UploadEndpoint<Response>,
+    func upload<Response>(_ endpoint: UploadEndpoint<Response>,
                                  progressCompletion: @escaping (_ percent: Float) -> Void,
                                  completion: @escaping (Response?, BVError?) -> Void ) where Response: Decodable {
 

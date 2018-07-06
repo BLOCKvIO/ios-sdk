@@ -85,6 +85,37 @@ extension BLOCKv {
 
     }
 
+    /// Deletes the specified vAtom.
+    ///
+    /// This will permanently delete the vAtom from the current user's inventory. This action is irreversible.
+    ///
+    /// - Parameters:
+    ///   - id: Unique identifer of the vAtom.
+    ///   - completion: The completion handler to call when the request is completed.
+    ///                 This handler is executed on the main queue.
+    public static func deleteVatom(_ id: String, completion: @escaping (BVError?) -> Void) {
+
+        let endpoint = API.UserVatom.deleteVatom(id)
+
+        self.client.request(endpoint) { (baseModel, error) in
+
+            // extract model, ensure no error
+            guard baseModel?.payload.message != nil, error == nil else {
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
+                return
+            }
+
+            // model is available
+            DispatchQueue.main.async {
+                completion(error)
+            }
+
+        }
+
+    }
+
     /// Searches for vAtoms on the BLOCKv platform.
     ///
     /// - Parameters:

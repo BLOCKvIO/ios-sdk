@@ -278,6 +278,16 @@ extension API {
             )
         }
 
+        /// Builds the endpoint to delete a vAtom specified by its id.
+        ///
+        /// Returns an endpoint over a BaseModel over a GeneralModel.
+        static func deleteVatom(_ id: String) -> Endpoint<BaseModel<GeneralModel>> {
+            return Endpoint(method: .post,
+                            path: "/v1/user/vatom/trash",
+                            parameters: ["this.id": id])
+
+        }
+
     }
 
     // MARK: -

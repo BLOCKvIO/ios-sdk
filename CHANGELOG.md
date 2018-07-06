@@ -65,6 +65,6 @@ This release has breaking changes.
 
 #### Added
 - Geo discover vAtoms (geo search).
-- Pull Request [#24](https://github.com/BLOCKvIO/ios-sdk/pull/24).
+  - Pull Request [#24](https://github.com/BLOCKvIO/ios-sdk/pull/24).
 - Geo discover groups (geo count search).
-- Pull Request [#24](https://github.com/BLOCKvIO/ios-sdk/pull/24).
+  - Pull Request [#24](https://github.com/BLOCKvIO/ios-sdk/pull/24).

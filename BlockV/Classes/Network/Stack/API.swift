@@ -223,6 +223,15 @@ extension API {
          return Endpoint(path: currentUserPath + "/redeemables")
          }
          */
+        
+        // MARK: - DEBUG
+        
+        /// DO NOT EXPOSE. ONLY USE FOR TESTING.
+        ///
+        /// Builds the endpoint to allow the current user to be deleted.
+        static func deleteCurrentUser() -> Endpoint<BaseModel<GeneralModel>> {
+            return Endpoint(method: .delete, path: "/v1/user")
+        }
 
     }
 

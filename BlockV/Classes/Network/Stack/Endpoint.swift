@@ -23,7 +23,7 @@ typealias Path = String
 ///
 /// The generic `response` parameter specifies the type of the response
 /// from the endpoint.
-public final class Endpoint<Response> {
+final class Endpoint<Response> {
 
     let method: HTTPMethod
     let path: Path
@@ -57,7 +57,7 @@ struct MultiformBodyPart {
 ///
 /// The generic `response` parameter specifies the type of the response
 /// from the endpoint.
-public final class UploadEndpoint<Response> {
+final class UploadEndpoint<Response> {
 
     let path: Path
     let bodyPart: MultiformBodyPart

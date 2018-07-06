@@ -45,7 +45,7 @@ protocol ClientProtocol {
 ///
 /// Models conforming to `OAuthTokenModel` allow for OAuth credentials to be
 /// processes by the client.
-public final class Client: ClientProtocol {
+final class Client: ClientProtocol {
 
     // MARK: - Properties
 
@@ -79,7 +79,7 @@ public final class Client: ClientProtocol {
 
     // MARK: - Initialization
 
-    internal init(config: Configuration, oauthHandler: OAuth2Handler) {
+    init(config: Configuration, oauthHandler: OAuth2Handler) {
 
         self.baseURL = URL(string: config.baseURLString)!
 
@@ -99,7 +99,7 @@ public final class Client: ClientProtocol {
 
     }
 
-    internal func getAccessToken(completion: @escaping (_ success: Bool, _ accessToken: String?) -> Void) {
+    func getAccessToken(completion: @escaping (_ success: Bool, _ accessToken: String?) -> Void) {
         self.oauthHandler.forceAccessTokenRefresh(completion: completion)
     }
 
@@ -115,7 +115,7 @@ public final class Client: ClientProtocol {
     /// - Parameters:
     ///   - endpoint: Endpoint for the request
     ///   - completion: The completion handler to call when the request is completed.
-    public func request(_ endpoint: Endpoint<Void>, completion: @escaping (Data?, BVError?) -> Void) {
+    func request(_ endpoint: Endpoint<Void>, completion: @escaping (Data?, BVError?) -> Void) {
 
         // create request
         let request = self.sessionManager.request(
@@ -153,7 +153,7 @@ public final class Client: ClientProtocol {
     /// - Parameters:
     ///   - endpoint: Endpoint for the request
     ///   - completion: The completion handler to call when the request is completed.
-    public func request<Response>(_ endpoint: Endpoint<Response>,
+    func request<Response>(_ endpoint: Endpoint<Response>,
                                   completion: @escaping (Response?, BVError?) -> Void ) where Response: Decodable {
 
         // create request (starts immediately)

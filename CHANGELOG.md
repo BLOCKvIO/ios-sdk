@@ -20,10 +20,15 @@ Released on TBC.
   - Pull Request [#41](https://github.com/BLOCKvIO/ios-sdk/pull/41)
 
 #### Updated
-- Update `getInventory` param as `id`.
+- Update inventory params to match Android.
   - Pull Request [#42](https://github.com/BLOCKvIO/ios-sdk/pull/42)
 - Readme to reflect beta status.
   - Pull Request [#40](https://github.com/BLOCKvIO/ios-sdk/pull/40)
+
+#### Upgrade Notes
+This release has breaking changes.
+
+- The `getInventory` method takes `id` as its first param, instead of `parentId`. The behavior is unchanged.
 
 ## [1.0.0](https://github.com/BLOCKvIO/ios-sdk/releases/tag/1.0.0)
 Released on 2018-06-30.
@@ -52,7 +57,7 @@ Released on 2018-06-30.
 This release has breaking changes.
 
 ----
-  
+
 ## [0.9.10](https://github.com/BLOCKvIO/ios-sdk/releases/tag/0.9.9)
   Released on 2018-06-26.
   

@@ -20,7 +20,7 @@ Released on TBC.
   - Pull Request [#41](https://github.com/BLOCKvIO/ios-sdk/pull/41)
 
 #### Updated
-- Update inventory params to match Android.
+- Inventory params now match Android.
   - Pull Request [#42](https://github.com/BLOCKvIO/ios-sdk/pull/42)
 - Readme to reflect beta status.
   - Pull Request [#40](https://github.com/BLOCKvIO/ios-sdk/pull/40)

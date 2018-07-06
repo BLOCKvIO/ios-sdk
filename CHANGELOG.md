@@ -58,7 +58,7 @@ This release has breaking changes.
 
 ----
 
-## [0.9.10](https://github.com/BLOCKvIO/ios-sdk/releases/tag/0.9.9)
+## [0.9.10](https://github.com/BLOCKvIO/ios-sdk/releases/tag/0.9.10)
   Released on 2018-06-26.
   
 #### Added

@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 - `1.0.x` Releases - [1.0.0](#100)
 
 #### 0.x Releases
-- `0.9.x` Releases - [0.9.9](#099) | [0.9.10](#09910)
+- `0.9.x` Releases - [0.9.9](#099) | [0.9.10](#0910)
 
 ---
 
@@ -26,7 +26,7 @@ Released on TBC.
   - Pull Request [#40](https://github.com/BLOCKvIO/ios-sdk/pull/40)
 
 ## [1.0.0](https://github.com/BLOCKvIO/ios-sdk/releases/tag/1.0.0)
-Released on 2018-3-5.
+Released on 2018-06-30.
 
 #### Added
 - Send message endpoint.
@@ -54,14 +54,14 @@ This release has breaking changes.
 ----
   
 ## [0.9.10](https://github.com/BLOCKvIO/ios-sdk/releases/tag/0.9.9)
-  Released on 2018-3-5.
+  Released on 2018-06-26.
   
 #### Added
 - Enforce re-authorization.
   - Pull Request [#26](https://github.com/BLOCKvIO/ios-sdk/pull/26).
   
 ## [0.9.9](https://github.com/BLOCKvIO/ios-sdk/releases/tag/0.9.9)
-  Released on 2018-3-5.
+  Released on 2018-06-21.
 
 #### Added
 - Geo discover vAtoms (geo search).

@@ -15,9 +15,9 @@ Released on TBC.
 
 #### Added
 - Allow vAtom deletion.
-  - Pull Request[43](https://github.com/BLOCKvIO/ios-sdk/pull/43)  
+  - Pull Request [#43](https://github.com/BLOCKvIO/ios-sdk/pull/43)  
 - Adopted Swiftlint as the linter.
-  - Pull Request[41](https://github.com/BLOCKvIO/ios-sdk/pull/41)
+  - Pull Request [#41](https://github.com/BLOCKvIO/ios-sdk/pull/41)
 
 #### Updated
 - Update `getInventory` param as `id`.

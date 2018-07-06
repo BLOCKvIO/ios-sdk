@@ -87,6 +87,8 @@ extension BLOCKv {
 
     /// Deletes the specified vAtom.
     ///
+    /// This will permanently delete the vAtom from the current user's inventory. This action is irreversible.
+    ///
     /// - Parameters:
     ///   - id: Unique identifer of the vAtom.
     ///   - completion: The completion handler to call when the request is completed.

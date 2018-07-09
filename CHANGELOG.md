@@ -15,9 +15,9 @@ Released on TBC.
 
 #### Added
 - Changelog to keep track of SDK changes
-- Pull Request [#44](https://github.com/BLOCKvIO/ios-sdk/pull/44)
+  - Pull Request [#44](https://github.com/BLOCKvIO/ios-sdk/pull/44)
 - Allow a vAtom to be sent to the trash.
-- Pull Request [#43](https://github.com/BLOCKvIO/ios-sdk/pull/43) , [#45](https://github.com/BLOCKvIO/ios-sdk/pull/45)
+  - Pull Request [#43](https://github.com/BLOCKvIO/ios-sdk/pull/43) , [#45](https://github.com/BLOCKvIO/ios-sdk/pull/45)
 - Adopted Swiftlint as the linter.
   - Pull Request [#41](https://github.com/BLOCKvIO/ios-sdk/pull/41)
 

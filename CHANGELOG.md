@@ -1,11 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-#### 1.x Releases
+#### 1.x Releases (API v1)
 - `1.1.x` Releases - [1.1.0](#110)
 - `1.0.x` Releases - [1.0.0](#100)
 
-#### 0.x Releases
+#### 0.x Releases (API v1)
 - `0.9.x` Releases - [0.9.9](#099) | [0.9.10](#0910)
 
 ---
@@ -14,8 +14,10 @@ All notable changes to this project will be documented in this file.
 Released on TBC.
 
 #### Added
-- Allow vAtom deletion.
-  - Pull Request [#43](https://github.com/BLOCKvIO/ios-sdk/pull/43)  
+- Changelog to keep track of SDK changes
+- Pull Request [#44](https://github.com/BLOCKvIO/ios-sdk/pull/44)
+- Allow a vAtom to be sent to the trash.
+- Pull Request [#43](https://github.com/BLOCKvIO/ios-sdk/pull/43) , [#45](https://github.com/BLOCKvIO/ios-sdk/pull/45)
 - Adopted Swiftlint as the linter.
   - Pull Request [#41](https://github.com/BLOCKvIO/ios-sdk/pull/41)
 

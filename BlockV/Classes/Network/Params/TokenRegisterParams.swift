@@ -62,6 +62,7 @@ extension UserInfo: DictionaryCodable {
             "last_name": lastName ?? "",
             "name_public": isNamePublic ?? true,
             "password": password ?? "",
+            "birthday": birthday ?? "",
             "avatar_public": isAvatarPublic ?? true,
             "language": language ?? ""
         ]

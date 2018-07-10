@@ -28,7 +28,7 @@ import Foundation
       {
         "name": "ActivatedImage",
         "value": {
-          "value": "https://cdndev.blockv.net/vatomic.prototyping/vatomic.prototyping::v1::vAtom::3D-Object/redsneaker_card.jpg",
+          "value": "https://cdndev.blockv.net/vatomic.prototyping/redsneaker_card.jpg",
           "resourceValueType": "ResourceValueType::URI"
         },
         "resourceType": "ResourceTypes::Image::JPEG"
@@ -41,9 +41,9 @@ import Foundation
 
 /// Web socket response model - Inventory Event.
 public struct WSActivityEvent: WSEvent, Equatable {
-    
+
     // MARK: - Properties
-    
+
     /// Unique identifier of the activity event.
     public let eventId: Int
     /// Unique identifier of the user this event is targetted for.
@@ -64,20 +64,20 @@ public struct WSActivityEvent: WSEvent, Equatable {
     public let actionName: String
     /// Timestamp of this event's creation.
     public let whenCreated: Date
-    
+
     // Client-side
-    
+
     /// Timestamp of when the event was received on-device (client-side).
     let timestamp: Date
-    
+
 }
 
 extension WSActivityEvent: Decodable {
-    
+
     enum CodingKeys: String, CodingKey {
-        case payload = "payload"
+        case payload
     }
-    
+
     enum PayloadCodingKeys: String, CodingKey {
         case eventId         = "msg_id"
         case targetUserId    = "user_id"
@@ -88,9 +88,9 @@ extension WSActivityEvent: Decodable {
         case whenCreated     = "when_created"
         case generic         = "generic"
     }
-    
+
     public init(from decoder: Decoder) throws {
-        
+
         let items = try decoder.container(keyedBy: CodingKeys.self)
         // de-nest payload to top level
         let payloadContainer = try items.nestedContainer(keyedBy: PayloadCodingKeys.self, forKey: .payload)
@@ -102,10 +102,10 @@ extension WSActivityEvent: Decodable {
         message       = try payloadContainer.decode(String.self, forKey: .message)
         actionName    = try payloadContainer.decode(String.self, forKey: .actionName)
         whenCreated   = try payloadContainer.decode(Date.self, forKey: .whenCreated)
-        
+
         // stamp this event with the current time
         timestamp = Date()
-        
+
     }
 
 }

@@ -14,63 +14,63 @@ import Foundation
 /// Possible view modes a face may define for presentation.
 public enum ViewMode: String {
 
-    case icon       = "icon"
-    case activated  = "activated"
-    case fullscreen = "fullscreen"
-    case card       = "card"
-    case background = "background"
-    
+    case icon
+    case activated
+    case fullscreen
+    case card
+    case background
+
 }
 
 /// A simple struct that models a template face.
 public struct FaceModel: Codable, Equatable {
-    
+
     public let id: String
     public let templateName: String
     public let meta: MetaModel
     public let properties: Properties
-    
+
     enum CodingKeys: String, CodingKey {
         case id
         case templateName = "template"
         case meta
         case properties
     }
-    
+
     public struct Properties: Codable, Equatable {
-        
+
         public let displayURL: URL
         public let constraints: Constraints
         public let resources: [String]
-        
+
         enum CodingKeys: String, CodingKey {
             case displayURL = "display_url"
             case constraints
             case resources
         }
-        
+
         public struct Constraints: Codable, Equatable {
-            
+
             public let viewMode: String
             public let platform: String
-            
-            enum CodingKeys: String, CodingKey {
-                case viewMode = "view_mode" //TODO: Map to view mode enum
+
+            enum CodingKeys: String, CodingKey { // swiftlint:disable:this nesting
+                case viewMode = "view_mode"
                 case platform
             }
-            
+
         }
     }
-    
+
 }
 
 // MARK: - Hashable
 
 extension FaceModel: Hashable {
-    
+
     /// Faces are uniquely identified by their platform identifier.
     public var hashValue: Int {
         return id.hashValue
     }
-    
+
 }

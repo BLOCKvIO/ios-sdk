@@ -15,13 +15,13 @@ import CoreLocation
 /// Represents a geo discover groups response.
 public struct GeoModel: Decodable {
     let groups: [GeoGroupModel]
-    
+
     enum CodingKeys: String, CodingKey {
         case groups
     }
-    
+
     public init(from decoder: Decoder) throws {
-        
+
         let container = try decoder.container(keyedBy: CodingKeys.self)
         // decode the array safely
         if let groups = try container.decodeIfPresent([Safe<GeoGroupModel>].self, forKey: .groups) {
@@ -30,12 +30,12 @@ public struct GeoModel: Decodable {
             self.groups = [] // unable to decode
         }
     }
-    
+
 }
 
 /// Represents a geo discover group item.
 public struct GeoGroupModel: Equatable {
-    
+
     /// Geo hash. Useful for URLs etc.
     public let geoHash: String
     /// Coordinate of the group.
@@ -48,14 +48,14 @@ public struct GeoGroupModel: Equatable {
 // MARK: - GeoGroupModel Codable
 
 extension GeoGroupModel: Codable {
-    
+
     enum CodingKeys: String, CodingKey {
         case geoHash   = "key"
         case longitude = "lon"
         case latitude  = "lat"
         case count     = "count"
     }
-    
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         geoHash = try container.decode(String.self, forKey: .geoHash)
@@ -64,7 +64,7 @@ extension GeoGroupModel: Codable {
         let lat = try container.decode(Double.self, forKey: .latitude)
         coordinate = CLLocationCoordinate2DMake(lat, lon)
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(geoHash, forKey: .geoHash)
@@ -72,13 +72,13 @@ extension GeoGroupModel: Codable {
         try container.encode(coordinate.latitude, forKey: .latitude)
         try container.encode(coordinate.longitude, forKey: .longitude)
     }
-    
+
 }
 
 // MARK: - Equatable
 
 extension CLLocationCoordinate2D: Equatable {}
 
-public func ==(lhs: CLLocationCoordinate2D, rhs: CLLocationCoordinate2D) -> Bool {
+public func == (lhs: CLLocationCoordinate2D, rhs: CLLocationCoordinate2D) -> Bool {
     return lhs.latitude == rhs.latitude && lhs.longitude == rhs.longitude
 }

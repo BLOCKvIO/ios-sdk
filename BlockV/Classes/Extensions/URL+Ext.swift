@@ -13,9 +13,9 @@ import Foundation
 
 extension URL {
     func encodeWithParams() -> URL {
-        
+
         // Encode with blockv url params.
-        
+
         return self
     }
 }

@@ -5,9 +5,11 @@ PODS:
     - JWTDecode (~> 2.1)
     - Signals (~> 5.0)
     - Starscream (~> 3.0)
+    - SwiftLint (~> 0.26)
   - JWTDecode (2.1.1)
   - Signals (5.0.0)
   - Starscream (3.0.5)
+  - SwiftLint (0.26.0)
 
 DEPENDENCIES:
   - BLOCKv (from `../`)
@@ -18,6 +20,7 @@ SPEC REPOS:
     - JWTDecode
     - Signals
     - Starscream
+    - SwiftLint
 
 EXTERNAL SOURCES:
   BLOCKv:
@@ -25,10 +28,11 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Alamofire: e4fa87002c137ba2d8d634d2c51fabcda0d5c223
-  BLOCKv: e7389d83317902d3c9ad7313df255354ddde8107
+  BLOCKv: 2659cde682578cc887f4ae341731a9221e41df92
   JWTDecode: 83e8b381aafe27158d9f692cbdca2b12d61d460c
   Signals: 6c41253cc172e4251d6064341bbc555a589c8d9f
   Starscream: faf918b2f2eff7d5dd21180646bf015a669673bd
+  SwiftLint: f6b83e8d95ee1e91e11932d843af4fdcbf3fc764
 
 PODFILE CHECKSUM: 607654f8b0435c8536102866fa4fb9ba2ddddd6c
 

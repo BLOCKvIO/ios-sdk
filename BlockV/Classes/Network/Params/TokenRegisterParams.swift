@@ -15,7 +15,7 @@ import Foundation
 
 /// User properties parameters.
 public struct UserInfo: Encodable {
-    
+
     public var firstName: String?
     public var lastName: String?
     public var isNamePublic: Bool?
@@ -23,7 +23,7 @@ public struct UserInfo: Encodable {
     public var birthday: String?
     public var isAvatarPublic: Bool?
     public var language: String?
-    
+
     public init(firstName: String? = nil,
                 lastName: String? = nil,
                 isNamePublic: Bool? = true,
@@ -31,7 +31,7 @@ public struct UserInfo: Encodable {
                 birthday: String? = nil,
                 isAvatarPublic: Bool? = true,
                 language: String? = nil) {
-        
+
         self.firstName = firstName
         self.lastName = lastName
         self.isNamePublic = isNamePublic
@@ -40,7 +40,7 @@ public struct UserInfo: Encodable {
         self.isAvatarPublic = isAvatarPublic
         self.language = language
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case firstName      = "first_name"
         case lastName       = "last_name"
@@ -50,13 +50,13 @@ public struct UserInfo: Encodable {
         case isAvatarPublic = "avatar_public"
         case language       = "language"
     }
-    
+
 }
 
 extension UserInfo: DictionaryCodable {
-    
+
     /// Returns a dictionary of all properties (with defaults for `nil` members).
-    public func toDictionary() -> [String : Any] {
+    public func toDictionary() -> [String: Any] {
         return [
             "first_name": firstName ?? "",
             "last_name": lastName ?? "",
@@ -66,13 +66,13 @@ extension UserInfo: DictionaryCodable {
             "language": language ?? ""
         ]
     }
-    
+
     /// Reuturns a dictionary of all non-nil members (empty strings are permitted).
     ///
     /// Useful for PATCH requests.
-    public func toSafeDictionary() -> [String : Any] {
-        var params: [String : Any] = [:]
-        
+    public func toSafeDictionary() -> [String: Any] {
+        var params: [String: Any] = [:]
+
         if let firstName = firstName {
             params["first_name"] = firstName
         }
@@ -97,7 +97,7 @@ extension UserInfo: DictionaryCodable {
 
         return params
     }
-    
+
 }
 
 // MARK: - Protocols
@@ -134,53 +134,53 @@ public struct OAuthTokenRegisterParams: RegisterParams {
     let userId: String // e.g. Facebook id
     let provider: String // e.g. FaceFacebook
     let oauthToken: String // e.g. oauth token
-    
+
     public init(userId: String, provider: String, oauthToken: String) {
         self.userId = userId
         self.provider = provider
         self.oauthToken = oauthToken
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case userId      = "token"
         case provider    = "token_type"
         case authData    = "auth_data"
     }
-    
+
     enum AuthDataKeys: String, CodingKey {
         case oauthToken = "auth_token"
     }
-    
+
 }
 
 extension OAuthTokenRegisterParams: Codable {
-    
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(userId, forKey: .userId)
         try container.encode(provider, forKey: .provider)
-        
+
         var authData = container.nestedContainer(keyedBy: AuthDataKeys.self, forKey: .authData)
         try authData.encode(oauthToken, forKey: .oauthToken)
     }
-    
+
     public init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         userId = try values.decode(String.self, forKey: .userId)
         provider = try values.decode(String.self, forKey: .provider)
-        
+
         let authData = try values.nestedContainer(keyedBy: AuthDataKeys.self, forKey: .authData)
         oauthToken = try authData.decode(String.self, forKey: .oauthToken)
     }
-    
+
 }
 
 extension OAuthTokenRegisterParams: DictionaryCodable {
-    public func toDictionary() -> [String : Any] {
+    public func toDictionary() -> [String: Any] {
         return [
-            "token" : userId,
-            "token_type" : provider,
-            "auth_data" : [
+            "token": userId,
+            "token_type": provider,
+            "auth_data": [
                 "auth_token": oauthToken
             ]
         ]
@@ -218,4 +218,3 @@ extension OAuthTokenRegisterParams: DictionaryCodable {
 //    }
 //
 //}
-

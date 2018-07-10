@@ -36,8 +36,9 @@ public enum JSON {
     case null
 }
 
+// swiftlint:disable identifier_name
 extension JSON: Equatable {
-    
+
     public static func == (lhs: JSON, rhs: JSON) -> Bool {
         switch (lhs, rhs) {
         case (.string(let s1), .string(let s2)):
@@ -57,9 +58,10 @@ extension JSON: Equatable {
         }
     }
 }
+// swiftlint:enable identifier_name
 
 extension JSON: CustomDebugStringConvertible {
-    
+
     public var debugDescription: String {
         switch self {
         case .string(let str):
@@ -79,61 +81,61 @@ extension JSON: CustomDebugStringConvertible {
 }
 
 extension JSON {
-    
+
     public var stringValue: String? {
         if case .string(let value) = self {
             return value
         }
         return nil
     }
-    
+
     public var floatValue: Float? {
         if case .number(let value) = self {
             return value
         }
         return nil
     }
-    
+
     public var boolValue: Bool? {
         if case .bool(let value) = self {
             return value
         }
         return nil
     }
-    
-    public var objectValue: [String : JSON]? {
+
+    public var objectValue: [String: JSON]? {
         if case .object(let value) = self {
             return value
         }
         return nil
     }
-    
+
     public var arrayValue: [JSON]? {
         if case .array(let value) = self {
             return value
         }
         return nil
     }
-    
+
     public var isNull: Bool {
         if case .null = self {
             return true
         }
         return false
     }
-    
+
     public subscript(index: Int) -> JSON? {
         if case .array(let arr) = self {
             return index < arr.count ? arr[index] : nil
         }
         return nil
     }
-    
+
     public subscript(key: String) -> JSON? {
         if case .object(let dict) = self {
             return dict[key]
         }
         return nil
     }
-    
+
 }

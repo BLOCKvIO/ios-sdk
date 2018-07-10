@@ -14,14 +14,14 @@ import Foundation
 // MARK: - BLOCKv
 
 extension Notification.Name {
-    
+
     // MARK: - Internal
-    
+
     internal struct BVInternal {
-        
+
         /// INTERNAL: Broadcast to indicate user authorization is required.
         internal static let UserAuthorizationRequried = Notification.Name("com.blockv.internal.user.auth.required")
-        
+
     }
 
 }

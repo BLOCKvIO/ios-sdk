@@ -12,7 +12,7 @@
 import Foundation
 
 extension DateFormatter {
-    
+
     /// BlockV server date formatter.
     ///
     /// Prefer .iso8601 where possible.
@@ -23,11 +23,11 @@ extension DateFormatter {
         formatter.locale = Locale(identifier: "en-US")
         return formatter
     }()
-    
+
 }
 
 extension Collection {
-    
+
     internal var prettyPrintedJSON: String? {
         do {
             let data: Data = try JSONSerialization.data(withJSONObject: self, options: .prettyPrinted)
@@ -36,5 +36,5 @@ extension Collection {
             return nil
         }
     }
-    
+
 }

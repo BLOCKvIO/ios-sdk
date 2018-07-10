@@ -201,12 +201,12 @@ extension VatomModel: Hashable {
 
 public struct VatomPricing: Equatable {
 
-    let pricingType: String
-    let currency: String
-    let price: String
-    let validFrom: String
-    let validThrough: String
-    let isVatIncluded: Bool
+    public let pricingType: String
+    public let currency: String
+    public let price: String
+    public let validFrom: String
+    public let validThrough: String
+    public let isVatIncluded: Bool
 
     enum CodingKeys: String, CodingKey {
         case pricingType

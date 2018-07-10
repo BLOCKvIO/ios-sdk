@@ -134,7 +134,7 @@ public final class BLOCKv {
     ///
     /// The affords the caller the ability to set the platform environment and be sure to
     /// receive a new networking client instance.
-    internal static var client: Client {
+    static var client: Client {
         // check if a new instance must be initialized
         if _client == nil {
             // init a new instance

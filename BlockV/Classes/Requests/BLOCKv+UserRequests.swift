@@ -387,5 +387,29 @@ extension BLOCKv {
         }
 
     }
+    
+    /// DO NOT EXPOSE. ONLY USE FOR TESTING.
+    ///
+    /// DELETES THE CURRENT USER.
+    internal static func deleteCurrentUser(completion: @escaping (Error?) -> Void) {
+        
+        let endpoint = API.CurrentUser.deleteCurrentUser()
+        
+        self.client.request(endpoint) { (baseModel, error) in
+            
+            guard baseModel?.payload != nil, error == nil else {
+                DispatchQueue.main.async {
+                    completion(error)
+                }
+                return
+            }
+            
+            DispatchQueue.main.async {
+                completion(nil)
+            }
+            
+        }
+        
+    }
 
 }

@@ -45,7 +45,7 @@ protocol ClientProtocol {
 ///
 /// Models conforming to `OAuthTokenModel` allow for OAuth credentials to be
 /// processes by the client.
-public final class Client: ClientProtocol {
+final class Client: ClientProtocol {
 
     // MARK: - Properties
 
@@ -153,7 +153,7 @@ public final class Client: ClientProtocol {
     /// - Parameters:
     ///   - endpoint: Endpoint for the request
     ///   - completion: The completion handler to call when the request is completed.
-    public func request<Response>(_ endpoint: Endpoint<Response>,
+    func request<Response>(_ endpoint: Endpoint<Response>,
                                   completion: @escaping (Response?, BVError?) -> Void ) where Response: Decodable {
 
         // create request (starts immediately)
@@ -236,7 +236,7 @@ public final class Client: ClientProtocol {
     ///   - endpoint: Upload endpoint
     ///   - progressCompletion: Percent completed
     ///   - completion: The completion handler to call when the request is completed.
-    public func upload<Response>(_ endpoint: UploadEndpoint<Response>,
+    func upload<Response>(_ endpoint: UploadEndpoint<Response>,
                                  progressCompletion: @escaping (_ percent: Float) -> Void,
                                  completion: @escaping (Response?, BVError?) -> Void ) where Response: Decodable {
 

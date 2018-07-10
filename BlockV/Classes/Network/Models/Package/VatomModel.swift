@@ -258,12 +258,12 @@ extension VatomPricing: Codable {
 public struct VatomChildPolicy: Codable, Equatable {
     public let count: Int
     public let creationPolicy: CreationPolicy
-    public let templateVariationName: String
+    public let templateVariationID: String
 
     enum CodingKeys: String, CodingKey {
         case count
         case creationPolicy = "creation_policy"
-        case templateVariationName = "template_variation"
+        case templateVariationID = "template_variation"
     }
 
     public struct CreationPolicy: Codable, Equatable {

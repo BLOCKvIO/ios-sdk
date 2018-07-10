@@ -1,6 +1,6 @@
 PODS:
-  - Alamofire (4.7.2)
-  - BLOCKv (1.0.0):
+  - Alamofire (4.7.3)
+  - BLOCKv (1.1.0):
     - Alamofire (~> 4.7)
     - JWTDecode (~> 2.1)
     - Signals (~> 5.0)
@@ -27,8 +27,8 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  Alamofire: e4fa87002c137ba2d8d634d2c51fabcda0d5c223
-  BLOCKv: 2659cde682578cc887f4ae341731a9221e41df92
+  Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
+  BLOCKv: aa3a9dd10529e9921227527494c7cb360d09d061
   JWTDecode: 83e8b381aafe27158d9f692cbdca2b12d61d460c
   Signals: 6c41253cc172e4251d6064341bbc555a589c8d9f
   Starscream: faf918b2f2eff7d5dd21180646bf015a669673bd

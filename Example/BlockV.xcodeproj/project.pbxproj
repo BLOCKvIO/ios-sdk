@@ -49,7 +49,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		06192B242F07228474ADC183 /* Pods-BlockV_Example.prod.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Example.prod.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Example/Pods-BlockV_Example.prod.xcconfig"; sourceTree = "<group>"; };
 		0B03B68EAC742F53F057C99E /* Pods-BlockV_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Example/Pods-BlockV_Example.debug.xcconfig"; sourceTree = "<group>"; };
+		1D5DEDC397E0FEB56C8DD44E /* Pods-BlockV_Tests.prod.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Tests.prod.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Tests/Pods-BlockV_Tests.prod.xcconfig"; sourceTree = "<group>"; };
 		1F3D93F779A140BD79E74900 /* Pods_BlockV_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BlockV_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DE93FD598C0B61200B996A4 /* Pods_BlockV_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BlockV_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD01AFB9204008FA782 /* BlockV_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BlockV_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -64,8 +66,10 @@
 		86A0806A35212DD33474BDB7 /* BLOCKv.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = BLOCKv.podspec; path = ../BLOCKv.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		A8F8F6BF41E2864BD8FA3FB7 /* Pods-BlockV_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Tests/Pods-BlockV_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		AC9D73DE9B5506A2FFBB74EE /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
+		B5A79A9FDD3524D3628C080E /* Pods-BlockV_Example.dev.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Example.dev.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Example/Pods-BlockV_Example.dev.xcconfig"; sourceTree = "<group>"; };
 		BC27A08D03F2D2401C48F394 /* Pods-BlockV_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Example/Pods-BlockV_Example.release.xcconfig"; sourceTree = "<group>"; };
 		C55D0BD7FD8ECD417C235202 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		CB05032DBDAACFFC17BA9C27 /* Pods-BlockV_Tests.dev.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Tests.dev.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Tests/Pods-BlockV_Tests.dev.xcconfig"; sourceTree = "<group>"; };
 		D519A844205E6EE3006B0D19 /* NetworkOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkOperation.swift; sourceTree = "<group>"; };
 		D519A847205E76EB006B0D19 /* NetworkDataOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkDataOperation.swift; sourceTree = "<group>"; };
 		D519A84A205E83AB006B0D19 /* VatomDetailTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VatomDetailTableViewController.swift; sourceTree = "<group>"; };
@@ -118,6 +122,10 @@
 				BC27A08D03F2D2401C48F394 /* Pods-BlockV_Example.release.xcconfig */,
 				A8F8F6BF41E2864BD8FA3FB7 /* Pods-BlockV_Tests.debug.xcconfig */,
 				6F6694DB9BF713D3EF69B6B5 /* Pods-BlockV_Tests.release.xcconfig */,
+				B5A79A9FDD3524D3628C080E /* Pods-BlockV_Example.dev.xcconfig */,
+				06192B242F07228474ADC183 /* Pods-BlockV_Example.prod.xcconfig */,
+				CB05032DBDAACFFC17BA9C27 /* Pods-BlockV_Tests.dev.xcconfig */,
+				1D5DEDC397E0FEB56C8DD44E /* Pods-BlockV_Tests.prod.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -653,16 +661,19 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 0B03B68EAC742F53F057C99E /* Pods-BlockV_Example.debug.xcconfig */;
 			buildSettings = {
-				APP_DISPLAY_NAME = "Debug-BLOCKv Eg";
+				APP_DISPLAY_NAME = "$(CONFIGURATION)-BV Eg";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WA2R22UJPX;
+				ENVIRONMENT_MAPPING = dev_env;
 				INFOPLIST_FILE = BlockV/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
-				PRODUCT_BUNDLE_IDENTIFIER = "--PRODUCT-BUNDLE-IDENTIFIER-";
+				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -D DEBUG";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.blockv.sdk-core.example.$(CONFIGURATION)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
@@ -673,18 +684,20 @@
 		};
 		607FACF11AFB9204008FA782 /* Dev */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BC27A08D03F2D2401C48F394 /* Pods-BlockV_Example.release.xcconfig */;
+			baseConfigurationReference = B5A79A9FDD3524D3628C080E /* Pods-BlockV_Example.dev.xcconfig */;
 			buildSettings = {
-				APP_DISPLAY_NAME = "Beta-BLOCKv Eg";
+				APP_DISPLAY_NAME = "$(CONFIGURATION)-BV Eg";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WA2R22UJPX;
+				ENVIRONMENT_MAPPING = dev_env;
 				INFOPLIST_FILE = BlockV/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
-				PRODUCT_BUNDLE_IDENTIFIER = "--PRODUCT-BUNDLE-IDENTIFIER-";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.blockv.sdk-core.example.$(CONFIGURATION)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
@@ -721,7 +734,7 @@
 		};
 		607FACF41AFB9204008FA782 /* Dev */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6F6694DB9BF713D3EF69B6B5 /* Pods-BlockV_Tests.release.xcconfig */;
+			baseConfigurationReference = CB05032DBDAACFFC17BA9C27 /* Pods-BlockV_Tests.dev.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = 4CTEXATCUR;
@@ -790,18 +803,20 @@
 		};
 		D5455B4520F88E3B00C98C2F /* Prod */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BC27A08D03F2D2401C48F394 /* Pods-BlockV_Example.release.xcconfig */;
+			baseConfigurationReference = 06192B242F07228474ADC183 /* Pods-BlockV_Example.prod.xcconfig */;
 			buildSettings = {
-				APP_DISPLAY_NAME = "BLOCKv Eg";
+				APP_DISPLAY_NAME = "$(CONFIGURATION)-BV Eg";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WA2R22UJPX;
+				ENVIRONMENT_MAPPING = prod_env;
 				INFOPLIST_FILE = BlockV/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
-				PRODUCT_BUNDLE_IDENTIFIER = "--PRODUCT-BUNDLE-IDENTIFIER-";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.blockv.sdk-core.example.$(CONFIGURATION)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
@@ -812,7 +827,7 @@
 		};
 		D5455B4620F88E3B00C98C2F /* Prod */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6F6694DB9BF713D3EF69B6B5 /* Pods-BlockV_Tests.release.xcconfig */;
+			baseConfigurationReference = 1D5DEDC397E0FEB56C8DD44E /* Pods-BlockV_Tests.prod.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = 4CTEXATCUR;

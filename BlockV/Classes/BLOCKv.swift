@@ -22,33 +22,6 @@ import JWTDecode
 /// Primary interface into the the BLOCKv SDK.
 public final class BLOCKv {
 
-    // MARK: - Enums
-
-    /// Models the BLOCKv platform environments.
-    public enum BVEnvironment {
-        /// Stable production environment.
-        case production
-        /// Unstable development environement (DO NOT USE).
-        case development
-
-        /// BLOCKv server base url
-        var apiServerURLString: String {
-            switch self {
-            case .production:  return "https://api.blockv.io"
-            case .development: return "https://apidev.blockv.net"
-            }
-        }
-
-        /// BLOCKv Web socket server base url
-        var webSocketURLString: String {
-            switch self {
-            case .production:  return "wss://newws.blockv.io/ws"
-            case .development: return "wss://ws.blockv.net/ws"
-            }
-        }
-
-    }
-
     // MARK: - Properties
 
     /// The App ID to be passed to the BLOCKv platform.
@@ -112,8 +85,19 @@ public final class BLOCKv {
             """
         precondition(BLOCKv.appID != nil, warning)
 
-        if environment == nil {
+        // - CONFIGURE ENVIRONMENT
+        
+        // extract the environment mapping
+        guard
+            let environmentString = Bundle.main.infoDictionary!["ENVIRONMENT_MAPPING"] as? String,
+            let env = BVEnvironment(rawValue: environmentString)
+        else {
             self.environment = .production // default to production
+            preconditionFailure("Unable to extract config environment mapping from info.plist.")
+        }
+        
+        if environment == nil {
+            self.environment = env
         }
 
         // return the configuration (inexpensive object)

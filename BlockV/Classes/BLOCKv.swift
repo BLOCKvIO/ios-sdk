@@ -86,7 +86,7 @@ public final class BLOCKv {
         precondition(BLOCKv.appID != nil, warning)
 
         // - CONFIGURE ENVIRONMENT
-        
+
         // extract the environment mapping
         guard
             let environmentString = Bundle.main.infoDictionary!["ENVIRONMENT_MAPPING"] as? String,
@@ -95,7 +95,7 @@ public final class BLOCKv {
             self.environment = .production // default to production
             preconditionFailure("Unable to extract config environment mapping from info.plist.")
         }
-        
+
         if environment == nil {
             self.environment = env
         }

@@ -19,8 +19,8 @@ public struct UserModel: Equatable {
     public let id: String
     public let firstName: String
     public let lastName: String
-    public let namePublic: Bool
-    public let avatarPublic: Bool
+    public let isNamePublic: Bool
+    public let isAvatarPublic: Bool
     public let birthday: String
     public let guestID: String
     public let nonPushNotification: Bool
@@ -42,8 +42,8 @@ public struct UserModel: Equatable {
     enum PropertiesCodingKeys: String, CodingKey {
         case firstName           = "first_name"
         case lastName            = "last_name"
-        case namePublic          = "name_public"
-        case avatarPublic        = "avatar_public"
+        case isNamePublic        = "name_public"
+        case isAvatarPublic      = "avatar_public"
         case avatarURL           = "avatar_uri"
         case birthday            = "birthday"
         case guestID             = "guest_id"
@@ -82,8 +82,8 @@ extension UserModel: Codable {
         let propertiesContainer = try items.nestedContainer(keyedBy: PropertiesCodingKeys.self, forKey: .properties)
         firstName           = try propertiesContainer.decode(String.self, forKey: .firstName)
         lastName            = try propertiesContainer.decode(String.self, forKey: .lastName)
-        namePublic          = try propertiesContainer.decode(Bool.self, forKey: .namePublic)
-        avatarPublic        = try propertiesContainer.decode(Bool.self, forKey: .avatarPublic)
+        isNamePublic        = try propertiesContainer.decode(Bool.self, forKey: .isNamePublic)
+        isAvatarPublic      = try propertiesContainer.decode(Bool.self, forKey: .isAvatarPublic)
         birthday            = try propertiesContainer.decode(String.self, forKey: .birthday)
         guestID             = try propertiesContainer.decode(String.self, forKey: .guestID)
         nonPushNotification = try propertiesContainer.decode(Bool.self, forKey: .nonPushNotification)
@@ -105,8 +105,8 @@ extension UserModel: Codable {
         var propertiesContainer = container.nestedContainer(keyedBy: PropertiesCodingKeys.self, forKey: .properties)
         try propertiesContainer.encode(firstName, forKey: .firstName)
         try propertiesContainer.encode(lastName, forKey: .lastName)
-        try propertiesContainer.encode(namePublic, forKey: .namePublic)
-        try propertiesContainer.encode(avatarPublic, forKey: .avatarPublic)
+        try propertiesContainer.encode(isNamePublic, forKey: .isNamePublic)
+        try propertiesContainer.encode(isAvatarPublic, forKey: .isAvatarPublic)
         try propertiesContainer.encode(avatarURL, forKey: .avatarURL)
         try propertiesContainer.encode(birthday, forKey: .birthday)
         try propertiesContainer.encode(guestID, forKey: .guestID)

@@ -27,6 +27,7 @@ public struct UserModel: Equatable {
     public let language: String
     public let meta: MetaModel
     public let avatarURL: URL?
+    public let isPasswordSet: Bool
 
     // Internal
 
@@ -49,6 +50,7 @@ public struct UserModel: Equatable {
         case guestID             = "guest_id"
         case nonPushNotification = "nonpush_notification"
         case language            = "language"
+        case isPasswordSet       = "is_password_set"
     }
 
     struct SystemProperties: Codable, Equatable {
@@ -88,6 +90,7 @@ extension UserModel: Codable {
         guestID             = try propertiesContainer.decode(String.self, forKey: .guestID)
         nonPushNotification = try propertiesContainer.decode(Bool.self, forKey: .nonPushNotification)
         language            = try propertiesContainer.decode(String.self, forKey: .language)
+        isPasswordSet       = try propertiesContainer.decode(Bool.self, forKey: .isPasswordSet)
 
         // Avatar URLs generally have a default value - but this is not guaranteed.
         avatarURL           = propertiesContainer.decodeSafely(Safe<URL>.self, forKey: .avatarURL)?.value
@@ -112,6 +115,7 @@ extension UserModel: Codable {
         try propertiesContainer.encode(guestID, forKey: .guestID)
         try propertiesContainer.encode(nonPushNotification, forKey: .nonPushNotification)
         try propertiesContainer.encode(language, forKey: .language)
+        try propertiesContainer.encode(isPasswordSet, forKey: .isPasswordSet)
 
     }
 

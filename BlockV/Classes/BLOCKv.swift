@@ -89,7 +89,7 @@ public final class BLOCKv {
 
         // extract the environment mapping from plist
         guard
-            let environmentString = Bundle.main.infoDictionary!["ENVIRONMENT_MAPPING"] as? String,
+            let environmentString = Bundle.main.infoDictionary?["ENVIRONMENT_MAPPING"] as? String,
             let env = BVEnvironment(rawValue: environmentString)
         else {
             self.environment = .production // default to production

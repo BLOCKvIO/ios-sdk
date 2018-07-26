@@ -47,8 +47,10 @@ class InventoryCollectionViewController: UICollectionViewController {
     fileprivate var vatoms: [VatomModel] = [] {
         didSet {
             filteredVatoms = vatoms.filter {
-                // filter out dropped vAtoms & coin wallet
-                (!$0.isDropped) && ($0.templateID != "vatomic::v1::vAtom::CoinWallet")
+                // filter out: dropped, avatar, and coin wallet vatoms
+                (!$0.isDropped)
+                    && (!$0.templateID.hasSuffix("::vAtom::Avatar"))
+                    && (!$0.templateID.hasSuffix("::vAtom::CoinWallet"))
             }
         }
     }

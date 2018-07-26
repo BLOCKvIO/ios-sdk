@@ -1,18 +1,20 @@
 PODS:
   - Alamofire (4.7.3)
-  - BLOCKv (1.1.0):
+  - BLOCKv/Core (1.1.0):
     - Alamofire (~> 4.7)
     - JWTDecode (~> 2.1)
     - Signals (~> 5.0)
     - Starscream (~> 3.0)
     - SwiftLint (~> 0.26)
+  - BLOCKv/Face (1.1.0):
+    - BLOCKv/Core
   - JWTDecode (2.1.1)
   - Signals (5.0.0)
   - Starscream (3.0.5)
   - SwiftLint (0.26.0)
 
 DEPENDENCIES:
-  - BLOCKv (from `../`)
+  - BLOCKv/Face (from `../`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -28,12 +30,12 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
-  BLOCKv: aa3a9dd10529e9921227527494c7cb360d09d061
+  BLOCKv: fe9cb0c98cc6895dfc5637e120ae891b354e0ced
   JWTDecode: 83e8b381aafe27158d9f692cbdca2b12d61d460c
   Signals: 6c41253cc172e4251d6064341bbc555a589c8d9f
   Starscream: faf918b2f2eff7d5dd21180646bf015a669673bd
   SwiftLint: f6b83e8d95ee1e91e11932d843af4fdcbf3fc764
 
-PODFILE CHECKSUM: 607654f8b0435c8536102866fa4fb9ba2ddddd6c
+PODFILE CHECKSUM: 76bb70fd3b772f6df8538f185f6542bc72f9f635
 
 COCOAPODS: 1.5.3

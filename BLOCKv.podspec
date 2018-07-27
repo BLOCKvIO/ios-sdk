@@ -13,12 +13,24 @@ Pod::Spec.new do |s|
   s.source                = { :git => 'https://github.com/BLOCKvIO/ios-sdk.git', :tag => s.version.to_s }
   s.social_media_url      = 'https://twitter.com/blockv_io'
   s.ios.deployment_target = '10.0'
-  s.source_files          = 'BlockV/Classes/**/*'
   s.swift_version         = '4.1'
+  s.default_subspecs      = 'Core'
   
-  s.dependency 'Alamofire',  '~> 4.7'  # Networking
-  s.dependency 'Starscream', '~> 3.0'  # Web socket
-  s.dependency 'JWTDecode',  '~> 2.1'  # JWT decoding
-  s.dependency 'Signals',    '~> 5.0'  # Elegant eventing
-  s.dependency 'SwiftLint',  '~> 0.26' # Linter
+  s.subspec 'Core' do |s|
+      s.source_files = 'BlockV/Core/**/*'
+      s.dependency 'Alamofire',  '~> 4.7'  # Networking
+      s.dependency 'Starscream', '~> 3.0'  # Web socket
+      s.dependency 'JWTDecode',  '~> 2.1'  # JWT decoding
+      s.dependency 'Signals',    '~> 5.0'  # Elegant eventing
+      s.dependency 'SwiftLint',  '~> 0.26' # Linter
+      #s.exclude_files = '**/Info*.plist'
+  end
+  
+  s.subspec 'Face' do |s|
+      s.ios.source_files = 'BlockV/Face/**/*'
+      s.dependency 'BLOCKv/Core'
+      #s.exclude_files = "**/Info*.plist"
+      #s.ios.resources = "Source/**/*.xib"
+  end
+  
 end

@@ -14,8 +14,8 @@ import Foundation
 /// Public user response model.
 public struct PublicUserModel: Codable, Equatable {
 
-    //public let id : String //TODO: Backend will add the id to the payload soon.
-    public var properties: Properties
+    public let id: String
+    public let properties: Properties
 
     public struct Properties: Codable, Equatable {
         public let firstName: String

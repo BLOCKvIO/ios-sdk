@@ -87,30 +87,33 @@ public final class BLOCKv {
 
         // - CONFIGURE ENVIRONMENT
 
+        // only modify if not set
         if environment == nil {
-
-            #if DEBUG
             
-            /* NOTE:
-             This should always be set to production to ensure 3rd party API consumers point to
-             production.
+            /*
+             The presense of the ENVIRONMENT_MAPPING user defined plist key allows the SDK to use pre-mapped
+             environments. This is only used internally for the BLOCKv apps. 3rd party API consumers must always use
+             the production environment.
              */
 
-            // only modifiy if you wish to experiment against a different environment.
-            self.environment = .production
+            // check if the plist contains a user defined key (internal only)
+            if let environmentString = Bundle.main.infoDictionary?["ENVIRONMENT_MAPPING"] as? String,
+                let mappedEnvironment = BVEnvironment(rawValue: environmentString) {
 
-            #else
-            // otherwise the environment mapping is extracted from the plist
-            guard
-                let environmentString = Bundle.main.infoDictionary?["ENVIRONMENT_MAPPING"] as? String,
-                let env = BVEnvironment(rawValue: environmentString)
-                else {
-                    self.environment = .production // default to production
-                    preconditionFailure("Unable to extract config environment mapping from info.plist.")
+                #if DEBUG
+                // environment for experimentation (safe to modify)
+                self.environment = .development
+                #else
+                // pre-mapped environment (do not modify)
+                self.environment = mappedEnvironment
+                #endif
+
+            } else {
+
+                // 3rd party API consumers must always point to production.
+                self.environment = .production
+
             }
-            self.environment = env
-
-            #endif
 
         }
 

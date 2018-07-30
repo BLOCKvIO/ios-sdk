@@ -86,18 +86,26 @@ public final class BLOCKv {
         precondition(BLOCKv.appID != nil, warning)
 
         // - CONFIGURE ENVIRONMENT
-
-        // extract the environment mapping from plist
-        guard
-            let environmentString = Bundle.main.infoDictionary?["ENVIRONMENT_MAPPING"] as? String,
-            let env = BVEnvironment(rawValue: environmentString)
-        else {
-            self.environment = .production // default to production
-            preconditionFailure("Unable to extract config environment mapping from info.plist.")
-        }
-
+        
         if environment == nil {
+            
+            #if DEBUG
+            // when in debug mode the environment should be changed here
+            self.environment = .production
+            
+            #else
+            // otherwise the environment mapping is extracted from the plist
+            guard
+                let environmentString = Bundle.main.infoDictionary?["ENVIRONMENT_MAPPING"] as? String,
+                let env = BVEnvironment(rawValue: environmentString)
+                else {
+                    self.environment = .production // default to production
+                    preconditionFailure("Unable to extract config environment mapping from info.plist.")
+            }
             self.environment = env
+            
+            #endif
+            
         }
 
         // return the configuration (inexpensive object)

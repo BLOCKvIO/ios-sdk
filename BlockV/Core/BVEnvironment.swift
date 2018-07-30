@@ -29,7 +29,7 @@ public enum BVEnvironment: String {
     /// BLOCKv Web socket server base url
     var webSocketURLString: String {
         switch self {
-        case .production:  return "wss//newws.blockv.io/ws"
+        case .production:  return "wss://newws.blockv.io/ws"
         case .development: return "wss://ws.blockv.net/ws"
         }
     }

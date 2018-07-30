@@ -90,8 +90,14 @@ public final class BLOCKv {
         if environment == nil {
 
             #if DEBUG
-            // when in debug mode the environment should be changed here
-            self.environment = .development
+            
+            /* NOTE:
+             This should always be set to production to ensure 3rd party API consumers point to
+             production.
+             */
+
+            // only modifiy if you wish to experiment against a different environment.
+            self.environment = .production
 
             #else
             // otherwise the environment mapping is extracted from the plist

@@ -89,7 +89,7 @@ public final class BLOCKv {
 
         // only modify if not set
         if environment == nil {
-            
+
             /*
              The presense of the ENVIRONMENT_MAPPING user defined plist key allows the SDK to use pre-mapped
              environments. This is only used internally for the BLOCKv apps. 3rd party API consumers must always use

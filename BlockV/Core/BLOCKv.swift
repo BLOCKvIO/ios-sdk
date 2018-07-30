@@ -91,7 +91,7 @@ public final class BLOCKv {
             
             #if DEBUG
             // when in debug mode the environment should be changed here
-            self.environment = .production
+            self.environment = .development
             
             #else
             // otherwise the environment mapping is extracted from the plist

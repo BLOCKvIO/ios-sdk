@@ -86,13 +86,13 @@ public final class BLOCKv {
         precondition(BLOCKv.appID != nil, warning)
 
         // - CONFIGURE ENVIRONMENT
-        
+
         if environment == nil {
-            
+
             #if DEBUG
             // when in debug mode the environment should be changed here
             self.environment = .development
-            
+
             #else
             // otherwise the environment mapping is extracted from the plist
             guard
@@ -103,9 +103,9 @@ public final class BLOCKv {
                     preconditionFailure("Unable to extract config environment mapping from info.plist.")
             }
             self.environment = env
-            
+
             #endif
-            
+
         }
 
         // return the configuration (inexpensive object)

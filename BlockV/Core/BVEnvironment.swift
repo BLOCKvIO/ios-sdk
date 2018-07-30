@@ -17,7 +17,7 @@ public enum BVEnvironment: String {
     case production = "prod_env"
     /// Unstable development environement (DO NOT USE).
     case development = "dev_env"
-    
+
     /// BLOCKv server base url
     var apiServerURLString: String {
         switch self {
@@ -25,7 +25,7 @@ public enum BVEnvironment: String {
         case .development: return "https://apidev.blockv.net"
         }
     }
-    
+
     /// BLOCKv Web socket server base url
     var webSocketURLString: String {
         switch self {
@@ -33,5 +33,5 @@ public enum BVEnvironment: String {
         case .development: return "wss://ws.blockv.net/ws"
         }
     }
-    
+
 }

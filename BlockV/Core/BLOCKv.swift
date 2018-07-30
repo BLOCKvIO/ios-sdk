@@ -22,33 +22,6 @@ import JWTDecode
 /// Primary interface into the the BLOCKv SDK.
 public final class BLOCKv {
 
-    // MARK: - Enums
-
-    /// Models the BLOCKv platform environments.
-    public enum BVEnvironment {
-        /// Stable production environment.
-        case production
-        /// Unstable development environement (DO NOT USE).
-        case development
-
-        /// BLOCKv server base url
-        var apiServerURLString: String {
-            switch self {
-            case .production:  return "https://api.blockv.io"
-            case .development: return "https://apidev.blockv.net"
-            }
-        }
-
-        /// BLOCKv Web socket server base url
-        var webSocketURLString: String {
-            switch self {
-            case .production:  return "wss://newws.blockv.io/ws"
-            case .development: return "wss://ws.blockv.net/ws"
-            }
-        }
-
-    }
-
     // MARK: - Properties
 
     /// The App ID to be passed to the BLOCKv platform.
@@ -112,8 +85,36 @@ public final class BLOCKv {
             """
         precondition(BLOCKv.appID != nil, warning)
 
+        // - CONFIGURE ENVIRONMENT
+
+        // only modify if not set
         if environment == nil {
-            self.environment = .production // default to production
+            
+            /*
+             The presense of the ENVIRONMENT_MAPPING user defined plist key allows the SDK to use pre-mapped
+             environments. This is only used internally for the BLOCKv apps. 3rd party API consumers must always use
+             the production environment.
+             */
+
+            // check if the plist contains a user defined key (internal only)
+            if let environmentString = Bundle.main.infoDictionary?["ENVIRONMENT_MAPPING"] as? String,
+                let mappedEnvironment = BVEnvironment(rawValue: environmentString) {
+
+                #if DEBUG
+                // environment for experimentation (safe to modify)
+                self.environment = .development
+                #else
+                // pre-mapped environment (do not modify)
+                self.environment = mappedEnvironment
+                #endif
+
+            } else {
+
+                // 3rd party API consumers must always point to production.
+                self.environment = .production
+
+            }
+
         }
 
         // return the configuration (inexpensive object)

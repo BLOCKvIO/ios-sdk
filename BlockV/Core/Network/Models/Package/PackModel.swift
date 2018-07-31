@@ -36,9 +36,9 @@ public struct PackModel: Decodable, Equatable {
         case actions
         case count
     }
-    
+
     // MARK: - Init
-    
+
     init(vatoms: [VatomModel], faces: [FaceModel], actions: [ActionModel]) {
         self.vatoms = vatoms
         self.faces = faces

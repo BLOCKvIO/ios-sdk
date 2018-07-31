@@ -36,6 +36,15 @@ public struct PackModel: Decodable, Equatable {
         case actions
         case count
     }
+    
+    // MARK: - Init
+    
+    init(vatoms: [VatomModel], faces: [FaceModel], actions: [ActionModel]) {
+        self.vatoms = vatoms
+        self.faces = faces
+        self.actions = actions
+        self.count = vatoms.count
+    }
 
     public init(from decoder: Decoder) throws {
 
@@ -91,12 +100,12 @@ extension PackModel {
     /// - Parameter id: Unique identifier of the vAtom.
     /// - Returns: The first Vatom Model of the sequence that satifies the id predicate, or `nil` if there is no
     ///   VatomModel.
-    private func firstVatom(whereId id: String) -> VatomModel? {
+    func firstVatom(whereId id: String) -> VatomModel? {
         return self.vatoms.first { $0.id == id }
     }
 
     /// Returns the faces associated with the vatom's template.
-    private func filterFaces(whereVatomId id: String) -> [FaceModel] {
+    func filterFaces(whereVatomId id: String) -> [FaceModel] {
         // find first vatom vatom
         guard let vatom = firstVatom(whereId: id) else {
             return []
@@ -105,12 +114,22 @@ extension PackModel {
     }
 
     /// Returns the actions associated with the vatom's template.
-    private func filterActions(whereVatomId id: String) -> [ActionModel] {
+    func filterActions(whereVatomId id: String) -> [ActionModel] {
         // find first vatom vatom
         guard let vatom = firstVatom(whereId: id) else {
             return []
         }
         return self.actions.filter { $0.templateID == vatom.templateID }
+    }
+    
+    /// Returns a PackModel for the specifed vAtom id.
+    func filterPackModel(whereVatomId id: String) -> PackModel? {
+        guard let vatom = firstVatom(whereId: id) else {
+            return nil
+        }
+        let faces = filterFaces(whereVatomId: id)
+        let actions = filterActions(whereVatomId: id)
+        return PackModel(vatoms: [vatom], faces: faces, actions: actions)
     }
 
 }

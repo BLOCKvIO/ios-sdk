@@ -71,7 +71,7 @@ public struct PackModel: Decodable, Equatable {
         self.count = try container.decodeIfPresent(Int.self, forKey: .count)
 
         /*
-         NOTE: The arrays of vatoms, faces, and actions are be decded 'safely'. In other words,
+         NOTE: The arrays of vatoms, faces, and actions are be decoded 'safely'. In other words,
          encountering a failure when decoding an element will result in only that element not being
          included in the decoded array. This is opposed to the default behaviour of `decode` for
          collections where the decoding failure of a single element throws and no elements are
@@ -80,4 +80,37 @@ public struct PackModel: Decodable, Equatable {
 
     }
 
+}
+
+// MARK: - Convenience Extension
+
+extension PackModel {
+    
+    /// Finds the first vAtom with the specified id.
+    ///
+    /// - Parameter id: Unique identifier of the vAtom.
+    /// - Returns: The first Vatom Model of the sequence that satifies the id predicate, or `nil` if there is no VatomModel
+    ///   if there is no VatomModel
+    private func firstVatom(whereId id: String) -> VatomModel? {
+        return self.vatoms.first { $0.id == id }
+    }
+    
+    /// Returns the faces associated with the vatom's template.
+    private func filterFaces(whereVatomId id: String) -> [FaceModel] {
+        // find first vatom vatom
+        guard let vatom = firstVatom(whereId: id) else {
+            return []
+        }
+        return self.faces.filter { $0.templateName ==  vatom.templateID}
+    }
+    
+    /// Returns the actions associated with the vatom's template.
+    private func filterActions(whereVatomId id: String) -> [ActionModel] {
+        // find first vatom vatom
+        guard let vatom = firstVatom(whereId: id) else {
+            return []
+        }
+        return self.actions.filter { $0.templateID == vatom.templateID }
+    }
+    
 }

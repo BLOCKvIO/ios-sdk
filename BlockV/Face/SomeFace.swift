@@ -24,6 +24,8 @@ struct VatomPackModel {
     let actions: [ActionModel]
 }
 
+// I guess VatomView should conform to FacePresenter?
+
 /// Types that want to present a vAtom face should conform to this protocol.
 protocol FacePresenter {
     var vatom: VatomModel { get set }
@@ -37,8 +39,8 @@ protocol FacePresenter {
 /// - Where to collect errors?
 class VatomView: UIView {
     
-    var vatom: VatomModel
-    var faces: FaceModel
+    var vatom: VatomModel!
+    var faces: FaceModel!
     
     func vatomUpdated() {
         
@@ -46,10 +48,7 @@ class VatomView: UIView {
         
     }
     
-    init(vatomPackModel: VatomPackModel) {
-        
-        
-    }
+
     
 }
 
@@ -59,10 +58,10 @@ struct FaceRoutine {
     
     var routine: ([FaceModel], ViewMode) -> FaceModel
     
-    func selectBestFace() -> FaceModel {
-        
-        
-        
-    }
+//    func selectBestFace() -> FaceModel {
+//        
+//        
+//        
+//    }
     
 }

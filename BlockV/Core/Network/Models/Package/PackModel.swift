@@ -110,7 +110,7 @@ extension PackModel {
         guard let vatom = findVatom(whereId: id) else {
             return []
         }
-        return self.faces.filter { $0.templateID ==  vatom.templateID}
+        return self.faces.filter { $0.templateID ==  vatom.templateID }
     }
 
     /// Returns the actions associated with the vAtom's template.

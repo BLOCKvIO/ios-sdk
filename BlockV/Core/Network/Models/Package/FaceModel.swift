@@ -26,13 +26,13 @@ public enum ViewMode: String {
 public struct FaceModel: Codable, Equatable {
 
     public let id: String
-    public let templateName: String
+    public let templateID: String
     public let meta: MetaModel
     public let properties: Properties
 
     enum CodingKeys: String, CodingKey {
         case id
-        case templateName = "template"
+        case templateID = "template"
         case meta
         case properties
     }

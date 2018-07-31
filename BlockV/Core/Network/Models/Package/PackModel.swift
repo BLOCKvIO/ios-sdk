@@ -85,25 +85,25 @@ public struct PackModel: Decodable, Equatable {
 // MARK: - Convenience Extension
 
 extension PackModel {
-    
+
     /// Finds the first vAtom with the specified id.
     ///
     /// - Parameter id: Unique identifier of the vAtom.
-    /// - Returns: The first Vatom Model of the sequence that satifies the id predicate, or `nil` if there is no VatomModel
-    ///   if there is no VatomModel
+    /// - Returns: The first Vatom Model of the sequence that satifies the id predicate, or `nil` if there is no
+    ///   VatomModel.
     private func firstVatom(whereId id: String) -> VatomModel? {
         return self.vatoms.first { $0.id == id }
     }
-    
+
     /// Returns the faces associated with the vatom's template.
     private func filterFaces(whereVatomId id: String) -> [FaceModel] {
         // find first vatom vatom
         guard let vatom = firstVatom(whereId: id) else {
             return []
         }
-        return self.faces.filter { $0.templateName ==  vatom.templateID}
+        return self.faces.filter { $0.templateID ==  vatom.templateID}
     }
-    
+
     /// Returns the actions associated with the vatom's template.
     private func filterActions(whereVatomId id: String) -> [ActionModel] {
         // find first vatom vatom
@@ -112,5 +112,5 @@ extension PackModel {
         }
         return self.actions.filter { $0.templateID == vatom.templateID }
     }
-    
+
 }

@@ -100,12 +100,12 @@ extension PackModel {
     /// - Parameter id: Unique identifier of the vAtom.
     /// - Returns: The first Vatom Model of the sequence that satisfies the id predicate, or `nil` if there is no
     ///   VatomModel matching the predicate.
-    func findVatom(whereId id: String) -> VatomModel? {
+    public func findVatom(whereId id: String) -> VatomModel? {
         return self.vatoms.first { $0.id == id }
     }
 
-    /// Returns the faces associated with the vatom's template.
-    func filterFaces(whereVatomId id: String) -> [FaceModel] {
+    /// Returns the faces associated with the vAtom's template.
+    public func filterFaces(whereVatomId id: String) -> [FaceModel] {
         // find first vatom vatom
         guard let vatom = findVatom(whereId: id) else {
             return []
@@ -113,8 +113,8 @@ extension PackModel {
         return self.faces.filter { $0.templateID ==  vatom.templateID}
     }
 
-    /// Returns the actions associated with the vatom's template.
-    func filterActions(whereVatomId id: String) -> [ActionModel] {
+    /// Returns the actions associated with the vAtom's template.
+    public func filterActions(whereVatomId id: String) -> [ActionModel] {
         // find first vatom vatom
         guard let vatom = findVatom(whereId: id) else {
             return []
@@ -122,8 +122,8 @@ extension PackModel {
         return self.actions.filter { $0.templateID == vatom.templateID }
     }
 
-    /// Returns a PackModel for the specifed vAtom id, or `nil` if there is no VatomModel matching the predicate.
-    func filter(whereVatomId id: String) -> PackModel {
+    /// Returns a PackModel for the specified vAtom id.
+    public func filter(whereVatomId id: String) -> PackModel {
         var vatoms: [VatomModel] = []
         if let vatom = findVatom(whereId: id) {
             vatoms.append(vatom)

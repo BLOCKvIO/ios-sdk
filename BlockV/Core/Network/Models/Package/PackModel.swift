@@ -123,7 +123,7 @@ extension PackModel {
     }
 
     /// Returns a PackModel for the specifed vAtom id, or `nil` if there is no VatomModel matching the predicate.
-    func filterPack(whereVatomId id: String) -> PackModel {
+    func filter(whereVatomId id: String) -> PackModel {
         var vatoms: [VatomModel] = []
         if let vatom = findVatom(whereId: id) {
             vatoms.append(vatom)

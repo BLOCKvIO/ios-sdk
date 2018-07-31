@@ -48,7 +48,10 @@ class VatomView: UIView {
         
     }
     
-
+    
+    //TODO Init
+    // 1. Pass in a face for display.
+    // 2. Pass in an array of faces that a routine must choose from.
     
 }
 
@@ -63,5 +66,40 @@ struct FaceRoutine {
 //        
 //        
 //    }
+    
+    func selectBestFace(faces: [FaceModel]) -> FaceModel {
+        
+        let rankings = faces.map { rankFace($0) }
+        let max = rankings.max()
+        let faceRanks = Array(zip(faces, rankings))
+        
+        
+    }
+    
+    /// Ranks the face
+    func rankFace(_ face: FaceModel) -> Int {
+        
+        var rank: Int = 0
+        
+        // prefer native faces over web
+        if face.properties.displayURL.absoluteString.hasPrefix("native://") {
+            
+            //TODO: Check if the native face has a view generator.
+            
+            rank += 1
+        }
+        
+        // prefer ios over generic
+        if face.properties.constraints.platform.caseInsensitiveCompare("ios") == .orderedSame {
+            rank += 1 // preferred
+        } else if face.properties.constraints.platform.caseInsensitiveCompare("generic") == .orderedSame {
+            rank += 0 // fallback
+        } else {
+            return -1 // do not use
+        }
+        
+        return rank
+        
+    }
     
 }

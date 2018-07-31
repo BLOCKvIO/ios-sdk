@@ -99,7 +99,7 @@ extension PackModel {
     ///
     /// - Parameter id: Unique identifier of the vAtom.
     /// - Returns: The first Vatom Model of the sequence that satifies the id predicate, or `nil` if there is no
-    ///   VatomModel.
+    ///   VatomModel matching the predicate.
     func firstVatom(whereId id: String) -> VatomModel? {
         return self.vatoms.first { $0.id == id }
     }
@@ -122,8 +122,8 @@ extension PackModel {
         return self.actions.filter { $0.templateID == vatom.templateID }
     }
     
-    /// Returns a PackModel for the specifed vAtom id.
-    func filterPackModel(whereVatomId id: String) -> PackModel? {
+    /// Returns a PackModel for the specifed vAtom id, or `nil` if there is no VatomModel matching the predicate.
+    func filterPack(whereVatomId id: String) -> PackModel? {
         guard let vatom = firstVatom(whereId: id) else {
             return nil
         }

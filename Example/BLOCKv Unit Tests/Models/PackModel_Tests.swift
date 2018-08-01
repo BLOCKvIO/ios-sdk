@@ -14,14 +14,19 @@ import XCTest
 
 class PackModel_Tests: XCTestCase {
     
-    lazy var decoder: JSONDecoder = {
+    // MARK: - Properties
+    
+    //TODO: Replace with official blockv decoder
+    lazy private var decoder: JSONDecoder = {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         return decoder
     }()
     
     /// Must be available to every test method.
-    var packModel: PackModel!
+    private var packModel: PackModel!
+    
+    // MARK: - Lifecycle
     
     override func setUp() {
         super.setUp()
@@ -35,6 +40,7 @@ class PackModel_Tests: XCTestCase {
             XCTAssertEqual(self.packModel.vatoms.count, 3)
             XCTAssertEqual(self.packModel.faces.count, 14)
             XCTAssertEqual(self.packModel.actions.count, 15)
+            
         } catch {
             XCTFail(error.localizedDescription)
         }
@@ -46,21 +52,26 @@ class PackModel_Tests: XCTestCase {
         super.tearDown()
     }
     
-    /// Test the decoding of json to a native PackModel.
-    ///
-    ///
-    func testPackModelDecoding() {
+    // MARK: - Test Methods
+    
+    /// Test finding a single vatom.
+    func testFindVatom() {
         
-        // pack model tests
-        XCTAssertEqual(self.packModel.vatoms.count, 3)
-        XCTAssertEqual(self.packModel.faces.count, 14)
-        XCTAssertEqual(self.packModel.actions.count, 15)
-        
+        do {
+            // test `findVatom`
+            let v = packModel.findVatom(whereId: "4389ec35-9fc4-4f31-1232-8cb6bcaa8b19")
+            let vatom = try self.require(v)
+            // ensure id of returned vatom matches the specified vatom id
+            XCTAssertEqual(vatom.id, "4389ec35-9fc4-4f31-1232-8cb6bcaa8b19")
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
     }
     
     /// Test the filter for finding a vAtom.
     func testFilterForVatom() {
         
+        // test `filter`
         let singlePack = self.packModel.filter(whereVatomId: "4389ec35-9fc4-4f31-1232-8cb6bcaa8b19")
         // single pack
         XCTAssertEqual(singlePack.vatoms.count, 1)
@@ -68,9 +79,7 @@ class PackModel_Tests: XCTestCase {
         XCTAssertEqual(singlePack.actions.count, 1)
         
         do {
-            // test `findVatom`
-            let v = packModel.findVatom(whereId: "4389ec35-9fc4-4f31-1232-8cb6bcaa8b19")
-            let vatom = try self.require(v)
+            let vatom = try self.require(singlePack.vatoms.first)
             // ensure id of returned vatom matches the specified vatom id
             XCTAssertEqual(vatom.id, "4389ec35-9fc4-4f31-1232-8cb6bcaa8b19")
         } catch {

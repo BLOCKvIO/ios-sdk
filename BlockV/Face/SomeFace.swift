@@ -18,7 +18,7 @@ import Foundation
  */
 
 /// Pack model holding a single vatom.
-struct VatomPackModel {
+struct VatomPackModel { // SinglePackModel
     let vatom: VatomModel
     let faces: [FaceModel]
     let actions: [ActionModel]

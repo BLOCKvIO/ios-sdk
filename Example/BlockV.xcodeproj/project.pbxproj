@@ -239,9 +239,8 @@
 		D530759221119E0E00DE7FD0 /* BLOCKv Unit Tests */ = {
 			isa = PBXGroup;
 			children = (
+				D53075A02111DBD600DE7FD0 /* Models */,
 				D530759D2111CADC00DE7FD0 /* Utilities */,
-				D530759321119E0E00DE7FD0 /* PackModel_Tests.swift */,
-				D5307588211199C200DE7FD0 /* MockModels.swift */,
 				D530759521119E0E00DE7FD0 /* Info.plist */,
 			);
 			path = "BLOCKv Unit Tests";
@@ -253,6 +252,15 @@
 				D530759E2111CC5200DE7FD0 /* Test+Utils.swift */,
 			);
 			path = Utilities;
+			sourceTree = "<group>";
+		};
+		D53075A02111DBD600DE7FD0 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				D530759321119E0E00DE7FD0 /* PackModel_Tests.swift */,
+				D5307588211199C200DE7FD0 /* MockModels.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		D5728D572060FE680041F4F7 /* Secrets */ = {

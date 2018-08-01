@@ -62,6 +62,20 @@ public struct FaceModel: Codable, Equatable {
         }
     }
 
+    // MARK: - Convenience
+
+    /// Boolean indicating whether this face is a native face.
+    public lazy var isNative: Bool = {
+        return self.properties.displayURL.absoluteString.hasPrefix("native://")
+    }()
+
+    /// Boolean indicating whether this face is a Web face.
+    ///
+    /// - important: Only secure connections are treated as Web faces.
+    public lazy var isWeb: Bool = {
+        return self.properties.displayURL.absoluteString.hasPrefix("https://")
+    }()
+
 }
 
 // MARK: - Hashable

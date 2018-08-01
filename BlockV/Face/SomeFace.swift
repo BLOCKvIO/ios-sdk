@@ -82,7 +82,7 @@ struct FaceRoutine {
         var rank: Int = 0
         
         // prefer native faces over web
-        if face.properties.displayURL.absoluteString.hasPrefix("native://") {
+        if face.isNative {
             
             //TODO: Check if the native face has a view generator.
             

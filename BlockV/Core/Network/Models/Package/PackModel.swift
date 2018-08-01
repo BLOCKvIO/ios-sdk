@@ -37,6 +37,15 @@ public struct PackModel: Decodable, Equatable {
         case count
     }
 
+    // MARK: - Init
+
+    init(vatoms: [VatomModel], faces: [FaceModel], actions: [ActionModel]) {
+        self.vatoms = vatoms
+        self.faces = faces
+        self.actions = actions
+        self.count = vatoms.count
+    }
+
     public init(from decoder: Decoder) throws {
 
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -71,13 +80,57 @@ public struct PackModel: Decodable, Equatable {
         self.count = try container.decodeIfPresent(Int.self, forKey: .count)
 
         /*
-         NOTE: The arrays of vatoms, faces, and actions are be decded 'safely'. In other words,
+         NOTE: The arrays of vatoms, faces, and actions are be decoded 'safely'. In other words,
          encountering a failure when decoding an element will result in only that element not being
          included in the decoded array. This is opposed to the default behaviour of `decode` for
          collections where the decoding failure of a single element throws and no elements are
          added.
          */
 
+    }
+
+}
+
+// MARK: - Convenience Extension
+
+extension PackModel {
+
+    /// Finds the vAtom with the specified id.
+    ///
+    /// - Parameter id: Unique identifier of the vAtom.
+    /// - Returns: The first Vatom Model of the sequence that satisfies the id predicate, or `nil` if there is no
+    ///   VatomModel matching the predicate.
+    public func findVatom(whereId id: String) -> VatomModel? {
+        return self.vatoms.first { $0.id == id }
+    }
+
+    /// Returns the faces associated with the vAtom's template.
+    public func filterFaces(whereVatomId id: String) -> [FaceModel] {
+        // find first vatom vatom
+        guard let vatom = findVatom(whereId: id) else {
+            return []
+        }
+        return self.faces.filter { $0.templateID ==  vatom.templateID }
+    }
+
+    /// Returns the actions associated with the vAtom's template.
+    public func filterActions(whereVatomId id: String) -> [ActionModel] {
+        // find first vatom vatom
+        guard let vatom = findVatom(whereId: id) else {
+            return []
+        }
+        return self.actions.filter { $0.templateID == vatom.templateID }
+    }
+
+    /// Returns a PackModel for the specified vAtom id.
+    public func filter(whereVatomId id: String) -> PackModel {
+        var vatoms: [VatomModel] = []
+        if let vatom = findVatom(whereId: id) {
+            vatoms.append(vatom)
+        }
+        let faces = filterFaces(whereVatomId: id)
+        let actions = filterActions(whereVatomId: id)
+        return PackModel(vatoms: vatoms, faces: faces, actions: actions)
     }
 
 }

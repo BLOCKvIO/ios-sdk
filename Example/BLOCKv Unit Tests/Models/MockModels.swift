@@ -10,6 +10,18 @@ import Foundation
 
 public enum MockModel {
     
+    public enum FaceModel {
+        
+        public static let nativeGenericIcon = """
+            {"id":"48476b21-a4cf-45b6-a2f3-9a9c7b491237","template":"vatomic.prototyping::Drone2","meta":{"created_by":"BLOCKv Backend","when_created":"2018-07-25T12:58:24Z","modified_by":"","when_modified":"2018-07-25T12:58:24Z","data_type":"v1::FaceType","in_sync":false,"when_synced":"","is_syncing":false},"properties":{"display_url":"native://generic-3d","package_url":".","constraints":{"bluetooth_le":false,"contact_list":false,"gps":false,"three_d":false,"view_mode":"icon","platform":"generic","quality":"high"},"resources":[]}}
+            """.data(using: .utf8)!
+        
+        public static let webGenericFullscreen = """
+            {"id":"856a8bc5-ada5-4158-840f-370d27171234c","template":"vatomic.prototyping::Invitation::v1","meta":{"created_by":"BLOCKv Backend","when_created":"2018-05-09T02:50:38Z","modified_by":"BLOCKv Backend","when_modified":"2018-05-10T14:35:21Z","data_type":"v1::FaceType","in_sync":false,"when_synced":"","is_syncing":false},"properties":{"display_url":"https://somewebsite.face.index.html","package_url":".","constraints":{"bluetooth_le":false,"contact_list":false,"gps":false,"three_d":false,"view_mode":"fullscreen","platform":"generic","quality":"high"},"resources":["CardBackground"]}}
+            """.data(using: .utf8)!
+        
+    }
+    
     public enum PackModel {
         
         public static let Example1 = """

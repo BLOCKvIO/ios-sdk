@@ -92,6 +92,19 @@ extension FaceModel: Codable {
 
 }
 
+// MARK: - Extension
+
+extension FaceModel {
+
+    //TODO: Since FaceModel is immutable, this could be set on init.
+
+    /// Boolean indicating whether the platform constraint of this face is supported.
+    var isPlatformSupported: Bool {
+        return properties.constraints.platform == "ios" || properties.constraints.platform == "generic"
+    }
+
+}
+
 // MARK: - Hashable
 
 extension FaceModel: Hashable {

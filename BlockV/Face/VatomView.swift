@@ -24,37 +24,39 @@ struct VatomPackModel { // SinglePackModel
 
 /// Responsible for displaying a vAtom face (native or Web).
 class VatomView: UIView {
-    
+
     // MARK: - Properties
-    
+
     var selectedFace: FaceModel
-    
+
     var loadingView: UIView?
     var errorView: UIView?
 
-    //TODO: This could become simply a PackModel.
+    //TODO: This could become PackModel.
     var vatom: VatomModel!
     var faces: [FaceModel] = []
     var actions: [ActionModel] = []
-    
+
     // MARK: - Initializer
 
+    /// Creates a vAtom view for the specifed vAtom.
+    ///
     /// 
     ///
     /// - Parameters:
     ///   - vatom: The vAtom to display.
     ///   - faces: The array of faces associated with the vAtom's template.
     ///   - actions: The array of actions associated with the vAtom's template.
-    ///   - routine: A predefined face selection routine that determines which face to display.
+    ///   - procedure: An embedded (predefiened) face selection procedure that determines which face to display.
     init(vatom: VatomModel,
          faces: [FaceModel],
          actions: [ActionModel],
-         routine: FaceRoutine) {
-        
-        super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+         procedure: EmbeddedProcedure) {
 
         // select best face
-        selectedFace = FaceSelector().selectFace(fromFaceModels: faces, usingRoutine: routine)
+        selectedFace = procedure.selectBestFace(faceModels: faces)!
+
+        super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
 
     }
 
@@ -64,32 +66,31 @@ class VatomView: UIView {
     ///   - vatom: The vAtom to display.
     ///   - faces: The array of faces associated with the vAtom's template.
     ///   - actions: The array of actions associated with the vAtom's template.
-    ///   - selectionRoutine: A function type that allow for full customization of the face selection.
+    ///   - customProcedure: A function type that allows for customization of the face selection.
     init(vatom: VatomModel,
          faces: [FaceModel],
          actions: [ActionModel],
-         selectionRoutine: FaceSelector.FaceSelectionProcedure) {
-        
+         customProcedure: FaceSelectionProcedure) {
+
+        selectedFace = customProcedure(faces)! //FIXME: What happens if this fails?
+
         super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
-        
-        
 
         // ...
-        
+
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func setup() {
-        
+
         self.loadingView = UIView() // or custom
         self.errorView = UIView() // or custom
-        
-        
+
     }
-    
+
     // MARK: - Methods
 
     func pickFace(vatom: VatomModel, viewContext: String) {

@@ -27,7 +27,7 @@ class VatomView: UIView {
 
     // MARK: - Properties
 
-    var selectedFace: FaceModel
+    var selectedFace: FaceModel? //FIXME: What should be displayed if a face is not selected?
 
     var loadingView: UIView?
     var errorView: UIView?
@@ -54,7 +54,7 @@ class VatomView: UIView {
          procedure: EmbeddedProcedure) {
 
         // select best face
-        selectedFace = procedure.selectBestFace(faceModels: faces)!
+        selectedFace = procedure.selectBestFace(faceModels: faces) //FIXME: What happens if this fails?
 
         super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
 
@@ -72,7 +72,7 @@ class VatomView: UIView {
          actions: [ActionModel],
          customProcedure: FaceSelectionProcedure) {
 
-        selectedFace = customProcedure(faces)! //FIXME: What happens if this fails?
+        selectedFace = customProcedure(faces) //FIXME: What happens if this fails?
 
         super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
 

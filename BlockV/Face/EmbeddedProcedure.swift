@@ -41,7 +41,7 @@ import Foundation
  1. Vatom private properties
  2. Vatom resources
  
- > This is enforced becuase routines don't have context of the vatom.
+ > This is enforced becuase procedures don't have context of the vatom.
  > Rather, such errors are left to the face code to validate and display an error.
  */
 
@@ -66,11 +66,10 @@ public enum EmbeddedProcedure: String {
     case card
     case background
 
-    /// Collection of face constraints.
+    /// Collection of face selection constraints.
     ///
-    /// Face constraints are supplied by the viewer. Only the viewer knows the constraints of the visual context in
-    /// which the vAtom is being displayed.
-    struct FaceConstraints {
+    /// These constraints are used as the selection criteria when choosing the best face for this procedure.
+    struct SelectionConstraints {
         /// The view_mode of the face.
         let viewMode: String
         // let quality: String
@@ -82,13 +81,14 @@ public enum EmbeddedProcedure: String {
     /// - Parameters:
     ///   - faceModels: Array of face models to be used by the selection procedure.
     ///   - constraints: Struct holding face contraints to be used by the selection procedure.
-    typealias EmbeddedFaceSelectionProcedure = (_ faceModels: [FaceModel], _ constraints: FaceConstraints) -> FaceModel?
+    typealias EmbeddedFaceSelectionProcedure = (_ faceModels: [FaceModel], _ constraints: SelectionConstraints)
+        -> FaceModel?
 
     /// Constraints associated with this embedded procedure.
     ///
     /// Returns the constrains for this embedded procedure.
-    var constraints: FaceConstraints {
-        return FaceConstraints(viewMode: self.rawValue)
+    var constraints: SelectionConstraints {
+        return SelectionConstraints(viewMode: self.rawValue)
     }
 
     //FIXME: Not yet used.
@@ -152,7 +152,10 @@ public enum EmbeddedProcedure: String {
     // MARK: - Face Selection
 
     /// Selects the best face using this procedure's defined face selection procedure and constraints.
-    func selectBestFace(faceModels: [FaceModel]) -> FaceModel? {
+    ///
+    /// - Parameter faceModels: Array of face models to select from.
+    /// - Returns: The best face, or `nil` if one is not found.
+    func selectBestFace(from faceModels: [FaceModel]) -> FaceModel? {
         // pass in this procedure's constraints
         return EmbeddedProcedure.defaultSelectionProcedure(faceModels, self.constraints)
     }

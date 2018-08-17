@@ -48,7 +48,14 @@ import Foundation
 // MARK: - Typealias
 
 /// embedded procedure has known contraints - thus constraints don't need to be passed in.
-typealias FaceSelectionProcedure = (_ faceModels: [FaceModel]) -> FaceModel?
+
+/// Closure that determines which face model to use.
+///
+/// - Parameters:
+///   - vatom: The vatom whose faces are to be selected.
+///   - actions: The
+typealias FaceSelectionProcedure = (_ vatom: VatomModel?, _ actions: [ActionModel]?, _ faces: [FaceModel])
+    -> FaceModel?
 
 // MARK: -
 

@@ -38,6 +38,8 @@
 		D597FF272051305A009B2910 /* UIAlertController+Etx.swift in Sources */ = {isa = PBXBuildFile; fileRef = D597FF262051305A009B2910 /* UIAlertController+Etx.swift */; };
 		D59C7DDD206CE1D000FCE1DD /* Actions.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D59C7DDC206CE1D000FCE1DD /* Actions.storyboard */; };
 		D5A08F3B2066514900FB3CB7 /* PasswordTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A08F3A2066514900FB3CB7 /* PasswordTableViewController.swift */; };
+		D5A482C32125B4C6009DD499 /* EmbeddedProcedure_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A482C22125B4C6009DD499 /* EmbeddedProcedure_Tests.swift */; };
+		D5A482C62125B655009DD499 /* MockModelsFaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A482C42125B5A7009DD499 /* MockModelsFaces.swift */; };
 		D5E3AC9F2049883900CFFEEA /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E3AC9E2049883800CFFEEA /* LoginViewController.swift */; };
 		FE05FFA026A3E5A0C79B6E20 /* Pods_BLOCKv_Unit_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7956FE101E9335CDDC8248F3 /* Pods_BLOCKv_Unit_Tests.framework */; };
 /* End PBXBuildFile section */
@@ -107,6 +109,8 @@
 		D597FF262051305A009B2910 /* UIAlertController+Etx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Etx.swift"; sourceTree = "<group>"; };
 		D59C7DDC206CE1D000FCE1DD /* Actions.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Actions.storyboard; sourceTree = "<group>"; };
 		D5A08F3A2066514900FB3CB7 /* PasswordTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordTableViewController.swift; sourceTree = "<group>"; };
+		D5A482C22125B4C6009DD499 /* EmbeddedProcedure_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedProcedure_Tests.swift; sourceTree = "<group>"; };
+		D5A482C42125B5A7009DD499 /* MockModelsFaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockModelsFaces.swift; sourceTree = "<group>"; };
 		D5E3AC9E2049883800CFFEEA /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -241,6 +245,7 @@
 		D530759221119E0E00DE7FD0 /* BLOCKv Unit Tests */ = {
 			isa = PBXGroup;
 			children = (
+				D5A482C72125B7D1009DD499 /* Face Selection */,
 				D53075A02111DBD600DE7FD0 /* Models */,
 				D530759D2111CADC00DE7FD0 /* Utilities */,
 				D530759521119E0E00DE7FD0 /* Info.plist */,
@@ -334,6 +339,15 @@
 				D5475763205D124100E6FE90 /* UIView+Ext.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		D5A482C72125B7D1009DD499 /* Face Selection */ = {
+			isa = PBXGroup;
+			children = (
+				D5A482C22125B4C6009DD499 /* EmbeddedProcedure_Tests.swift */,
+				D5A482C42125B5A7009DD499 /* MockModelsFaces.swift */,
+			);
+			path = "Face Selection";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -558,6 +572,8 @@
 				D530759421119E0E00DE7FD0 /* PackModel_Tests.swift in Sources */,
 				D53075A42112E9E000DE7FD0 /* FaceModel_Tests.swift in Sources */,
 				D530759C21119E2A00DE7FD0 /* MockModels.swift in Sources */,
+				D5A482C62125B655009DD499 /* MockModelsFaces.swift in Sources */,
+				D5A482C32125B4C6009DD499 /* EmbeddedProcedure_Tests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

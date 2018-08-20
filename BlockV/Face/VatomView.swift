@@ -81,7 +81,7 @@ class VatomView: UIView {
     /// The vatom pack.
     var vatomPack: VatomPackModel {
         didSet {
-            // Run Face View Lifecycle (FVLC).
+            // run face view lifecycle (FVLC).
             runFaceViewLifecylce()
         }
     }
@@ -94,7 +94,7 @@ class VatomView: UIView {
     /// on screen.
     var procedure: FaceSelectionProcedure {
         didSet {
-            // Run Face View Lifecycle (FVLC).
+            // run face view lifecycle (FVLC).
             runFaceViewLifecylce()
         }
     }
@@ -143,6 +143,7 @@ class VatomView: UIView {
 
     private func commonInit() {
 
+        self.accessibilityIdentifier = "id_vatomView"
         self.loadingView = UIView() // or custom
         self.errorView = UIView() // or custom
 
@@ -150,13 +151,24 @@ class VatomView: UIView {
 
     // MARK: - Methods
 
+    /// Exectues the Face View Lifecycle
+    ///
+    /// 1. Run face selection procedure
+    /// 2. Create face view
+    /// 3. Inform the face view to load it's content
+    /// 4. Display the face view
     func runFaceViewLifecylce() {
 
         let supportedDisplayURLS: Set = ["native://image"]
 
         if let selectedFace = procedure(self.vatomPack, supportedDisplayURLS) {
             print(selectedFace)
-            // Create and show face
+            
+            // 1. Find face model's generator
+            // 2. Call validate on the face code to see if the vatom meets the face code's requirements
+            // 3. Init face view
+            // 4. call onLoad(completion:)
+
         } else {
             // Display the error view (which shows the activated image).
         }

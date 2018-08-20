@@ -23,15 +23,28 @@ public protocol FaceView where Self: UIView {
     /// Uniqiue identifier of the native face.
     var displayURL: String { get }
 
+    /// Vatom pack for display.
+    var vatomPack: VatomPackModel { get set }
+    
+    /// Selected face model.
+    var selectedFace: FaceModel { get set }
+
+    /// Face selection procedure.
+    var procedure: FaceSelectionProcedure { get set }
+
     // MARK: - Lifecycle
 
     /// Called
     func onLoad(completed: () -> Void, failed: Error?)
 
     /// Called when the vatom pack is updated.
+    ///
+    /// This may be called in response to numerous events.
+    ///
+    /// E.g. A vAtom's root or private section are updated and the signal come down via the Web socket.
     func onVatomUpdated(_ vatomPack: VatomPackModel)
 
-    ///
+    /// Called
     func onUnload()
 
 }

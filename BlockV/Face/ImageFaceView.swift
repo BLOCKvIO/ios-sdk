@@ -20,8 +20,6 @@ class ImageFaceView: UIView, FaceView {
 
     var vatomPack: VatomPackModel
 
-    var procedure: FaceSelectionProcedure
-
     var selectedFace: FaceModel
 
     // MARK: - Initialization
@@ -34,12 +32,10 @@ class ImageFaceView: UIView, FaceView {
      I am going to try without passing VatomView down.
      */
     init(vatomPack: VatomPackModel,
-         selectedFace: FaceModel,
-         procedure: @escaping FaceSelectionProcedure) {
+         selectedFace: FaceModel) {
 
         self.vatomPack = vatomPack
         self.selectedFace = selectedFace
-        self.procedure = procedure
 
         super.init(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
 
@@ -49,16 +45,16 @@ class ImageFaceView: UIView, FaceView {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     // MARK: - View Lifecylce
-    
+
     override func layoutSubviews() {
         super.layoutSubviews()
-        
+
         //FIXME: This should be replaced by face config
-        
+
         guard let image = imageView.image else { return }
-        
+
         // check scale
         if self.selectedFace.properties.constraints.viewMode == "card" {
             imageView.contentMode = .scaleAspectFill
@@ -67,7 +63,7 @@ class ImageFaceView: UIView, FaceView {
         } else {
             imageView.contentMode = .center
         }
-        
+
     }
 
     // MARK: - Face View Lifecycle
@@ -90,12 +86,13 @@ class ImageFaceView: UIView, FaceView {
     }
 
     // MARK: -
-    
+
+    ///FIXME: This must become
     func doResourceStuff() {
-        
+
         //let resourceId =
         let resourceURL = vatomPack.vatom.resources
-        
+
     }
 
     // FIXME: This should be of type FLAnimatedImageView

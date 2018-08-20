@@ -16,7 +16,7 @@ import Foundation
 /// Closure used during face model selection.
 ///
 /// A Face Selection Procedure (FSP) is an algorithm used to select the 'best' face model from the (potentially) many
-/// faces associated with the vatom's template. An FSP gives Viewers the control over the selection procedure.
+/// faces associated with the vatom's template. An FSP gives Viewers the control over the selection procedure used.
 ///
 /// Available inputs:
 /// - vAtom to be displayed.
@@ -27,7 +27,7 @@ import Foundation
 /// - Parameters:
 ///   - vatomPack: vAtom pack from which the best face should be selected.
 ///   - displayURLs: Set of displayURLs of the installed native faces.
-typealias FaceSelectionProcedure = (_ vatomPack: VatomPackModel, _ displayURLs: Set<String>)
+public typealias FaceSelectionProcedure = (_ vatomPack: VatomPackModel, _ displayURLs: Set<String>)
     -> FaceModel?
 
 /// Models the face selection procedures (FSP)s. This is a set of pre-built face selection procedures offered by the SDK

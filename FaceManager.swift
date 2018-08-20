@@ -11,19 +11,14 @@
 
 import Foundation
 
+typealias FaceViewGenerator = (_ vatom: VatomModel, _ face: FaceModel) -> FaceView
+
 public struct FaceManager {
-    
-    // MARK: - Type Alias
-    
-    ///
-    public typealias NativeViewGenerator = (_ vatom: VatomModel, _ face: FaceModel) -> UIView
     
     // MARK: - Properties
     
-    /// Dictionary of native faces.
-    ///
-    /// Viewer should
-    private var nativeFaces: [String : NativeViewGenerator] = [:]
+    /// Dictionary of face
+    private var faceViews: [String : FaceViewGenerator] = [:]
     
     // MARK: - Methods
     
@@ -32,9 +27,11 @@ public struct FaceManager {
     /// - Parameters:
     ///   - generator: A closure that take in a vatom and a face and generates a UIView.
     ///   - url: The display url
-    public func register(generator: NativeViewGenerator, forDisplayURL url: String) {
+    public func registerFaceView(_ faceView: FaceView) {
         
         // register the native face somewhere
+        
+//        self.faceViews[faceView.displayURL] = 
         
     }
     

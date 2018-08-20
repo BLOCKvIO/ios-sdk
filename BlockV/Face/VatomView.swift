@@ -72,8 +72,8 @@ class VatomView: UIView {
 
     // MARK: - Properties
 
-    var selectedFace: FaceModel? //FIXME: What should be displayed if a face is not selected?
-    var selectedFaceView: UIView? //FIXME: What type should this be?
+    var selectedFace: FaceModel?
+    var selectedFaceView: FaceView?
 
     var loadingView: UIView?
     var errorView: UIView?
@@ -81,7 +81,7 @@ class VatomView: UIView {
     /// The vatom pack.
     var vatomPack: VatomPackModel {
         didSet {
-            // Run the Face View Lifecycle (FVLC).
+            // Run Face View Lifecycle (FVLC).
             runFaceViewLifecylce()
         }
     }
@@ -94,7 +94,7 @@ class VatomView: UIView {
     /// on screen.
     var procedure: FaceSelectionProcedure {
         didSet {
-            // Run the Face View Lifecycle (FVLC).
+            // Run Face View Lifecycle (FVLC).
             runFaceViewLifecylce()
         }
     }
@@ -128,11 +128,10 @@ class VatomView: UIView {
     ///   - faces: The array of faces associated with the vAtom's template.
     ///   - actions: The array of actions associated with the vAtom's template.
     ///   - customProcedure: A function type that allows for a custom face selection procedure (FSP).
-    init(vatomPack: VatomPackModel,
-         customProcedure: @escaping FaceSelectionProcedure) {
+    init(vatomPack: VatomPackModel, procedure: @escaping FaceSelectionProcedure) {
 
         self.vatomPack = vatomPack
-        self.procedure = customProcedure
+        self.procedure = procedure
 
         super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
 

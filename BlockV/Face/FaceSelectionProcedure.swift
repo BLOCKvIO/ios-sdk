@@ -26,7 +26,7 @@ import Foundation
 ///
 /// - Parameters:
 ///   - vatomPack: vAtom pack from which the best face should be selected.
-///   - displayURLs: Set of displayURLs of supported native faces.
+///   - displayURLs: Set of displayURLs of the installed native faces.
 typealias FaceSelectionProcedure = (_ vatomPack: VatomPackModel, _ displayURLs: Set<String>)
     -> FaceModel?
 
@@ -77,9 +77,8 @@ public enum EmbeddedProcedure: String {
     /// Selects the 'best' face using this procedure's stored Face Selection Procedure (FSP).
     ///
     /// - Parameters:
-    ///   - vatom: The vAtom to be displayed.
-    ///   - actions: The action models associated with the vAtom's template.
-    ///   - faces: The face models assocated with the vAtom's template.
+    ///   - vatomPack: vAtom pack from which the best face should be selected.
+    ///   - displayURLs: Set of displayURLs of the installed native faces.
     ///   - useFallback: Determines whether the fallback procedure should be used. If `true` the fallback is used,
     ///   `false` otherwise.
     /// - Returns: The selected face model, or `nil` if no face model is selected.

@@ -36,9 +36,6 @@ public protocol FaceView where Self: UIView {
     /// Selected face model.
     var selectedFace: FaceModel { get set }
 
-    /// Face selection procedure.
-    var procedure: FaceSelectionProcedure { get set }
-
     // MARK: - Lifecycle
 
     /// Called

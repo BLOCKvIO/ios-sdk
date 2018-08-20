@@ -11,24 +11,24 @@
 
 import Foundation
 
-protocol VatomViewLifeCycle {
-    
-    
-    
-}
+/// Protocol for all faces to adopt.
+///
+/// This is the base protocol and defines the base of what it means to be a face (native or web).
+///
+/// Face creators will begin by implementing this protocol on a UIView.
+public protocol FaceView where Self: UIView {
 
-/// Protocol for native faces to adopt
-protocol NativeFaceView {
+    // MARK: - Properties
 
     /// Uniqiue identifier of the native face.
     var displayURL: String { get }
-    
+
     // MARK: - Lifecycle
 
-    ///
+    /// Called
     func onLoad(completed: () -> Void, failed: Error?)
 
-    ///
+    /// Called when the vatom pack is updated.
     func onVatomUpdated(_ vatomPack: VatomPackModel)
 
     ///

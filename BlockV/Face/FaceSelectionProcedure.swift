@@ -36,7 +36,7 @@ typealias FaceSelectionProcedure = (_ vatomPack: VatomPackModel, _ displayURLs: 
 /// It important to think of the cases simply as unique identifiers of stored face selection procedures.
 /// Cases loosely map to the server's 'view_mode' simply because the 'view_mode' is generally the predominant selection
 /// criteria.
-public enum StoredProcedure: String {
+public enum EmbeddedProcedure: String {
 
     /// Selects based on 'icon' view mode.
     case icon
@@ -46,8 +46,6 @@ public enum StoredProcedure: String {
     case fullscreen
     /// Selects based on 'card' view mode.
     case card
-    /// Selects based on 'background' view mode.
-    case background
 
     //TODO: The generic viewer will likely specify it's own stored procedures. This means the whole fallback concept
     // should be removed. Rather, the generic viewer should specify its own procedures with its own fallbacks since this
@@ -55,24 +53,22 @@ public enum StoredProcedure: String {
 
     /// A fallback allows one procedure to fallback on antoher in the event the first procedure fails to select a
     /// face model.
-    var fallback: StoredProcedure? {
+    var fallback: EmbeddedProcedure? {
         switch self {
         case .icon:         return nil
         case .activated:    return .icon
         case .fullscreen:   return .icon
-        case .card:         return .fullscreen
-        case .background:   return nil
+        case .card:         return .icon
         }
     }
 
     /// Returns the selection procedure for this case.
     var selectionProcedure: FaceSelectionProcedure {
         switch self {
-        case .icon:         return StoredProcedureBuilder.iconProcedure
-        case .activated:    return StoredProcedureBuilder.activatedProcedure
-        case .fullscreen:   return StoredProcedureBuilder.fullscreenProcedure
-        case .card:         return StoredProcedureBuilder.cardProcedure
-        case .background:   return StoredProcedureBuilder.backgroundProcedure
+        case .icon:         return EmbeddedProcedureBuilder.iconProcedure
+        case .activated:    return EmbeddedProcedureBuilder.activatedProcedure
+        case .fullscreen:   return EmbeddedProcedureBuilder.fullscreenProcedure
+        case .card:         return EmbeddedProcedureBuilder.cardProcedure
         }
     }
 
@@ -115,38 +111,33 @@ public enum StoredProcedure: String {
 }
 
 ///
-private struct StoredProcedureBuilder {
+private struct EmbeddedProcedureBuilder {
 
     // MARK: - Stored Face Selection Procedure (FSP)
 
     static let iconProcedure: FaceSelectionProcedure = { (vatomPack, displayURLs) in
-        StoredProcedureBuilder.defaultSelectionProcedure(vatomPack.faces, displayURLs,
-                                                         StoredProcedure.icon.constraints)
+        EmbeddedProcedureBuilder.defaultSelectionProcedure(vatomPack.faces, displayURLs,
+                                                         EmbeddedProcedure.icon.constraints)
     }
 
     static let activatedProcedure: FaceSelectionProcedure = { (vatomPack, displayURLs)  in
-        StoredProcedureBuilder.defaultSelectionProcedure(vatomPack.faces, displayURLs,
-                                                         StoredProcedure.activated.constraints)
+        EmbeddedProcedureBuilder.defaultSelectionProcedure(vatomPack.faces, displayURLs,
+                                                         EmbeddedProcedure.activated.constraints)
     }
 
     static let fullscreenProcedure: FaceSelectionProcedure = { (vatomPack, displayURLs)  in
-        StoredProcedureBuilder.defaultSelectionProcedure(vatomPack.faces, displayURLs,
-                                                         StoredProcedure.fullscreen.constraints)
+        EmbeddedProcedureBuilder.defaultSelectionProcedure(vatomPack.faces, displayURLs,
+                                                         EmbeddedProcedure.fullscreen.constraints)
     }
 
     static let cardProcedure: FaceSelectionProcedure = { (vatomPack, displayURLs)  in
-        StoredProcedureBuilder.defaultSelectionProcedure(vatomPack.faces, displayURLs,
-                                                         StoredProcedure.card.constraints)
-    }
-
-    static let backgroundProcedure: FaceSelectionProcedure = { (vatomPack, displayURLs) in
-        StoredProcedureBuilder.defaultSelectionProcedure(vatomPack.faces, displayURLs,
-                                                         StoredProcedure.background.constraints)
+        EmbeddedProcedureBuilder.defaultSelectionProcedure(vatomPack.faces, displayURLs,
+                                                         EmbeddedProcedure.card.constraints)
     }
 
     // MARK: - Stored Procedure
 
-    /// Stored procedures only take in the face models and a set of constraints.
+    /// Embedded procedures only take in the face models and a set of constraints (as this is all they need).
     ///
     /// A face selection procedure takes, as input, an array of face models and a set of face constraints. As output,
     /// it return a face model which satisfies all supplied contraints, or `nil` if no satisfactory face was found.
@@ -154,16 +145,16 @@ private struct StoredProcedureBuilder {
     /// - Parameters:
     ///   - faceModels: Array of face models to be used by the selection procedure.
     ///   - constraints: Struct holding face contraints to be used by the selection procedure.
-    typealias StoredFaceSelectionProcedure = (_ faceModels: [FaceModel],
+    typealias EmbeddedFaceSelectionProcedure = (_ faceModels: [FaceModel],
         _ displayURLs: Set<String>,
-        _ constraints: StoredProcedure.SelectionConstraints)
+        _ constraints: EmbeddedProcedure.SelectionConstraints)
         -> FaceModel?
 
     /// Default selection procedure.
     ///
     /// This closure defines a procedure that is common to most stored procedures. Therefore, it makes
     /// sense to the logic in a central place.
-    static let defaultSelectionProcedure: StoredFaceSelectionProcedure = { (faceModels, displayURLs, constraints) in
+    static let defaultSelectionProcedure: EmbeddedFaceSelectionProcedure = { (faceModels, displayURLs, constraints) in
 
         var bestFace: FaceModel?
         var bestRank = 0

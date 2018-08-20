@@ -38,7 +38,7 @@ class EmbeddedProcedure_Tests: XCTestCase {
             let faceModels = try decoder.decode([FaceModel].self, from: MockModelFaces.genericIconAnd3D)
             XCTAssertEqual(faceModels.count, 2)
             
-            let possibleBestFaceForIcon = StoredProcedure.icon.selectBestFace(from: faceModels)
+            let possibleBestFaceForIcon = EmbeddedProcedure.icon.selectBestFace(from: faceModels)
             let bestFaceForIcon = try self.require(possibleBestFaceForIcon)
             XCTAssertEqual(bestFaceForIcon.id, "bbbb")
             
@@ -55,7 +55,7 @@ class EmbeddedProcedure_Tests: XCTestCase {
             let faceModels = try decoder.decode([FaceModel].self, from: MockModelFaces.genericIconAnd3D)
             XCTAssertEqual(faceModels.count, 2)
             
-            let possibleBestFaceForCard = StoredProcedure.card.selectBestFace(from: faceModels)
+            let possibleBestFaceForCard = EmbeddedProcedure.card.selectBestFace(from: faceModels)
             let bestFaceForCard = try self.require(possibleBestFaceForCard)
             XCTAssertEqual(bestFaceForCard.id, "aaaa")
             

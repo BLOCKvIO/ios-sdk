@@ -9,20 +9,29 @@
 //  governing permissions and limitations under the License.
 //
 
-import UIKit
-import WebKit
+import Foundation
 
-class VatomWebFaceView: UIView {
+protocol VatomViewLifeCycle {
+    
+    
+    
+}
 
-    var webView: WKWebView?
+/// Protocol for native faces to adopt
+protocol NativeFaceView {
+
+    /// Uniqiue identifier of the native face.
+    var displayURL: String { get }
     
-    init() {
-        super.init(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
-        self.backgroundColor = .blue
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
+    // MARK: - Lifecycle
+
+    ///
+    func onLoad(completed: () -> Void, failed: Error?)
+
+    ///
+    func onVatomUpdated(_ vatomPack: VatomPackModel)
+
+    ///
+    func onUnload()
+
 }

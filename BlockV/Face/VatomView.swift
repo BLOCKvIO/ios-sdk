@@ -47,8 +47,6 @@ import Foundation
 
 
 
-
-
 // ------------------------------------
 
 /// Pack model holding a single vatom and its associated faces and actions.
@@ -56,9 +54,6 @@ struct VatomPackModel {
     let vatom: VatomModel
     let faces: [FaceModel] = []
     let actions: [ActionModel] = []
-    
-    //TODO: The init may need to be private to prevent the viewer from init-ing this struct with arbitrary and unrelated
-    // vatom, actions, or faces.
 }
 
 // ------------------------------------
@@ -93,7 +88,7 @@ class VatomView: UIView {
             runFaceViewLifecylce()
         }
     }
-    
+
     /// The face selection procedure.
     ///
     /// Viewers may wish to update the procedure in reponse to certian events.
@@ -106,12 +101,10 @@ class VatomView: UIView {
             runFaceViewLifecylce()
         }
     }
-    
+
     // MARK: - Web Socket
-    
+
     // TODO: Respond to the Web socket, pass events down to the Face View.
-    
-    
 
     // MARK: - Initializer
 
@@ -121,12 +114,12 @@ class VatomView: UIView {
     ///   - vatomPack: The vAtom to display and its associated faces and actions.
     ///   - faces: The array of faces associated with the vAtom's template.
     ///   - actions: The array of actions associated with the vAtom's template.
-    ///   - procedure: An embedded (predefiened) face selection procedure that determines which face to display.
-    init(vatomPack: VatomPackModel, procedure: StoredProcedure) {
-        
+    ///   - procedure: An embedded (predefiened) face selection procedure (FSP) that determines which face to display.
+    init(vatomPack: VatomPackModel, procedure: EmbeddedProcedure) {
+
         self.vatomPack = vatomPack
         self.procedure = procedure.selectionProcedure
-        
+
         super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
 
     }
@@ -137,7 +130,7 @@ class VatomView: UIView {
     ///   - vatom: The vAtom to display.
     ///   - faces: The array of faces associated with the vAtom's template.
     ///   - actions: The array of actions associated with the vAtom's template.
-    ///   - customProcedure: A function type that allows for customization of the face selection.
+    ///   - customProcedure: A function type that allows for a custom face selection procedure (FSP).
     init(vatomPack: VatomPackModel,
          customProcedure: @escaping FaceSelectionProcedure) {
 

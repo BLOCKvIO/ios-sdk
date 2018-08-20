@@ -31,6 +31,9 @@ Pod::Spec.new do |s|
       s.dependency 'BLOCKv/Core'
       #s.exclude_files = "**/Info*.plist"
       #s.ios.resources = "Source/**/*.xib"
+      
+      # native://image
+      s.dependency 'FLAnimatedImage', '~> 1.0'
   end
   
 end

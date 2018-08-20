@@ -8,6 +8,8 @@ PODS:
     - SwiftLint (~> 0.26)
   - BLOCKv/Face (1.1.0):
     - BLOCKv/Core
+    - FLAnimatedImage (~> 1.0)
+  - FLAnimatedImage (1.0.12)
   - JWTDecode (2.1.1)
   - Signals (5.0.0)
   - Starscream (3.0.5)
@@ -19,6 +21,7 @@ DEPENDENCIES:
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Alamofire
+    - FLAnimatedImage
     - JWTDecode
     - Signals
     - Starscream
@@ -30,7 +33,8 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
-  BLOCKv: fe9cb0c98cc6895dfc5637e120ae891b354e0ced
+  BLOCKv: 2ecb02a96030898a065133973598dc2b3462e2df
+  FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
   JWTDecode: 83e8b381aafe27158d9f692cbdca2b12d61d460c
   Signals: 6c41253cc172e4251d6064341bbc555a589c8d9f
   Starscream: faf918b2f2eff7d5dd21180646bf015a669673bd

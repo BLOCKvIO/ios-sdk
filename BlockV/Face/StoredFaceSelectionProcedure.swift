@@ -12,36 +12,10 @@
 import Foundation
 
 /*
- Goals:
- 1. Vatom View will ask for the best face (default routine for each view context).
- 2. Viewer's must be able to use pre-defined routines.
- 3. Viewer's must be able supply a custom face selection procedure.
+ Questions:
  
- Concept: Face Selection Procedure
+ - Should the FSP validate that the native face is installed?
  
- A face selection procedure is an algorithm used to select a face model from the (potentially) many faces
- associated with the vatom's template.
- 
- Since vatoms rarely define the exact face they wish to show (because the faces that get registered against the vatom's
- template are out of the developers control).
- 
- A face selection procedure allows for 2 things:
- 1. The best face can be chosen from the attributes and contraints of the available faces.
- 2. A fallback face can be provided (in the event no face meets the criteria).
- 
- 
- Face selection procedures ONLY validate:
- 1. The native face code is installed.
- 2. The platform is supported.
- 3. The constrians, e.g. view mode are satisfied.
- 
- > If there are multiple, select the first.
- 
- Face selection routines do NOT validate:
- 1. Vatom private properties
- 2. Vatom resources
- 
- > Rather, such errors are left to the face code to validate and display an error.
  */
 
 // MARK: - Typealias
@@ -58,8 +32,6 @@ import Foundation
 typealias FaceSelectionProcedure = (_ vatom: VatomModel, _ actions: [ActionModel], _ faces: [FaceModel])
     -> FaceModel?
 
-// MARK: -
-
 /// Models the face selection procedures (FSP)s. This is a set of pre-built face selection procedures offered by the SDK
 /// to meet common use cases.
 ///
@@ -68,12 +40,20 @@ typealias FaceSelectionProcedure = (_ vatom: VatomModel, _ actions: [ActionModel
 /// criteria.
 public enum StoredProcedure: String {
 
+    /// Selects based on 'icon' view mode.
     case icon
+    /// Selects based on 'activated' view mode.
     case activated
+    /// Selects based on 'fullscreen' view mode.
     case fullscreen
+    /// Selects based on 'card' view mode.
     case card
+    /// Selects based on 'background' view mode.
     case background
 
+    //TODO: The generic viewer will likely specify it's own stored procedures. This means the whole fallback concept
+    // should be removed.
+    
     /// A fallback allows one procedure to fallback on antoher in the event the first procedure fails to select a
     /// face model.
     var fallback: StoredProcedure? {

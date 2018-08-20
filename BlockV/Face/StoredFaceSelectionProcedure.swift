@@ -11,13 +11,6 @@
 
 import Foundation
 
-/*
- Questions:
- 
- - Should the FSP validate that the native face is installed?
- 
- */
-
 // MARK: - Typealias
 
 /// Closure used during face model selection.
@@ -25,11 +18,16 @@ import Foundation
 /// A Face Selection Procedure (FSP) is an algorithm used to select the 'best' face model from the (potentially) many
 /// faces associated with the vatom's template. An FSP gives Viewers the control over the selection procedure.
 ///
+/// Available inputs:
+/// - vAtom to be displayed.
+/// - Actions associated with the vAtom's template.
+/// - Face modeles associated with the vAtom's template.
+/// - Supported display URLs. This is the set of display urls (i.e. unique identifiers of the install native faces).
+///
 /// - Parameters:
-///   - vatom: The vAtom whose faces are to be selected.
-///   - actions: The action models associated with the vAtom's template.
-///   - faces: The face models assocated with the vAtom's template.
-typealias FaceSelectionProcedure = (_ vatom: VatomModel, _ actions: [ActionModel], _ faces: [FaceModel])
+///   - vatomPack: vAtom pack from which the best face should be selected.
+///   - displayURLs: Set of displayURLs of supported native faces.
+typealias FaceSelectionProcedure = (_ vatomPack: VatomPackModel, _ displayURLs: Set<String>)
     -> FaceModel?
 
 /// Models the face selection procedures (FSP)s. This is a set of pre-built face selection procedures offered by the SDK
@@ -52,8 +50,9 @@ public enum StoredProcedure: String {
     case background
 
     //TODO: The generic viewer will likely specify it's own stored procedures. This means the whole fallback concept
-    // should be removed.
-    
+    // should be removed. Rather, the generic viewer should specify its own procedures with its own fallbacks since this
+    // is not something the sdk should be offering as a 'common' solution.
+
     /// A fallback allows one procedure to fallback on antoher in the event the first procedure fails to select a
     /// face model.
     var fallback: StoredProcedure? {
@@ -88,11 +87,11 @@ public enum StoredProcedure: String {
     ///   - useFallback: Determines whether the fallback procedure should be used. If `true` the fallback is used,
     ///   `false` otherwise.
     /// - Returns: The selected face model, or `nil` if no face model is selected.
-    func selectBestFace(vatom: VatomModel, actions: [ActionModel], faces: [FaceModel], useFallback: Bool = true)
+    func selectBestFace(vatomPack: VatomPackModel, displayURLs: Set<String>, useFallback: Bool = true)
         -> FaceModel? {
         // execute this procedure, use fallback if necessary
-        return self.selectionProcedure(vatom, actions, faces) ??
-            self.fallback?.selectionProcedure(vatom, actions, faces)
+        return self.selectionProcedure(vatomPack, displayURLs) ??
+            self.fallback?.selectionProcedure(vatomPack, displayURLs)
     }
 
     // MARK: Constraints
@@ -120,24 +119,29 @@ private struct StoredProcedureBuilder {
 
     // MARK: - Stored Face Selection Procedure (FSP)
 
-    static let iconProcedure: FaceSelectionProcedure = { (vatom, actionModels, faceModels) in
-        StoredProcedureBuilder.defaultSelectionProcedure(faceModels, StoredProcedure.icon.constraints)
+    static let iconProcedure: FaceSelectionProcedure = { (vatomPack, displayURLs) in
+        StoredProcedureBuilder.defaultSelectionProcedure(vatomPack.faces, displayURLs,
+                                                         StoredProcedure.icon.constraints)
     }
 
-    static let activatedProcedure: FaceSelectionProcedure = { (vatom, actionModels, faceModels) in
-        StoredProcedureBuilder.defaultSelectionProcedure(faceModels, StoredProcedure.activated.constraints)
+    static let activatedProcedure: FaceSelectionProcedure = { (vatomPack, displayURLs)  in
+        StoredProcedureBuilder.defaultSelectionProcedure(vatomPack.faces, displayURLs,
+                                                         StoredProcedure.activated.constraints)
     }
 
-    static let fullscreenProcedure: FaceSelectionProcedure = { (vatom, actionModels, faceModels) in
-        StoredProcedureBuilder.defaultSelectionProcedure(faceModels, StoredProcedure.fullscreen.constraints)
+    static let fullscreenProcedure: FaceSelectionProcedure = { (vatomPack, displayURLs)  in
+        StoredProcedureBuilder.defaultSelectionProcedure(vatomPack.faces, displayURLs,
+                                                         StoredProcedure.fullscreen.constraints)
     }
 
-    static let cardProcedure: FaceSelectionProcedure = { (vatom, actionModels, faceModels) in
-        StoredProcedureBuilder.defaultSelectionProcedure(faceModels, StoredProcedure.card.constraints)
+    static let cardProcedure: FaceSelectionProcedure = { (vatomPack, displayURLs)  in
+        StoredProcedureBuilder.defaultSelectionProcedure(vatomPack.faces, displayURLs,
+                                                         StoredProcedure.card.constraints)
     }
 
-    static let backgroundProcedure: FaceSelectionProcedure = { (vatom, actionModels, faceModels) in
-        StoredProcedureBuilder.defaultSelectionProcedure(faceModels, StoredProcedure.background.constraints)
+    static let backgroundProcedure: FaceSelectionProcedure = { (vatomPack, displayURLs) in
+        StoredProcedureBuilder.defaultSelectionProcedure(vatomPack.faces, displayURLs,
+                                                         StoredProcedure.background.constraints)
     }
 
     // MARK: - Stored Procedure
@@ -151,6 +155,7 @@ private struct StoredProcedureBuilder {
     ///   - faceModels: Array of face models to be used by the selection procedure.
     ///   - constraints: Struct holding face contraints to be used by the selection procedure.
     typealias StoredFaceSelectionProcedure = (_ faceModels: [FaceModel],
+        _ displayURLs: Set<String>,
         _ constraints: StoredProcedure.SelectionConstraints)
         -> FaceModel?
 
@@ -158,7 +163,7 @@ private struct StoredProcedureBuilder {
     ///
     /// This closure defines a procedure that is common to most stored procedures. Therefore, it makes
     /// sense to the logic in a central place.
-    static let defaultSelectionProcedure: StoredFaceSelectionProcedure = { (faceModels, constraints) in
+    static let defaultSelectionProcedure: StoredFaceSelectionProcedure = { (faceModels, displayURLs, constraints) in
 
         var bestFace: FaceModel?
         var bestRank = 0
@@ -167,7 +172,7 @@ private struct StoredProcedureBuilder {
 
             var rank = -1
 
-            // ensure the 'view mode' is supported
+            // ensure 'view mode' is supported
             if face.properties.constraints.viewMode != constraints.viewMode {
                 rank = -1
                 continue
@@ -185,6 +190,11 @@ private struct StoredProcedureBuilder {
 
             // rank 'native' over 'web'
             if face.isNative {
+                // enusrue the native face is supported (i.e. the face code is installed)
+                if displayURLs.contains(where: { $0.caseInsensitiveCompare("") == .orderedSame }) {
+                    rank = -1
+                    continue
+                }
                 rank += 1
             }
 

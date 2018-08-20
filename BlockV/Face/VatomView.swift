@@ -140,10 +140,10 @@ class VatomView: UIView {
     ///   - customProcedure: A function type that allows for customization of the face selection.
     init(vatomPack: VatomPackModel,
          customProcedure: @escaping FaceSelectionProcedure) {
-        
+
         self.vatomPack = vatomPack
         self.procedure = customProcedure
-        
+
         super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
 
     }
@@ -153,23 +153,25 @@ class VatomView: UIView {
     }
 
     private func commonInit() {
-        
+
         self.loadingView = UIView() // or custom
         self.errorView = UIView() // or custom
-        
+
     }
 
     // MARK: - Methods
-    
+
     func runFaceViewLifecylce() {
-        
-        if let selectedFace = procedure(self.vatomPack.vatom, self.vatomPack.actions, self.vatomPack.faces) {
+
+        let supportedDisplayURLS: Set = ["native://image"]
+
+        if let selectedFace = procedure(self.vatomPack, supportedDisplayURLS) {
             print(selectedFace)
             // Create and show face
         } else {
             // Display the error view (which shows the activated image).
         }
-        
+
     }
 
 }

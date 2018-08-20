@@ -16,27 +16,13 @@ class ImageFaceView: UIView, FaceView {
 
     // MARK: - Fave View Protocol
 
-    let displayURL: String = "native://test"
+    let displayURL: String = "native://image"
 
     var vatomPack: VatomPackModel
 
     var procedure: FaceSelectionProcedure
 
     var selectedFace: FaceModel
-
-    // MARK: - Lifecycle
-
-    func onLoad(completed: () -> Void, failed: Error?) {
-        print(#function)
-    }
-
-    func onVatomUpdated(_ vatomPack: VatomPackModel) {
-        print(#function)
-    }
-
-    func onUnload() {
-        print(#function)
-    }
 
     // MARK: - Initialization
 
@@ -63,16 +49,16 @@ class ImageFaceView: UIView, FaceView {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
-    // MARK: -
-
+    
+    // MARK: - View Lifecylce
+    
     override func layoutSubviews() {
         super.layoutSubviews()
-
-        //FIXME: This can be replaced by face config
-
+        
+        //FIXME: This should be replaced by face config
+        
         guard let image = imageView.image else { return }
-
+        
         // check scale
         if self.selectedFace.properties.constraints.viewMode == "card" {
             imageView.contentMode = .scaleAspectFill
@@ -81,10 +67,36 @@ class ImageFaceView: UIView, FaceView {
         } else {
             imageView.contentMode = .center
         }
+        
+    }
+
+    // MARK: - Face View Lifecycle
+
+    func onLoad(completed: () -> Void, failed: Error?) {
+        print(#function)
+
+        // Grab resource
+
+        // Download resource
 
     }
 
+    func onVatomUpdated(_ vatomPack: VatomPackModel) {
+        print(#function)
+    }
+
+    func onUnload() {
+        print(#function)
+    }
+
     // MARK: -
+    
+    func doResourceStuff() {
+        
+        //let resourceId =
+        let resourceURL = vatomPack.vatom.resources
+        
+    }
 
     // FIXME: This should be of type FLAnimatedImageView
     lazy var imageView: UIImageView = {

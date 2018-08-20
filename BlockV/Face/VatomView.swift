@@ -11,7 +11,6 @@
 
 import Foundation
 
-
 /*
  Goals:
  1. Vatom View will ask for the best face (default routine for each view context).
@@ -45,15 +44,13 @@ import Foundation
  > Rather, such errors are left to the face code to validate and display an error.
  */
 
-
-
 // ------------------------------------
 
 /// Pack model holding a single vatom and its associated faces and actions.
-struct VatomPackModel {
-    let vatom: VatomModel
-    let faces: [FaceModel] = []
-    let actions: [ActionModel] = []
+public struct VatomPackModel {
+    public let vatom: VatomModel
+    public let faces: [FaceModel] = []
+    public let actions: [ActionModel] = []
 }
 
 // ------------------------------------

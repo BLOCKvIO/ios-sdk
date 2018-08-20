@@ -23,9 +23,16 @@ public protocol FaceView where Self: UIView {
     /// Uniqiue identifier of the native face.
     var displayURL: String { get }
 
+    /*
+     Architecture
+     
+     Another option to having a vatomPack is to have a refrence to VatomView. This may eliminate copies
+     (although with COW it shouldn't be an issue).
+     */
+
     /// Vatom pack for display.
     var vatomPack: VatomPackModel { get set }
-    
+
     /// Selected face model.
     var selectedFace: FaceModel { get set }
 

@@ -11,13 +11,6 @@
 
 import Foundation
 
-/// Pack model holding a single vatom and its associated faces and actions.
-public struct VatomPackModel {
-    public let vatom: VatomModel
-    public let faces: [FaceModel] = []
-    public let actions: [ActionModel] = []
-}
-
 /// A simple struct that holds the three components necessary to interaction with vAtoms.
 ///
 /// These are:

@@ -38,6 +38,8 @@ public typealias FaceSelectionProcedure = (_ vatomPack: VatomPackModel, _ displa
 /// Models the embedded face selection procedures (FSP)s. This is a set of pre-built face selection procedures defined
 /// by the SDK to meet common use cases.
 ///
+/// Additionally, there is a custom case which allows Viewers to control the FSP.
+///
 /// It important to think of the cases simply as unique identifiers of stored face selection procedures. Cases loosely
 /// map to the server's 'view_mode' simply because the 'view_mode' is generally the predominant selection criteria.
 public enum EmbeddedProcedure {

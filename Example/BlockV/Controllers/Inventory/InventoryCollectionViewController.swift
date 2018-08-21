@@ -308,6 +308,11 @@ class InventoryCollectionViewController: UICollectionViewController {
         if segue.identifier == "seg.vatom.detail" {
             let destination = segue.destination as! VatomDetailTableViewController
             destination.vatom = vatomToPass
+        } else if segue.identifier == "seg.vatom.show" {
+            let destination = segue.destination as! UINavigationController
+            let vc = destination.viewControllers[0] as! ActivatedVatomViewController
+//            vc.vatomPack = // the vatom pack
+            vc.procedure = EmbeddedProcedure.icon
         }
     }
     
@@ -362,7 +367,8 @@ extension InventoryCollectionViewController {
         // check if the cell has a vatom
         if let vatom = currentCell.vatom {
             self.vatomToPass = vatom
-            performSegue(withIdentifier: "seg.vatom.detail", sender: self)
+//            performSegue(withIdentifier: "seg.vatom.detail", sender: self)
+            performSegue(withIdentifier: "seg.vatom.show", sender: self)
         }
         
     }

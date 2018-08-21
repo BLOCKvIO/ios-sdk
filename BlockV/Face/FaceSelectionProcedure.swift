@@ -40,7 +40,7 @@ public typealias FaceSelectionProcedure = (_ vatomPack: VatomPackModel, _ displa
 ///
 /// It important to think of the cases simply as unique identifiers of stored face selection procedures. Cases loosely
 /// map to the server's 'view_mode' simply because the 'view_mode' is generally the predominant selection criteria.
-public enum EmbeddedProcedure: String {
+public enum EmbeddedProcedure {
 
     /// Selects based on 'icon' view mode.
     case icon
@@ -50,30 +50,50 @@ public enum EmbeddedProcedure: String {
     case fullscreen
     /// Selects based on 'card' view mode.
     case card
+    /// Selects based on an FSP specified by the Viewer.
+    case custom(FaceSelectionProcedure)
 
-    //TODO: The generic viewer will likely specify it's own stored procedures. This means the whole fallback concept
-    // should be removed. Rather, the generic viewer should specify its own procedures with its own fallbacks since this
-    // is not something the SDK should be offering as a 'common' solution.
-
-    /// A fallback allows one procedure to fallback on antoher in the event the first procedure fails to select a
-    /// face model.
+    /// A fallback allows one procedure to fallback on another (in the event the first procedure fails to select a
+    /// face model). This logic is specific to the embeed procedures.
     var fallback: EmbeddedProcedure? {
         switch self {
         case .icon:         return nil
         case .activated:    return .icon
         case .fullscreen:   return .icon
         case .card:         return .icon
+        case .custom:       return nil
         }
     }
 
     /// Returns the face selection procedure.
     var selectionProcedure: FaceSelectionProcedure {
         switch self {
-        case .icon:         return EmbeddedProcedureBuilder.iconProcedure
-        case .activated:    return EmbeddedProcedureBuilder.activatedProcedure
-        case .fullscreen:   return EmbeddedProcedureBuilder.fullscreenProcedure
-        case .card:         return EmbeddedProcedureBuilder.cardProcedure
+        case .icon:             return EmbeddedProcedureBuilder.iconProcedure
+        case .activated:        return EmbeddedProcedureBuilder.activatedProcedure
+        case .fullscreen:       return EmbeddedProcedureBuilder.fullscreenProcedure
+        case .card:             return EmbeddedProcedureBuilder.cardProcedure
+        case let .custom(fsp):  return fsp
         }
+    }
+
+    // MARK: Constraints
+
+    /// Constraints associated with this embedded procedure.
+    var constraints: SelectionConstraints? {
+        switch self {
+        case .icon:         return SelectionConstraints(viewMode: "icon")
+        case .activated:    return SelectionConstraints(viewMode: "activated")
+        case .fullscreen:   return SelectionConstraints(viewMode: "fullscreen")
+        case .card:         return SelectionConstraints(viewMode: "card")
+        case .custom:       return nil
+        }
+    }
+
+    /// Constraints used as the selection criteria when choosing the best face for this procedure.
+    struct SelectionConstraints {
+        /// The view_mode of the face.
+        let viewMode: String
+        // let quality: String // e.g. of futher constraints
     }
 
     // MARK: - Face selection
@@ -88,50 +108,36 @@ public enum EmbeddedProcedure: String {
     /// - Returns: The selected face model, or `nil` if no face model is selected.
     func selectBestFace(vatomPack: VatomPackModel, displayURLs: Set<String>, useFallback: Bool = true)
         -> FaceModel? {
-        // execute this procedure, use fallback if necessary
-        return self.selectionProcedure(vatomPack, displayURLs) ??
-            self.fallback?.selectionProcedure(vatomPack, displayURLs)
-    }
-
-    // MARK: Constraints
-
-    /// Constraints associated with this embedded procedure.
-    var constraints: SelectionConstraints {
-        return SelectionConstraints(viewMode: self.rawValue)
-    }
-
-    /// Constraints used as the selection criteria when choosing the best face for this procedure.
-    struct SelectionConstraints {
-        /// The view_mode of the face.
-        let viewMode: String
-        // let quality: String // e.g. of futher constraints
+            // execute this procedure, use fallback if necessary
+            return self.selectionProcedure(vatomPack, displayURLs) ??
+                self.fallback?.selectionProcedure(vatomPack, displayURLs)
     }
 
 }
 
-///
+/// Struct responsible for buidling the embedded procedures.
 private struct EmbeddedProcedureBuilder {
 
     // MARK: - Stored Face Selection Procedure (FSP)
 
     static let iconProcedure: FaceSelectionProcedure = { (vatomPack, displayURLs) in
         EmbeddedProcedureBuilder.defaultSelectionProcedure(vatomPack.faces, displayURLs,
-                                                         EmbeddedProcedure.icon.constraints)
+                                                         EmbeddedProcedure.icon.constraints!)
     }
 
     static let activatedProcedure: FaceSelectionProcedure = { (vatomPack, displayURLs)  in
         EmbeddedProcedureBuilder.defaultSelectionProcedure(vatomPack.faces, displayURLs,
-                                                         EmbeddedProcedure.activated.constraints)
+                                                         EmbeddedProcedure.activated.constraints!)
     }
 
     static let fullscreenProcedure: FaceSelectionProcedure = { (vatomPack, displayURLs)  in
         EmbeddedProcedureBuilder.defaultSelectionProcedure(vatomPack.faces, displayURLs,
-                                                         EmbeddedProcedure.fullscreen.constraints)
+                                                         EmbeddedProcedure.fullscreen.constraints!)
     }
 
     static let cardProcedure: FaceSelectionProcedure = { (vatomPack, displayURLs)  in
         EmbeddedProcedureBuilder.defaultSelectionProcedure(vatomPack.faces, displayURLs,
-                                                         EmbeddedProcedure.card.constraints)
+                                                         EmbeddedProcedure.card.constraints!)
     }
 
     // MARK: - Stored Procedure
@@ -173,7 +179,8 @@ private struct EmbeddedProcedureBuilder {
             var rank = 0
 
             // ensure 'view mode' is supported
-            if face.properties.constraints.viewMode != constraints.viewMode {
+            if  constraints.viewMode != face.properties.constraints.viewMode {
+                // face does not meet this visual context's constraints
                 continue
             }
 
@@ -183,6 +190,7 @@ private struct EmbeddedProcedureBuilder {
             } else if face.properties.constraints.platform == "generic" {
                 rank += 1
             } else {
+                // platform not supported
                 continue
             }
 

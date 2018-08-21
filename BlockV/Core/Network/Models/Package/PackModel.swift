@@ -11,6 +11,13 @@
 
 import Foundation
 
+/// Pack model holding a single vatom and its associated faces and actions.
+public struct VatomPackModel {
+    public let vatom: VatomModel
+    public let faces: [FaceModel]
+    public let actions: [ActionModel]
+}
+
 /// A simple struct that holds the three components necessary to interaction with vAtoms.
 ///
 /// These are:
@@ -123,14 +130,14 @@ extension PackModel {
     }
 
     /// Returns a PackModel for the specified vAtom id.
-    public func filter(whereVatomId id: String) -> PackModel {
-        var vatoms: [VatomModel] = []
+    public func filter(whereVatomId id: String) -> VatomPackModel? {
+        // find vatom
         if let vatom = findVatom(whereId: id) {
-            vatoms.append(vatom)
+            let faces = filterFaces(whereVatomId: id)
+            let actions = filterActions(whereVatomId: id)
+            return VatomPackModel(vatom: vatom, faces: faces, actions: actions)
         }
-        let faces = filterFaces(whereVatomId: id)
-        let actions = filterActions(whereVatomId: id)
-        return PackModel(vatoms: vatoms, faces: faces, actions: actions)
+        return nil
     }
 
 }

@@ -207,6 +207,8 @@ private struct EmbeddedProcedureBuilder {
                 }
 
             }
+            
+            //TODO: Check if web face is installed
 
             // compare to best rank
             if rank > bestRank {

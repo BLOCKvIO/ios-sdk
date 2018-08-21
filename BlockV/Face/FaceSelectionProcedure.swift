@@ -13,16 +13,19 @@ import Foundation
 
 // MARK: - Typealias
 
-/// Closure used during face model selection.
+/// A Face Selection Procedure (FSP) is an algorithm used to select the best face model from the (potentially) many
+/// faces associated with the vatom's template. An FSP gives Viewer apps optional control over the face selection
+/// procedure.
 ///
-/// A Face Selection Procedure (FSP) is an algorithm used to select the 'best' face model from the (potentially) many
-/// faces associated with the vatom's template. An FSP gives Viewers the control over the selection procedure used.
-///
-/// Available inputs:
+/// Closure inputs:
 /// - vAtom to be displayed.
 /// - Actions associated with the vAtom's template.
-/// - Face modeles associated with the vAtom's template.
-/// - Supported display URLs. This is the set of display urls (i.e. unique identifiers of the install native faces).
+/// - Faces associated with the vAtom's template.
+/// - Installed display URLs. This is the set of native face display URLs (i.e. unique identifiers of the installed
+///   native faces).
+///
+/// Closure ouput:
+/// - Optional face model. The closure should return the 'best' face given the inputs, or `nil` if no face is selected.
 ///
 /// - Parameters:
 ///   - vatomPack: vAtom pack from which the best face should be selected.
@@ -30,12 +33,11 @@ import Foundation
 public typealias FaceSelectionProcedure = (_ vatomPack: VatomPackModel, _ displayURLs: Set<String>)
     -> FaceModel?
 
-/// Models the face selection procedures (FSP)s. This is a set of pre-built face selection procedures offered by the SDK
-/// to meet common use cases.
+/// Models the embedded face selection procedures (FSP)s. This is a set of pre-built face selection procedures defined
+/// by the SDK to meet common use cases.
 ///
-/// It important to think of the cases simply as unique identifiers of stored face selection procedures.
-/// Cases loosely map to the server's 'view_mode' simply because the 'view_mode' is generally the predominant selection
-/// criteria.
+/// It important to think of the cases simply as unique identifiers of stored face selection procedures. Cases loosely
+/// map to the server's 'view_mode' simply because the 'view_mode' is generally the predominant selection criteria.
 public enum EmbeddedProcedure: String {
 
     /// Selects based on 'icon' view mode.
@@ -49,7 +51,7 @@ public enum EmbeddedProcedure: String {
 
     //TODO: The generic viewer will likely specify it's own stored procedures. This means the whole fallback concept
     // should be removed. Rather, the generic viewer should specify its own procedures with its own fallbacks since this
-    // is not something the sdk should be offering as a 'common' solution.
+    // is not something the SDK should be offering as a 'common' solution.
 
     /// A fallback allows one procedure to fallback on antoher in the event the first procedure fails to select a
     /// face model.
@@ -62,7 +64,7 @@ public enum EmbeddedProcedure: String {
         }
     }
 
-    /// Returns the selection procedure for this case.
+    /// Returns the face selection procedure.
     var selectionProcedure: FaceSelectionProcedure {
         switch self {
         case .icon:         return EmbeddedProcedureBuilder.iconProcedure
@@ -78,7 +80,7 @@ public enum EmbeddedProcedure: String {
     ///
     /// - Parameters:
     ///   - vatomPack: vAtom pack from which the best face should be selected.
-    ///   - displayURLs: Set of displayURLs of the installed native faces.
+    ///   - displayURLs: Set of display URLs of the installed native faces.
     ///   - useFallback: Determines whether the fallback procedure should be used. If `true` the fallback is used,
     ///   `false` otherwise.
     /// - Returns: The selected face model, or `nil` if no face model is selected.
@@ -92,15 +94,11 @@ public enum EmbeddedProcedure: String {
     // MARK: Constraints
 
     /// Constraints associated with this embedded procedure.
-    ///
-    /// Returns the constrains for this embedded procedure.
     var constraints: SelectionConstraints {
         return SelectionConstraints(viewMode: self.rawValue)
     }
 
-    /// Constraints associated with this embedded procedure.
-    ///
-    /// These constraints are used as the selection criteria when choosing the best face for this procedure.
+    /// Constraints used as the selection criteria when choosing the best face for this procedure.
     struct SelectionConstraints {
         /// The view_mode of the face.
         let viewMode: String
@@ -136,13 +134,11 @@ private struct EmbeddedProcedureBuilder {
 
     // MARK: - Stored Procedure
 
-    /// Embedded procedures only take in the face models and a set of constraints (as this is all they need).
-    ///
-    /// A face selection procedure takes, as input, an array of face models and a set of face constraints. As output,
-    /// it return a face model which satisfies all supplied contraints, or `nil` if no satisfactory face was found.
+    /// Embedded procedures take in only face models, display urls, and a set of constraints (as this is all they need).
     ///
     /// - Parameters:
     ///   - faceModels: Array of face models to be used by the selection procedure.
+    ///   - displayURLs: Set of display URLs of the installed native faces.
     ///   - constraints: Struct holding face contraints to be used by the selection procedure.
     typealias EmbeddedFaceSelectionProcedure = (_ faceModels: [FaceModel],
         _ displayURLs: Set<String>,
@@ -151,8 +147,7 @@ private struct EmbeddedProcedureBuilder {
 
     /// Default selection procedure.
     ///
-    /// This closure defines a procedure that is common to most stored procedures. Therefore, it makes
-    /// sense to the logic in a central place.
+    /// This closure defines a procedure that is common to most embedded FSPs. The logic is therefor consoldated here.
     static let defaultSelectionProcedure: EmbeddedFaceSelectionProcedure = { (faceModels, displayURLs, constraints) in
 
         var bestFace: FaceModel?

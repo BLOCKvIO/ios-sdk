@@ -79,9 +79,9 @@ class VatomView: UIView {
     var errorView: UIView?
 
     /// The vatom pack.
-    var vatomPack: VatomPackModel {
+    var vatomPack: VatomPackModel? {
         didSet {
-            // run face view lifecycle (FVLC).
+            // run FVLC
             runFaceViewLifecylce()
         }
     }
@@ -92,9 +92,9 @@ class VatomView: UIView {
     ///
     /// For example, if the viewer may wish to change the procedure from 'icon' to 'activated' while the VatomView is
     /// on screen.
-    var procedure: FaceSelectionProcedure {
+    var procedure: EmbeddedProcedure? {
         didSet {
-            // run face view lifecycle (FVLC).
+            // run FVLC
             runFaceViewLifecylce()
         }
     }
@@ -111,24 +111,9 @@ class VatomView: UIView {
     ///   - vatomPack: The vAtom to display and its associated faces and actions.
     ///   - faces: The array of faces associated with the vAtom's template.
     ///   - actions: The array of actions associated with the vAtom's template.
-    ///   - procedure: An embedded (predefiened) face selection procedure (FSP) that determines which face to display.
+    ///   - procedure: An face selection procedure (FSP) (either embedded or custom) that determines which face to
+    ///     display.
     init(vatomPack: VatomPackModel, procedure: EmbeddedProcedure) {
-
-        self.vatomPack = vatomPack
-        self.procedure = procedure.selectionProcedure
-
-        super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
-
-    }
-
-    /// Creates a vAtom view for the specifed vAtom using the provided face selection procedure.
-    ///
-    /// - Parameters:
-    ///   - vatom: The vAtom to display.
-    ///   - faces: The array of faces associated with the vAtom's template.
-    ///   - actions: The array of actions associated with the vAtom's template.
-    ///   - customProcedure: A function type that allows for a custom face selection procedure (FSP).
-    init(vatomPack: VatomPackModel, procedure: @escaping FaceSelectionProcedure) {
 
         self.vatomPack = vatomPack
         self.procedure = procedure
@@ -141,9 +126,9 @@ class VatomView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
+    /// Common initializer
     private func commonInit() {
 
-        self.accessibilityIdentifier = "id_vatomView"
         self.loadingView = UIView() // or custom
         self.errorView = UIView() // or custom
 
@@ -159,9 +144,12 @@ class VatomView: UIView {
     /// 4. Display the face view
     func runFaceViewLifecylce() {
 
+        // precondition that vatom pack and procedure have been set
+        guard let vatomPack = vatomPack, let procedure = procedure else { return }
+
         let supportedDisplayURLS: Set = ["native://image"]
 
-        if let selectedFace = procedure(self.vatomPack, supportedDisplayURLS) {
+        if let selectedFace = procedure.selectionProcedure(vatomPack, supportedDisplayURLS) {
             print(selectedFace)
 
             // 1. Find face model's generator

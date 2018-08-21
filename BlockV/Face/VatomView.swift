@@ -163,7 +163,7 @@ class VatomView: UIView {
 
         if let selectedFace = procedure(self.vatomPack, supportedDisplayURLS) {
             print(selectedFace)
-            
+
             // 1. Find face model's generator
             // 2. Call validate on the face code to see if the vatom meets the face code's requirements
             // 3. Init face view

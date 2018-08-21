@@ -149,6 +149,13 @@ private struct EmbeddedProcedureBuilder {
 
     /// Default selection procedure.
     ///
+    /// This is a simple face selection procedure that ranks faces relative to their peers:
+    ///
+    /// 1. Ensure the face supports the current view mode.
+    /// 2. Prefer specialized faces over generic.
+    /// 3. Prefer native faces over web.
+    /// 4. Ensure native faces are supported (i.e. have native face code installed).
+    /// 5. Select the 'best' face.
     ///
     /// This closure defines a procedure that is common to most embedded FSPs. The logic is therefor consoldated here.
     static let defaultSelectionProcedure: EmbeddedFaceSelectionProcedure = { (faceModels, displayURLs, constraints) in
@@ -157,10 +164,10 @@ private struct EmbeddedProcedureBuilder {
         var bestRank = -1
 
         for face in faceModels {
-            
+
             /*
-             The question here is:
-             - Does this face meet the requirements of the FSP, if so how does it compare to it's peers.
+             Question to answer:
+             - Does this face meet the requirements of the FSP, if so, how does it compare to it's peers.
              */
 
             var rank = 0
@@ -170,7 +177,7 @@ private struct EmbeddedProcedureBuilder {
                 continue
             }
 
-            // rank 'ios' faces over 'generic'
+            // prefrer specialized faces over generic
             if face.properties.constraints.platform == "ios" {
                 rank += 2
             } else if face.properties.constraints.platform == "generic" {
@@ -179,13 +186,18 @@ private struct EmbeddedProcedureBuilder {
                 continue
             }
 
-            // rank 'native' over 'web'
+            // prefer 'native' over 'web'
             if face.isNative {
+
                 // enusrue the native face is supported (i.e. the face code is installed)
-                if displayURLs.contains(where: { $0.caseInsensitiveCompare("") != .orderedSame }) { //FIXME: Add face display url
+                if !displayURLs.contains(where: {
+                    ($0.caseInsensitiveCompare(face.properties.displayURL.absoluteString) == .orderedSame) }) {
+                    rank += 1
+                } else {
+                    // native code is not installed
                     continue
                 }
-                rank += 1
+
             }
 
             // compare to best rank

@@ -14,8 +14,10 @@ import Foundation
 // MARK: - Typealias
 
 /// A Face Selection Procedure (FSP) is an algorithm used to select the best face model from the (potentially) many
-/// faces associated with the vatom's template. An FSP gives Viewer apps optional control over the face selection
-/// procedure.
+/// faces associated with the vatom's template. It is an algorithm that assists a vAtom in selecting the best face for
+/// a specific visual context.
+///
+/// An FSP gives the Viewer optional control over the face selection procedure.
 ///
 /// Closure inputs:
 /// - vAtom to be displayed.
@@ -147,19 +149,24 @@ private struct EmbeddedProcedureBuilder {
 
     /// Default selection procedure.
     ///
+    ///
     /// This closure defines a procedure that is common to most embedded FSPs. The logic is therefor consoldated here.
     static let defaultSelectionProcedure: EmbeddedFaceSelectionProcedure = { (faceModels, displayURLs, constraints) in
 
         var bestFace: FaceModel?
-        var bestRank = 0
+        var bestRank = -1
 
         for face in faceModels {
+            
+            /*
+             The question here is:
+             - Does this face meet the requirements of the FSP, if so how does it compare to it's peers.
+             */
 
-            var rank = -1
+            var rank = 0
 
             // ensure 'view mode' is supported
             if face.properties.constraints.viewMode != constraints.viewMode {
-                rank = -1
                 continue
             }
 
@@ -169,15 +176,13 @@ private struct EmbeddedProcedureBuilder {
             } else if face.properties.constraints.platform == "generic" {
                 rank += 1
             } else {
-                rank = 1
                 continue
             }
 
             // rank 'native' over 'web'
             if face.isNative {
                 // enusrue the native face is supported (i.e. the face code is installed)
-                if displayURLs.contains(where: { $0.caseInsensitiveCompare("") == .orderedSame }) {
-                    rank = -1
+                if displayURLs.contains(where: { $0.caseInsensitiveCompare("") != .orderedSame }) { //FIXME: Add face display url
                     continue
                 }
                 rank += 1

@@ -129,7 +129,7 @@ extension PackModel {
         return self.actions.filter { $0.templateID == vatom.templateID }
     }
 
-    /// Returns a PackModel for the specified vAtom id.
+    /// Returns a VatomPackModel for the specified vAtom id.
     public func filter(whereVatomId id: String) -> VatomPackModel? {
         // find vatom
         if let vatom = findVatom(whereId: id) {

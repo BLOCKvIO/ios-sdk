@@ -43,7 +43,7 @@ public typealias FaceSelectionProcedure = (_ vatomPack: VatomPackModel, _ displa
 /// It important to think of the cases simply as unique identifiers of stored face selection procedures. Cases loosely
 /// map to the server's 'view_mode' simply because the 'view_mode' is generally the predominant selection criteria.
 public enum EmbeddedProcedure {
-
+    
     /// Selects based on 'icon' view mode.
     case icon
     /// Selects based on 'activated' view mode.
@@ -54,7 +54,7 @@ public enum EmbeddedProcedure {
     case card
     /// Selects based on an FSP specified by the Viewer.
     case custom(FaceSelectionProcedure)
-
+    
     /// A fallback allows one procedure to fallback on another (in the event the first procedure fails to select a
     /// face model). This logic is specific to the embeed procedures.
     var fallback: EmbeddedProcedure? {
@@ -66,7 +66,7 @@ public enum EmbeddedProcedure {
         case .custom:       return nil
         }
     }
-
+    
     /// Returns the face selection procedure.
     var selectionProcedure: FaceSelectionProcedure {
         switch self {
@@ -77,9 +77,9 @@ public enum EmbeddedProcedure {
         case let .custom(fsp):  return fsp
         }
     }
-
+    
     // MARK: Constraints
-
+    
     /// Constraints associated with this embedded procedure.
     var constraints: SelectionConstraints? {
         switch self {
@@ -90,16 +90,16 @@ public enum EmbeddedProcedure {
         case .custom:       return nil
         }
     }
-
+    
     /// Constraints used as the selection criteria when choosing the best face for this procedure.
     struct SelectionConstraints {
         /// The view_mode of the face.
         let viewMode: String
         // let quality: String // e.g. of futher constraints
     }
-
+    
     // MARK: - Face selection
-
+    
     /// Selects the 'best' face using this procedure's stored Face Selection Procedure (FSP).
     ///
     /// - Parameters:
@@ -114,36 +114,36 @@ public enum EmbeddedProcedure {
             return self.selectionProcedure(vatomPack, displayURLs) ??
                 self.fallback?.selectionProcedure(vatomPack, displayURLs)
     }
-
+    
 }
 
 /// Struct responsible for buidling the embedded procedures.
 private struct EmbeddedProcedureBuilder {
-
+    
     // MARK: - Stored Face Selection Procedure (FSP)
-
+    
     static let iconProcedure: FaceSelectionProcedure = { (vatomPack, displayURLs) in
         EmbeddedProcedureBuilder.defaultSelectionProcedure(vatomPack.faces, displayURLs,
-                                                         EmbeddedProcedure.icon.constraints!)
+                                                           EmbeddedProcedure.icon.constraints!)
     }
-
+    
     static let activatedProcedure: FaceSelectionProcedure = { (vatomPack, displayURLs)  in
         EmbeddedProcedureBuilder.defaultSelectionProcedure(vatomPack.faces, displayURLs,
-                                                         EmbeddedProcedure.activated.constraints!)
+                                                           EmbeddedProcedure.activated.constraints!)
     }
-
+    
     static let fullscreenProcedure: FaceSelectionProcedure = { (vatomPack, displayURLs)  in
         EmbeddedProcedureBuilder.defaultSelectionProcedure(vatomPack.faces, displayURLs,
-                                                         EmbeddedProcedure.fullscreen.constraints!)
+                                                           EmbeddedProcedure.fullscreen.constraints!)
     }
-
+    
     static let cardProcedure: FaceSelectionProcedure = { (vatomPack, displayURLs)  in
         EmbeddedProcedureBuilder.defaultSelectionProcedure(vatomPack.faces, displayURLs,
-                                                         EmbeddedProcedure.card.constraints!)
+                                                           EmbeddedProcedure.card.constraints!)
     }
-
+    
     // MARK: - Stored Procedure
-
+    
     /// Embedded procedures take in only face models, display urls, and a set of constraints (as this is all they need).
     ///
     /// - Parameters:
@@ -154,7 +154,7 @@ private struct EmbeddedProcedureBuilder {
         _ displayURLs: Set<String>,
         _ constraints: EmbeddedProcedure.SelectionConstraints)
         -> FaceModel?
-
+    
     /// Default selection procedure.
     ///
     /// This is a simple face selection procedure that ranks faces relative to their peers:
@@ -167,25 +167,25 @@ private struct EmbeddedProcedureBuilder {
     ///
     /// This closure defines a procedure that is common to most embedded FSPs. The logic is therefor consoldated here.
     static let defaultSelectionProcedure: EmbeddedFaceSelectionProcedure = { (faceModels, displayURLs, constraints) in
-
+        
         var bestFace: FaceModel?
         var bestRank = -1
-
+        
         for face in faceModels {
-
+            
             /*
              Question to answer:
              - Does this face meet the requirements of the FSP, if so, how does it compare to it's peers.
              */
-
+            
             var rank = 0
-
+            
             // ensure 'view mode' is supported
             if  constraints.viewMode != face.properties.constraints.viewMode {
                 // face does not meet this visual context's constraints
                 continue
             }
-
+            
             // prefrer specialized faces over generic
             if face.properties.constraints.platform == "ios" {
                 rank += 2
@@ -195,10 +195,10 @@ private struct EmbeddedProcedureBuilder {
                 // platform not supported
                 continue
             }
-
+            
             // prefer 'native' over 'web'
             if face.isNative {
-
+                
                 // enusrue the native face is supported (i.e. the face code is installed)
                 if !displayURLs.contains(where: {
                     ($0.caseInsensitiveCompare(face.properties.displayURL.absoluteString) == .orderedSame) }) {
@@ -207,21 +207,21 @@ private struct EmbeddedProcedureBuilder {
                     // native code is not installed
                     continue
                 }
-
+                
             }
             
             //TODO: Check if web face is installed
-
+            
             // compare to best rank
             if rank > bestRank {
                 bestRank = rank // update rank
                 bestFace = face // update best face
             }
-
+            
         }
-
+        
         return bestFace
-
+        
     }
-
+    
 }

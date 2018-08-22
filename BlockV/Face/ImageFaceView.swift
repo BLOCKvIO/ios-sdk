@@ -68,7 +68,7 @@ class ImageFaceView: UIView, FaceView {
 
     // MARK: - Face View Lifecycle
 
-    func onLoad(completed: () -> Void, failed: Error?) {
+    func load(completion: (Error?) -> Void) {
         print(#function)
 
         // Grab resource
@@ -77,11 +77,11 @@ class ImageFaceView: UIView, FaceView {
 
     }
 
-    func onVatomUpdated(_ vatomPack: VatomPackModel) {
+    func vatomUpdated(_ vatomPack: VatomPackModel) {
         print(#function)
     }
 
-    func onUnload() {
+    func unload() {
         print(#function)
     }
 

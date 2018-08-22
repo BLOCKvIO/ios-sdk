@@ -37,18 +37,33 @@ public protocol FaceView where Self: UIView {
     var selectedFace: FaceModel { get set }
 
     // MARK: - Lifecycle
+    
+    /*
+     1. If the face is downloading resource in the background (say not part of it's initial load process) how/should it
+     communicate this activity back the caller?
+     
+     2. If, after load, the face encounters some error, how should the caller be notified? The `load(completion: (Error?) -> Void)`
+     completion could be stored and called again?
+     
+     3. How should the face respond to vatomUpdated?
+     
+     4. Should we create a test face that logs all these cases? Like a button to trigger load complete, a button to trigger
+     an error, some UI to show the vatom updates
+     */
 
-    /// Called
-    func onLoad(completed: () -> Void, failed: Error?)
+    /// Called to initiate the loading of the face code.
+    ///
+    /// This should trigger the downloading of all necessary face resources.
+    func load(completion: (Error?) -> Void)
 
     /// Called when the vatom pack is updated.
     ///
     /// This may be called in response to numerous events.
     ///
-    /// E.g. A vAtom's root or private section are updated and the signal come down via the Web socket.
-    func onVatomUpdated(_ vatomPack: VatomPackModel)
+    /// E.g. A vAtom's root or private section are updated and the signal come down via the Web socket state update.
+    func vatomUpdated(_ vatomPack: VatomPackModel)
 
     /// Called
-    func onUnload()
+    func unload()
 
 }

@@ -186,6 +186,20 @@ public class VatomView: UIView {
         // 3. find face model's generator
         //FIXME: This should be pulled from the face registry.
         let faceView = ImageFaceView(vatomPack: vatomPack, selectedFace: selectedFace)
+        
+        // 4. instruct face to load its content
+        faceView.load { (error) in
+            
+            // ensure no error
+            guard error == nil else {
+                // show error
+                return
+            }
+            
+            // show face
+            
+            
+        }
 
         /*
          How do I know if the vAtom is loading?

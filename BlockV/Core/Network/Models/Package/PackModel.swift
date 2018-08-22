@@ -18,7 +18,7 @@ public struct VatomPackModel {
     public let actions: [ActionModel]
 }
 
-/// A simple struct that holds the three components necessary to interaction with vAtoms.
+/// A simple struct that holds the three components necessary to interact with vAtoms.
 ///
 /// These are:
 /// 1. Array of vAtoms

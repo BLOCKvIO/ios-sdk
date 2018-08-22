@@ -44,16 +44,7 @@ import Foundation
  > Rather, such errors are left to the face code to validate and display an error.
  */
 
-// ------------------------------------
 
-/// Pack model holding a single vatom and its associated faces and actions.
-public struct VatomPackModel {
-    public let vatom: VatomModel
-    public let faces: [FaceModel] = []
-    public let actions: [ActionModel] = []
-}
-
-// ------------------------------------
 
 /*
  Questions:
@@ -183,51 +174,32 @@ public class VatomView: UIView {
             return
         }
 
+        //FIXME: Call validate on the face code to see if the vatom meets the face code's requirements
+
         // 3. find face model's generator
         //FIXME: This should be pulled from the face registry.
         let faceView = ImageFaceView(vatomPack: vatomPack, selectedFace: selectedFace)
-        
+
         // 4. instruct face to load its content
         faceView.load { (error) in
-            
+
             // ensure no error
             guard error == nil else {
                 // show error
                 return
             }
-            
+
             // show face
-            
-            
-        }
-
-        /*
-         How do I know if the vAtom is loading?
-         How do I know if a vAtom's resources are loading?
-
-         Maybe the face view should inform the VatomView when the face is done loading? This way the VatomView knows
-         when to show the loader, and then, when to show the face. This would work well as a delegate.
-         
-         */
-
-        //FIXME: Will native and web hierarchys be different? Is there a need for this conditional flow?
-        if selectedFace.isNative {
+            //FIXME: Will native and web hierarchys be different? Is there a need for this conditional flow?
 
             // inset the face view self's view hierarcy
             self.selectedFaceView = faceView
+            //FIXME: Show the face view with alpha of 0.0001 to allow web view to load.
             faceView.frame = self.bounds
             faceView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             self.insertSubview(faceView, at: 0)
 
-        } else if selectedFace.isWeb {
-
-        } else {
-            // show some error
         }
-
-        // > Call validate on the face code to see if the vatom meets the face code's requirements
-        // 3. Init face view
-        // 4. call onLoad(completion:)
 
     }
 

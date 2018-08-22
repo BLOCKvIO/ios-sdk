@@ -51,11 +51,13 @@ extension FaceModel: Codable {
         public let displayURL: URL
         public let constraints: Constraints
         public let resources: [String]
+        public let config: JSON?
 
         enum CodingKeys: String, CodingKey {
             case displayURL = "display_url"
             case constraints
             case resources
+            case config
         }
 
         public struct Constraints: Codable, Equatable {

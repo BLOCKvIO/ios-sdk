@@ -72,16 +72,14 @@ class PackModel_Tests: XCTestCase {
     func testFilterForVatom() {
         
         // test `filter`
-        let singlePack = self.packModel.filter(whereVatomId: "4389ec35-9fc4-4f31-1232-8cb6bcaa8b19")
-        // single pack
-        XCTAssertEqual(singlePack.vatoms.count, 1)
-        XCTAssertEqual(singlePack.faces.count, 2)
-        XCTAssertEqual(singlePack.actions.count, 1)
+        let vatomPack = self.packModel.filter(whereVatomId: "4389ec35-9fc4-4f31-1232-8cb6bcaa8b19")
         
         do {
-            let vatom = try self.require(singlePack.vatoms.first)
+            let vatomPack = try self.require(vatomPack)
+            XCTAssertEqual(vatomPack.faces.count, 2)
+            XCTAssertEqual(vatomPack.actions.count, 1)
             // ensure id of returned vatom matches the specified vatom id
-            XCTAssertEqual(vatom.id, "4389ec35-9fc4-4f31-1232-8cb6bcaa8b19")
+            XCTAssertEqual(vatomPack.vatom.id, "4389ec35-9fc4-4f31-1232-8cb6bcaa8b19")
         } catch {
             XCTFail(error.localizedDescription)
         }

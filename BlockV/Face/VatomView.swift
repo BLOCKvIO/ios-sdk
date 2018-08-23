@@ -40,6 +40,7 @@ import Foundation
  Face selection routines do NOT validate:
  1. Vatom private properties
  2. Vatom resources
+ 3. Vatom face model config sections
  
  > Rather, such errors are left to the face code to validate and display an error.
  */
@@ -66,21 +67,40 @@ import Foundation
 /// Responsible for displaying a vAtom face (native or Web).
 public class VatomView: UIView {
 
-    // MARK: - Properties
+    // MARK: - Enum
 
-    /*
-     Both vatomPack and the procedure may be updated over the life of the vatom view.
-     This means if either is updated, the VVLC should run.
-     
-     Either update may (or may not) result in the selectedFaceModel changing. If it does a full FaceView replacement is
-     needed.
-     
-     If the vatomPack is updated, and the selectedFaceModel remains the same, then updates may (or may not) need to be
-     passed down to the currently selected face view.
-     
-     How sould consumer set the vatomPack and procedure? Via one function?
-     
-     */
+    /// Models the Vatom View Lifecycle (VVLC) state.
+    public enum LifecycleState {
+        /// Lifecycle is busy or face view has not completed loading.
+        case loading
+        /// Lifecycle encountered an error
+        case error
+        /// Face view has successfully completed loading
+        case completed
+    }
+    
+    /// Tracks the VVLC state.
+    public internal(set) var state: LifecycleState = .loading {
+        didSet {
+            switch state {
+            case .loading:
+                self.selectedFaceView?.alpha = 0.000001
+                self.loadingView?.isHidden = false
+                self.errorView?.isHidden = true
+            case .error:
+                self.selectedFaceView?.alpha = 0.000001
+                self.loadingView?.isHidden = true
+                self.errorView?.isHidden = false
+
+            case .completed:
+                self.selectedFaceView?.alpha = 1
+                self.loadingView?.isHidden = true
+                self.errorView?.isHidden = true
+            }
+        }
+    }
+
+    // MARK: - Properties
 
     /// The vatom pack.
     public private(set) var vatomPack: VatomPackModel?
@@ -97,7 +117,7 @@ public class VatomView: UIView {
     public private(set) var selectedFaceModel: FaceModel?
 
     /// Selected face view (function of the selected face model).
-    public private(set) var selectedFaceView: FaceView?
+    public private(set) var selectedFaceView: (UIView & FaceView)?
 
     //FIXME: How is the consumer going to set the loading and error views?
 
@@ -126,6 +146,8 @@ public class VatomView: UIView {
         super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
 
         commonInit()
+        runVatomViewLifecylce()
+
     }
 
     required public init?(coder aDecoder: NSCoder) {
@@ -135,21 +157,34 @@ public class VatomView: UIView {
         // caller must ser procedure
 
         commonInit()
+
     }
 
     /// Common initializer
     private func commonInit() {
 
-        self.backgroundColor = UIColor.red.withAlphaComponent(0.3)
+        //self.backgroundColor = UIColor.red.withAlphaComponent(0.3)
 
         self.loadingView = UIView() // or custom
         self.errorView = UIView() // or custom
 
-        runVatomViewLifecylce()
-
     }
 
     // MARK: - Methods
+
+    /*
+     Both vatomPack and the procedure may be updated over the life of the vatom view.
+     This means if either is updated, the VVLC should run.
+     
+     Either update may (or may not) result in the selectedFaceModel changing. If it does a full FaceView replacement is
+     needed.
+     
+     If the vatomPack is updated, and the selectedFaceModel remains the same, then updates may (or may not) need to be
+     passed down to the currently selected face view.
+     
+     How sould consumer set the vatomPack and procedure? Via one function?
+     
+     */
 
     /// Updates the vatomPack and procedure. Triggers the Vatom View Lifecycle which may result in a new face view
     /// being shown.
@@ -191,8 +226,9 @@ public class VatomView: UIView {
 
         // 1. select the best face model
         guard let selectedFace = procedure.selectionProcedure(vatomPack, faceRegistry) else {
-            
+
             printBV(error: "Face Selection Procedure (FSP) returned without selecting a face model.")
+            self.state = .error
             //FIXME: display the error view (which shows the activated image).
             return
         }
@@ -211,6 +247,7 @@ public class VatomView: UIView {
              The VVLC should not be re-run (since the selected face view does not need replacing).
              */
 
+            self.state = .completed
             // update currently selected face view (without replacement)
             self.selectedFaceView?.vatomUpdated(vatomPack)
 
@@ -244,12 +281,13 @@ public class VatomView: UIView {
          Options: This function could take in a FaceView instance, or take in a FaceView.Type and create the instance
          itself (using the generator)?
          */
+        
+        self.state = .loading
 
         // update currently selected face view
         self.selectedFaceView = newFaceView
 
         // insert face view into the view hierarcy
-        newFaceView.alpha = 0.000001 // hack to allow webview to load
         newFaceView.frame = self.bounds
         newFaceView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         self.insertSubview(newFaceView, at: 0)
@@ -261,12 +299,13 @@ public class VatomView: UIView {
 
             // ensure no error
             guard error == nil else {
-                // show error
+                // face view encountered an error
+                self.state = .error
                 return
             }
 
             // show face
-            // ...
+            self.state = .completed
 
         }
 

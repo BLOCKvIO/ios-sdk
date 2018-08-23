@@ -44,8 +44,6 @@ import Foundation
  > Rather, such errors are left to the face code to validate and display an error.
  */
 
-
-
 /*
  Questions:
  
@@ -56,6 +54,13 @@ import Foundation
  3. Should we allow vatom view to be instantiated directly using a face (i.e. without using a selection procedure)?
     > Maybe someone creates a viewer and only wants to add 2 faces to each of their vAtoms.
     > How are we going to enfore that people add a 'minimum reasonable faces'?
+ 
+ - What if the FSP was a type rather than a function. That way each FSP could have a name, and therefore be identifiable
+ by the VatomView and so have conditional logic run based on its name. Or, should the VatomView be 'unware' of the FSP
+ and simply use what information the vatompack gives it?
+ 
+ -
+ 
  */
 
 /// Responsible for displaying a vAtom face (native or Web).
@@ -63,32 +68,41 @@ public class VatomView: UIView {
 
     // MARK: - Properties
 
-    var selectedFace: FaceModel?
-    var selectedFaceView: FaceView?
-
-    var loadingView: UIView?
-    var errorView: UIView?
+    /*
+     Both vatomPack and the procedure may be updated over the life of the vatom view.
+     This means if either is updated, the VVLC should run.
+     
+     Either update may (or may not) result in the selectedFaceModel changing. If it does a full FaceView replacement is
+     needed.
+     
+     If the vatomPack is updated, and the selectedFaceModel remains the same, then updates may (or may not) need to be
+     passed down to the currently selected face view.
+     
+     How sould consumer set the vatomPack and procedure? Via one function?
+     
+     */
 
     /// The vatom pack.
-    public var vatomPack: VatomPackModel? {
-        didSet {
-            // run FVLC
-            runFaceViewLifecylce()
-        }
-    }
+    public private(set) var vatomPack: VatomPackModel?
 
     /// The face selection procedure.
     ///
     /// Viewers may wish to update the procedure in reponse to certian events.
     ///
-    /// For example, if the viewer may wish to change the procedure from 'icon' to 'activated' while the VatomView is
+    /// For example, the viewer may change the procedure from 'icon' to 'activated' while the VatomView is
     /// on screen.
-    public var procedure: EmbeddedProcedure? {
-        didSet {
-            // run FVLC
-            runFaceViewLifecylce()
-        }
-    }
+    public private(set) var procedure: EmbeddedProcedure?
+
+    /// Face model selected by the specifed face selection procedure (FSP).
+    public private(set) var selectedFaceModel: FaceModel?
+
+    /// Selected face view (function of the selected face model).
+    public private(set) var selectedFaceView: FaceView?
+
+    //FIXME: How is the consumer going to set the loading and error views?
+
+    var loadingView: UIView?
+    var errorView: UIView?
 
     // MARK: - Web Socket
 
@@ -131,57 +145,117 @@ public class VatomView: UIView {
         self.loadingView = UIView() // or custom
         self.errorView = UIView() // or custom
 
-        precondition(vatomPack != nil, "Vatom Pack must not be nil")
-        precondition(procedure != nil, "Procedure must not be nil")
-
-        runFaceViewLifecylce()
+        runVatomViewLifecylce()
 
     }
 
     // MARK: - Methods
 
-    /// Exectues the Face View Lifecycle for a specific vatom.
+    /// Updates the vatomPack and procedure. Triggers the Vatom View Lifecycle which may result in a new face view
+    /// being shown.
+    ///
+    public func update(usingVatomPack vatomPack: VatomPackModel, procedure: EmbeddedProcedure) {
+
+        self.vatomPack = vatomPack
+        self.procedure = procedure
+
+        runVatomViewLifecylce()
+
+    }
+
+    /// Exectues the Vatom View Lifecycle (VVLC) on the current vAtom pack.
+    ///
+    /// Called
     ///
     /// 1. Run face selection procedure
+    /// > Compare the selected face to the current face
     /// 2. Create face view
     /// 3. Inform the face view to load it's content
     /// 4. Display the face view
-    public func runFaceViewLifecylce() {
+    public func runVatomViewLifecylce() {
 
-        // precondition that vatom pack and procedure have been set
-        guard let vatomPack = vatomPack, let procedure = procedure else { return }
+        //FIXME: Part of this could run on a background thread, e.g fsp
 
-        //FIXME: Mocks the face registery.
-        //FIXME: Need to decide how to register the web face (if at all).
-        let faceRegistry: Set = ["web://",
-                                 "native://image",
-                                 "native://image-policy",
-                                 "native://image-redeemable",
-                                 "native://level-image"]
+        precondition(vatomPack != nil, "vatomPack must not be nil.")
+        precondition(procedure != nil, "procedure must not be nil.")
 
-        // 1. select the best face
+        // precondition that vatom pack is not nil
+        guard let vatomPack = vatomPack else {
+            return
+        }
+
+        // precondition that procedure is not nil
+        guard let procedure = procedure else {
+            return
+        }
+
+        // 1. select the best face model
         guard let selectedFace = procedure.selectionProcedure(vatomPack, faceRegistry) else {
-            // display the error view (which shows the activated image).
-            return
-        }
-        self.selectedFace = selectedFace
-        print("Selected face: \(selectedFace)")
-
-        // 2. check if a new face model has been selected
-        guard selectedFace != self.selectedFace else {
-            // no change
-            // maybe notify the face to redraw?
+            //FIXME: display the error view (which shows the activated image).
             return
         }
 
-        //FIXME: Call validate on the face code to see if the vatom meets the face code's requirements
+        printBV(info: "FSP selected face model: \(selectedFace)")
 
-        // 3. find face model's generator
-        //FIXME: This should be pulled from the face registry.
-        let faceView = ImageFaceView(vatomPack: vatomPack, selectedFace: selectedFace)
+        // 2. check if the face model has not changed
+        if selectedFace == self.selectedFaceModel {
 
-        // 4. instruct face to load its content
-        faceView.load { (error) in
+            printBV(info: "Face model unchanged - Updating face view.")
+
+            /*
+             Although the selected face model has not changed, other items in the vatom pack may have, these updates
+             must be passed to the face view to give it a change to update its state.
+             
+             The VVLC should not be re-run (since the selected face view does not need replacing).
+             */
+
+            // update currently selected face view (without replacement)
+            self.selectedFaceView?.vatomUpdated(vatomPack)
+
+            //FXIME: How does the face view find out what has changed? Maybe the vatomPack must have a 'diff' property?
+
+        } else {
+
+            printBV(info: "Face model change - Replacing face view.")
+
+            //FIXME: Call validate on the face code to see if the vatom meets the face code's requirements
+
+            //FIXME: This should be pulled from the face registry.
+            // 3. find face model's face view generator
+            let selectedFaceView = ImageFaceView(vatomPack: vatomPack, selectedFace: selectedFace)
+
+            // relace currently selected face view with newly selected
+            self.replaceFaceView(withFaceView: selectedFaceView)
+
+        }
+
+    }
+
+    /// Replaces the current face view (if any) with the specified face view and starts the FVLC.
+    ///
+    /// Call this function only if you want a full replace of the current face view.
+    ///
+    /// Triggers the Face View Life Cycle (VVLC)
+    func replaceFaceView<T: FaceView>(withFaceView newFaceView: T) {
+
+        /*
+         Options: This function could take in a FaceView instance, or take in a FaceView.Type and create the instance
+         itself (using the generator)?
+         */
+
+        // update currently selected face view
+        self.selectedFaceView = newFaceView
+
+        // insert face view into the view hierarcy
+        newFaceView.alpha = 0.000001 // hack to allow webview to load
+        newFaceView.frame = self.bounds
+        newFaceView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        self.insertSubview(newFaceView, at: 0)
+
+        // 1. instruct face view to load its content
+        newFaceView.load { (error) in
+
+            printBV(info: "Face view load completion called.")
 
             // ensure no error
             guard error == nil else {
@@ -190,17 +264,18 @@ public class VatomView: UIView {
             }
 
             // show face
-            //FIXME: Will native and web hierarchys be different? Is there a need for this conditional flow?
-
-            // inset the face view self's view hierarcy
-            self.selectedFaceView = faceView
-            //FIXME: Show the face view with alpha of 0.0001 to allow web view to load.
-            faceView.frame = self.bounds
-            faceView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            self.insertSubview(faceView, at: 0)
+            // ...
 
         }
 
     }
+
+    //FIXME: Mocks the face registery.
+    //FIXME: Need to decide how to register the web face (if at all).
+    let faceRegistry: Set = ["web://",
+                             "native://image",
+                             "native://image-policy",
+                             "native://image-redeemable",
+                             "native://level-image"]
 
 }

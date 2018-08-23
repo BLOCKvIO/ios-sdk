@@ -139,5 +139,14 @@ extension PackModel {
         }
         return nil
     }
+    
+    /// I am still experimenting with this.
+    ///
+    /// The namign VatomPack and PackModel is getting confusing...
+    ///
+    /// Returns a VatomPack for each vatom in the PackModel.
+    public func createPackModels() -> [VatomPackModel] {
+        return self.vatoms.compactMap { self.filter(whereVatomId: $0.id) }
+    }
 
 }

@@ -191,11 +191,13 @@ public class VatomView: UIView {
 
         // 1. select the best face model
         guard let selectedFace = procedure.selectionProcedure(vatomPack, faceRegistry) else {
+            
+            printBV(error: "Face Selection Procedure (FSP) returned without selecting a face model.")
             //FIXME: display the error view (which shows the activated image).
             return
         }
 
-        printBV(info: "FSP selected face model: \(selectedFace)")
+        printBV(info: "Face Selection Procedure (FSP) selected face model: \(selectedFace)")
 
         // 2. check if the face model has not changed
         if selectedFace == self.selectedFaceModel {

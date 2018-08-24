@@ -84,7 +84,7 @@ public enum EmbeddedProcedure {
     // MARK: Constraints
 
     /// Constraints associated with this embedded procedure.
-    var constraints: SelectionConstraints? {
+    var constraints: SelectionConstraints {
         switch self {
         case .icon:         return SelectionConstraints(viewMode: "icon")
         case .activated:    return SelectionConstraints(viewMode: "activated")
@@ -147,25 +147,25 @@ private struct EmbeddedProcedureBuilder {
     static let iconProcedure: FaceSelectionProcedure = { (vatomPack, displayURLs) in
         EmbeddedProcedureBuilder.defaultSelectionProcedure(vatomPack.faces,
                                                            displayURLs,
-                                                           EmbeddedProcedure.icon.constraints!)
+                                                           EmbeddedProcedure.icon.constraints)
     }
 
     static let activatedProcedure: FaceSelectionProcedure = { (vatomPack, displayURLs)  in
         EmbeddedProcedureBuilder.defaultSelectionProcedure(vatomPack.faces,
                                                            displayURLs,
-                                                           EmbeddedProcedure.activated.constraints!)
+                                                           EmbeddedProcedure.activated.constraints)
     }
 
     static let fullscreenProcedure: FaceSelectionProcedure = { (vatomPack, displayURLs)  in
         EmbeddedProcedureBuilder.defaultSelectionProcedure(vatomPack.faces,
                                                            displayURLs,
-                                                           EmbeddedProcedure.fullscreen.constraints!)
+                                                           EmbeddedProcedure.fullscreen.constraints)
     }
 
     static let cardProcedure: FaceSelectionProcedure = { (vatomPack, displayURLs)  in
         EmbeddedProcedureBuilder.defaultSelectionProcedure(vatomPack.faces,
                                                            displayURLs,
-                                                           EmbeddedProcedure.card.constraints!)
+                                                           EmbeddedProcedure.card.constraints)
     }
 
     // MARK: - Stored Procedure

@@ -27,7 +27,7 @@ class ActivatedVatomViewController: UIViewController {
     // MARK: - Properties
     
     var vatomPack: VatomPackModel?
-    var procedure: EmbeddedProcedure?
+    var procedure: FaceSelectionProcedure?
     
     @IBOutlet weak var vatomView: VatomView!
     
@@ -35,6 +35,9 @@ class ActivatedVatomViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        vatomView.update(usingVatomPack: vatomPack!, procedure: procedure!)
+        vatomView.backgroundColor = .blue
 
         // Do any additional setup after loading the view.
     }

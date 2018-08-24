@@ -316,7 +316,7 @@ class InventoryCollectionViewController: UICollectionViewController {
             let destination = segue.destination as! UINavigationController
             let vc = destination.viewControllers[0] as! ActivatedVatomViewController
             vc.vatomPack = self.vatomPacks.first! //FIXME: 
-            vc.procedure = EmbeddedProcedure.icon
+            vc.procedure = EmbeddedProcedure.icon.selectionProcedure
         }
     }
     

@@ -78,7 +78,7 @@ public class VatomView: UIView {
         /// Face view has successfully completed loading
         case completed
     }
-    
+
     /// Tracks the VVLC state.
     public internal(set) var state: LifecycleState = .loading {
         didSet {
@@ -111,7 +111,7 @@ public class VatomView: UIView {
     ///
     /// For example, the viewer may change the procedure from 'icon' to 'activated' while the VatomView is
     /// on screen.
-    public private(set) var procedure: EmbeddedProcedure?
+    public private(set) var procedure: FaceSelectionProcedure?
 
     /// Face model selected by the specifed face selection procedure (FSP).
     public private(set) var selectedFaceModel: FaceModel?
@@ -136,10 +136,9 @@ public class VatomView: UIView {
     ///   - vatomPack: The vAtom to display and its associated faces and actions.
     ///   - faces: The array of faces associated with the vAtom's template.
     ///   - actions: The array of actions associated with the vAtom's template.
-    ///   - procedure: An face selection procedure (FSP) (either embedded or custom) that determines which face to
+    ///   - procedure: An face selection procedure (FSP) that determines which face to
     ///     display.
-    public init(vatomPack: VatomPackModel, procedure: EmbeddedProcedure) {
-
+    public init(vatomPack: VatomPackModel, procedure: @escaping FaceSelectionProcedure) {
         self.vatomPack = vatomPack
         self.procedure = procedure
 
@@ -147,7 +146,6 @@ public class VatomView: UIView {
 
         commonInit()
         runVatomViewLifecylce()
-
     }
 
     required public init?(coder aDecoder: NSCoder) {
@@ -186,10 +184,7 @@ public class VatomView: UIView {
      
      */
 
-    /// Updates the vatomPack and procedure. Triggers the Vatom View Lifecycle which may result in a new face view
-    /// being shown.
-    ///
-    public func update(usingVatomPack vatomPack: VatomPackModel, procedure: EmbeddedProcedure) {
+    public func update(usingVatomPack vatomPack: VatomPackModel, procedure: @escaping FaceSelectionProcedure) {
 
         self.vatomPack = vatomPack
         self.procedure = procedure
@@ -225,7 +220,7 @@ public class VatomView: UIView {
         }
 
         // 1. select the best face model
-        guard let selectedFace = procedure.selectionProcedure(vatomPack, faceRegistry) else {
+        guard let selectedFace = procedure(vatomPack, faceRegistry) else {
 
             printBV(error: "Face Selection Procedure (FSP) returned without selecting a face model.")
             self.state = .error
@@ -261,7 +256,7 @@ public class VatomView: UIView {
 
             //FIXME: This should be pulled from the face registry.
             // 3. find face model's face view generator
-            let selectedFaceView = ImageFaceView(vatomPack: vatomPack, selectedFace: selectedFace)
+            let selectedFaceView = NativeTestFaceView(vatomPack: vatomPack, selectedFace: selectedFace)
 
             // relace currently selected face view with newly selected
             self.replaceFaceView(withFaceView: selectedFaceView)
@@ -281,7 +276,7 @@ public class VatomView: UIView {
          Options: This function could take in a FaceView instance, or take in a FaceView.Type and create the instance
          itself (using the generator)?
          */
-        
+
         self.state = .loading
 
         // update currently selected face view

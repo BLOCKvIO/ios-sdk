@@ -37,7 +37,7 @@ public protocol FaceView where Self: UIView {
     var selectedFace: FaceModel { get set }
 
     // MARK: - Lifecycle
-    
+
     /*
      1. If the face is downloading resource in the background (say not part of it's initial load process) how/should it
      communicate this activity back the caller?

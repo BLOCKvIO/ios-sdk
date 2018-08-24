@@ -63,7 +63,7 @@ class ImageFaceView: UIView, FaceView {
 
     func load(completion: (Error?) -> Void) {
         print(#function)
-        
+
         // Download resource
 
     }

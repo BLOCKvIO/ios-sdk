@@ -256,7 +256,7 @@ public class VatomView: UIView {
 
             //FIXME: This should be pulled from the face registry.
             // 3. find face model's face view generator
-            let selectedFaceView = NativeTestFaceView(vatomPack: vatomPack, selectedFace: selectedFace)
+            let selectedFaceView = ImageFaceView(vatomPack: vatomPack, selectedFace: selectedFace)
 
             // relace currently selected face view with newly selected
             self.replaceFaceView(withFaceView: selectedFaceView)

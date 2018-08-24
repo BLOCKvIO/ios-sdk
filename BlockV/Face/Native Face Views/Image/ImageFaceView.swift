@@ -24,13 +24,6 @@ class ImageFaceView: UIView, FaceView {
 
     // MARK: - Initialization
 
-    /*
-     FIXME: In the generic viewer, the procedure is not passed in using the initialiser.
-     Rather, a reference to the 'host' view VatomView is passed in. But this means that only the
-     reference needs to be passed in because all the properties are available then.
-     
-     I am going to try without passing VatomView down.
-     */
     init(vatomPack: VatomPackModel,
          selectedFace: FaceModel) {
 
@@ -70,9 +63,7 @@ class ImageFaceView: UIView, FaceView {
 
     func load(completion: (Error?) -> Void) {
         print(#function)
-
-        // Grab resource
-
+        
         // Download resource
 
     }
@@ -85,13 +76,10 @@ class ImageFaceView: UIView, FaceView {
         print(#function)
     }
 
-    // MARK: -
+    // MARK: - Prototype
 
     ///FIXME: This must become
     func doResourceStuff() {
-
-        //let resourceId =
-       // let resourceURL = vatomPack.vatom.resources
 
     }
 

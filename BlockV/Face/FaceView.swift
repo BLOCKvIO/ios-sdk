@@ -11,24 +11,13 @@
 
 import Foundation
 
-/// Protocol for all faces to adopt.
-///
-/// This is the base protocol and defines the base of what it means to be a face (native or web).
-///
-/// Face creators will begin by implementing this protocol on a UIView.
+/// The protocol that native face views must conform to.
 public protocol FaceView where Self: UIView {
 
     // MARK: - Properties
 
     /// Uniqiue identifier of the native face.
     var displayURL: String { get }
-
-    /*
-     Architecture
-     
-     Another option to having a vatomPack is to have a refrence to VatomView. This may eliminate copies
-     (although with COW it shouldn't be an issue).
-     */
 
     /// Vatom pack for display.
     var vatomPack: VatomPackModel { get set }
@@ -37,19 +26,6 @@ public protocol FaceView where Self: UIView {
     var selectedFace: FaceModel { get set }
 
     // MARK: - Lifecycle
-
-    /*
-     1. If the face is downloading resource in the background (say not part of it's initial load process) how/should it
-     communicate this activity back the caller?
-     
-     2. If, after load, the face encounters some error, how should the caller be notified? The `load(completion: (Error?) -> Void)`
-     completion could be stored and called again?
-     
-     3. How should the face respond to vatomUpdated?
-     
-     4. Should we create a test face that logs all these cases? Like a button to trigger load complete, a button to trigger
-     an error, some UI to show the vatom updates
-     */
 
     /// Called to initiate the loading of the face code.
     ///

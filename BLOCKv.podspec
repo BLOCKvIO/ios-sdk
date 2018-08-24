@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
   s.default_subspecs      = 'Core'
   
   s.subspec 'Core' do |s|
-      s.source_files = 'BlockV/Core/**/*'
+      s.source_files = 'BlockV/Core/**/*.{swift}'
       s.dependency 'Alamofire',  '~> 4.7'  # Networking
       s.dependency 'Starscream', '~> 3.0'  # Web socket
       s.dependency 'JWTDecode',  '~> 2.1'  # JWT decoding
@@ -27,13 +27,20 @@ Pod::Spec.new do |s|
   end
   
   s.subspec 'Face' do |s|
-      s.ios.source_files = 'BlockV/Face/**/*'
+      s.ios.source_files = 'BlockV/Face/**/*.{swift}'
       s.dependency 'BLOCKv/Core'
       #s.exclude_files = "**/Info*.plist"
       #s.ios.resources = "Source/**/*.xib"
       
       # native://image
       s.dependency 'FLAnimatedImage', '~> 1.0'
+     
+     # include all .xib (only needed if native faces use .xibs)
+     s.resource_bundles = {
+         #'FaceModule' => ['Pod/**/*.xib']
+         'FaceModule' => ['BlockV/Face/**/*.{xib}']
+     }
+     
   end
   
 end

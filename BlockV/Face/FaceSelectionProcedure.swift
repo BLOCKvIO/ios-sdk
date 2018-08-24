@@ -226,7 +226,7 @@ private struct EmbeddedProcedureBuilder {
             if face.isNative {
 
                 // enusrue the native face is supported (i.e. the face code is installed)
-                if !displayURLs.contains(where: {
+                if displayURLs.contains(where: {
                     ($0.caseInsensitiveCompare(face.properties.displayURL.absoluteString) == .orderedSame) }) {
                     rank += 1
                 } else {

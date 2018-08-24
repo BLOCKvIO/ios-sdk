@@ -62,6 +62,11 @@ public struct VatomModel: Equatable {
     public var resources: [VatomResourceModel] // `var` only to allow for resource encoding
     public var privateProperties: JSON? // Private section may contain JSON of any structure.
 
+    /// Array of face models associated with this vAtom's template.
+    public var faceModels: [FaceModel]
+    /// Array of action models associated with this vAtom's template.
+    public var actionModels: [ActionModel]
+
     enum CodingKeys: String, CodingKey {
         case id
         case version
@@ -70,6 +75,8 @@ public struct VatomModel: Equatable {
         case whenModified      = "when_modified"
         case properties        = "vAtom::vAtomType"
         case privateProperties = "private"
+        case faceModels        = "faceModels"
+        case actionModels      = "actionModels"
     }
 
     enum PropertiesCodingKeys: String, CodingKey {
@@ -136,15 +143,16 @@ public struct VatomModel: Equatable {
 
 extension VatomModel: Decodable {
 
-    public init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws { // swiftlint:disable:this function_body_length
         let items = try decoder.container(keyedBy: CodingKeys.self)
         id                = try items.decode(String.self, forKey: .id)
         version           = try items.decode(String.self, forKey: .version)
         isUnpublished     = try items.decode(Bool.self, forKey: .isUnpublished)
         whenCreated       = try items.decode(Date.self, forKey: .whenCreated)
         whenModified      = try items.decode(Date.self, forKey: .whenModified)
-
         privateProperties = try items.decodeIfPresent(JSON.self, forKey: .privateProperties)
+        faceModels        = try items.decodeIfPresent([FaceModel].self, forKey: .faceModels) ?? []
+        actionModels      = try items.decodeIfPresent([ActionModel].self, forKey: .actionModels) ?? []
 
         // de-nest properties to top level
         let propertiesContainer = try items.nestedContainer(keyedBy: PropertiesCodingKeys.self, forKey: .properties)
@@ -182,7 +190,6 @@ extension VatomModel: Decodable {
                                                                       forKey: .tags) ?? []
         childPolicy         = try propertiesContainer.decodeIfPresent([VatomChildPolicy].self,
                                                                       forKey: .childPolicy) ?? []
-
     }
 
 }

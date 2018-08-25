@@ -11,28 +11,21 @@
 
 import Foundation
 
-typealias FaceViewGenerator = (_ vatom: VatomModel, _ face: FaceModel) -> FaceView
+public typealias FaceViewRoster = [String: FaceView.Type]
 
-public struct FaceManager {
+public class FaceViewRegistry {
 
     // MARK: - Properties
 
+    public static let shared = FaceViewRegistry()
+
     /// Dictionary of face
-    private var faceViews: [String: FaceViewGenerator] = [:]
+    public private(set) var roster: FaceViewRoster = [:]
 
     // MARK: - Methods
 
-    /// Registers a native view generator.
-    ///
-    /// - Parameters:
-    ///   - generator: A closure that take in a vatom and a face and generates a UIView.
-    ///   - url: The display url
-    public func registerFaceView(_ faceView: FaceView) {
-
-        // register the native face somewhere
-
-//        self.faceViews[faceView.displayURL] = 
-
+    public func register(_ faceView: FaceView.Type) {
+        roster[faceView.displayURL] = faceView
     }
 
 }

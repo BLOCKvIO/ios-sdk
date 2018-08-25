@@ -17,7 +17,9 @@ class ImageFaceView: UIView, FaceView {
 
     // MARK: - Fave View Protocol
 
-    let displayURL: String = "native://image"
+    class var displayURL: String {
+        return "native://image"
+    }
 
     var vatomPack: VatomPackModel
 
@@ -25,7 +27,7 @@ class ImageFaceView: UIView, FaceView {
 
     // MARK: - Initialization
 
-    init(vatomPack: VatomPackModel, selectedFace: FaceModel) {
+    required init(vatomPack: VatomPackModel, selectedFace: FaceModel) {
 
         self.vatomPack = vatomPack
         self.selectedFace = selectedFace

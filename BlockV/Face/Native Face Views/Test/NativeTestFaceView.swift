@@ -28,13 +28,13 @@ class NativeTestFaceView: UIView, FaceView, FaceModuleNibLoadable {
 
     // MARK: - Fave View Protocol
 
-    let displayURL = "native://test"
+    static let displayURL = "native://test"
     var vatomPack: VatomPackModel
     var selectedFace: FaceModel
 
     // MARK: - Initialization
 
-    init(vatomPack: VatomPackModel, selectedFace: FaceModel) {
+    required init(vatomPack: VatomPackModel, selectedFace: FaceModel) {
 
         self.vatomPack = vatomPack
         self.selectedFace = selectedFace

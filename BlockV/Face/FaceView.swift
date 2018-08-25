@@ -11,19 +11,25 @@
 
 import Foundation
 
-/// The protocol that native face views must conform to.
+/// The protocol that face views must conform to.
 public protocol FaceView where Self: UIView {
 
     // MARK: - Properties
 
-    /// Uniqiue identifier of the native face.
-    var displayURL: String { get }
+    /// Uniqiue identifier of the face.
+    ///
+    /// This id is used to register the face in the face registry. The face registry is an input to the
+    /// `FaceSelectionProcedure` type.
+    static var displayURL: String { get }
 
     /// Vatom pack for display.
     var vatomPack: VatomPackModel { get set }
 
     /// Selected face model.
     var selectedFace: FaceModel { get set }
+
+    /// Initialized with a vatomPack and the selected face model.
+    init(vatomPack: VatomPackModel, selectedFace: FaceModel)
 
     // MARK: - Lifecycle
 

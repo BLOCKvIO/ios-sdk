@@ -38,6 +38,8 @@ class ActivatedVatomViewController: UIViewController {
         
         vatomView.update(usingVatomPack: vatomPack!, procedure: procedure!)
         vatomView.backgroundColor = .blue
+        
+        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneTapped))
 
         // Do any additional setup after loading the view.
     }
@@ -45,6 +47,10 @@ class ActivatedVatomViewController: UIViewController {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    @objc private func doneTapped() {
+        self.navigationController?.dismiss(animated: true, completion: nil)
     }
     
 

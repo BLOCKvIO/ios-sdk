@@ -30,9 +30,9 @@ import Foundation
 /// - Optional face model. The closure should return the 'best' face given the inputs, or `nil` if no face is selected.
 ///
 /// - Parameters:
-///   - vatomPack: vAtom pack from which the best face should be selected.
-///   - faceRegistry: Set of displayURLs of the installed native faces.
-public typealias FaceSelectionProcedure = (_ vatomPack: VatomPackModel, _ faceRegistry: Set<String>)
+///   - vatomPack: vAtom pack from which the best face model should be selected.
+///   - installedURLs: Set of displayURLs of the installed face views.
+public typealias FaceSelectionProcedure = (_ vatomPack: VatomPackModel, _ installedURLs: Set<String>)
     -> FaceModel?
 
 /// Models the embedded face selection procedures (FSP)s. This is a set of pre-built face selection procedures defined
@@ -122,49 +122,49 @@ private struct EmbeddedProcedureBuilder {
 
     // MARK: - Stored Face Selection Procedure (FSP) + Fallback
 
-    static let iconProcedureWithFallback: FaceSelectionProcedure = { (vatomPack, faceRegistry) in
-        return EmbeddedProcedureBuilder.iconProcedure(vatomPack, faceRegistry) ??
-            EmbeddedProcedure.icon.fallback?.procedure(vatomPack, faceRegistry)
+    static let iconProcedureWithFallback: FaceSelectionProcedure = { (vatomPack, installedURLs) in
+        return EmbeddedProcedureBuilder.iconProcedure(vatomPack, installedURLs) ??
+            EmbeddedProcedure.icon.fallback?.procedure(vatomPack, installedURLs)
     }
 
-    static let activatedProcedureWithFallback: FaceSelectionProcedure = { (vatomPack, faceRegistry)  in
-        return EmbeddedProcedureBuilder.activatedProcedure(vatomPack, faceRegistry) ??
-            EmbeddedProcedure.activated.fallback?.procedure(vatomPack, faceRegistry)
+    static let activatedProcedureWithFallback: FaceSelectionProcedure = { (vatomPack, installedURLs)  in
+        return EmbeddedProcedureBuilder.activatedProcedure(vatomPack, installedURLs) ??
+            EmbeddedProcedure.activated.fallback?.procedure(vatomPack, installedURLs)
     }
 
-    static let fullscreenProcedureWithFallack: FaceSelectionProcedure = { (vatomPack, faceRegistry)  in
-        return EmbeddedProcedureBuilder.fullscreenProcedure(vatomPack, faceRegistry) ??
-            EmbeddedProcedure.fullscreen.fallback?.procedure(vatomPack, faceRegistry)
+    static let fullscreenProcedureWithFallack: FaceSelectionProcedure = { (vatomPack, installedURLs)  in
+        return EmbeddedProcedureBuilder.fullscreenProcedure(vatomPack, installedURLs) ??
+            EmbeddedProcedure.fullscreen.fallback?.procedure(vatomPack, installedURLs)
     }
 
-    static let cardProcedureWithFallack: FaceSelectionProcedure = { (vatomPack, faceRegistry)  in
-        return EmbeddedProcedureBuilder.cardProcedure(vatomPack, faceRegistry) ??
-            EmbeddedProcedure.card.fallback?.procedure(vatomPack, faceRegistry)
+    static let cardProcedureWithFallack: FaceSelectionProcedure = { (vatomPack, installedURLs)  in
+        return EmbeddedProcedureBuilder.cardProcedure(vatomPack, installedURLs) ??
+            EmbeddedProcedure.card.fallback?.procedure(vatomPack, installedURLs)
     }
 
     // MARK: - Face Selection Procedures (FSP)
 
-    static let iconProcedure: FaceSelectionProcedure = { (vatomPack, faceRegistry) in
+    static let iconProcedure: FaceSelectionProcedure = { (vatomPack, installedURLs) in
         EmbeddedProcedureBuilder.defaultSelectionProcedure(vatomPack.faces,
-                                                           faceRegistry,
+                                                           installedURLs,
                                                            EmbeddedProcedure.icon.constraints)
     }
 
-    static let activatedProcedure: FaceSelectionProcedure = { (vatomPack, faceRegistry)  in
+    static let activatedProcedure: FaceSelectionProcedure = { (vatomPack, installedURLs)  in
         EmbeddedProcedureBuilder.defaultSelectionProcedure(vatomPack.faces,
-                                                           faceRegistry,
+                                                           installedURLs,
                                                            EmbeddedProcedure.activated.constraints)
     }
 
-    static let fullscreenProcedure: FaceSelectionProcedure = { (vatomPack, faceRegistry)  in
+    static let fullscreenProcedure: FaceSelectionProcedure = { (vatomPack, installedURLs)  in
         EmbeddedProcedureBuilder.defaultSelectionProcedure(vatomPack.faces,
-                                                           faceRegistry,
+                                                           installedURLs,
                                                            EmbeddedProcedure.fullscreen.constraints)
     }
 
-    static let cardProcedure: FaceSelectionProcedure = { (vatomPack, faceRegistry)  in
+    static let cardProcedure: FaceSelectionProcedure = { (vatomPack, installedURLs)  in
         EmbeddedProcedureBuilder.defaultSelectionProcedure(vatomPack.faces,
-                                                           faceRegistry,
+                                                           installedURLs,
                                                            EmbeddedProcedure.card.constraints)
     }
 
@@ -174,10 +174,10 @@ private struct EmbeddedProcedureBuilder {
     ///
     /// - Parameters:
     ///   - faceModels: Array of face models to be used by the selection procedure.
-    ///   - faceRegistry: Set of display URLs of the installed native faces.
+    ///   - installedURLs: Set of display URLs of the installed face views.
     ///   - constraints: Struct holding face contraints to be used by the selection procedure.
     typealias EmbeddedFaceSelectionProcedure = (_ faceModels: [FaceModel],
-        _ faceRegistry: Set<String>,
+        _ installedURLs: Set<String>,
         _ constraints: EmbeddedProcedure.SelectionConstraints)
         -> FaceModel?
 
@@ -192,7 +192,7 @@ private struct EmbeddedProcedureBuilder {
     /// 5. Select the 'best' face.
     ///
     /// This closure defines a procedure that is common to most embedded FSPs. The logic is therefor consoldated here.
-    static let defaultSelectionProcedure: EmbeddedFaceSelectionProcedure = { (faceModels, faceRegistry, constraints) in
+    static let defaultSelectionProcedure: EmbeddedFaceSelectionProcedure = { (faceModels, installedURLs, constraints) in
 
         var bestFace: FaceModel?
         var bestRank = -1
@@ -226,7 +226,7 @@ private struct EmbeddedProcedureBuilder {
             if face.isNative {
 
                 // enusrue the native face is supported (i.e. the face code is installed)
-                if faceRegistry.contains(where: {
+                if installedURLs.contains(where: {
                     ($0.caseInsensitiveCompare(face.properties.displayURL.absoluteString) == .orderedSame) }) {
                     rank += 1
                 } else {

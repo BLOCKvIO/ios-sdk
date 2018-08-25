@@ -18,7 +18,7 @@ import UIKit
 /// Native test face view
 ///
 /// This face is soley meant for testing the funcitonality of native faces.
-class NativeTestFaceView: UIView, FaceView, FaceModuleNibLoadable {
+class NativeTestFaceView: UIView, FaceView, FaceModuleNibLoadable {    
 
     // MARK: - Outlets
 
@@ -67,9 +67,15 @@ class NativeTestFaceView: UIView, FaceView, FaceModuleNibLoadable {
     }
 
     // MARK: - Face View Lifecycle
+    
+    var timer: Timer?
 
-    func load(completion: (Error?) -> Void) {
+    func load(completion: @escaping (Error?) -> Void) {
         print(#function)
+        
+        self.timer = Timer(timeInterval: 3, repeats: false) { (timer) in
+            completion(nil)
+        }
 
         // Download resource
 

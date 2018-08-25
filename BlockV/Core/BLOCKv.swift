@@ -14,9 +14,9 @@ import Alamofire
 import JWTDecode
 
 /*
- Goal:
- BLOCKv should be invariant over App ID and Environment. In other words, the properties should
- change, once set. Possibly targets for each environemnt?
+ Design:
+ Class BLOCKv must be invariant over `appID` and `environment`. In other words, the properties should never
+ change once set.
  */
 
 /// Primary interface into the the BLOCKv SDK.
@@ -102,7 +102,7 @@ public final class BLOCKv {
 
                 #if DEBUG
                 // environment for experimentation (safe to modify)
-                self.environment = .development
+                self.environment = .production
                 #else
                 // pre-mapped environment (do not modify)
                 self.environment = mappedEnvironment

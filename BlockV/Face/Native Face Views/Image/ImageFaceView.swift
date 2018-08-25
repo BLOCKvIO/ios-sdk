@@ -61,10 +61,16 @@ class ImageFaceView: UIView, FaceView {
 
     // MARK: - Face View Lifecycle
 
-    func load(completion: (Error?) -> Void) {
+    var timer: Timer?
+
+    func load(completion: @escaping (Error?) -> Void) {
         print(#function)
 
         // Download resource
+        
+        self.timer = Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { _ in
+            completion(nil)
+        }
 
     }
 

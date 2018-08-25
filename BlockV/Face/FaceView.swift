@@ -30,7 +30,7 @@ public protocol FaceView where Self: UIView {
     /// Called to initiate the loading of the face code.
     ///
     /// This should trigger the downloading of all necessary face resources.
-    func load(completion: (Error?) -> Void)
+    func load(completion: @escaping (Error?) -> Void)
 
     /// Called when the vatom pack is updated.
     ///

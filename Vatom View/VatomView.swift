@@ -14,57 +14,21 @@ import Foundation
 /*
  Goals:
  1. Vatom View will ask for the best face (default routine for each view context).
- 2. Viewer's must be able to use pre-defined routines.
+ 2. Viewer's must be able to use pre-defined procedures.
  3. Viewer's must be able supply a custom face selection procedure.
- 
- Concept: Face Selection Procedure
- 
- A face selection procedure is an algorithm used to select a face model from the (potentially) many faces
- associated with the vatom's template.
- 
- Since vatoms rarely define the exact face they wish to show (because the faces that get registered against the vatom's
- template are out of the developers control).
- 
- A face selection procedure allows for 2 things:
- 1. The best face can be chosen from the attributes and contraints of the available faces.
- 2. A fallback face can be provided (in the event no face meets the criteria).
- 
- 
- Face selection procedures ONLY validate:
- 1. The native face code is installed.
- 2. The platform is supported.
- 3. The constrians, e.g. view mode are satisfied.
- 
- > If there are multiple, select the first.
  
  Face selection routines do NOT validate:
  1. Vatom private properties
  2. Vatom resources
- 3. Vatom face model config sections
- 
+ 3. Vatom face model config
  > Rather, such errors are left to the face code to validate and display an error.
  */
 
-/*
- Questions:
- 
- 1. What view must be shown when the selection procedure fails to select a face?
- > See outcomes - show error with actiavted image.
- 2. Should their be a fallback, like show the native image face?
- > No, show error.
- 3. Should we allow vatom view to be instantiated directly using a face (i.e. without using a selection procedure)?
-    > Maybe someone creates a viewer and only wants to add 2 faces to each of their vAtoms.
-    > How are we going to enfore that people add a 'minimum reasonable faces'?
- 
- - What if the FSP was a type rather than a function. That way each FSP could have a name, and therefore be identifiable
- by the VatomView and so have conditional logic run based on its name. Or, should the VatomView be 'unware' of the FSP
- and simply use what information the vatompack gives it?
- 
- -
- 
- */
-
-/// Responsible for displaying a vAtom face (native or Web).
+/// Displays a face view for the specified vAtom.
+///
+/// The face displayed is dependent on the face selection procedure (FSP).
+///
+/// Loading and error views may be customized.
 public class VatomView: UIView {
 
     // MARK: - Enum
@@ -113,6 +77,11 @@ public class VatomView: UIView {
     /// on screen.
     public private(set) var procedure: FaceSelectionProcedure?
 
+    /// List of all the installed face views.
+    ///
+    /// The roster is a consolidated list of the face views registered by both the SDK and Viewer.
+    public private(set) var roster: FaceViewRoster?
+
     /// Face model selected by the specifed face selection procedure (FSP).
     public private(set) var selectedFaceModel: FaceModel?
 
@@ -138,9 +107,13 @@ public class VatomView: UIView {
     ///   - actions: The array of actions associated with the vAtom's template.
     ///   - procedure: An face selection procedure (FSP) that determines which face to
     ///     display.
-    public init(vatomPack: VatomPackModel, procedure: @escaping FaceSelectionProcedure) {
+    public init(vatomPack: VatomPackModel,
+                procedure: @escaping FaceSelectionProcedure,
+                roster: FaceViewRoster = FaceViewRegistry.shared.roster) {
+
         self.vatomPack = vatomPack
         self.procedure = procedure
+        self.roster = roster
 
         super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
 
@@ -152,16 +125,14 @@ public class VatomView: UIView {
         super.init(coder: aDecoder)
 
         // caller must set vatom pack
-        // caller must ser procedure
+        // caller must set procedure
+        // caller must set face view roster
 
         commonInit()
-
     }
 
     /// Common initializer
     private func commonInit() {
-
-        //self.backgroundColor = UIColor.red.withAlphaComponent(0.3)
 
         self.loadingView = UIView() // or custom
         self.errorView = UIView() // or custom
@@ -184,10 +155,13 @@ public class VatomView: UIView {
      
      */
 
-    public func update(usingVatomPack vatomPack: VatomPackModel, procedure: @escaping FaceSelectionProcedure) {
+    public func update(usingVatomPack vatomPack: VatomPackModel,
+                       procedure: @escaping FaceSelectionProcedure,
+                       roster: FaceViewRoster? = nil) {
 
         self.vatomPack = vatomPack
         self.procedure = procedure
+        self.roster = roster
 
         runVatomViewLifecylce()
 
@@ -208,19 +182,17 @@ public class VatomView: UIView {
 
         precondition(vatomPack != nil, "vatomPack must not be nil.")
         precondition(procedure != nil, "procedure must not be nil.")
+        precondition(roster != nil, "face view roster must not be nil.")
 
         // precondition that vatom pack is not nil
-        guard let vatomPack = vatomPack else {
-            return
-        }
-
+        guard let vatomPack = vatomPack else { return }
         // precondition that procedure is not nil
-        guard let procedure = procedure else {
-            return
-        }
+        guard let procedure = procedure else { return }
+        // precodition that face view roster is not nil
+        guard let roster = roster else { return }
 
         // 1. select the best face model
-        guard let selectedFace = procedure(vatomPack, faceRegistry) else {
+        guard let selectedFace = procedure(vatomPack, Set(roster.keys)) else {
 
             printBV(error: "Face Selection Procedure (FSP) returned without selecting a face model.")
             self.state = .error
@@ -259,7 +231,7 @@ public class VatomView: UIView {
             let selectedFaceView = ImageFaceView(vatomPack: vatomPack, selectedFace: selectedFace)
 
             // relace currently selected face view with newly selected
-            self.replaceFaceView(withFaceView: selectedFaceView)
+            self.replaceFaceView(with: selectedFaceView)
 
         }
 
@@ -270,7 +242,7 @@ public class VatomView: UIView {
     /// Call this function only if you want a full replace of the current face view.
     ///
     /// Triggers the Face View Life Cycle (VVLC)
-    func replaceFaceView<T: FaceView>(withFaceView newFaceView: T) {
+    func replaceFaceView<T: FaceView>(with newFaceView: T) {
 
         /*
          Options: This function could take in a FaceView instance, or take in a FaceView.Type and create the instance
@@ -305,13 +277,5 @@ public class VatomView: UIView {
         }
 
     }
-
-    //FIXME: Mocks the face registery.
-    //FIXME: Need to decide how to register the web face (if at all).
-    let faceRegistry: Set = ["web://",
-                             "native://image",
-                             "native://image-policy",
-                             "native://image-redeemable",
-                             "native://level-image"]
 
 }

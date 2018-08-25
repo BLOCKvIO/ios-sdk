@@ -11,13 +11,26 @@
 
 import Foundation
 
-public typealias FaceViewRoster = [String: FaceView.Type]
+/*
+ This could all move onto VatomView as a static? As long as the memory overhead of VatomView remains small.
+ */
+
+public typealias DisplayURL = String
+
+public typealias FaceViewRoster = [DisplayURL: FaceView.Type]
 
 public class FaceViewRegistry {
 
     // MARK: - Properties
 
     public static let shared = FaceViewRegistry()
+
+    init() {
+        // register embedded face views
+        self.register(ImageFaceView.self)
+        self.register(ImageSubclassFaceView.self)
+        self.register(TestFaceView.self)
+    }
 
     /// Dictionary of face
     public private(set) var roster: FaceViewRoster = [:]

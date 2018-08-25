@@ -315,8 +315,9 @@ class InventoryCollectionViewController: UICollectionViewController {
         } else if segue.identifier == "seg.vatom.show" {
             let destination = segue.destination as! UINavigationController
             let vc = destination.viewControllers[0] as! ActivatedVatomViewController
-            vc.vatomPack = self.vatomPacks.first! //FIXME: 
-            vc.procedure = EmbeddedProcedure.card.procedure //FIXME:
+            vc.vatomPack = self.vatomPacks.first!
+            vc.procedure = EmbeddedProcedure.card.procedure
+            vc.roster = FaceViewRegistry.shared.roster
         }
     }
     

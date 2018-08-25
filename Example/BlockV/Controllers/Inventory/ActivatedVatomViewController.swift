@@ -28,6 +28,7 @@ class ActivatedVatomViewController: UIViewController {
     
     var vatomPack: VatomPackModel?
     var procedure: FaceSelectionProcedure?
+    var roster: FaceViewRoster?
     
     @IBOutlet weak var vatomView: VatomView!
     
@@ -36,7 +37,7 @@ class ActivatedVatomViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        vatomView.update(usingVatomPack: vatomPack!, procedure: procedure!)
+        vatomView.update(usingVatomPack: vatomPack!, procedure: procedure!, roster: roster!)
         vatomView.backgroundColor = .blue
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneTapped))

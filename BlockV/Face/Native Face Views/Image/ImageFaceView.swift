@@ -12,14 +12,12 @@
 import UIKit
 import FLAnimatedImage
 
-/// Native image face view
+/// Native Image face view
 class ImageFaceView: UIView, FaceView {
 
-    // MARK: - Fave View Protocol
+    // MARK: - Face View Protocol
 
-    class var displayURL: String {
-        return "native://image"
-    }
+    class var displayURL: String { return "native://image" }
 
     var vatomPack: VatomPackModel
 

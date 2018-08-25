@@ -18,7 +18,7 @@ import UIKit
 /// Native test face view
 ///
 /// This face is soley meant for testing the funcitonality of native faces.
-class NativeTestFaceView: UIView, FaceView, FaceModuleNibLoadable {    
+class TestFaceView: UIView, FaceView, FaceModuleNibLoadable {    
 
     // MARK: - Outlets
 

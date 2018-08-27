@@ -225,8 +225,13 @@ public class VatomView: UIView {
             printBV(info: "Face model change - Replacing face view.")
 
             // 3. find face view type
-            // let faceViewType = FaceViewRegistry.shared.roster[selectedFaceModel.properties.displayURL.absoluteString]
-            let faceViewType = FaceViewRegistry.shared.roster["native://progressive-image"]!
+            guard let faceViewType = FaceViewRegistry.shared.roster[
+                selectedFaceModel.properties.displayURL.absoluteString] else {
+                    // viewer developer must register the face view with the face registry
+                    preconditionFailure("FSP selected a face without the face code being installed.")
+            }
+
+            //let faceViewType = FaceViewRegistry.shared.roster["native://image"]!
             let selectedFaceView: FaceView = faceViewType.init(vatomPack: vatomPack,
                                                                faceModel: selectedFaceModel)
             // let selectedFaceView: FaceView = ImageFaceView(vatomPack: vatomPack, faceModel: selectedFace)

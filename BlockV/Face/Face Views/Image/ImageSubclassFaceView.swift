@@ -13,17 +13,17 @@ import Foundation
 
 /// Tests that subclassing a face view works as expected.
 class ImageSubclassFaceView: ImageFaceView {
-
+    
     override class var displayURL: String {
-return "native://some-subclass"
+        return "native://some-subclass"
     }
-
-    required init(vatomPack: VatomPackModel, selectedFace: FaceModel) {
-        super.init(vatomPack: vatomPack, selectedFace: selectedFace)
+    
+    required init(vatomPack: VatomPackModel, faceModel: FaceModel) {
+        super.init(vatomPack: vatomPack, faceModel: faceModel)
     }
-
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
 }

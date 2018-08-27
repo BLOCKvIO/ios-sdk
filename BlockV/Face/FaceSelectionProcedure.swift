@@ -75,7 +75,7 @@ public enum EmbeddedProcedure {
     public var selectionProcedure: FaceSelectionProcedure {
         switch self {
         case .icon:             return EmbeddedProcedureBuilder.iconProcedureWithFallback
-        case .engaged:        return EmbeddedProcedureBuilder.engagedProcedureWithFallback
+        case .engaged:          return EmbeddedProcedureBuilder.engagedProcedureWithFallback
         case .fullscreen:       return EmbeddedProcedureBuilder.fullscreenProcedureWithFallack
         case .card:             return EmbeddedProcedureBuilder.cardProcedureWithFallack
         }

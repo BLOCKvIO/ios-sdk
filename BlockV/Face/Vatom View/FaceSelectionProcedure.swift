@@ -50,8 +50,8 @@ public enum EmbeddedProcedure {
 
     /// Selects based on 'icon' view mode.
     case icon
-    /// Selects based on 'activated' view mode.
-    case activated
+    /// Selects based on 'engaged' view mode.
+    case engaged
     /// Selects based on 'fullscreen' view mode.
     case fullscreen
     /// Selects based on 'card' view mode.
@@ -63,7 +63,7 @@ public enum EmbeddedProcedure {
     var fallback: EmbeddedProcedure? {
         switch self {
         case .icon:         return nil
-        case .activated:    return .icon
+        case .engaged:      return .icon
         case .fullscreen:   return nil
         case .card:         return nil
         }
@@ -75,7 +75,7 @@ public enum EmbeddedProcedure {
     public var procedure: FaceSelectionProcedure {
         switch self {
         case .icon:             return EmbeddedProcedureBuilder.iconProcedureWithFallback
-        case .activated:        return EmbeddedProcedureBuilder.activatedProcedureWithFallback
+        case .engaged:          return EmbeddedProcedureBuilder.engagedProcedureWithFallback
         case .fullscreen:       return EmbeddedProcedureBuilder.fullscreenProcedureWithFallack
         case .card:             return EmbeddedProcedureBuilder.cardProcedureWithFallack
         }
@@ -87,7 +87,7 @@ public enum EmbeddedProcedure {
     var constraints: SelectionConstraints {
         switch self {
         case .icon:         return SelectionConstraints(viewMode: "icon")
-        case .activated:    return SelectionConstraints(viewMode: "activated")
+        case .engaged:      return SelectionConstraints(viewMode: "engaged")
         case .fullscreen:   return SelectionConstraints(viewMode: "fullscreen")
         case .card:         return SelectionConstraints(viewMode: "card")
         }
@@ -100,20 +100,20 @@ public enum EmbeddedProcedure {
         // let quality: String // e.g. of futher constraints
     }
 
-//    /// Selects the 'best' face using this procedure's stored Face Selection Procedure (FSP).
-//    ///
-//    /// - Parameters:
-//    ///   - vatomPack: vAtom pack from which the best face should be selected.
-//    ///   - displayURLs: Set of display URLs of the installed native faces.
-//    ///   - useFallback: Determines whether the fallback procedure should be used. If `true` the fallback is used,
-//    ///   `false` otherwise.
-//    /// - Returns: The selected face model, or `nil` if no face model is selected.
-//    func selectBestFace(vatomPack: VatomPackModel, displayURLs: Set<String>, useFallback: Bool = true)
-//        -> FaceModel? {
-//            // execute this procedure, use fallback if necessary
-//            return self.selectionProcedure(vatomPack, displayURLs) ??
-//                self.fallback?.selectionProcedure(vatomPack, displayURLs)
-//    }
+    //    /// Selects the 'best' face using this procedure's stored Face Selection Procedure (FSP).
+    //    ///
+    //    /// - Parameters:
+    //    ///   - vatomPack: vAtom pack from which the best face should be selected.
+    //    ///   - displayURLs: Set of display URLs of the installed native faces.
+    //    ///   - useFallback: Determines whether the fallback procedure should be used. If `true` the fallback is used,
+    //    ///   `false` otherwise.
+    //    /// - Returns: The selected face model, or `nil` if no face model is selected.
+    //    func selectBestFace(vatomPack: VatomPackModel, displayURLs: Set<String>, useFallback: Bool = true)
+    //        -> FaceModel? {
+    //            // execute this procedure, use fallback if necessary
+    //            return self.selectionProcedure(vatomPack, displayURLs) ??
+    //                self.fallback?.selectionProcedure(vatomPack, displayURLs)
+    //    }
 
 }
 
@@ -127,9 +127,9 @@ private struct EmbeddedProcedureBuilder {
             EmbeddedProcedure.icon.fallback?.procedure(vatomPack, installedURLs)
     }
 
-    static let activatedProcedureWithFallback: FaceSelectionProcedure = { (vatomPack, installedURLs)  in
-        return EmbeddedProcedureBuilder.activatedProcedure(vatomPack, installedURLs) ??
-            EmbeddedProcedure.activated.fallback?.procedure(vatomPack, installedURLs)
+    static let engagedProcedureWithFallback: FaceSelectionProcedure = { (vatomPack, installedURLs)  in
+        return EmbeddedProcedureBuilder.engagedProcedure(vatomPack, installedURLs) ??
+            EmbeddedProcedure.engaged.fallback?.procedure(vatomPack, installedURLs)
     }
 
     static let fullscreenProcedureWithFallack: FaceSelectionProcedure = { (vatomPack, installedURLs)  in
@@ -150,10 +150,10 @@ private struct EmbeddedProcedureBuilder {
                                                            EmbeddedProcedure.icon.constraints)
     }
 
-    static let activatedProcedure: FaceSelectionProcedure = { (vatomPack, installedURLs)  in
+    static let engagedProcedure: FaceSelectionProcedure = { (vatomPack, installedURLs)  in
         EmbeddedProcedureBuilder.defaultSelectionProcedure(vatomPack.faces,
                                                            installedURLs,
-                                                           EmbeddedProcedure.activated.constraints)
+                                                           EmbeddedProcedure.engaged.constraints)
     }
 
     static let fullscreenProcedure: FaceSelectionProcedure = { (vatomPack, installedURLs)  in

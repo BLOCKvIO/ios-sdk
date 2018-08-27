@@ -18,7 +18,7 @@ import UIKit
 /// Native test face view
 ///
 /// This face is soley meant for testing the funcitonality of native faces.
-class TestFaceView: UIView, FaceView, FaceModuleNibLoadable {    
+class TestFaceView: FaceView, FaceModuleNibLoadable {
 
     // MARK: - Outlets
 
@@ -29,17 +29,11 @@ class TestFaceView: UIView, FaceView, FaceModuleNibLoadable {
     // MARK: - Fave View Protocol
 
     static let displayURL = "native://test"
-    var vatomPack: VatomPackModel
-    var selectedFace: FaceModel
 
     // MARK: - Initialization
 
-    required init(vatomPack: VatomPackModel, selectedFace: FaceModel) {
-
-        self.vatomPack = vatomPack
-        self.selectedFace = selectedFace
-
-        super.init(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+    required init(vatomPack: VatomPackModel, faceModel: FaceModel) {
+        super.init(vatomPack: vatomPack, faceModel: faceModel)
 
         self.backgroundColor = UIColor.red.withAlphaComponent(0.3)
 
@@ -67,13 +61,13 @@ class TestFaceView: UIView, FaceView, FaceModuleNibLoadable {
     }
 
     // MARK: - Face View Lifecycle
-    
+
     var timer: Timer?
 
     func load(completion: @escaping (Error?) -> Void) {
         print(#function)
-        
-        self.timer = Timer(timeInterval: 3, repeats: false) { (timer) in
+
+        self.timer = Timer(timeInterval: 3, repeats: false) { (_) in
             completion(nil)
         }
 

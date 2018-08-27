@@ -8,7 +8,5 @@
 import UIKit
 
 class LoadingView: UIView {
-    
-    
 
 }

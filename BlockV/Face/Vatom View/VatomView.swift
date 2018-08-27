@@ -30,9 +30,9 @@ import Foundation
 ///
 /// Loading and error views may be customized.
 public class VatomView: UIView {
-    
+
     // MARK: - Enum
-    
+
     /// Models the Vatom View Lifecycle (VVLC) state.
     public enum LifecycleState {
         /// Lifecycle is busy or face view has not completed loading.
@@ -42,7 +42,7 @@ public class VatomView: UIView {
         /// Face view has successfully completed loading
         case completed
     }
-    
+
     /// Tracks the VVLC state.
     public internal(set) var state: LifecycleState = .loading {
         didSet {
@@ -55,7 +55,7 @@ public class VatomView: UIView {
                 self.selectedFaceView?.alpha = 0.000001
                 self.loadingView?.isHidden = true
                 self.errorView?.isHidden = false
-                
+
             case .completed:
                 self.selectedFaceView?.alpha = 1
                 self.loadingView?.isHidden = true
@@ -63,12 +63,12 @@ public class VatomView: UIView {
             }
         }
     }
-    
+
     // MARK: - Properties
-    
+
     /// The vatom pack.
     public private(set) var vatomPack: VatomPackModel?
-    
+
     /// The face selection procedure.
     ///
     /// Viewers may wish to update the procedure in reponse to certian events.
@@ -76,29 +76,29 @@ public class VatomView: UIView {
     /// For example, the viewer may change the procedure from 'icon' to 'activated' while the VatomView is
     /// on screen.
     public private(set) var procedure: FaceSelectionProcedure?
-    
+
     /// List of all the installed face views.
     ///
     /// The roster is a consolidated list of the face views registered by both the SDK and Viewer.
     public private(set) var roster: FaceViewRoster?
-    
+
     /// Face model selected by the specifed face selection procedure (FSP).
     public private(set) var selectedFaceModel: FaceModel?
-    
+
     /// Selected face view (function of the selected face model).
     public private(set) var selectedFaceView: FaceView? //(UIView & FaceView)?
-    
+
     //FIXME: How is the consumer going to set the loading and error views?
-    
+
     var loadingView: UIView?
     var errorView: UIView?
-    
+
     // MARK: - Web Socket
-    
+
     // TODO: Respond to the Web socket, pass events down to the face view, run FVLC.
-    
+
     // MARK: - Initializer
-    
+
     /// Creates a vAtom view for the specifed vAtom.
     ///
     /// - Parameters:
@@ -110,37 +110,37 @@ public class VatomView: UIView {
     public init(vatomPack: VatomPackModel,
                 procedure: @escaping FaceSelectionProcedure,
                 roster: FaceViewRoster = FaceViewRegistry.shared.roster) {
-        
+
         self.vatomPack = vatomPack
         self.procedure = procedure
         self.roster = roster
-        
+
         super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
-        
+
         commonInit()
         runVatomViewLifecylce()
     }
-    
+
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        
+
         // caller must set vatom pack
         // caller must set procedure
         // caller must set face view roster
-        
+
         commonInit()
     }
-    
+
     /// Common initializer
     private func commonInit() {
-        
+
         self.loadingView = UIView() // or custom
         self.errorView = UIView() // or custom
-        
+
     }
-    
+
     // MARK: - Methods
-    
+
     /*
      Both vatomPack and the procedure may be updated over the life of the vatom view.
      This means if either is updated, the VVLC should run.
@@ -154,19 +154,19 @@ public class VatomView: UIView {
      How sould consumer set the vatomPack and procedure? Via one function?
      
      */
-    
+
     public func update(usingVatomPack vatomPack: VatomPackModel,
                        procedure: @escaping FaceSelectionProcedure,
                        roster: FaceViewRoster? = nil) {
-        
+
         self.vatomPack = vatomPack
         self.procedure = procedure
         self.roster = roster
-        
+
         runVatomViewLifecylce()
-        
+
     }
-    
+
     /// Exectues the Vatom View Lifecycle (VVLC) on the current vAtom pack.
     ///
     /// Called
@@ -177,106 +177,106 @@ public class VatomView: UIView {
     /// 3. Inform the face view to load it's content
     /// 4. Display the face view
     public func runVatomViewLifecylce() {
-        
+
         //FIXME: Part of this could run on a background thread, e.g fsp
-        
+
         precondition(vatomPack != nil, "vatomPack must not be nil.")
         precondition(procedure != nil, "procedure must not be nil.")
         precondition(roster != nil, "face view roster must not be nil.")
-        
+
         // precondition that vatom pack is not nil
         guard let vatomPack = vatomPack else { return }
         // precondition that procedure is not nil
         guard let procedure = procedure else { return }
         // precodition that face view roster is not nil
         guard let roster = roster else { return }
-        
+
         // 1. select the best face model
         guard let selectedFaceModel = procedure(vatomPack, Set(roster.keys)) else {
-            
+
             printBV(error: "Face Selection Procedure (FSP) returned without selecting a face model.")
             self.state = .error
             //FIXME: display the error view (which shows the activated image).
             return
         }
-        
+
         printBV(info: "Face Selection Procedure (FSP) selected face model: \(selectedFaceModel)")
-        
+
         // 2. check if the face model has not changed
         if selectedFaceModel == self.selectedFaceModel {
-            
+
             printBV(info: "Face model unchanged - Updating face view.")
-            
+
             /*
              Although the selected face model has not changed, other items in the vatom pack may have, these updates
              must be passed to the face view to give it a change to update its state.
              
              The VVLC should not be re-run (since the selected face view does not need replacing).
              */
-            
+
             self.state = .completed
             // update currently selected face view (without replacement)
             self.selectedFaceView?.vatomUpdated(vatomPack)
-            
+
             //FXIME: How does the face view find out what has changed? Maybe the vatomPack must have a 'diff' property?
-            
+
         } else {
-            
+
             printBV(info: "Face model change - Replacing face view.")
-            
+
             // 3. find face view type
             //            let faceViewType = FaceViewRegistry.shared.roster[selectedFaceModel.properties.displayURL.absoluteString]
             let faceViewType = FaceViewRegistry.shared.roster["native://progressive-image"]!
             let selectedFaceView: FaceView = faceViewType.init(vatomPack: vatomPack,
                                                                faceModel: selectedFaceModel)
             //            let selectedFaceView: FaceView = ImageFaceView(vatomPack: vatomPack, faceModel: selectedFace)
-            
+
             // relace currently selected face view with newly selected
             self.replaceFaceView(with: selectedFaceView)
-            
+
         }
-        
+
     }
-    
+
     /// Replaces the current face view (if any) with the specified face view and starts the FVLC.
     ///
     /// Call this function only if you want a full replace of the current face view.
     ///
     /// Triggers the Face View Life Cycle (VVLC)
     func replaceFaceView(with newFaceView: (FaceView)) {
-        
+
         /*
          Options: This function could take in a FaceView instance, or take in a FaceView.Type and create the instance
          itself (using the generator)?
          */
-        
+
         self.state = .loading
-        
+
         // update currently selected face view
         self.selectedFaceView = newFaceView
-        
+
         // insert face view into the view hierarcy
         newFaceView.frame = self.bounds
         newFaceView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         self.insertSubview(newFaceView, at: 0)
-        
+
         // 1. instruct face view to load its content
         newFaceView.load { (error) in
-            
+
             printBV(info: "Face view load completion called.")
-            
+
             // ensure no error
             guard error == nil else {
                 // face view encountered an error
                 self.state = .error
                 return
             }
-            
+
             // show face
             self.state = .completed
-            
+
         }
-        
+
     }
-    
+
 }

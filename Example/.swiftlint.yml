@@ -6,7 +6,7 @@ disabled_rules: # rule identifiers to exclude from running
   - todo
 
 included: # paths to include during linting. `--path` is ignored if present.
-  - ../BlockV/Core
+  #- ../BlockV/Core
   - ../BlockV/Face
 excluded: # paths to ignore during linting. Takes precedence over `included`.
   - Pods

@@ -11,6 +11,17 @@
 
 import Foundation
 
+/// Possible view modes a face may define for presentation.
+public enum ViewMode: String {
+
+    case icon
+    case activated
+    case fullscreen
+    case card
+    case background
+
+}
+
 /// A simple struct that models a template face.
 ///
 /// FaceModel has value semantics and is immutable.

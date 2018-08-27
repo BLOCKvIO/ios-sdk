@@ -155,6 +155,8 @@ extension BVError: Equatable {
             return true
         case (let .webSocket(lhsReason), let .webSocket(rhsReason)):
             return lhsReason == rhsReason
+        case (let .custom(lhsReason), let .custom(rhsReason)):
+            return lhsReason == rhsReason
         default:
             return false
         }

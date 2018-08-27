@@ -225,11 +225,11 @@ public class VatomView: UIView {
             printBV(info: "Face model change - Replacing face view.")
 
             // 3. find face view type
-            //            let faceViewType = FaceViewRegistry.shared.roster[selectedFaceModel.properties.displayURL.absoluteString]
+            // let faceViewType = FaceViewRegistry.shared.roster[selectedFaceModel.properties.displayURL.absoluteString]
             let faceViewType = FaceViewRegistry.shared.roster["native://progressive-image"]!
             let selectedFaceView: FaceView = faceViewType.init(vatomPack: vatomPack,
                                                                faceModel: selectedFaceModel)
-            //            let selectedFaceView: FaceView = ImageFaceView(vatomPack: vatomPack, faceModel: selectedFace)
+            // let selectedFaceView: FaceView = ImageFaceView(vatomPack: vatomPack, faceModel: selectedFace)
 
             // relace currently selected face view with newly selected
             self.replaceFaceView(with: selectedFaceView)

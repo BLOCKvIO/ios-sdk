@@ -28,7 +28,7 @@ class TestFaceView: FaceView, FaceModuleNibLoadable {
 
     // MARK: - Fave View Protocol
 
-    static let displayURL = "native://test"
+    class var displayURL: String { return "native://test" }
 
     // MARK: - Initialization
 

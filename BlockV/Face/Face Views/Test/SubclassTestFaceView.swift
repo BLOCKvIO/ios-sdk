@@ -12,11 +12,9 @@
 import Foundation
 
 /// Tests that subclassing a face view works as expected.
-class ImageSubclassFaceView: ImageFaceView {
+class SubclassTestFaceView: TestFaceView {
 
-    override class var displayURL: String {
-        return "native://some-subclass"
-    }
+    override class var displayURL: String { return "native://test-subclass" }
 
     required init(vatomPack: VatomPackModel, faceModel: FaceModel) {
         super.init(vatomPack: vatomPack, faceModel: faceModel)

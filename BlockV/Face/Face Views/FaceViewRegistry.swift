@@ -28,8 +28,9 @@ public class FaceViewRegistry {
     init() {
         // register embedded face views
         self.register(ImageFaceView.self)
-        self.register(ImageSubclassFaceView.self)
+        // test face views
         self.register(TestFaceView.self)
+        self.register(SubclassTestFaceView.self)
     }
 
     /// Dictionary of face

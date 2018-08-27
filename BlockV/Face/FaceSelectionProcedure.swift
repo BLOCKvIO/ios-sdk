@@ -50,8 +50,8 @@ public enum EmbeddedProcedure {
 
     /// Selects based on 'icon' view mode.
     case icon
-    /// Selects based on 'activated' view mode.
-    case activated
+    /// Selects based on 'engaged' view mode.
+    case engaged
     /// Selects based on 'fullscreen' view mode.
     case fullscreen
     /// Selects based on 'card' view mode.
@@ -63,7 +63,7 @@ public enum EmbeddedProcedure {
     var fallback: EmbeddedProcedure? {
         switch self {
         case .icon:         return nil
-        case .activated:    return .icon
+        case .engaged:      return .icon
         case .fullscreen:   return nil
         case .card:         return nil
         }
@@ -75,7 +75,7 @@ public enum EmbeddedProcedure {
     public var selectionProcedure: FaceSelectionProcedure {
         switch self {
         case .icon:             return EmbeddedProcedureBuilder.iconProcedureWithFallback
-        case .activated:        return EmbeddedProcedureBuilder.activatedProcedureWithFallback
+        case .engaged:        return EmbeddedProcedureBuilder.engagedProcedureWithFallback
         case .fullscreen:       return EmbeddedProcedureBuilder.fullscreenProcedureWithFallack
         case .card:             return EmbeddedProcedureBuilder.cardProcedureWithFallack
         }
@@ -87,7 +87,7 @@ public enum EmbeddedProcedure {
     var constraints: SelectionConstraints {
         switch self {
         case .icon:         return SelectionConstraints(viewMode: "icon")
-        case .activated:    return SelectionConstraints(viewMode: "activated")
+        case .engaged:      return SelectionConstraints(viewMode: "engaged")
         case .fullscreen:   return SelectionConstraints(viewMode: "fullscreen")
         case .card:         return SelectionConstraints(viewMode: "card")
         }
@@ -127,9 +127,9 @@ private struct EmbeddedProcedureBuilder {
             EmbeddedProcedure.icon.fallback?.selectionProcedure(vatomPack, displayURLs)
     }
 
-    static let activatedProcedureWithFallback: FaceSelectionProcedure = { (vatomPack, displayURLs)  in
-        return EmbeddedProcedureBuilder.activatedProcedure(vatomPack, displayURLs) ??
-            EmbeddedProcedure.activated.fallback?.selectionProcedure(vatomPack, displayURLs)
+    static let engagedProcedureWithFallback: FaceSelectionProcedure = { (vatomPack, displayURLs)  in
+        return EmbeddedProcedureBuilder.engagedProcedure(vatomPack, displayURLs) ??
+            EmbeddedProcedure.engaged.fallback?.selectionProcedure(vatomPack, displayURLs)
     }
 
     static let fullscreenProcedureWithFallack: FaceSelectionProcedure = { (vatomPack, displayURLs)  in
@@ -150,7 +150,7 @@ private struct EmbeddedProcedureBuilder {
                                                            EmbeddedProcedure.icon.constraints)
     }
 
-    static let activatedProcedure: FaceSelectionProcedure = { (vatomPack, displayURLs)  in
+    static let engagedProcedure: FaceSelectionProcedure = { (vatomPack, displayURLs)  in
         EmbeddedProcedureBuilder.defaultSelectionProcedure(vatomPack.faces,
                                                            displayURLs,
                                                            EmbeddedProcedure.activated.constraints)

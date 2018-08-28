@@ -48,7 +48,7 @@ extension FaceModel: Codable {
 
     public struct Properties: Codable, Equatable {
 
-        public let displayURL: URL
+        public let displayURL: String
         public let constraints: Constraints
         public let resources: [String]
         public let config: JSON?

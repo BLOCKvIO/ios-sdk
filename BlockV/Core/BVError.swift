@@ -29,11 +29,11 @@ public enum BVError: Error {
     /// Models a native swift model decoding error.
     case modelDecoding(reason: String)
     /// Models a BLOCKv platform error.
-    case platformError(reason: PlatformErrorReason)
+    case platform(reason: PlatformErrorReason)
     /// Models any underlying networking library errors.
-    case networkingError(error: Error)
+    case networking(error: Error)
     /// Models a Web socket error.
-    case webSocketError(error: WebSocketErrorReason)
+    case webSocket(error: WebSocketErrorReason)
 
     //FIXME: REMOVE AT SOME POINT
     /// Models a custom error. This should be used in very limited circumstances.
@@ -43,7 +43,7 @@ public enum BVError: Error {
     // MARK: Reasons
 
     /// Platform error. Associated values: `code` and `message`.
-    public enum PlatformErrorReason {
+    public enum PlatformErrorReason: Equatable {
 
         case unknownAppId(Int, String)
         case internalServerIssue(Int, String)
@@ -136,21 +136,69 @@ public enum BVError: Error {
     }
 
     ///
-    public enum WebSocketErrorReason {
+    public enum WebSocketErrorReason: Equatable {
         case connectionFailed
         case connectionDisconnected
     }
 
 }
 
+extension BVError: Equatable {
+
+    public static func == (lhs: BVError, rhs: BVError) -> Bool {
+        switch (lhs, rhs) {
+        case (let .modelDecoding(lhsReason), let .modelDecoding(rhsReason)):
+            return lhsReason == rhsReason
+        case (let .platform(lhsReason), let .platform(rhsReason)):
+            return lhsReason == rhsReason
+        case (.networking, .networking): //TODO: does not compare associated values
+            return true
+        case (let .webSocket(lhsReason), let .webSocket(rhsReason)):
+            return lhsReason == rhsReason
+        case (let .custom(lhsReason), let .custom(rhsReason)):
+            return lhsReason == rhsReason
+        default:
+            return false
+        }
+    }
+
+    /*
+     # Example Usage
+
+     ## Option 1
+
+     if case let BVError.platform(reason) = error, case .unknownAppId = reason {
+         print("App Id Error")
+     }
+
+     ## Option 2
+     
+     if case let BVError.platform(reason) = error {
+         if case .unknownAppId(_, _) = reason {
+             print("App Id Error")
+         }
+     }
+
+     ## Option 3
+
+     switch error {
+     case .platform(reason: .unknownAppId(_, _)):
+         print("App Id Error")
+     default:
+         return
+     }
+     */
+
+}
+
 extension BVError: LocalizedError {
     public var errorDescription: String? {
         switch self {
-        case .webSocketError(let error):
+        case .webSocket(let error):
             return "Web socket error: \(error.localizedDescription)"
-        case .networkingError(let error):
+        case .networking(let error):
             return "Networking failed with error: \(error.localizedDescription)"
-        case .platformError(let reason):
+        case .platform(let reason):
             return reason.localizedDescription
         case .modelDecoding(let reason):
             return "Model decoding failed with error: \(reason)"

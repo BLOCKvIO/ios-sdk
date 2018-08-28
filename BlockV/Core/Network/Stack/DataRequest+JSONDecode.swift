@@ -40,14 +40,14 @@ extension DataRequest {
                     // 2. The error from our server needs to be unwrapped and passed back.
 
                     guard let validData = data, validData.count > 0 else {
-                        return .failure(BVError.networkingError(error:
+                        return .failure(BVError.networking(error:
                             AFError.responseSerializationFailed(reason: .inputDataNilOrZeroLength)))
                     }
 
                     do {
                         // decode the payload into an blockv error object
                         let errorModel = try decoder.decode(ErrorModel.self, from: validData)
-                        let error = BVError.platformError(reason:
+                        let error = BVError.platform(reason:
                             BVError.PlatformErrorReason(code: errorModel.code, message: errorModel.message))
                         return .failure(error) //TODO: Alamofire error is lost in this case.
 
@@ -70,7 +70,7 @@ extension DataRequest {
                     //                        emptyDataStatusCodes.contains(response.statusCode) {
                     //                        return NSNull()
                     //                    }
-                    return .failure(BVError.networkingError(error:
+                    return .failure(BVError.networking(error:
                         AFError.responseSerializationFailed(reason: .inputDataNilOrZeroLength)))
                 }
 

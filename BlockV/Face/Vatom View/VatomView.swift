@@ -226,7 +226,7 @@ public class VatomView: UIView {
 
             // 3. find face view type
             guard let faceViewType = FaceViewRegistry.shared.roster[
-                selectedFaceModel.properties.displayURL.absoluteString] else {
+                selectedFaceModel.properties.displayURL] else {
                     // viewer developer must register the face view with the face registry
                     preconditionFailure("FSP selected a face without the face code being installed.")
             }

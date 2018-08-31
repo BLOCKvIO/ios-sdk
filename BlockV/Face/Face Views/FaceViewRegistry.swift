@@ -29,9 +29,9 @@ public typealias FaceViewRoster = [DisplayURL: FaceView.Type]
 /// The registration of a custom face view where the `displayURL` matches an already registered face view will result
 /// in an overwrite.
 public class FaceViewRegistry {
-    
+
     // MARK: - Properties
-    
+
     public static let shared: FaceViewRegistry = {
         let registry = FaceViewRegistry()
         // - embedded
@@ -41,14 +41,14 @@ public class FaceViewRegistry {
         registry.register(SubclassTestFaceView.self)
         return registry
     }()
-    
+
     /// Dictionary of face
     public private(set) var roster: FaceViewRoster = [:]
-    
+
     // MARK: - Methods
-    
+
     public func register(_ faceView: FaceView.Type) {
         roster[faceView.displayURL] = faceView
     }
-    
+
 }

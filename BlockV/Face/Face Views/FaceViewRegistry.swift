@@ -15,10 +15,23 @@ public typealias DisplayURL = String
 
 public typealias FaceViewRoster = [DisplayURL: FaceView.Type]
 
+/// This class is a registry for Face Views.
+///
+/// VatomView uses the registry's roster when determining which face model to select. The roster provides information
+/// to VatomView about which face views are registered (i.e. able to display a vAtom).
+///
+/// The internal `roster` holds map of FaceView's keyed by their display URL.
+///
+/// On initialization, BLOCKv embedded faces are registered (i.e. stored in the roster).
+/// Viewers may register custom Face Views using the `register` method.
+///
+/// - important:
+/// The registration of a custom face view where the `displayURL` matches an already registered face view will result
+/// in an overwrite.
 public class FaceViewRegistry {
-
+    
     // MARK: - Properties
-
+    
     public static let shared: FaceViewRegistry = {
         let registry = FaceViewRegistry()
         // - embedded
@@ -28,14 +41,14 @@ public class FaceViewRegistry {
         registry.register(SubclassTestFaceView.self)
         return registry
     }()
-
+    
     /// Dictionary of face
     public private(set) var roster: FaceViewRoster = [:]
-
+    
     // MARK: - Methods
-
+    
     public func register(_ faceView: FaceView.Type) {
         roster[faceView.displayURL] = faceView
     }
-
+    
 }

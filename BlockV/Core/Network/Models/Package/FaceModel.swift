@@ -48,7 +48,7 @@ extension FaceModel: Codable {
 
     public struct Properties: Codable, Equatable {
 
-        public let displayURL: URL
+        public let displayURL: String
         public let constraints: Constraints
         public let resources: [String]
         public let config: JSON?
@@ -80,8 +80,8 @@ extension FaceModel: Codable {
         properties = try items.decode(Properties.self, forKey: .properties)
         meta       = try items.decode(MetaModel.self, forKey: .meta)
         // convenience
-        isNative   = properties.displayURL.absoluteString.hasPrefix("native://")
-        isWeb      = properties.displayURL.absoluteString.hasPrefix("https://")
+        isNative   = properties.displayURL.hasPrefix("native://")
+        isWeb      = properties.displayURL.hasPrefix("https://")
     }
 
     public func encode(to encoder: Encoder) throws {

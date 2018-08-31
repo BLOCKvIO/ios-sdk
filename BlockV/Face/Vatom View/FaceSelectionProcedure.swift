@@ -227,7 +227,7 @@ private struct EmbeddedProcedureBuilder {
 
                 // enusrue the native face is supported (i.e. the face code is installed)
                 if installedURLs.contains(where: {
-                    ($0.caseInsensitiveCompare(face.properties.displayURL.absoluteString) == .orderedSame) }) {
+                    ($0.caseInsensitiveCompare(face.properties.displayURL) == .orderedSame) }) {
                     rank += 1
                 } else {
                     // native code is not installed

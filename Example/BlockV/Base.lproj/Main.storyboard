@@ -327,7 +327,7 @@
                                 </constraints>
                                 <connections>
                                     <outlet property="activatedImageView" destination="grR-hz-WKP" id="CLc-zB-yvw"/>
-                                    <segue destination="1PY-y9-icg" kind="presentation" identifier="seg.vatom.show" id="CyV-eb-bXr"/>
+                                    <segue destination="1PY-y9-icg" kind="presentation" identifier="seg.vatom.detail" id="CyV-eb-bXr"/>
                                 </connections>
                             </collectionViewCell>
                         </cells>
@@ -735,10 +735,10 @@
             </objects>
             <point key="canvasLocation" x="3854" y="358"/>
         </scene>
-        <!--Activated Vatom View Controller-->
+        <!--Engaged Vatom View Controller-->
         <scene sceneID="DKt-yd-ROS">
             <objects>
-                <viewController id="cz9-lr-kkU" customClass="ActivatedVatomViewController" customModule="BlockV_Example" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="seg.vatom.engaged" id="cz9-lr-kkU" customClass="EngagedVatomViewController" customModule="BlockV_Example" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="4kx-IT-D8w"/>
                         <viewControllerLayoutGuide type="bottom" id="suM-d6-dfe"/>
@@ -747,46 +747,77 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="NYV-fp-8BC" customClass="VatomView" customModule="BLOCKv">
-                                <rect key="frame" x="42" y="164" width="291" height="403"/>
-                                <color key="backgroundColor" red="0.90884068839999999" green="0.91783911110000005" blue="0.91783911110000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                            </view>
-                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="9" translatesAutoresizingMaskIntoConstraints="NO" id="nVX-Wd-tCf">
-                                <rect key="frame" x="143.5" y="80" width="88" height="50"/>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="CQf-n0-C37">
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                                 <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wnX-Ru-iqG">
-                                        <rect key="frame" x="27.5" y="0.0" width="33.5" height="20.5"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Description" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Q5f-KU-IYE">
-                                        <rect key="frame" x="0.0" y="29.5" width="88" height="20.5"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
+                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="9" translatesAutoresizingMaskIntoConstraints="NO" id="nVX-Wd-tCf">
+                                        <rect key="frame" x="150.5" y="25" width="74" height="46.5"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wnX-Ru-iqG">
+                                                <rect key="frame" x="20.5" y="0.0" width="33.5" height="20.5"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Description" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Q5f-KU-IYE">
+                                                <rect key="frame" x="0.0" y="29.5" width="74" height="17"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                        </subviews>
+                                    </stackView>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dUp-u6-SGt" customClass="VatomView" customModule="BLOCKv">
+                                        <rect key="frame" x="107" y="107.5" width="160" height="160"/>
+                                        <color key="backgroundColor" red="0.90980392160000001" green="0.91764705879999997" blue="0.91764705879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="160" id="3nn-1m-LLh"/>
+                                            <constraint firstAttribute="width" secondItem="dUp-u6-SGt" secondAttribute="height" multiplier="1:1" id="lXY-cG-zTo"/>
+                                        </constraints>
+                                    </view>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="NYV-fp-8BC">
+                                        <rect key="frame" x="26" y="317.5" width="323" height="464"/>
+                                        <color key="backgroundColor" red="0.90980392156862744" green="0.91764705882352937" blue="0.91764705882352937" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="464" id="HB8-D5-Oaa"/>
+                                        </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                <integer key="value" value="18"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </view>
                                 </subviews>
-                            </stackView>
+                                <constraints>
+                                    <constraint firstItem="dUp-u6-SGt" firstAttribute="centerX" secondItem="CQf-n0-C37" secondAttribute="centerX" id="3K2-jY-AVy"/>
+                                    <constraint firstItem="dUp-u6-SGt" firstAttribute="top" secondItem="nVX-Wd-tCf" secondAttribute="bottom" constant="36" id="8MA-oB-f4Z"/>
+                                    <constraint firstItem="NYV-fp-8BC" firstAttribute="top" secondItem="dUp-u6-SGt" secondAttribute="bottom" constant="50" id="Hk3-12-ROM"/>
+                                    <constraint firstAttribute="trailing" secondItem="NYV-fp-8BC" secondAttribute="trailing" constant="26" id="POS-AO-F5y"/>
+                                    <constraint firstItem="NYV-fp-8BC" firstAttribute="centerX" secondItem="CQf-n0-C37" secondAttribute="centerX" id="WAC-sn-OAk"/>
+                                    <constraint firstItem="nVX-Wd-tCf" firstAttribute="centerX" secondItem="CQf-n0-C37" secondAttribute="centerX" id="Yba-hu-2ZZ"/>
+                                    <constraint firstItem="nVX-Wd-tCf" firstAttribute="top" secondItem="CQf-n0-C37" secondAttribute="top" constant="25" id="nGH-SJ-njR"/>
+                                    <constraint firstAttribute="bottom" secondItem="NYV-fp-8BC" secondAttribute="bottom" constant="20" id="tmq-BL-uhD"/>
+                                    <constraint firstItem="NYV-fp-8BC" firstAttribute="leading" secondItem="CQf-n0-C37" secondAttribute="leading" constant="26" id="v5g-7T-cJv"/>
+                                </constraints>
+                            </scrollView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="NYV-fp-8BC" firstAttribute="leading" secondItem="EVw-Cn-qCW" secondAttribute="leadingMargin" constant="26" id="2gs-Io-oBd"/>
-                            <constraint firstItem="NYV-fp-8BC" firstAttribute="top" secondItem="4kx-IT-D8w" secondAttribute="bottom" constant="100" id="FBR-o8-oo6"/>
-                            <constraint firstItem="suM-d6-dfe" firstAttribute="top" secondItem="NYV-fp-8BC" secondAttribute="bottom" constant="100" id="Oia-RQ-EO9"/>
-                            <constraint firstItem="nVX-Wd-tCf" firstAttribute="top" secondItem="4kx-IT-D8w" secondAttribute="bottom" constant="16" id="Wjx-TL-PKw"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="NYV-fp-8BC" secondAttribute="trailing" constant="26" id="ikj-Qi-QYy"/>
-                            <constraint firstItem="nVX-Wd-tCf" firstAttribute="centerX" secondItem="EVw-Cn-qCW" secondAttribute="centerX" id="x2I-SK-js3"/>
+                            <constraint firstItem="CQf-n0-C37" firstAttribute="leading" secondItem="EVw-Cn-qCW" secondAttribute="leading" id="I50-Uc-3AQ"/>
+                            <constraint firstAttribute="trailing" secondItem="CQf-n0-C37" secondAttribute="trailing" id="Tu6-Xp-8rQ"/>
+                            <constraint firstItem="CQf-n0-C37" firstAttribute="top" secondItem="4kx-IT-D8w" secondAttribute="bottom" id="U0e-OR-PhH"/>
+                            <constraint firstItem="suM-d6-dfe" firstAttribute="top" secondItem="CQf-n0-C37" secondAttribute="bottom" id="Vdx-S1-iWY"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="VtC-SN-RS4"/>
                     <connections>
-                        <outlet property="vatomView" destination="NYV-fp-8BC" id="G8O-zK-62P"/>
+                        <outlet property="bottomContainerView" destination="NYV-fp-8BC" id="3hN-Qa-jqP"/>
+                        <outlet property="topVatomView" destination="dUp-u6-SGt" id="neL-lf-Y1k"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="OMH-NZ-VGj" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="6728.8000000000002" y="-449.32533733133437"/>
+            <point key="canvasLocation" x="6728.8000000000002" y="-1197.7511244377813"/>
         </scene>
         <!--vAtom-->
         <scene sceneID="d13-os-Xy4">
@@ -1374,7 +1405,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Vze-Xp-Tw9" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="7504.8000000000002" y="-449.32533733133437"/>
+            <point key="canvasLocation" x="5790" y="-412"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="lXe-Qd-Gup">
@@ -1410,7 +1441,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lqb-7g-Yya" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="5789.6000000000004" y="-449.32533733133437"/>
+            <point key="canvasLocation" x="5790" y="-1197"/>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>

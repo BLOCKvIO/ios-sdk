@@ -266,7 +266,7 @@ extension API {
         /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
         static func getInventory(parentID: String,
                                  page: Int = 0,
-                                 limit: Int = 0) -> Endpoint<BaseModel<PackModel>> {
+                                 limit: Int = 0) -> Endpoint<BaseModel<UnpackedModel>> {
             return Endpoint(method: .post,
                             path: userVatomPath + "/inventory",
                             parameters: [
@@ -280,7 +280,7 @@ extension API {
         /// Builds the endpoint to get a vAtom by its unique identifier.
         ///
         /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
-        static func getVatoms(withIDs ids: [String]) -> Endpoint<BaseModel<PackModel>> {
+        static func getVatoms(withIDs ids: [String]) -> Endpoint<BaseModel<UnpackedModel>> {
             return Endpoint(method: .post,
                             path: userVatomPath + "/get",
                             parameters: ["ids": ids]
@@ -308,7 +308,7 @@ extension API {
         ///
         /// - Parameter payload: Raw request payload.
         /// - Returns: Endpoint generic over `PackModel`.
-        static func discover(_ payload: [String: Any]) -> Endpoint<BaseModel<PackModel>> {
+        static func discover(_ payload: [String: Any]) -> Endpoint<BaseModel<UnpackedModel>> {
 
             return Endpoint(method: .post,
                             path: "/v1/vatom/discover",
@@ -330,7 +330,7 @@ extension API {
                                 bottomLeftLon: Double,
                                 topRightLat: Double,
                                 topRightLon: Double,
-                                filter: String) -> Endpoint<BaseModel<PackModel>> {
+                                filter: String) -> Endpoint<BaseModel<UnpackedModel>> {
 
             // create the payload
             let payload: [String: Any] =

@@ -22,6 +22,14 @@ public enum MockModel {
         
     }
     
+    public enum VatomModel {
+        
+        public static let basicVatom = """
+            {"id":"7a85bf21-1cad-4909-b9a6-706e570e2341","when_created":"2018-07-26T11:56:40Z","when_modified":"2018-07-26T12:07:29Z","vAtom::vAtomType":{"parent_id":".","publisher_fqdn":"vatomic.prototyping","root_type":"vAtom::vAtomType","owner":"bb161234-bfef-401e-ad89-3edf8388e01c","author":"2e101324-ffcd-4e91-aa81-ccfc74ae9d79","template":"vatomic.prototyping::v1::vAtom::UnitTest","template_variation":"vatomic.prototyping::UnitTest::V1","notify_msg":"","title":"Unit Test vAtom","description":"A vAtom for unit testing.","disabled":false,"category":"Test","tags":[],"transferable":true,"acquirable":false,"tradeable":false,"transferred_by":"2e1123f8-ffcd-4e91-aa81-ccfc74ae9d79","cloned_from":"","cloning_score":0,"in_contract":false,"redeemable":false,"in_contract_with":"","commerce":{"pricing":{"pricingType":"Fixed","value":{"currency":"","price":"0","valid_from":"*","valid_through":"*","vat_included":false}}},"states":[{"name":"Activated","value":{"type":"boolean","value":"true"},"on_state_change":{"reactor":""}}],"resources":[{"name":"ActivatedImage","resourceType":"ResourceTypes::Image::JPEG","value":{"resourceValueType":"ResourceValueType::URI","value":"https://cdndevsec.blockv.net/N2E4NWJmMjEtMWNhZC00OTA5LWI5YTYtNzA2ZTU3MGnByb3RvdHlwaW5nOjp2MTU9iamVjdC9ybmVha2VyX2NhcmQuanBn"}},{"name":"Scene","resourceType":"ResourceTypes::3D::Scene","value":{"resourceValueType":"ResourceValueType::URI","value":"https://cdndevsec.blockv.net/N2E4NWJmMjEtMWNhZC00OTA5LWI5YTYtNzA2ZTU3MGU4YWQxOjovdwaW5nOjp2MTo6dkF0b206OjNELmVha2VyLnYzZA=="}}],"visibility":{"type":"public","value":"*"},"num_direct_clones":0,"geo_pos":{"$reql_type$":"GEOMETRY","coordinates":[0,0],"type":"Point"},"dropped":false},"private":{"allows_user_rotation":true,"allows_user_zoom":true,"auto_rotate_x":0,"auto_rotate_y":0,"auto_rotate_z":0,"play_animation":true,"resources":[],"scene_resource_name":""},"unpublished":false,"version":"v1::vAtomType"}
+            """.data(using: .utf8)!
+        
+    }
+    
     public enum PackModel {
         
         public static let Example1 = """

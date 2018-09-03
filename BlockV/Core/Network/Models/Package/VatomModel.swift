@@ -63,11 +63,6 @@ public struct VatomModel: Equatable {
     /// Array of action models associated with this vAtom's template.
     public var actionModels: [ActionModel]
 
-    /// Array of face models associated with this vAtom's template.
-    public var faceModels: [FaceModel]
-    /// Array of action models associated with this vAtom's template.
-    public var actionModels: [ActionModel]
-
     enum CodingKeys: String, CodingKey {
         case id
         case version

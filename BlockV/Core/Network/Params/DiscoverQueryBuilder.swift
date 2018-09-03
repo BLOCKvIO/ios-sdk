@@ -154,7 +154,7 @@ public class DiscoverQueryBuilder {
     /// - Parameter type: Result `type` controls the response payload of the query
     ///     - `*` returns vAtoms.
     ///     - `count` returns only the numerical count of the query and an empty vAtom array.
-    public func setReturn(type: ResultType) {
+    internal func setReturn(type: ResultType) {
         self.resultStructure = ["type": type.rawValue]
     }
 

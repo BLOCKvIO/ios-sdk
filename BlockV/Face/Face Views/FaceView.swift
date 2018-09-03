@@ -36,7 +36,7 @@ public protocol FaceViewInterface: class {
     /// This may be called in response to numerous events.
     ///
     /// E.g. A vAtom's root or private section are updated and the signal come down via the Web socket state update.
-    func vatomUpdated(_ vatomPack: VatomPackModel)
+    func vatomUpdated(_ vatom: VatomModel)
     
     /// Called
     func unload()
@@ -45,15 +45,15 @@ public protocol FaceViewInterface: class {
 
 open class BaseFaceView: UIView {
     
-    /// Vatom pack for display.
-    public var vatomPack: VatomPackModel
+    /// Vatom for display.
+    public var vatom: VatomModel
     
     /// Selected face model.
     public var faceModel: FaceModel
     
     /// Initializes a BaseFaceView.
-    public required init(vatomPack: VatomPackModel, faceModel: FaceModel) {
-        self.vatomPack = vatomPack
+    public required init(vatom: VatomModel, faceModel: FaceModel) {
+        self.vatom = vatom
         self.faceModel = faceModel
         super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
     }

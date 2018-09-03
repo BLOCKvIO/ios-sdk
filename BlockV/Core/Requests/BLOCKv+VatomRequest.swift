@@ -140,15 +140,15 @@ extension BLOCKv {
     ///       action models as populated properties.
     ///   - error: BLOCKv error.
     public static func discover(_ builder: DiscoverQueryBuilder,
-                                completion: @escaping(_ vatoms: [VatomModel],_ error: BVError?) -> Void) {
-        
+                                completion: @escaping(_ vatoms: [VatomModel], _ error: BVError?) -> Void) {
+
         // explicitly set return type to payload
         builder.setReturn(type: .payload)
         self.discover(payload: builder.toDictionary()) { (result, error) in
             completion(result?.vatoms ?? [], error)
         }
     }
-    
+
     /// Searches for the count (tally) of vAtoms on the BLOCKv platform.
     ///
     /// - Parameters:
@@ -160,14 +160,14 @@ extension BLOCKv {
     ///   - error: BLOCKv error.
     public static func discoverCount(_ builder: DiscoverQueryBuilder,
                                      completion: @escaping(_ count: Int?, _ error: BVError?) -> Void) {
-        
+
         // explicitlt set return type to payload
         builder.setReturn(type: .count)
         self.discover(payload: builder.toDictionary()) { (result, error) in
             completion(result?.count, error)
         }
     }
-    
+
     public typealias DiscoverResult = (vatoms: [VatomModel], count: Int)
 
     /// Performs a search for vAtoms on the BLOCKv platform.
@@ -201,7 +201,7 @@ extension BLOCKv {
 
             // model is available
             let packedVatoms = unpackedModel.package()
-            
+
             DispatchQueue.main.async {
                 //print(model)
                 completion((packedVatoms, packedVatoms.count), nil)

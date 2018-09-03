@@ -8,13 +8,11 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-
 import Foundation
 
 public struct VatomModel: Equatable {
 
     // Top Level Properties
-
     // constants
     public let id: String
     public let version: String
@@ -25,7 +23,6 @@ public struct VatomModel: Equatable {
     public var isUnpublished: Bool
 
     // Second Level (de-nested one level)
-
     // constants
     public let author: String
     public let rootType: String
@@ -61,6 +58,10 @@ public struct VatomModel: Equatable {
     public var geoPosition: GeoPosition
     public var resources: [VatomResourceModel] // `var` only to allow for resource encoding
     public var privateProperties: JSON? // Private section may contain JSON of any structure.
+    /// Array of face models associated with this vAtom's template.
+    public var faceModels: [FaceModel]
+    /// Array of action models associated with this vAtom's template.
+    public var actionModels: [ActionModel]
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -70,6 +71,8 @@ public struct VatomModel: Equatable {
         case whenModified      = "when_modified"
         case properties        = "vAtom::vAtomType"
         case privateProperties = "private"
+        case faceModels        = "faceModels"
+        case actionModels      = "actionModels"
     }
 
     enum PropertiesCodingKeys: String, CodingKey {
@@ -117,7 +120,6 @@ public struct VatomModel: Equatable {
     }
 
     //TODO: Updgrade to full GeoJSON support.
-
     /// The geographic position of the vAtom.
     ///
     /// - SeeAlso:
@@ -133,18 +135,18 @@ public struct VatomModel: Equatable {
 }
 
 // MARK: Codable
-
 extension VatomModel: Decodable {
 
-    public init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws { // swiftlint:disable:this function_body_length
         let items = try decoder.container(keyedBy: CodingKeys.self)
         id                = try items.decode(String.self, forKey: .id)
         version           = try items.decode(String.self, forKey: .version)
         isUnpublished     = try items.decode(Bool.self, forKey: .isUnpublished)
         whenCreated       = try items.decode(Date.self, forKey: .whenCreated)
         whenModified      = try items.decode(Date.self, forKey: .whenModified)
-
         privateProperties = try items.decodeIfPresent(JSON.self, forKey: .privateProperties)
+        faceModels        = try items.decodeIfPresent([FaceModel].self, forKey: .faceModels) ?? []
+        actionModels      = try items.decodeIfPresent([ActionModel].self, forKey: .actionModels) ?? []
 
         // de-nest properties to top level
         let propertiesContainer = try items.nestedContainer(keyedBy: PropertiesCodingKeys.self, forKey: .properties)
@@ -182,13 +184,11 @@ extension VatomModel: Decodable {
                                                                       forKey: .tags) ?? []
         childPolicy         = try propertiesContainer.decodeIfPresent([VatomChildPolicy].self,
                                                                       forKey: .childPolicy) ?? []
-
     }
 
 }
 
 // MARK: Hashable
-
 extension VatomModel: Hashable {
 
     /// vAtoms are uniquely identified by their platform identifier.
@@ -198,7 +198,6 @@ extension VatomModel: Hashable {
 }
 
 // MARK: - Vatom Pricing
-
 public struct VatomPricing: Equatable {
 
     public let pricingType: String
@@ -223,7 +222,6 @@ public struct VatomPricing: Equatable {
 }
 
 // MARK: Codable
-
 extension VatomPricing: Codable {
 
     public init(from decoder: Decoder) throws {
@@ -254,7 +252,6 @@ extension VatomPricing: Codable {
 }
 
 // MARK: - Vatom Child Policy
-
 public struct VatomChildPolicy: Codable, Equatable {
     public let count: Int
     public let creationPolicy: CreationPolicy

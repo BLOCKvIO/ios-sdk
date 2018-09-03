@@ -21,8 +21,8 @@ class ImageFaceView: FaceView {
 
     // MARK: - Initialization
 
-    required init(vatomPack: VatomPackModel, faceModel: FaceModel) {
-        super.init(vatomPack: vatomPack, faceModel: faceModel)
+    required init(vatom: VatomModel, faceModel: FaceModel) {
+        super.init(vatom: vatom, faceModel: faceModel)
 
         try? self.extractConfig()
     }
@@ -103,7 +103,7 @@ class ImageFaceView: FaceView {
 
     }
 
-    func vatomUpdated(_ vatomPack: VatomPackModel) {
+    func vatomUpdated(_ vatom: VatomModel) {
         print(#function)
     }
 

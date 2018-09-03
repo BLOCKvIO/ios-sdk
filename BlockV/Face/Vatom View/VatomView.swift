@@ -67,7 +67,7 @@ public class VatomView: UIView {
     // MARK: - Properties
 
     /// The vatom pack.
-    public private(set) var vatomPack: VatomPackModel?
+    public private(set) var vatom: VatomModel?
 
     /// The face selection procedure.
     ///
@@ -107,11 +107,11 @@ public class VatomView: UIView {
     ///   - actions: The array of actions associated with the vAtom's template.
     ///   - procedure: An face selection procedure (FSP) that determines which face to
     ///     display.
-    public init(vatomPack: VatomPackModel,
+    public init(vatom: VatomModel,
                 procedure: @escaping FaceSelectionProcedure,
                 roster: FaceViewRoster = FaceViewRegistry.shared.roster) {
 
-        self.vatomPack = vatomPack
+        self.vatom = vatom
         self.procedure = procedure
         self.roster = roster
 
@@ -155,11 +155,11 @@ public class VatomView: UIView {
      
      */
 
-    public func update(usingVatomPack vatomPack: VatomPackModel,
+    public func update(usingVatom vatom: VatomModel,
                        procedure: @escaping FaceSelectionProcedure,
                        roster: FaceViewRoster? = nil) {
 
-        self.vatomPack = vatomPack
+        self.vatom = vatom
         self.procedure = procedure
         self.roster = roster
 
@@ -180,19 +180,19 @@ public class VatomView: UIView {
 
         //FIXME: Part of this could run on a background thread, e.g fsp
 
-        precondition(vatomPack != nil, "vatomPack must not be nil.")
+        precondition(vatom != nil, "vatom must not be nil.")
         precondition(procedure != nil, "procedure must not be nil.")
         precondition(roster != nil, "face view roster must not be nil.")
 
-        // precondition that vatom pack is not nil
-        guard let vatomPack = vatomPack else { return }
+        // precondition that vatom is not nil
+        guard let vatom = vatom else { return }
         // precondition that procedure is not nil
         guard let procedure = procedure else { return }
         // precodition that face view roster is not nil
         guard let roster = roster else { return }
 
         // 1. select the best face model
-        guard let selectedFaceModel = procedure(vatomPack, Set(roster.keys)) else {
+        guard let selectedFaceModel = procedure(vatom, Set(roster.keys)) else {
 
             printBV(error: "Face Selection Procedure (FSP) returned without selecting a face model.")
             self.state = .error
@@ -216,7 +216,7 @@ public class VatomView: UIView {
 
             self.state = .completed
             // update currently selected face view (without replacement)
-            self.selectedFaceView?.vatomUpdated(vatomPack)
+            self.selectedFaceView?.vatomUpdated(vatom)
 
             //FXIME: How does the face view find out what has changed? Maybe the vatomPack must have a 'diff' property?
 
@@ -231,9 +231,9 @@ public class VatomView: UIView {
             }
 
             //let faceViewType = FaceViewRegistry.shared.roster["native://image"]!
-            let selectedFaceView: FaceView = faceViewType.init(vatomPack: vatomPack,
+            let selectedFaceView: FaceView = faceViewType.init(vatom: vatom,
                                                                faceModel: selectedFaceModel)
-            // let selectedFaceView: FaceView = ImageFaceView(vatomPack: vatomPack, faceModel: selectedFace)
+            // let selectedFaceView: FaceView = ImageFaceView(vatom: vatom, faceModel: selectedFace)
 
             // relace currently selected face view with newly selected
             self.replaceFaceView(with: selectedFaceView)

@@ -44,19 +44,19 @@ class InventoryCollectionViewController: UICollectionViewController {
     }()
     
     /// Model holding the inventory vatoms.
-    fileprivate var vatomPacks: [VatomPackModel] = [] {
+    fileprivate var vatoms: [VatomModel] = [] {
         didSet {
-            filteredVatomPacks = vatomPacks.filter {
+            filteredVatoms = vatoms.filter {
                 // filter out: dropped, avatar, and coin wallet vatoms
-                (!$0.vatom.isDropped)
-                    && (!$0.vatom.templateID.hasSuffix("::vAtom::Avatar"))
-                    && (!$0.vatom.templateID.hasSuffix("::vAtom::CoinWallet"))
+                (!$0.isDropped)
+                    && (!$0.templateID.hasSuffix("::vAtom::Avatar"))
+                    && (!$0.templateID.hasSuffix("::vAtom::CoinWallet"))
             }
         }
     }
     
     /// Model holding the filtered vAtoms.
-    fileprivate var filteredVatomPacks: [VatomPackModel] = [] {
+    fileprivate var filteredVatoms: [VatomModel] = [] {
         didSet {
             collectionView?.reloadData()
         }
@@ -187,10 +187,10 @@ class InventoryCollectionViewController: UICollectionViewController {
     /// Note: Input parameters are left to their defautls.
     fileprivate func fetchInventory() {
         
-        BLOCKv.getInventory { [weak self] (packModel, error) in
+        BLOCKv.getInventory { [weak self] (vatomModels, error) in
             
             // handle error
-            guard let model = packModel, error == nil else {
+            guard error == nil else {
                 print("\n>>> Error > Viewer: \(error!.localizedDescription)")
                 self?.present(UIAlertController.errorAlert(error!), animated: true)
                 return
@@ -209,11 +209,7 @@ class InventoryCollectionViewController: UICollectionViewController {
              `whenModifed` date. For example, if a vAtom is picked up off the map, its
              `droppped` flag is set as `false` and the `whenModified` date updated.
              */
-            
-            // convert the PackModel into an array of VatomPacks
-            let returnedVatomPacks = model.createPackModels()
-            // sort the vatom packs
-            self?.vatomPacks = returnedVatomPacks.sorted { $0.vatom.whenModified > $1.vatom.whenModified }
+            self?.vatoms = vatomModels.sorted { $0.whenModified > $1.whenModified }
             
             // begin download
             self?.dowloadActivatedImages()
@@ -233,18 +229,18 @@ class InventoryCollectionViewController: UICollectionViewController {
         builder.addDefinedFilter(forField: .templateID, filterOperator: .equal, value: "vatomic.prototyping::DrinkCoupon::v1", combineOperator: .and)
         
         // execute the discover call
-        BLOCKv.discover(builder) { [weak self] (packModel, error) in
+        BLOCKv.discover(builder) { [weak self] (vatomModels, error) in
             
             // handle error
-            guard let model = packModel, error == nil else {
+            guard error == nil else {
                 print("\n>>> Error > Viewer: \(error!.localizedDescription)")
                 self?.present(UIAlertController.errorAlert(error!), animated: true)
                 return
             }
             
             // handle success
-            print("\nViewer > Fetched discover group model")
-            print("\n\(model)")
+            print("\nViewer > Fetched discover vatom models")
+            print("\n\(vatomModels)")
             
         }
         
@@ -255,10 +251,10 @@ class InventoryCollectionViewController: UICollectionViewController {
     /// On completion of the download, the data blob is mapped to the vatom ID in a dictionary.
     func dowloadActivatedImages() {
         
-        for vatomPack in filteredVatomPacks {
+        for vatom in filteredVatoms {
             
             // find the vatom's activated image url
-            guard let activatedImageURL = vatomPack.vatom.resources.first(where: { $0.name == "ActivatedImage"} )?.url else {
+            guard let activatedImageURL = vatom.resources.first(where: { $0.name == "ActivatedImage"} )?.url else {
                 // oops, not found, skip this vatom
                 continue
             }
@@ -280,13 +276,13 @@ class InventoryCollectionViewController: UICollectionViewController {
                 // handle success
                 
                 // store the image data
-                self?.activatedImages[vatomPack.vatom.id] = data
+                self?.activatedImages[vatom.id] = data
                 
                 // handle success
-                print("Viewer > Downloaded 'ActivatedImage' for vAtom: \(vatomPack.vatom.id) Data: \(data)")
+                print("Viewer > Downloaded 'ActivatedImage' for vAtom: \(vatom.id) Data: \(data)")
                 
                 // find the vatoms index
-                if let index = self?.filteredVatomPacks.index(where: { $0.vatom.id == vatomPack.vatom.id }) {
+                if let index = self?.filteredVatoms.index(where: { $0.id == vatom.id }) {
                     // ask collection view to reload that cell
                     self?.collectionView?.reloadItems(at: [IndexPath(row: index, section: 0)])
                 }
@@ -312,12 +308,6 @@ class InventoryCollectionViewController: UICollectionViewController {
         if segue.identifier == "seg.vatom.detail" {
             let destination = segue.destination as! VatomDetailTableViewController
             destination.vatom = vatomToPass
-        } else if segue.identifier == "seg.vatom.show" {
-            let destination = segue.destination as! UINavigationController
-            let vc = destination.viewControllers[0] as! ActivatedVatomViewController
-            vc.vatomPack = self.vatomPacks.first!
-            vc.procedure = EmbeddedProcedure.card.procedure
-            vc.roster = FaceViewRegistry.shared.roster
         }
     }
     
@@ -340,7 +330,7 @@ extension InventoryCollectionViewController {
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.filteredVatomPacks.count
+        return self.filteredVatoms.count
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -350,10 +340,10 @@ extension InventoryCollectionViewController {
         cell.backgroundColor = UIColor.gray.withAlphaComponent(0.1)
         
         // get vatom id
-        let vatomID = filteredVatomPacks[indexPath.row].vatom.id
+        let vatomID = filteredVatoms[indexPath.row].id
         
         // set the cell's vatom
-        cell.vatom = filteredVatomPacks[indexPath.row].vatom
+        cell.vatom = filteredVatoms[indexPath.row]
 
         // find image data
         if let imageData = activatedImages[vatomID] {
@@ -372,8 +362,7 @@ extension InventoryCollectionViewController {
         // check if the cell has a vatom
         if let vatom = currentCell.vatom {
             self.vatomToPass = vatom
-//            performSegue(withIdentifier: "seg.vatom.detail", sender: self)
-            performSegue(withIdentifier: "seg.vatom.show", sender: self)
+            performSegue(withIdentifier: "seg.vatom.detail", sender: self)
         }
         
     }

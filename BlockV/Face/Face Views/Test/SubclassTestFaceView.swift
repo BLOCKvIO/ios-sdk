@@ -16,8 +16,8 @@ class SubclassTestFaceView: TestFaceView {
 
     override class var displayURL: String { return "native://test-subclass" }
 
-    required init(vatomPack: VatomPackModel, faceModel: FaceModel) {
-        super.init(vatomPack: vatomPack, faceModel: faceModel)
+    required init(vatom: VatomModel, faceModel: FaceModel) {
+        super.init(vatom: vatom, faceModel: faceModel)
     }
 
     required init?(coder aDecoder: NSCoder) {

@@ -74,11 +74,11 @@ extension BLOCKv {
     ///   - error: BLOCKv error.
     public static func getVatoms(withIDs ids: [String],
                                  completion: @escaping (_ vatoms: [VatomModel], _ error: BVError?) -> Void) {
-        
+
         let endpoint = API.UserVatom.getVatoms(withIDs: ids)
-        
+
         self.client.request(endpoint) { (baseModel, error) in
-            
+
             // extract model, ensure no error
             guard let unpackedModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
@@ -86,16 +86,16 @@ extension BLOCKv {
                 }
                 return
             }
-            
+
             // model is available
             let packedVatoms = unpackedModel.package()
-            
+
             DispatchQueue.main.async {
                 completion(packedVatoms, nil)
             }
-            
+
         }
-        
+
     }
 
     /// Trashes the specified vAtom.
@@ -217,7 +217,7 @@ extension BLOCKv {
 
             // model is available
             let packedVatoms = unpackedModel.package()
-            
+
             DispatchQueue.main.async {
                 //print(model)
                 completion(packedVatoms, nil)

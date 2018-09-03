@@ -205,12 +205,12 @@ private struct EmbeddedProcedureBuilder {
                 continue
             }
 
-            // prefer 'native' over 'web'
             if face.isNative {
 
                 // enusrue the native face is supported (i.e. the face code is installed)
                 if installedURLs.contains(where: {
                     ($0.caseInsensitiveCompare(face.properties.displayURL) == .orderedSame) }) {
+                    // prefer 'native' over 'web'
                     rank += 1
                 } else {
                     // native code is not installed
@@ -219,7 +219,15 @@ private struct EmbeddedProcedureBuilder {
 
             }
 
-            //TODO: Check if web face is installed
+            if face.isWeb {
+                // enusrue the native face is supported (i.e. the face code is installed)
+                if installedURLs.contains(where: {
+                    ($0.caseInsensitiveCompare("https://*") == .orderedSame) }) {
+                } else {
+                    // native code is not installed
+                    continue
+                }
+            }
 
             // compare to best rank
             if rank > bestRank {

@@ -136,9 +136,39 @@ extension BLOCKv {
     ///              discover queries.
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
-    public static func discover(_ builder: DiscoverQueryBuilder, completion: @escaping (UnpackedModel?, BVError?) -> Void) {
-        self.discover(payload: builder.toDictionary(), completion: completion)
+    ///   - vatoms: Array of *packaged* vAtoms. Packaged vAtoms have their template's registered faces and actions
+    ///       action models as populated properties.
+    ///   - error: BLOCKv error.
+    public static func discover(_ builder: DiscoverQueryBuilder,
+                                completion: @escaping(_ vatoms: [VatomModel], _ error: BVError?) -> Void) {
+
+        // explicitly set return type to payload
+        builder.setReturn(type: .payload)
+        self.discover(payload: builder.toDictionary()) { (result, error) in
+            completion(result?.vatoms ?? [], error)
+        }
     }
+
+    /// Searches for the count (tally) of vAtoms on the BLOCKv platform.
+    ///
+    /// - Parameters:
+    ///   - builder: A discover query builder object. Use the builder to simplify constructing
+    ///              discover queries.
+    ///   - completion: The completion handler to call when the request is completed.
+    ///                 This handler is executed on the main queue.
+    ///   - count: Number of discovered vAtoms.
+    ///   - error: BLOCKv error.
+    public static func discoverCount(_ builder: DiscoverQueryBuilder,
+                                     completion: @escaping(_ count: Int?, _ error: BVError?) -> Void) {
+
+        // explicitlt set return type to payload
+        builder.setReturn(type: .count)
+        self.discover(payload: builder.toDictionary()) { (result, error) in
+            completion(result?.count, error)
+        }
+    }
+
+    public typealias DiscoverResult = (vatoms: [VatomModel], count: Int)
 
     /// Performs a search for vAtoms on the BLOCKv platform.
     ///
@@ -148,14 +178,20 @@ extension BLOCKv {
     ///   - payload: Raw request payload in the form of a dictionary.
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
-    public static func discover(payload: [String: Any], completion: @escaping (UnpackedModel?, BVError?) -> Void) {
+    ///   - result: Tuple containing the result of the discover query.
+    ///     - vatoms: Array of *packaged* vAtoms. Packaged vAtoms have their template's registered faces and actions
+    ///       action models as populated properties. `nil` if the return type is `count`.
+    ///     - count: Number of discovered vAtoms.
+    ///   - error: BLOCKv error.
+    public static func discover(payload: [String: Any],
+                                completion: @escaping (_ result: DiscoverResult?, _ error: BVError?) -> Void) {
 
         let endpoint = API.VatomDiscover.discover(payload)
 
         self.client.request(endpoint) { (baseModel, error) in
 
             // extract model, handle error
-            guard let packModel = baseModel?.payload, error == nil else {
+            guard let unpackedModel = baseModel?.payload, error == nil else {
                 DispatchQueue.main.async {
                     print(error!.localizedDescription)
                     completion(nil, error!)
@@ -164,9 +200,11 @@ extension BLOCKv {
             }
 
             // model is available
+            let packedVatoms = unpackedModel.package()
+
             DispatchQueue.main.async {
                 //print(model)
-                completion(packModel, nil)
+                completion((packedVatoms, packedVatoms.count), nil)
             }
 
         }

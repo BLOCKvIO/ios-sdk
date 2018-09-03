@@ -305,9 +305,17 @@ class InventoryCollectionViewController: UICollectionViewController {
     // MARK: - Navigation
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+//        if segue.identifier == "seg.vatom.detail" {
+//            let destination = segue.destination as! VatomDetailTableViewController
+//            destination.vatom = vatomToPass
+//        }
+        
         if segue.identifier == "seg.vatom.detail" {
-            let destination = segue.destination as! VatomDetailTableViewController
-            destination.vatom = vatomToPass
+            let destination = segue.destination as! UINavigationController
+            let engagedVatomVC = destination.viewControllers[0] as! EngagedVatomViewController
+            engagedVatomVC.vatom = vatomToPass
+            engagedVatomVC.topProcedure = EmbeddedProcedure.engaged.procedure
+            engagedVatomVC.bottomProcedure = EmbeddedProcedure.card.procedure
         }
     }
     

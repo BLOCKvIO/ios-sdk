@@ -1,15 +1,18 @@
 //
-//  EmbeddedProcedure_Tests.swift
-//  BLOCKv_Unit_Tests
+//  BlockV AG. Copyright (c) 2018, all rights reserved.
 //
-//  Created by Cameron McOnie on 2018/08/16.
-//  Copyright © 2018 CocoaPods. All rights reserved.
+//  Licensed under the BlockV SDK License (the "License"); you may not use this file or
+//  the BlockV SDK except in compliance with the License accompanying it. Unless
+//  required by applicable law or agreed to in writing, the BlockV SDK distributed under
+//  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+//  ANY KIND, either express or implied. See the License for the specific language
+//  governing permissions and limitations under the License.
 //
 
 import XCTest
 @testable import BLOCKv
 
-class EmbeddedProcedure_Tests: XCTestCase {
+class FaceSelectionProcedure_Tests: XCTestCase {
     
     //TODO: Replace with official blockv decoder
     lazy private var decoder: JSONDecoder = {
@@ -32,37 +35,49 @@ class EmbeddedProcedure_Tests: XCTestCase {
     
     ///TODO: This does not yet test whether the native face is installed.
     func testEmbeddedIconSelectionProcedure() {
-        
+
         do {
-            // decode json into pack model
+            
+            // decode json into face models
             let faceModels = try decoder.decode([FaceModel].self, from: MockModelFaces.genericIconAnd3D)
             XCTAssertEqual(faceModels.count, 2)
             
-            let possibleBestFaceForIcon = EmbeddedProcedure.icon.selectBestFace(from: faceModels)
+            // decode json into a vatom model
+            var vatomModel = try decoder.decode(VatomModel.self, from: MockModel.VatomModel.basicVatom)
+            vatomModel.faceModels = faceModels
+
+            let possibleBestFaceForIcon = EmbeddedProcedure.icon.procedure(vatomModel,
+                                                                           ["native://image", "native://generic-3d"])
+            
             let bestFaceForIcon = try self.require(possibleBestFaceForIcon)
             XCTAssertEqual(bestFaceForIcon.id, "bbbb")
-            
+
         } catch {
             XCTFail(error.localizedDescription)
         }
-        
+
     }
-    
+
     func testEmbeddedCardSelectionProcedure() {
-        
+
         do {
             // decode json into pack model
             let faceModels = try decoder.decode([FaceModel].self, from: MockModelFaces.genericIconAnd3D)
             XCTAssertEqual(faceModels.count, 2)
             
-            let possibleBestFaceForCard = EmbeddedProcedure.card.selectBestFace(from: faceModels)
+            // decode json into a vatom model
+            var vatomModel = try decoder.decode(VatomModel.self, from: MockModel.VatomModel.basicVatom)
+            vatomModel.faceModels = faceModels
+
+            let possibleBestFaceForCard = EmbeddedProcedure.card.procedure(vatomModel,
+                                                                           ["native://image", "native://generic-3d"])
             let bestFaceForCard = try self.require(possibleBestFaceForCard)
             XCTAssertEqual(bestFaceForCard.id, "aaaa")
-            
+
         } catch {
             XCTFail(error.localizedDescription)
         }
-        
+
     }
     
     func testPerformanceExample() {

@@ -15,7 +15,6 @@
 		D519A845205E6EE3006B0D19 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D519A844205E6EE3006B0D19 /* NetworkOperation.swift */; };
 		D519A848205E76EB006B0D19 /* NetworkDataOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D519A847205E76EB006B0D19 /* NetworkDataOperation.swift */; };
 		D519A84B205E83AB006B0D19 /* VatomDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D519A84A205E83AB006B0D19 /* VatomDetailTableViewController.swift */; };
-		D530759421119E0E00DE7FD0 /* PackModel_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D530759321119E0E00DE7FD0 /* PackModel_Tests.swift */; };
 		D530759C21119E2A00DE7FD0 /* MockModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5307588211199C200DE7FD0 /* MockModels.swift */; };
 		D530759F2111CC5200DE7FD0 /* Test+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = D530759E2111CC5200DE7FD0 /* Test+Utils.swift */; };
 		D53075A42112E9E000DE7FD0 /* FaceModel_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D53075A32112E9E000DE7FD0 /* FaceModel_Tests.swift */; };
@@ -38,7 +37,7 @@
 		D597FF272051305A009B2910 /* UIAlertController+Etx.swift in Sources */ = {isa = PBXBuildFile; fileRef = D597FF262051305A009B2910 /* UIAlertController+Etx.swift */; };
 		D59C7DDD206CE1D000FCE1DD /* Actions.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D59C7DDC206CE1D000FCE1DD /* Actions.storyboard */; };
 		D5A08F3B2066514900FB3CB7 /* PasswordTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A08F3A2066514900FB3CB7 /* PasswordTableViewController.swift */; };
-		D5A482C32125B4C6009DD499 /* EmbeddedProcedure_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A482C22125B4C6009DD499 /* EmbeddedProcedure_Tests.swift */; };
+		D5A482C32125B4C6009DD499 /* FaceSelectionProcedure_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A482C22125B4C6009DD499 /* FaceSelectionProcedure_Tests.swift */; };
 		D5A482C62125B655009DD499 /* MockModelsFaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A482C42125B5A7009DD499 /* MockModelsFaces.swift */; };
 		D5E3AC9F2049883900CFFEEA /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E3AC9E2049883800CFFEEA /* LoginViewController.swift */; };
 		FE05FFA026A3E5A0C79B6E20 /* Pods_BLOCKv_Unit_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7956FE101E9335CDDC8248F3 /* Pods_BLOCKv_Unit_Tests.framework */; };
@@ -86,7 +85,6 @@
 		D519A84A205E83AB006B0D19 /* VatomDetailTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VatomDetailTableViewController.swift; sourceTree = "<group>"; };
 		D5307588211199C200DE7FD0 /* MockModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockModels.swift; sourceTree = "<group>"; };
 		D530759121119E0E00DE7FD0 /* BLOCKv_Unit_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BLOCKv_Unit_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D530759321119E0E00DE7FD0 /* PackModel_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackModel_Tests.swift; sourceTree = "<group>"; };
 		D530759521119E0E00DE7FD0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D530759E2111CC5200DE7FD0 /* Test+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Test+Utils.swift"; sourceTree = "<group>"; };
 		D53075A32112E9E000DE7FD0 /* FaceModel_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceModel_Tests.swift; sourceTree = "<group>"; };
@@ -109,7 +107,7 @@
 		D597FF262051305A009B2910 /* UIAlertController+Etx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Etx.swift"; sourceTree = "<group>"; };
 		D59C7DDC206CE1D000FCE1DD /* Actions.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Actions.storyboard; sourceTree = "<group>"; };
 		D5A08F3A2066514900FB3CB7 /* PasswordTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordTableViewController.swift; sourceTree = "<group>"; };
-		D5A482C22125B4C6009DD499 /* EmbeddedProcedure_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedProcedure_Tests.swift; sourceTree = "<group>"; };
+		D5A482C22125B4C6009DD499 /* FaceSelectionProcedure_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceSelectionProcedure_Tests.swift; sourceTree = "<group>"; };
 		D5A482C42125B5A7009DD499 /* MockModelsFaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockModelsFaces.swift; sourceTree = "<group>"; };
 		D5E3AC9E2049883800CFFEEA /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -265,7 +263,6 @@
 			isa = PBXGroup;
 			children = (
 				D5307588211199C200DE7FD0 /* MockModels.swift */,
-				D530759321119E0E00DE7FD0 /* PackModel_Tests.swift */,
 				D53075A32112E9E000DE7FD0 /* FaceModel_Tests.swift */,
 			);
 			path = Models;
@@ -336,7 +333,7 @@
 		D5A482C72125B7D1009DD499 /* Face Selection */ = {
 			isa = PBXGroup;
 			children = (
-				D5A482C22125B4C6009DD499 /* EmbeddedProcedure_Tests.swift */,
+				D5A482C22125B4C6009DD499 /* FaceSelectionProcedure_Tests.swift */,
 				D5A482C42125B5A7009DD499 /* MockModelsFaces.swift */,
 			);
 			path = "Face Selection";
@@ -563,11 +560,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				D530759F2111CC5200DE7FD0 /* Test+Utils.swift in Sources */,
-				D530759421119E0E00DE7FD0 /* PackModel_Tests.swift in Sources */,
 				D53075A42112E9E000DE7FD0 /* FaceModel_Tests.swift in Sources */,
 				D530759C21119E2A00DE7FD0 /* MockModels.swift in Sources */,
 				D5A482C62125B655009DD499 /* MockModelsFaces.swift in Sources */,
-				D5A482C32125B4C6009DD499 /* EmbeddedProcedure_Tests.swift in Sources */,
+				D5A482C32125B4C6009DD499 /* FaceSelectionProcedure_Tests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

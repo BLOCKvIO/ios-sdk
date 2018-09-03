@@ -33,7 +33,7 @@
 		D55B21FB2056E04B00B6D5C2 /* InventoryCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B21FA2056E04B00B6D5C2 /* InventoryCollectionViewController.swift */; };
 		D5728D5C206131980041F4F7 /* TransferActionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5728D5B206131980041F4F7 /* TransferActionViewController.swift */; };
 		D5728D5E206155600041F4F7 /* ActionListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5728D5D206155600041F4F7 /* ActionListTableViewController.swift */; };
-		D584360A212C927F0045467F /* ActivatedVatomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5843609212C927F0045467F /* ActivatedVatomViewController.swift */; };
+		D584360A212C927F0045467F /* EngagedVatomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5843609212C927F0045467F /* EngagedVatomViewController.swift */; };
 		D597FF272051305A009B2910 /* UIAlertController+Etx.swift in Sources */ = {isa = PBXBuildFile; fileRef = D597FF262051305A009B2910 /* UIAlertController+Etx.swift */; };
 		D59C7DDD206CE1D000FCE1DD /* Actions.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D59C7DDC206CE1D000FCE1DD /* Actions.storyboard */; };
 		D5A08F3B2066514900FB3CB7 /* PasswordTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A08F3A2066514900FB3CB7 /* PasswordTableViewController.swift */; };
@@ -103,7 +103,7 @@
 		D55B21FA2056E04B00B6D5C2 /* InventoryCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryCollectionViewController.swift; sourceTree = "<group>"; };
 		D5728D5B206131980041F4F7 /* TransferActionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferActionViewController.swift; sourceTree = "<group>"; };
 		D5728D5D206155600041F4F7 /* ActionListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionListTableViewController.swift; sourceTree = "<group>"; };
-		D5843609212C927F0045467F /* ActivatedVatomViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivatedVatomViewController.swift; sourceTree = "<group>"; };
+		D5843609212C927F0045467F /* EngagedVatomViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngagedVatomViewController.swift; sourceTree = "<group>"; };
 		D597FF262051305A009B2910 /* UIAlertController+Etx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Etx.swift"; sourceTree = "<group>"; };
 		D59C7DDC206CE1D000FCE1DD /* Actions.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Actions.storyboard; sourceTree = "<group>"; };
 		D5A08F3A2066514900FB3CB7 /* PasswordTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordTableViewController.swift; sourceTree = "<group>"; };
@@ -235,7 +235,7 @@
 			children = (
 				D55B21FA2056E04B00B6D5C2 /* InventoryCollectionViewController.swift */,
 				D519A84A205E83AB006B0D19 /* VatomDetailTableViewController.swift */,
-				D5843609212C927F0045467F /* ActivatedVatomViewController.swift */,
+				D5843609212C927F0045467F /* EngagedVatomViewController.swift */,
 			);
 			path = Inventory;
 			sourceTree = "<group>";
@@ -543,7 +543,7 @@
 				D55B21F020540AC200B6D5C2 /* RegisterTableViewController.swift in Sources */,
 				D5E3AC9F2049883900CFFEEA /* LoginViewController.swift in Sources */,
 				D55B21E02052772400B6D5C2 /* VerifyTableViewController.swift in Sources */,
-				D584360A212C927F0045467F /* ActivatedVatomViewController.swift in Sources */,
+				D584360A212C927F0045467F /* EngagedVatomViewController.swift in Sources */,
 				D55B21E72052BB7400B6D5C2 /* ProfileViewController.swift in Sources */,
 				D55B21F92056DE6D00B6D5C2 /* UIColor+Ext.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,

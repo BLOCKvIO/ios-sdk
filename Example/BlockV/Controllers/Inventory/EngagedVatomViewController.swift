@@ -1,5 +1,5 @@
 //
-//  ActivatedVatomViewController.swift
+//  EngagedVatomViewController.swift
 //  BlockV_Example
 //
 //  Created by Cameron McOnie on 2018/08/21.
@@ -22,23 +22,36 @@ import BLOCKv
  
  */
 
-class ActivatedVatomViewController: UIViewController {
+class EngagedVatomViewController: UIViewController {
 
     // MARK: - Properties
     
-    var vatom: VatomModel?
-    var procedure: FaceSelectionProcedure?
-    var roster: FaceViewRoster?
+    @IBOutlet weak var topVatomView: VatomView! // using storyboards
+    @IBOutlet weak var bottomContainerView: UIView! // using code, this is just a container view
     
-    @IBOutlet weak var vatomView: VatomView!
+    private var bottomVatomView: VatomView!
+    
+    var vatom: VatomModel?
+    
+    var topProcedure: FaceSelectionProcedure?
+    var bottomProcedure: FaceSelectionProcedure?
     
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        vatomView.update(usingVatom: vatom!, procedure: procedure!, roster: roster!)
-        vatomView.backgroundColor = .blue
+        // VatomView using storyboard
+        topVatomView.update(usingVatom: vatom!, procedure: topProcedure!, roster: FaceViewRegistry.shared.roster)
+        topVatomView.backgroundColor = .blue
+        
+        // VatomView built in code
+        
+        // FIXME: Should we allow VatomView to be init's with no arguments?
+        bottomVatomView = VatomView(vatom: vatom!, procedure: bottomProcedure!)
+        bottomVatomView.backgroundColor = .red
+        bottomContainerView.addSubview(bottomVatomView)
+        bottomVatomView.frame = bottomContainerView.bounds.insetBy(dx: 5, dy: 5)
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneTapped))
 

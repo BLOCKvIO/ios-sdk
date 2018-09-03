@@ -219,6 +219,13 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		AD614629213DC79D00204E5B /* Face Selection Procedure */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "Face Selection Procedure";
+			sourceTree = "<group>";
+		};
 		D519A846205E76C9006B0D19 /* Operations */ = {
 			isa = PBXGroup;
 			children = (
@@ -241,6 +248,7 @@
 		D530759221119E0E00DE7FD0 /* BLOCKv Unit Tests */ = {
 			isa = PBXGroup;
 			children = (
+				AD614629213DC79D00204E5B /* Face Selection Procedure */,
 				D53075A02111DBD600DE7FD0 /* Models */,
 				D530759D2111CADC00DE7FD0 /* Utilities */,
 				D530759521119E0E00DE7FD0 /* Info.plist */,

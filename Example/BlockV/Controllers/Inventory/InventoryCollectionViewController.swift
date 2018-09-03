@@ -187,10 +187,10 @@ class InventoryCollectionViewController: UICollectionViewController {
     /// Note: Input parameters are left to their defautls.
     fileprivate func fetchInventory() {
         
-        BLOCKv.getInventory { [weak self] (packModel, error) in
+        BLOCKv.getInventory { [weak self] (vatomModels, error) in
             
             // handle error
-            guard let model = packModel, error == nil else {
+            guard error == nil else {
                 print("\n>>> Error > Viewer: \(error!.localizedDescription)")
                 self?.present(UIAlertController.errorAlert(error!), animated: true)
                 return
@@ -209,7 +209,7 @@ class InventoryCollectionViewController: UICollectionViewController {
              `whenModifed` date. For example, if a vAtom is picked up off the map, its
              `droppped` flag is set as `false` and the `whenModified` date updated.
              */
-            self?.vatoms = model.vatoms.sorted { $0.whenModified > $1.whenModified }
+            self?.vatoms = vatomModels.sorted { $0.whenModified > $1.whenModified }
             
             // begin download
             self?.dowloadActivatedImages()
@@ -229,18 +229,18 @@ class InventoryCollectionViewController: UICollectionViewController {
         builder.addDefinedFilter(forField: .templateID, filterOperator: .equal, value: "vatomic.prototyping::DrinkCoupon::v1", combineOperator: .and)
         
         // execute the discover call
-        BLOCKv.discover(builder) { [weak self] (packModel, error) in
+        BLOCKv.discover(builder) { [weak self] (vatomModels, error) in
             
             // handle error
-            guard let model = packModel, error == nil else {
+            guard error == nil else {
                 print("\n>>> Error > Viewer: \(error!.localizedDescription)")
                 self?.present(UIAlertController.errorAlert(error!), animated: true)
                 return
             }
             
             // handle success
-            print("\nViewer > Fetched discover group model")
-            print("\n\(model)")
+            print("\nViewer > Fetched discover vatom models")
+            print("\n\(vatomModels)")
             
         }
         

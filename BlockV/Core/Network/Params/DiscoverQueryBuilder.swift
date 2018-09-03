@@ -154,7 +154,7 @@ public class DiscoverQueryBuilder {
     /// - Parameter type: Result `type` controls the response payload of the query
     ///     - `*` returns vAtoms.
     ///     - `count` returns only the numerical count of the query and an empty vAtom array.
-    public func setReturn(type: ResultType) {
+    internal func setReturn(type: ResultType) {
         self.resultStructure = ["type": type.rawValue]
     }
 
@@ -200,19 +200,15 @@ extension DiscoverQueryBuilder {
 
         /// Filter field
         public enum Field: String {
-            case id                  = "id"
-            case whenCreated         = "when_created"
-            case whenModified        = "when_modified"
-            case parentID            = "vAtom::vAtomType.parent_id"
-            case owner               = "vAtom::vAtomType.owner"
-            case author              = "vAtom::vAtomType.author"
+            case publisherFQDN       = "vAtom::vAtomType.publisher_fqdn"
             case templateID          = "vAtom::vAtomType.template"
             case templateVariationID = "vAtom::vAtomType.template_variation"
-            case dropped             = "vAtom::vAtomType.dropped"
-            case transferable        = "vAtom::vAtomType.transferable"
-            case acquirable          = "vAtom::vAtomType.acquirable"
+            case owner               = "vAtom::vAtomType.owner"
+            case author              = "vAtom::vAtomType.author"
+            case parentID            = "vAtom::vAtomType.parent_id"
             case category            = "vAtom::vAtomType.category"
-            case title               = "vAtom::vAtomType.title"
+            case inContract          = "vAtom::vAtomType.in_contract"
+            case visibilityType      = "vAtom::vAtomType.visibility_type"
         }
 
         /// Filter combine operator

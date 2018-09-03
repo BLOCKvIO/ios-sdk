@@ -11,8 +11,6 @@
 
 import Foundation
 
-//TODO: Define hashable conformance
-
 /// This type models a template action.
 public struct ActionModel: Equatable {
 
@@ -97,6 +95,16 @@ extension ActionModel {
         let actionName = String(compoundName[markerRange.upperBound..<compoundName.endIndex])
 
         return (templateID, actionName)
+    }
+
+}
+
+// MARK: - Hashable
+
+extension ActionModel: Hashable {
+
+    public var hashValue: Int {
+        return compoundName.hashValue
     }
 
 }

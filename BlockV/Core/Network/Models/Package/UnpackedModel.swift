@@ -11,22 +11,14 @@
 
 import Foundation
 
-/// Pack model holding a single vatom and its associated faces and actions.
-public struct VatomPackModel {
-    public let vatom: VatomModel
-    public let faces: [FaceModel]
-    public let actions: [ActionModel]
-}
-
-/// A simple struct that holds the three components necessary to interact with vAtoms.
+/// A struct that holds **unpackaged** vAtoms.
 ///
-/// These are:
-/// 1. Array of vAtoms
-/// 2. Array of all the faces associated with the vAtoms.
-///   Technically, an array of all the faces linked to the parent templates of the vAtoms in the vAtoms array.
-/// 3. Array of all the actions associated with the vAtoms.
-///   Technically, an array of all the actions linked to the parent templates of the vAtoms in the vAtoms array.
-public struct PackModel: Decodable, Equatable {
+/// - Array of unpackaged vAtoms
+/// - Array of faces for each of the present templates.
+///   - Technically, a consolidated array of all the faces linked to the parent templates of the present vAtoms.
+/// - Array of actions for each of the present templates.
+///   - Technically, a consolidated array of all the actions linked to the parent templates of the present vAtoms.
+public struct UnpackedModel: Decodable, Equatable {
 
     public var vatoms: [VatomModel]
     public var faces: [FaceModel]
@@ -42,15 +34,6 @@ public struct PackModel: Decodable, Equatable {
         case faces
         case actions
         case count
-    }
-
-    // MARK: - Init
-
-    init(vatoms: [VatomModel], faces: [FaceModel], actions: [ActionModel]) {
-        self.vatoms = vatoms
-        self.faces = faces
-        self.actions = actions
-        self.count = vatoms.count
     }
 
     public init(from decoder: Decoder) throws {
@@ -87,7 +70,7 @@ public struct PackModel: Decodable, Equatable {
         self.count = try container.decodeIfPresent(Int.self, forKey: .count)
 
         /*
-         NOTE: The arrays of vatoms, faces, and actions are be decoded 'safely'. In other words,
+         NOTE: The arrays of vatoms, faces, and actions are be decded 'safely'. In other words,
          encountering a failure when decoding an element will result in only that element not being
          included in the decoded array. This is opposed to the default behaviour of `decode` for
          collections where the decoding failure of a single element throws and no elements are
@@ -96,48 +79,30 @@ public struct PackModel: Decodable, Equatable {
 
     }
 
-}
-
-// MARK: - Convenience Extension
-
-extension PackModel {
-
-    /// Finds the vAtom with the specified id.
+    /// Applies a transformation on an unpacked vatom model to produce a packed vatom models.
     ///
-    /// - Parameter id: Unique identifier of the vAtom.
-    /// - Returns: The first Vatom Model of the sequence that satisfies the id predicate, or `nil` if there is no
-    ///   VatomModel matching the predicate.
-    public func findVatom(whereId id: String) -> VatomModel? {
-        return self.vatoms.first { $0.id == id }
-    }
+    /// The resulting vatoms have their template's face and action models directly attached.
+    ///
+    /// - note:
+    /// Actions and Faces are associated at the template level. The BLOCKv API returns vAtoms, Action, and Faces as
+    /// three separate arrays (i.e. unpacked). This methods 'packages' the actions and faces onto associated vatoms.
+    func package() -> [VatomModel] {
 
-    /// Returns the faces associated with the vAtom's template.
-    public func filterFaces(whereVatomId id: String) -> [FaceModel] {
-        // find first vatom vatom
-        guard let vatom = findVatom(whereId: id) else {
-            return []
-        }
-        return self.faces.filter { $0.templateID ==  vatom.templateID }
-    }
+        // dictionary keyed by template id, mapping a templateId to face models
+        let facesByTemplate = Dictionary(grouping: self.faces, by: { face in face.templateID })
+        // dictionary keyed by template id, mapping a templateId to action models
+        let actionsByTemplate = Dictionary(grouping: self.actions, by: { action in action.templateID })
 
-    /// Returns the actions associated with the vAtom's template.
-    public func filterActions(whereVatomId id: String) -> [ActionModel] {
-        // find first vatom vatom
-        guard let vatom = findVatom(whereId: id) else {
-            return []
+        // associate actions and faces with each vatom
+        var packedVatoms = self.vatoms
+        for (index, vatom) in packedVatoms.enumerated() {
+            packedVatoms[index].faceModels = facesByTemplate[vatom.templateID] ?? []
+            packedVatoms[index].actionModels = actionsByTemplate[vatom.templateID] ?? []
         }
-        return self.actions.filter { $0.templateID == vatom.templateID }
-    }
 
-    /// Returns a VatomPackModel for the specified vAtom id.
-    public func filter(whereVatomId id: String) -> VatomPackModel? {
-        // find vatom
-        if let vatom = findVatom(whereId: id) {
-            let faces = filterFaces(whereVatomId: id)
-            let actions = filterActions(whereVatomId: id)
-            return VatomPackModel(vatom: vatom, faces: faces, actions: actions)
-        }
-        return nil
+        // return the packed vatoms
+        return packedVatoms
+
     }
 
 }

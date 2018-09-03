@@ -32,7 +32,6 @@
 		D55B21F52056745700B6D5C2 /* UIViewController+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B21F42056745700B6D5C2 /* UIViewController+Ext.swift */; };
 		D55B21F92056DE6D00B6D5C2 /* UIColor+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B21F82056DE6D00B6D5C2 /* UIColor+Ext.swift */; };
 		D55B21FB2056E04B00B6D5C2 /* InventoryCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B21FA2056E04B00B6D5C2 /* InventoryCollectionViewController.swift */; };
-		D5728D562060FD1B0041F4F7 /* Secret.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5728D552060FD1B0041F4F7 /* Secret.swift */; };
 		D5728D5C206131980041F4F7 /* TransferActionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5728D5B206131980041F4F7 /* TransferActionViewController.swift */; };
 		D5728D5E206155600041F4F7 /* ActionListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5728D5D206155600041F4F7 /* ActionListTableViewController.swift */; };
 		D597FF272051305A009B2910 /* UIAlertController+Etx.swift in Sources */ = {isa = PBXBuildFile; fileRef = D597FF262051305A009B2910 /* UIAlertController+Etx.swift */; };
@@ -101,7 +100,6 @@
 		D55B21F42056745700B6D5C2 /* UIViewController+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Ext.swift"; sourceTree = "<group>"; };
 		D55B21F82056DE6D00B6D5C2 /* UIColor+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Ext.swift"; sourceTree = "<group>"; };
 		D55B21FA2056E04B00B6D5C2 /* InventoryCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryCollectionViewController.swift; sourceTree = "<group>"; };
-		D5728D552060FD1B0041F4F7 /* Secret.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secret.swift; sourceTree = "<group>"; };
 		D5728D5B206131980041F4F7 /* TransferActionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferActionViewController.swift; sourceTree = "<group>"; };
 		D5728D5D206155600041F4F7 /* ActionListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionListTableViewController.swift; sourceTree = "<group>"; };
 		D597FF262051305A009B2910 /* UIAlertController+Etx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Etx.swift"; sourceTree = "<group>"; };
@@ -184,7 +182,6 @@
 				D58E31B6205E96910024BA0E /* Utility */,
 				D597FF2520512FF3009B2910 /* Extensions */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
-				D5728D572060FE680041F4F7 /* Secrets */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 			);
 			name = "Example for BlockV";
@@ -264,14 +261,6 @@
 				D53075A32112E9E000DE7FD0 /* FaceModel_Tests.swift */,
 			);
 			path = Models;
-			sourceTree = "<group>";
-		};
-		D5728D572060FE680041F4F7 /* Secrets */ = {
-			isa = PBXGroup;
-			children = (
-				D5728D552060FD1B0041F4F7 /* Secret.swift */,
-			);
-			path = Secrets;
 			sourceTree = "<group>";
 		};
 		D5728D5A206130E40041F4F7 /* Actions */ = {
@@ -527,7 +516,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D519A848205E76EB006B0D19 /* NetworkDataOperation.swift in Sources */,
-				D5728D562060FD1B0041F4F7 /* Secret.swift in Sources */,
 				D5A08F3B2066514900FB3CB7 /* PasswordTableViewController.swift in Sources */,
 				D5475764205D124100E6FE90 /* UIView+Ext.swift in Sources */,
 				D547576B205E67AD00E6FE90 /* VatomCell.swift in Sources */,

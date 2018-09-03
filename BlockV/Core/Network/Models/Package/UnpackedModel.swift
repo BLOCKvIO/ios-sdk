@@ -11,15 +11,14 @@
 
 import Foundation
 
-/// A simple struct that holds the three components necessary to interaction with vAtoms.
+/// A struct that holds **unpackaged** vAtoms.
 ///
-/// These are:
-/// 1. Array of vAtoms
-/// 2. Array of all the faces associated with the vAtoms.
-///   Technically, an array of all the faces linked to the parent templates of the vAtoms in the vAtoms array.
-/// 3. Array of all the actions associated with the vAtoms.
-///   Technically, an array of all the actions linked to the parent templates of the vAtoms in the vAtoms array.
-public struct PackModel: Decodable, Equatable {
+/// - Array of unpackaged vAtoms
+/// - Array of faces for each of the present templates.
+///   - Technically, a consolidated array of all the faces linked to the parent templates of the present vAtoms.
+/// - Array of actions for each of the present templates.
+///   - Technically, a consolidated array of all the actions linked to the parent templates of the present vAtoms.
+public struct UnpackedModel: Decodable, Equatable {
 
     public var vatoms: [VatomModel]
     public var faces: [FaceModel]
@@ -78,6 +77,32 @@ public struct PackModel: Decodable, Equatable {
          added.
          */
 
+    }
+    
+    /// Applies a transformation on an unpacked vatom model to produce a packed vatom models.
+    ///
+    /// The resulting vatoms have their template's face and action models directly attached.
+    ///
+    /// - note:
+    /// Actions and Faces are associated at the template level. The BLOCKv API returns vAtoms, Action, and Faces as
+    /// three separate arrays (i.e. unpacked). This methods 'packages' the actions and faces onto associated vatoms.
+    func package() -> [VatomModel] {
+        
+        // dictionary keyed by template id, mapping a templateId to face models
+        let facesByTemplate = Dictionary(grouping: self.faces, by: { face in face.templateID })
+        // dictionary keyed by template id, mapping a templateId to action models
+        let actionsByTemplate = Dictionary(grouping: self.actions, by: { action in action.templateID })
+        
+        // associate actions and faces with each vatom
+        var packedVatoms = self.vatoms
+        for (index, vatom) in packedVatoms.enumerated() {
+            packedVatoms[index].faceModels = facesByTemplate[vatom.templateID] ?? []
+            packedVatoms[index].actionModels = actionsByTemplate[vatom.templateID] ?? []
+        }
+        
+        // return the packed vatoms
+        return packedVatoms
+        
     }
 
 }

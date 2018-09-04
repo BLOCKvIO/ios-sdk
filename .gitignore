@@ -31,4 +31,4 @@ Carthage
 # `pod install` in .travis.yml
 #
 Pods/
-Example/BlockV/Secrets/
+Secret.swift

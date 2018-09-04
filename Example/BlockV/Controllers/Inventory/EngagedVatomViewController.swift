@@ -65,7 +65,7 @@ class EngagedVatomViewController: UIViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "seg.vatom.detail" {
             let destination = segue.destination as! VatomDetailTableViewController
-            destination.vatom = vatomToPass
+            //destination.vatom = vatomToPass
         }
     }
 

@@ -224,15 +224,14 @@ private struct EmbeddedProcedureBuilder {
                 //FIXME: Add native face view for web check.
                 continue
 
-                /*
-                // enusrue the native face is supported (i.e. the face code is installed)
-                if installedURLs.contains(where: {
-                    ($0.caseInsensitiveCompare("https://*") == .orderedSame) }) {
-                } else {
-                    // native code is not installed
-                    continue
-                }
-                */
+//                // enusrue the native face is supported (i.e. the face code is installed)
+//                if installedURLs.contains(where: {
+//                    ($0.caseInsensitiveCompare("https://*") == .orderedSame) }) {
+//                } else {
+//                    // native code is not installed
+//                    continue
+//                }
+
             }
 
             // compare to best rank

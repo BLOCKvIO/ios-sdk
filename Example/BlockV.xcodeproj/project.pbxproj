@@ -155,6 +155,7 @@
 			isa = PBXGroup;
 			children = (
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
+				D5728D552060FD1B0041F4F7 /* Secret.swift */,
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
 				D59C7DDC206CE1D000FCE1DD /* Actions.storyboard */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
@@ -163,7 +164,6 @@
 				D58E31B6205E96910024BA0E /* Utility */,
 				D597FF2520512FF3009B2910 /* Extensions */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
-				D5728D572060FE680041F4F7 /* Secrets */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 			);
 			name = "Example for BlockV";
@@ -230,14 +230,6 @@
 				D519A84A205E83AB006B0D19 /* VatomDetailTableViewController.swift */,
 			);
 			path = Inventory;
-			sourceTree = "<group>";
-		};
-		D5728D572060FE680041F4F7 /* Secrets */ = {
-			isa = PBXGroup;
-			children = (
-				D5728D552060FD1B0041F4F7 /* Secret.swift */,
-			);
-			path = Secrets;
 			sourceTree = "<group>";
 		};
 		D5728D5A206130E40041F4F7 /* Actions */ = {

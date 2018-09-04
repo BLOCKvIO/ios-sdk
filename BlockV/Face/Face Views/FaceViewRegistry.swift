@@ -34,11 +34,9 @@ public class FaceViewRegistry {
 
     public static let shared: FaceViewRegistry = {
         let registry = FaceViewRegistry()
-        // - embedded
-        registry.register(ImageFaceView.self)
-        // - test
-        registry.register(TestFaceView.self)
-        registry.register(SubclassTestFaceView.self)
+        
+        //TODO: Add embedded faces
+        
         return registry
     }()
 

@@ -39,8 +39,6 @@
 		D597FF272051305A009B2910 /* UIAlertController+Etx.swift in Sources */ = {isa = PBXBuildFile; fileRef = D597FF262051305A009B2910 /* UIAlertController+Etx.swift */; };
 		D59C7DDD206CE1D000FCE1DD /* Actions.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D59C7DDC206CE1D000FCE1DD /* Actions.storyboard */; };
 		D5A08F3B2066514900FB3CB7 /* PasswordTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A08F3A2066514900FB3CB7 /* PasswordTableViewController.swift */; };
-		D5A482C32125B4C6009DD499 /* FaceSelectionProcedure_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A482C22125B4C6009DD499 /* FaceSelectionProcedure_Tests.swift */; };
-		D5A482C62125B655009DD499 /* MockModelsFaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A482C42125B5A7009DD499 /* MockModelsFaces.swift */; };
 		D5E3AC9F2049883900CFFEEA /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E3AC9E2049883800CFFEEA /* LoginViewController.swift */; };
 		FE05FFA026A3E5A0C79B6E20 /* Pods_BLOCKv_Unit_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7956FE101E9335CDDC8248F3 /* Pods_BLOCKv_Unit_Tests.framework */; };
 /* End PBXBuildFile section */
@@ -166,6 +164,7 @@
 				607FACD11AFB9204008FA782 /* Products */,
 				32B39594BEF1B7EDB269086E /* Pods */,
 				8C7B4899EFB41257035A54F2 /* Frameworks */,
+				AD5C612F213EB76F00153EC4 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -182,7 +181,6 @@
 			isa = PBXGroup;
 			children = (
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
-				D5728D552060FD1B0041F4F7 /* Secret.swift */,
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
 				D59C7DDC206CE1D000FCE1DD /* Actions.storyboard */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
@@ -223,6 +221,15 @@
 				7956FE101E9335CDDC8248F3 /* Pods_BLOCKv_Unit_Tests.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		AD5C612F213EB76F00153EC4 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				D5A482C42125B5A7009DD499 /* MockModelsFaces.swift */,
+				D5A482C22125B4C6009DD499 /* FaceSelectionProcedure_Tests.swift */,
+			);
+			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 		AD614629213DC79D00204E5B /* Face Selection Procedure */ = {
@@ -342,15 +349,6 @@
 				D5475763205D124100E6FE90 /* UIView+Ext.swift */,
 			);
 			path = Extensions;
-			sourceTree = "<group>";
-		};
-		D5A482C72125B7D1009DD499 /* Face Selection */ = {
-			isa = PBXGroup;
-			children = (
-				D5A482C22125B4C6009DD499 /* FaceSelectionProcedure_Tests.swift */,
-				D5A482C42125B5A7009DD499 /* MockModelsFaces.swift */,
-			);
-			path = "Face Selection";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -578,8 +576,6 @@
 				AD61462E213DC88700204E5B /* FaceSelectionProcedure_Tests.swift in Sources */,
 				D53075A42112E9E000DE7FD0 /* FaceModel_Tests.swift in Sources */,
 				D530759C21119E2A00DE7FD0 /* MockModels.swift in Sources */,
-				D5A482C62125B655009DD499 /* MockModelsFaces.swift in Sources */,
-				D5A482C32125B4C6009DD499 /* FaceSelectionProcedure_Tests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

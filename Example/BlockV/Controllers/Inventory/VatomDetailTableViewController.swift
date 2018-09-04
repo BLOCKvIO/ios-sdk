@@ -29,9 +29,7 @@
 import UIKit
 import BLOCKv
 
-/// This view controller demonstrates how to fetch a single vAtom.
-///
-///
+/// This view controller demonstrates how to fetch a single vAtom and display updated properties.
 class VatomDetailTableViewController: UITableViewController {
     
     // MARK: - Inputs

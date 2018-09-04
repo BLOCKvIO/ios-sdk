@@ -776,7 +776,7 @@
                                         </constraints>
                                     </view>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="NYV-fp-8BC">
-                                        <rect key="frame" x="26" y="317.5" width="323" height="464"/>
+                                        <rect key="frame" x="26" y="498" width="323" height="464"/>
                                         <color key="backgroundColor" red="0.90980392156862744" green="0.91764705882352937" blue="0.91764705882352937" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="464" id="HB8-D5-Oaa"/>
@@ -787,14 +787,24 @@
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                     </view>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pd0-Fd-93d" customClass="VatomView" customModule="BLOCKv">
+                                        <rect key="frame" x="37" y="302" width="301" height="160"/>
+                                        <color key="backgroundColor" red="0.90980392160000001" green="0.91764705879999997" blue="0.91764705879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="160" id="6Z2-sX-SII"/>
+                                        </constraints>
+                                    </view>
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="dUp-u6-SGt" firstAttribute="centerX" secondItem="CQf-n0-C37" secondAttribute="centerX" id="3K2-jY-AVy"/>
+                                    <constraint firstItem="pd0-Fd-93d" firstAttribute="top" secondItem="dUp-u6-SGt" secondAttribute="bottom" constant="34.5" id="6Fe-2s-Qul"/>
                                     <constraint firstItem="dUp-u6-SGt" firstAttribute="top" secondItem="nVX-Wd-tCf" secondAttribute="bottom" constant="36" id="8MA-oB-f4Z"/>
-                                    <constraint firstItem="NYV-fp-8BC" firstAttribute="top" secondItem="dUp-u6-SGt" secondAttribute="bottom" constant="50" id="Hk3-12-ROM"/>
                                     <constraint firstAttribute="trailing" secondItem="NYV-fp-8BC" secondAttribute="trailing" constant="26" id="POS-AO-F5y"/>
                                     <constraint firstItem="NYV-fp-8BC" firstAttribute="centerX" secondItem="CQf-n0-C37" secondAttribute="centerX" id="WAC-sn-OAk"/>
                                     <constraint firstItem="nVX-Wd-tCf" firstAttribute="centerX" secondItem="CQf-n0-C37" secondAttribute="centerX" id="Yba-hu-2ZZ"/>
+                                    <constraint firstItem="NYV-fp-8BC" firstAttribute="top" secondItem="pd0-Fd-93d" secondAttribute="bottom" constant="36" id="Zz0-ZY-ndK"/>
+                                    <constraint firstItem="pd0-Fd-93d" firstAttribute="centerX" secondItem="CQf-n0-C37" secondAttribute="centerX" id="afH-uf-9Bg"/>
+                                    <constraint firstItem="pd0-Fd-93d" firstAttribute="width" secondItem="CQf-n0-C37" secondAttribute="width" multiplier="0.8" constant="1" id="hzb-S2-U1r"/>
                                     <constraint firstItem="nVX-Wd-tCf" firstAttribute="top" secondItem="CQf-n0-C37" secondAttribute="top" constant="25" id="nGH-SJ-njR"/>
                                     <constraint firstAttribute="bottom" secondItem="NYV-fp-8BC" secondAttribute="bottom" constant="20" id="tmq-BL-uhD"/>
                                     <constraint firstItem="NYV-fp-8BC" firstAttribute="leading" secondItem="CQf-n0-C37" secondAttribute="leading" constant="26" id="v5g-7T-cJv"/>
@@ -809,7 +819,13 @@
                             <constraint firstItem="suM-d6-dfe" firstAttribute="top" secondItem="CQf-n0-C37" secondAttribute="bottom" id="Vdx-S1-iWY"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="VtC-SN-RS4"/>
+                    <navigationItem key="navigationItem" id="VtC-SN-RS4">
+                        <barButtonItem key="rightBarButtonItem" title="Info" id="SKG-Bx-GKN">
+                            <connections>
+                                <segue destination="OCf-oV-sVa" kind="show" id="rjz-Uh-CFv"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="bottomContainerView" destination="NYV-fp-8BC" id="3hN-Qa-jqP"/>
                         <outlet property="topVatomView" destination="dUp-u6-SGt" id="neL-lf-Y1k"/>
@@ -1405,7 +1421,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Vze-Xp-Tw9" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="5790" y="-412"/>
+            <point key="canvasLocation" x="7633" y="-1198"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="lXe-Qd-Gup">

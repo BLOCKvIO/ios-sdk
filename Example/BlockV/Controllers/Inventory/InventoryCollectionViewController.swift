@@ -279,7 +279,7 @@ class InventoryCollectionViewController: UICollectionViewController {
                 self?.activatedImages[vatom.id] = data
                 
                 // handle success
-                print("Viewer > Downloaded 'ActivatedImage' for vAtom: \(vatom.id) Data: \(data)")
+                //print("Viewer > Downloaded 'ActivatedImage' for vAtom: \(vatom.id) Data: \(data)")
                 
                 // find the vatoms index
                 if let index = self?.filteredVatoms.index(where: { $0.id == vatom.id }) {

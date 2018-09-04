@@ -143,7 +143,10 @@ public class VatomView: UIView {
     /// Common initializer
     private func commonInit() {
 
-        self.loadingView = UIView() // or custom
+        self.loadingView = DefaultLoadingView(frame: self.bounds)
+        loadingView!.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+        self.addSubview(loadingView!)
+
         self.errorView = UIView() // or custom
 
     }
@@ -241,9 +244,9 @@ public class VatomView: UIView {
             printBV(info: "Face view for face model: \(faceViewType)")
 
             //let faceViewType = FaceViewRegistry.shared.roster["native://image"]!
+            //let selectedFaceView: FaceView = ImageFaceView(vatom: vatom, faceModel: selectedFace)
             let selectedFaceView: FaceView = faceViewType.init(vatom: vatom,
                                                                faceModel: selectedFaceModel)
-            // let selectedFaceView: FaceView = ImageFaceView(vatom: vatom, faceModel: selectedFace)
 
             // relace currently selected face view with newly selected
             self.replaceFaceView(with: selectedFaceView)

@@ -119,9 +119,9 @@ class ImageFaceView: FaceView {
         // artificially wait so we can test the loader.
         self._timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false) { _ in
             self.backgroundColor = .green
-            completion(nil)
 
-            self.doResourceStuff()
+            // ugly completion handlers
+            self.doResourceStuff(completion: completion)
         }
 
     }
@@ -153,11 +153,11 @@ class ImageFaceView: FaceView {
 
 extension ImageFaceView {
 
-    func doResourceStuff() {
+    func doResourceStuff(completion: @escaping (Error?) -> Void) {
 
         if let resourceModel = vatom.resources.first(where: { $0.name == config.imageName }) {
             if let url = try? BLOCKv.encodeURL(resourceModel.url) {
-                self.animatedImageView.downloaded(from: url)
+                self.animatedImageView.downloaded(from: url, completion: completion)
             }
         }
 
@@ -166,7 +166,9 @@ extension ImageFaceView {
 }
 
 extension UIImageView {
-    func downloaded(from url: URL, contentMode mode: UIViewContentMode = .scaleAspectFit) {
+    func downloaded(from url: URL,
+                    contentMode mode: UIViewContentMode = .scaleAspectFit,
+                    completion: ((Error?) -> Void)? = nil) {
         contentMode = mode
         URLSession.shared.dataTask(with: url) { data, response, error in
             guard
@@ -174,15 +176,20 @@ extension UIImageView {
                 let mimeType = response?.mimeType, mimeType.hasPrefix("image"),
                 let data = data, error == nil,
                 let image = UIImage(data: data)
-                else { return }
+                else {
+                    completion?(error)
+                    return
+            }
+            
             DispatchQueue.main.async {
                 self.image = image
+                completion?(nil)
                 printBV(info: "Image downloaded: \(url)")
             }
             }.resume()
     }
     func downloaded(from link: String, contentMode mode: UIViewContentMode = .scaleAspectFit) {
         guard let url = URL(string: link) else { return }
-        downloaded(from: url, contentMode: mode)
+        downloaded(from: url, contentMode: mode, completion: nil)
     }
 }

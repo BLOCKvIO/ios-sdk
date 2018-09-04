@@ -19,38 +19,58 @@ class ImageFaceView: FaceView {
 
     class var displayURL: String { return "native://image" }
 
+    // MARK: - Properties
+
+    lazy var animatedImageView: FLAnimatedImageView = {
+        let imageView = FLAnimatedImageView()
+        imageView.autoresizingMask = [ .flexibleWidth, .flexibleHeight ]
+        imageView.clipsToBounds = true
+        return imageView
+    }()
+
     // MARK: - Initialization
 
     required init(vatom: VatomModel, faceModel: FaceModel) {
         super.init(vatom: vatom, faceModel: faceModel)
 
+        // add image view
+        self.addSubview(animatedImageView)
+        animatedImageView.frame = self.bounds
+        animatedImageView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+
         try? self.extractConfig()
     }
 
     required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("init(coder:) should not be called on Face Views. Please use VatomView.")
     }
 
     // MARK: - Face Config
 
-    enum Scale: String {
-        case fit, fill
+    /// Face model face configuration specification.
+    private struct Config {
+        enum Scale: String {
+            case fit, fill
+        }
+        var scale: Scale?
+        var imageName: String
     }
 
-    private var scale: Scale?
-    private var imageName: String?
-
-    /// Validates the face has a suitable config section.
+    /// Face configuration (initialized with default values).
     ///
-    /// Throws an error if the face does not meet the config specification.
+    /// - `scale`: defaults to `nil`.
+    /// - `imageName`: defaults to `"ActivatedImage"`
+    private var config = Config(scale: nil, imageName: "ActivatedImage")
+
+    /// Extracts the face view's configuration.
     private func extractConfig() throws {
         // extract scale
         if let scaleString = self.faceModel.properties.config?["scale"]?.stringValue {
-            self.scale = Scale(rawValue: scaleString)
+            config.scale = Config.Scale(rawValue: scaleString)!
         }
         // extract image name
         if let imageNameString = self.faceModel.properties.config?["name"]?.stringValue {
-            self.imageName = imageNameString
+            config.imageName = imageNameString
         }
     }
 
@@ -68,63 +88,101 @@ class ImageFaceView: FaceView {
     /// is used to choose the best content mode.
     private func updateContentMode() {
 
-        guard let image = imageView.image else { return }
+        guard let image = animatedImageView.image else { return }
 
         // check face config
-        if let scale = self.scale {
+        if let scale = config.scale {
             switch scale {
-            case .fill: imageView.contentMode = .scaleAspectFill
-            case .fit: imageView.contentMode = .scaleAspectFit
+            case .fill: animatedImageView.contentMode = .scaleAspectFill
+            case .fit: animatedImageView.contentMode = .scaleAspectFit
             }
             // no face config supplied (try and do the right thing)
         } else if self.faceModel.properties.constraints.viewMode == "card" {
-            imageView.contentMode = .scaleAspectFill
-        } else if image.size.width > imageView.bounds.size.width || image.size.height > imageView.bounds.size.height {
-            imageView.contentMode = .scaleAspectFit
+            animatedImageView.contentMode = .scaleAspectFill
+        } else if image.size.width > animatedImageView.bounds.size.width ||
+            image.size.height > animatedImageView.bounds.size.height {
+            animatedImageView.contentMode = .scaleAspectFit
         } else {
-            imageView.contentMode = .center
+            animatedImageView.contentMode = .center
         }
 
     }
 
     // MARK: - Face View Lifecycle
 
-    var timer: Timer?
+    private var _timer: Timer?
 
+    /// Begin loading the face view's content.
     func load(completion: @escaping (Error?) -> Void) {
         print(#function)
 
-        // Download resource
-
-        self.timer = Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { _ in
-            self.backgroundColor = .red
+        // artificially wait so we can test the loader.
+        self._timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false) { _ in
+            self.backgroundColor = .green
             completion(nil)
+
+            self.doResourceStuff()
         }
 
     }
 
+    /// Respond to updates to the packaged vatom.
     func vatomUpdated(_ vatom: VatomModel) {
         print(#function)
+
+        // replace current vatom
+        self.vatom = vatom
+
+        /*
+         NOTE:
+         The ImageFaceView does not need to respond to vAtom updates. All the properties this face uses are immutable
+         once the vAtom has been emmited. Thus, no meaningful UI update can be made.
+         */
     }
 
+    /// Unload the face view.
     func unload() {
         print(#function)
     }
 
-    // MARK: - Prototype
+}
 
-    ///FIXME: This must become
+// MARK: - TEMPORARY
+
+///FIXME: Replace with resource manager
+
+extension ImageFaceView {
+
     func doResourceStuff() {
+
+        if let resourceModel = vatom.resources.first(where: { $0.name == config.imageName }) {
+            if let url = try? BLOCKv.encodeURL(resourceModel.url) {
+                self.animatedImageView.downloaded(from: url)
+            }
+        }
 
     }
 
-    // FIXME: This should be of type FLAnimatedImageView
-    lazy var imageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.frame = self.bounds
-        imageView.autoresizingMask = [ .flexibleWidth, .flexibleHeight ]
-        imageView.clipsToBounds = true
-        return imageView
-    }()
+}
 
+extension UIImageView {
+    func downloaded(from url: URL, contentMode mode: UIViewContentMode = .scaleAspectFit) {
+        contentMode = mode
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            guard
+                let httpURLResponse = response as? HTTPURLResponse, httpURLResponse.statusCode == 200,
+                let mimeType = response?.mimeType, mimeType.hasPrefix("image"),
+                let data = data, error == nil,
+                let image = UIImage(data: data)
+                else { return }
+            DispatchQueue.main.async {
+                self.image = image
+                printBV(info: "Image downloaded: \(url)")
+            }
+            }.resume()
+    }
+    func downloaded(from link: String, contentMode mode: UIViewContentMode = .scaleAspectFit) {
+        guard let url = URL(string: link) else { return }
+        downloaded(from: url, contentMode: mode)
+    }
 }

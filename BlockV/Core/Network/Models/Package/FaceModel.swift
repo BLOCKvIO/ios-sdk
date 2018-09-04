@@ -11,13 +11,33 @@
 
 import Foundation
 
-/// A simple struct that models a template face model.
-public struct FaceModel: Codable, Equatable {
+/// A simple struct that models a template face.
+///
+/// FaceModel has value semantics and is immutable.
+public struct FaceModel: Equatable {
+
+    // MARK: - Properties
 
     public let id: String
     public let templateID: String
     public let meta: MetaModel
     public let properties: Properties
+
+    // MARK: - Convenience
+
+    /// Boolean indicating whether this face is a native face.
+    public let isNative: Bool
+
+    /// Boolean indicating whether this face is a Web face.
+    ///
+    /// - important: Only secure connections are regarded as Web faces (i.e https).
+    public let isWeb: Bool
+
+}
+
+// MARK: - Codable
+
+extension FaceModel: Codable {
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -31,11 +51,13 @@ public struct FaceModel: Codable, Equatable {
         public let displayURL: String
         public let constraints: Constraints
         public let resources: [String]
+        public let config: JSON?
 
         enum CodingKeys: String, CodingKey {
             case displayURL = "display_url"
             case constraints
             case resources
+            case config
         }
 
         public struct Constraints: Codable, Equatable {
@@ -49,6 +71,25 @@ public struct FaceModel: Codable, Equatable {
             }
 
         }
+    }
+
+    public init(from decoder: Decoder) throws {
+        let items = try decoder.container(keyedBy: CodingKeys.self)
+        id         = try items.decode(String.self, forKey: .id)
+        templateID = try items.decode(String.self, forKey: .templateID)
+        properties = try items.decode(Properties.self, forKey: .properties)
+        meta       = try items.decode(MetaModel.self, forKey: .meta)
+        // convenience
+        isNative   = properties.displayURL.hasPrefix("native://")
+        isWeb      = properties.displayURL.hasPrefix("https://")
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(templateID, forKey: .templateID)
+        try container.encode(properties, forKey: .properties)
+        try container.encode(meta, forKey: .meta)
     }
 
 }

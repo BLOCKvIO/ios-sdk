@@ -17,6 +17,9 @@ import Foundation
  2. Viewer's must be able to use pre-defined procedures.
  3. Viewer's must be able supply a custom face selection procedure.
  
+ - Always defaults to the icon embedded FSP.
+ - Always defaults to use the shared FaceRegistry roster.
+ 
  Face selection routines do NOT validate:
  1. Vatom private properties
  2. Vatom resources
@@ -67,20 +70,20 @@ public class VatomView: UIView {
     // MARK: - Properties
 
     /// The vatom pack.
-    public private(set) var vatom: VatomModel?
+    public internal(set) var vatom: VatomModel?
 
     /// The face selection procedure.
     ///
     /// Viewers may wish to update the procedure in reponse to certian events.
     ///
-    /// For example, the viewer may change the procedure from 'icon' to 'activated' while the VatomView is
+    /// For example, the viewer may change the procedure from 'icon' to 'engaged' while the VatomView is
     /// on screen.
-    public private(set) var procedure: FaceSelectionProcedure?
+    public internal(set) var procedure: FaceSelectionProcedure
 
     /// List of all the installed face views.
     ///
     /// The roster is a consolidated list of the face views registered by both the SDK and Viewer.
-    public private(set) var roster: FaceViewRoster?
+    public internal(set) var roster: FaceViewRoster
 
     /// Face model selected by the specifed face selection procedure (FSP).
     public private(set) var selectedFaceModel: FaceModel?
@@ -98,7 +101,7 @@ public class VatomView: UIView {
     // TODO: Respond to the Web socket, pass events down to the face view, run FVLC.
 
     // MARK: - Initializer
-    
+
     //FIXME: Should this class be allowed to be initialized with no params?
 
     /// Creates a vAtom view for the specifed vAtom.
@@ -110,7 +113,7 @@ public class VatomView: UIView {
     ///   - procedure: An face selection procedure (FSP) that determines which face to
     ///     display.
     public init(vatom: VatomModel,
-                procedure: @escaping FaceSelectionProcedure,
+                procedure: @escaping FaceSelectionProcedure = EmbeddedProcedure.icon.procedure,
                 roster: FaceViewRoster = FaceViewRegistry.shared.roster) {
 
         self.vatom = vatom
@@ -124,6 +127,10 @@ public class VatomView: UIView {
     }
 
     required public init?(coder aDecoder: NSCoder) {
+
+        self.procedure = EmbeddedProcedure.icon.procedure
+        self.roster = FaceViewRegistry.shared.roster
+
         super.init(coder: aDecoder)
 
         // caller must set vatom pack
@@ -158,12 +165,10 @@ public class VatomView: UIView {
      */
 
     public func update(usingVatom vatom: VatomModel,
-                       procedure: @escaping FaceSelectionProcedure,
-                       roster: FaceViewRoster? = nil) {
+                       procedure: FaceSelectionProcedure? = nil) {
 
         self.vatom = vatom
-        self.procedure = procedure
-        self.roster = roster
+        procedure.flatMap { self.procedure = $0 } // assign if not nil
 
         runVatomViewLifecylce()
 
@@ -183,15 +188,8 @@ public class VatomView: UIView {
         //FIXME: Part of this could run on a background thread, e.g fsp
 
         precondition(vatom != nil, "vatom must not be nil.")
-        precondition(procedure != nil, "procedure must not be nil.")
-        precondition(roster != nil, "face view roster must not be nil.")
 
-        // precondition that vatom is not nil
-        guard let vatom = vatom else { return }
-        // precondition that procedure is not nil
-        guard let procedure = procedure else { return }
-        // precodition that face view roster is not nil
-        guard let roster = roster else { return }
+        guard let vatom = vatom else { return } //FIXME: Show error?
 
         // 1. select the best face model
         guard let selectedFaceModel = procedure(vatom, Set(roster.keys)) else {
@@ -226,13 +224,21 @@ public class VatomView: UIView {
 
             printBV(info: "Face model change - Replacing face view.")
 
+            // replace currently selected face model
+            self.selectedFaceModel = selectedFaceModel
+
             // 3. find face view type
             guard let faceViewType = roster[selectedFaceModel.properties.displayURL] else {
-                    // viewer developer must register the face view with the face registry
-                    preconditionFailure("FSP selected a face without the face code being installed.")
-                
-                // FIXME: Should this change to an assertionFailure() and then show the error view.
+                // viewer developer MUST have registered the face view with the face registry
+                assertionFailure(
+                    """
+                    Face selection procedure (FSP) selected a face without the face view being installed. Your FSP
+                    MUST check if the face view has been registered with the FaceRegistry.
+                    """)
+                return
             }
+
+            printBV(info: "Face view for face model: \(faceViewType)")
 
             //let faceViewType = FaceViewRegistry.shared.roster["native://image"]!
             let selectedFaceView: FaceView = faceViewType.init(vatom: vatom,

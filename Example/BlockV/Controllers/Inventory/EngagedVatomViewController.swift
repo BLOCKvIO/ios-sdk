@@ -18,34 +18,58 @@ import BLOCKv
 
 class EngagedVatomViewController: UIViewController {
 
-    // MARK: - Properties
+    // MARK: - Outlets
+    
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var descriptionLabel: UILabel!
     
     @IBOutlet weak var topVatomView: VatomView! // using storyboards
+    @IBOutlet weak var middleVatomView: VatomView! // using storyboards
     @IBOutlet weak var bottomContainerView: UIView! // using code, this is just a container view
+    
+    // MARK: - Properties
     
     private var bottomVatomView: VatomView!
     
     /// Backing vAtom for display.
-    var vatom: VatomModel?
+    var vatom: VatomModel? {
+        didSet {
+            print("Vatom Updated: \(vatom?.id ?? "nil")")
+        }
+    }
     
-    var topProcedure: FaceSelectionProcedure?
-    var bottomProcedure: FaceSelectionProcedure?
+    var topFSP: FaceSelectionProcedure    = EmbeddedProcedure.card.procedure
+    var middleFSP: FaceSelectionProcedure = EmbeddedProcedure.card.procedure
+    var bottomFSP: FaceSelectionProcedure = EmbeddedProcedure.card.procedure
     
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.titleLabel.text = vatom?.title ?? "--"
+        self.descriptionLabel.text = vatom?.description ?? "--"
+        
         // setup
-        self.title = "Vatom View"
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneTapped))
 
         // top - VatomView via storyboard
-        topVatomView.update(usingVatom: vatom!, procedure: topProcedure!, roster: FaceViewRegistry.shared.roster)
+        // here we must call `update` in order to pass the vatom and the procedure to the VV. The default roster
+        // will be used.
+        topVatomView.update(usingVatom: vatom!, procedure: topFSP)
         topVatomView.backgroundColor = .blue
         
+        
+        
+        // middle - VatomView via storyboard
+        middleVatomView.update(usingVatom: vatom!, procedure: middleFSP)
+        middleVatomView.backgroundColor = .yellow
+        
+        
+        
+        
         // bottom - VatomView programmatically
-        bottomVatomView = VatomView(vatom: vatom!, procedure: bottomProcedure!)
+        bottomVatomView = VatomView(vatom: vatom!, procedure: bottomFSP)
         bottomVatomView.backgroundColor = .red
         bottomContainerView.addSubview(bottomVatomView)
         bottomVatomView.frame = bottomContainerView.bounds.insetBy(dx: 15, dy: 15)
@@ -53,6 +77,37 @@ class EngagedVatomViewController: UIViewController {
     }
     
     // MARK: - Actions
+
+    /// Refresh the vAtom's state. Go out to network to fetch the lastest vAtoms state.
+    @IBAction func handleRefresh(_ sender: UIBarButtonItem) {
+        print(#function)
+
+        // refresh the vatom
+        BLOCKv.getVatoms(withIDs: [vatom!.id]) { [weak self] (responseVatom, error) in
+
+            // handle error
+            guard error == nil else {
+                print("\n>>> Error > Viewer: \(error!.localizedDescription)")
+                self?.present(UIAlertController.errorAlert(error!), animated: true)
+                return
+            }
+
+            // ensure a vatom was returned
+            guard let responseVatom = responseVatom.first else {
+                print("\n>>> Error > Viewer: No vAtom found")
+                return
+            }
+            
+            self?.vatom = responseVatom
+            
+            // update the vatom view
+            self?.topVatomView.update(usingVatom: responseVatom)
+            
+
+        }
+        
+        
+    }
     
     @objc private func doneTapped() {
         self.navigationController?.dismiss(animated: true, completion: nil)

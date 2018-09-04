@@ -310,8 +310,6 @@ class InventoryCollectionViewController: UICollectionViewController {
             let destination = segue.destination as! UINavigationController
             let engagedVatomVC = destination.viewControllers[0] as! EngagedVatomViewController
             engagedVatomVC.vatom = vatomToPass
-            engagedVatomVC.topProcedure = EmbeddedProcedure.engaged.procedure
-            engagedVatomVC.bottomProcedure = EmbeddedProcedure.card.procedure
         }
     }
     

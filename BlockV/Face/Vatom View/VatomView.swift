@@ -98,6 +98,8 @@ public class VatomView: UIView {
     // TODO: Respond to the Web socket, pass events down to the face view, run FVLC.
 
     // MARK: - Initializer
+    
+    //FIXME: Should this class be allowed to be initialized with no params?
 
     /// Creates a vAtom view for the specifed vAtom.
     ///
@@ -228,6 +230,8 @@ public class VatomView: UIView {
             guard let faceViewType = roster[selectedFaceModel.properties.displayURL] else {
                     // viewer developer must register the face view with the face registry
                     preconditionFailure("FSP selected a face without the face code being installed.")
+                
+                // FIXME: Should this change to an assertionFailure() and then show the error view.
             }
 
             //let faceViewType = FaceViewRegistry.shared.roster["native://image"]!

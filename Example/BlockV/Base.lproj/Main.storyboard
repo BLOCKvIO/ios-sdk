@@ -327,7 +327,7 @@
                                 </constraints>
                                 <connections>
                                     <outlet property="activatedImageView" destination="grR-hz-WKP" id="CLc-zB-yvw"/>
-                                    <segue destination="1PY-y9-icg" kind="presentation" identifier="seg.vatom.detail" id="CyV-eb-bXr"/>
+                                    <segue destination="1PY-y9-icg" kind="presentation" identifier="seg.vatom.faceviews" id="CyV-eb-bXr"/>
                                 </connections>
                             </collectionViewCell>
                         </cells>
@@ -822,7 +822,7 @@
                     <navigationItem key="navigationItem" id="VtC-SN-RS4">
                         <barButtonItem key="rightBarButtonItem" title="Info" id="SKG-Bx-GKN">
                             <connections>
-                                <segue destination="OCf-oV-sVa" kind="show" id="rjz-Uh-CFv"/>
+                                <segue destination="OCf-oV-sVa" kind="show" identifier="seg.vatom.detail" id="rjz-Uh-CFv"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -833,7 +833,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="OMH-NZ-VGj" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="6728.8000000000002" y="-1197.7511244377813"/>
+            <point key="canvasLocation" x="6566" y="-466"/>
         </scene>
         <!--vAtom-->
         <scene sceneID="d13-os-Xy4">
@@ -1421,7 +1421,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Vze-Xp-Tw9" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="7633" y="-1198"/>
+            <point key="canvasLocation" x="7372" y="-466"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="lXe-Qd-Gup">
@@ -1457,7 +1457,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lqb-7g-Yya" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="5790" y="-1197"/>
+            <point key="canvasLocation" x="5790" y="-466"/>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>

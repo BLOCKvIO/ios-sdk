@@ -305,12 +305,8 @@ class InventoryCollectionViewController: UICollectionViewController {
     // MARK: - Navigation
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//        if segue.identifier == "seg.vatom.detail" {
-//            let destination = segue.destination as! VatomDetailTableViewController
-//            destination.vatom = vatomToPass
-//        }
         
-        if segue.identifier == "seg.vatom.detail" {
+        if segue.identifier == "seg.vatom.faceviews" {
             let destination = segue.destination as! UINavigationController
             let engagedVatomVC = destination.viewControllers[0] as! EngagedVatomViewController
             engagedVatomVC.vatom = vatomToPass
@@ -321,7 +317,7 @@ class InventoryCollectionViewController: UICollectionViewController {
     
     override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
         // prevent the segue - we will do it programatically
-        if identifier == "seg.vatom.detail" {
+        if identifier == "seg.vatom.faceviews" {
             return false
         }
         return true
@@ -370,7 +366,7 @@ extension InventoryCollectionViewController {
         // check if the cell has a vatom
         if let vatom = currentCell.vatom {
             self.vatomToPass = vatom
-            performSegue(withIdentifier: "seg.vatom.detail", sender: self)
+            performSegue(withIdentifier: "seg.vatom.faceviews", sender: self)
         }
         
     }

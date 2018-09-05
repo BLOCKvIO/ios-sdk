@@ -36,7 +36,6 @@ class ImageFaceView: FaceView {
         // add image view
         self.addSubview(animatedImageView)
         animatedImageView.frame = self.bounds
-        animatedImageView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
 
         // extract config
         self.extractConfig()
@@ -61,7 +60,7 @@ class ImageFaceView: FaceView {
     ///
     /// - `scale`: defaults to `nil`.
     /// - `imageName`: defaults to `"ActivatedImage"`
-    private var config = Config(scale: nil, imageName: "ActivatedImage")
+    private var config = Config(scale: .fit, imageName: "ActivatedImage")
 
     /// Extracts the face view's configuration.
     private func extractConfig() {
@@ -89,23 +88,25 @@ class ImageFaceView: FaceView {
     /// is used to choose the best content mode.
     private func updateContentMode() {
 
-        guard let image = animatedImageView.image else { return }
+        guard animatedImageView.image != nil else { return }
 
         // check face config
         if let scale = config.scale {
             switch scale {
             case .fill: animatedImageView.contentMode = .scaleAspectFill
-            case .fit: animatedImageView.contentMode = .scaleAspectFit
+            case .fit:  animatedImageView.contentMode = .scaleAspectFit
             }
-            // no face config supplied (try and do the right thing)
-        } else if self.faceModel.properties.constraints.viewMode == "card" {
-            animatedImageView.contentMode = .scaleAspectFill
-        } else if image.size.width > animatedImageView.bounds.size.width ||
-            image.size.height > animatedImageView.bounds.size.height {
-            animatedImageView.contentMode = .scaleAspectFit
-        } else {
-            animatedImageView.contentMode = .center
         }
+
+//        // no face config supplied (try and do the right thing)
+//        else if self.faceModel.properties.constraints.viewMode == "card" {
+//            animatedImageView.contentMode = .scaleAspectFill
+//        } else if image.size.width > animatedImageView.bounds.size.width ||
+//            image.size.height > animatedImageView.bounds.size.height {
+//            animatedImageView.contentMode = .scaleAspectFit
+//        } else {
+//            animatedImageView.contentMode = .center
+//        }
 
     }
 
@@ -119,7 +120,6 @@ class ImageFaceView: FaceView {
 
         // artificially wait so we can test the loader.
         self._timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false) { _ in
-            self.backgroundColor = .green
 
             // ugly completion handlers
             self.doResourceStuff(completion: completion)

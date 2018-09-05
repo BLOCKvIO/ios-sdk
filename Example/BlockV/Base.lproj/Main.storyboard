@@ -751,17 +751,17 @@
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="CQf-n0-C37">
                                 <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                                 <subviews>
-                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="9" translatesAutoresizingMaskIntoConstraints="NO" id="nVX-Wd-tCf">
-                                        <rect key="frame" x="20" y="25" width="335" height="47.5"/>
+                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="nVX-Wd-tCf">
+                                        <rect key="frame" x="148.5" y="25" width="78.5" height="54.5"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wnX-Ru-iqG">
-                                                <rect key="frame" x="151" y="0.0" width="33.5" height="20.5"/>
+                                                <rect key="frame" x="22.5" y="0.0" width="33.5" height="20.5"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Description" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Q5f-KU-IYE">
-                                                <rect key="frame" x="128.5" y="29.5" width="78.5" height="18"/>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Description" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Q5f-KU-IYE">
+                                                <rect key="frame" x="0.0" y="36.5" width="78.5" height="18"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
@@ -769,7 +769,7 @@
                                         </subviews>
                                     </stackView>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dUp-u6-SGt" customClass="VatomView" customModule="BLOCKv">
-                                        <rect key="frame" x="107" y="118.5" width="160" height="160"/>
+                                        <rect key="frame" x="107" y="125.5" width="160" height="160"/>
                                         <color key="backgroundColor" red="0.90980392160000001" green="0.91764705879999997" blue="0.91764705879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="160" id="3nn-1m-LLh"/>
@@ -777,19 +777,14 @@
                                         </constraints>
                                     </view>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="NYV-fp-8BC">
-                                        <rect key="frame" x="26" y="509" width="323" height="464"/>
+                                        <rect key="frame" x="26" y="526" width="323" height="464"/>
                                         <color key="backgroundColor" red="0.90980392156862744" green="0.91764705882352937" blue="0.91764705882352937" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="464" id="HB8-D5-Oaa"/>
                                         </constraints>
-                                        <userDefinedRuntimeAttributes>
-                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
-                                                <integer key="value" value="18"/>
-                                            </userDefinedRuntimeAttribute>
-                                        </userDefinedRuntimeAttributes>
                                     </view>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pd0-Fd-93d" customClass="VatomView" customModule="BLOCKv">
-                                        <rect key="frame" x="37" y="313" width="301" height="160"/>
+                                        <rect key="frame" x="37" y="320" width="301" height="160"/>
                                         <color key="backgroundColor" red="0.90980392160000001" green="0.91764705879999997" blue="0.91764705879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="160" id="6Z2-sX-SII"/>
@@ -800,14 +795,14 @@
                                     <constraint firstItem="dUp-u6-SGt" firstAttribute="centerX" secondItem="CQf-n0-C37" secondAttribute="centerX" id="3K2-jY-AVy"/>
                                     <constraint firstItem="pd0-Fd-93d" firstAttribute="top" secondItem="dUp-u6-SGt" secondAttribute="bottom" constant="34.5" id="6Fe-2s-Qul"/>
                                     <constraint firstItem="dUp-u6-SGt" firstAttribute="top" secondItem="nVX-Wd-tCf" secondAttribute="bottom" constant="46" id="8MA-oB-f4Z"/>
-                                    <constraint firstItem="nVX-Wd-tCf" firstAttribute="leading" relation="lessThanOrEqual" secondItem="CQf-n0-C37" secondAttribute="leading" constant="20" id="JCR-yM-jE2"/>
+                                    <constraint firstItem="nVX-Wd-tCf" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="CQf-n0-C37" secondAttribute="leading" constant="10" id="JCR-yM-jE2"/>
                                     <constraint firstAttribute="trailing" secondItem="NYV-fp-8BC" secondAttribute="trailing" constant="26" id="POS-AO-F5y"/>
                                     <constraint firstItem="NYV-fp-8BC" firstAttribute="centerX" secondItem="CQf-n0-C37" secondAttribute="centerX" id="WAC-sn-OAk"/>
                                     <constraint firstItem="nVX-Wd-tCf" firstAttribute="centerX" secondItem="CQf-n0-C37" secondAttribute="centerX" id="Yba-hu-2ZZ"/>
-                                    <constraint firstItem="NYV-fp-8BC" firstAttribute="top" secondItem="pd0-Fd-93d" secondAttribute="bottom" constant="36" id="Zz0-ZY-ndK"/>
+                                    <constraint firstItem="NYV-fp-8BC" firstAttribute="top" secondItem="pd0-Fd-93d" secondAttribute="bottom" constant="46" id="Zz0-ZY-ndK"/>
                                     <constraint firstItem="pd0-Fd-93d" firstAttribute="centerX" secondItem="CQf-n0-C37" secondAttribute="centerX" id="afH-uf-9Bg"/>
                                     <constraint firstItem="pd0-Fd-93d" firstAttribute="width" secondItem="CQf-n0-C37" secondAttribute="width" multiplier="0.8" constant="1" id="hzb-S2-U1r"/>
-                                    <constraint firstAttribute="trailing" relation="lessThanOrEqual" secondItem="nVX-Wd-tCf" secondAttribute="trailing" constant="20" id="lIM-Hd-96i"/>
+                                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="nVX-Wd-tCf" secondAttribute="trailing" constant="10" id="lIM-Hd-96i"/>
                                     <constraint firstItem="nVX-Wd-tCf" firstAttribute="top" secondItem="CQf-n0-C37" secondAttribute="top" constant="25" id="nGH-SJ-njR"/>
                                     <constraint firstAttribute="bottom" secondItem="NYV-fp-8BC" secondAttribute="bottom" constant="20" id="tmq-BL-uhD"/>
                                     <constraint firstItem="NYV-fp-8BC" firstAttribute="leading" secondItem="CQf-n0-C37" secondAttribute="leading" constant="26" id="v5g-7T-cJv"/>

@@ -57,22 +57,15 @@ class EngagedVatomViewController: UIViewController {
         // here we must call `update` in order to pass the vatom and the procedure to the VV. The default roster
         // will be used.
         topVatomView.update(usingVatom: vatom!, procedure: topFSP)
-        topVatomView.backgroundColor = .blue
-        
-        
         
         // middle - VatomView via storyboard
         middleVatomView.update(usingVatom: vatom!, procedure: middleFSP)
-        middleVatomView.backgroundColor = .yellow
-        
-        
-        
         
         // bottom - VatomView programmatically
         bottomVatomView = VatomView(vatom: vatom!, procedure: bottomFSP)
-        bottomVatomView.backgroundColor = .red
         bottomContainerView.addSubview(bottomVatomView)
-        bottomVatomView.frame = bottomContainerView.bounds.insetBy(dx: 15, dy: 15)
+        bottomVatomView.frame = bottomContainerView.bounds
+        bottomVatomView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         
     }
     

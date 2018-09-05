@@ -38,7 +38,7 @@ internal final class DefaultLoadingView: UIView, FaceViewLoader {
         self.addSubview(activityIndicator)
         activityIndicator.frame = self.bounds
         activityIndicator.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        self.backgroundColor = UIColor.orange.withAlphaComponent(0.5)
+//        self.backgroundColor = UIColor.orange.withAlphaComponent(0.5)
     }
 
     required init?(coder aDecoder: NSCoder) {

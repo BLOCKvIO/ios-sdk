@@ -116,7 +116,7 @@ public class VatomView: UIView {
     /// Creates a vAtom view for the specifed vAtom.
     ///
     /// - Parameters:
-    ///   - vatomPack: The vAtom to display and its associated faces and actions.
+    ///   - vatom: The vAtom to display (with its associated faces and actions).
     ///   - faces: The array of faces associated with the vAtom's template.
     ///   - actions: The array of actions associated with the vAtom's template.
     ///   - procedure: An face selection procedure (FSP) that determines which face to
@@ -141,9 +141,7 @@ public class VatomView: UIView {
 
         super.init(coder: aDecoder)
 
-        // caller must set vatom pack
-        // caller must set procedure
-        // caller must set face view roster
+        // caller must set vatom model
 
         commonInit()
     }

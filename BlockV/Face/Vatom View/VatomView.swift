@@ -72,7 +72,7 @@ public class VatomView: UIView {
 
     // MARK: - Properties
 
-    /// The vatom pack.
+    /// The vatom to display.
     public internal(set) var vatom: VatomModel?
 
     /// The face selection procedure.
@@ -99,14 +99,6 @@ public class VatomView: UIView {
     var loadingView: (UIView & FaceViewLoader)?
     var errorView: UIView?
 
-    // MARK: - Web Socket
-
-    /// A Boolean value that controls whether the receiver responds directly to Web socket updates.
-    ///
-    /// The recommended approach is to have vatom state managed by another type, e.g. inventory and propagrate changes
-    /// to VatomView via the update interface. The lessens the potential for 
-    var shouldLiveUpdate: Bool = false
-
     // TODO: Respond to the Web socket, pass events down to the face view, run FVLC.
 
     // MARK: - Initializer
@@ -117,8 +109,6 @@ public class VatomView: UIView {
     ///
     /// - Parameters:
     ///   - vatom: The vAtom to display (with its associated faces and actions).
-    ///   - faces: The array of faces associated with the vAtom's template.
-    ///   - actions: The array of actions associated with the vAtom's template.
     ///   - procedure: An face selection procedure (FSP) that determines which face to
     ///     display.
     public init(vatom: VatomModel,
@@ -160,16 +150,14 @@ public class VatomView: UIView {
     // MARK: - Methods
 
     /*
-     Both vatomPack and the procedure may be updated over the life of the vatom view.
+     Both vatom and the procedure may be updated over the life of the vatom view.
      This means if either is updated, the VVLC should run.
      
      Either update may (or may not) result in the selectedFaceModel changing. If it does a full FaceView replacement is
      needed.
      
-     If the vatomPack is updated, and the selectedFaceModel remains the same, then updates may (or may not) need to be
+     If the vatom is updated, and the selectedFaceModel remains the same, then updates may (or may not) need to be
      passed down to the currently selected face view.
-     
-     How sould consumer set the vatomPack and procedure? Via one function?
      
      */
 
@@ -183,7 +171,7 @@ public class VatomView: UIView {
 
     }
 
-    /// Exectues the Vatom View Lifecycle (VVLC) on the current vAtom pack.
+    /// Exectues the Vatom View Lifecycle (VVLC) on the current vAtom.
     ///
     /// Called
     ///
@@ -217,7 +205,7 @@ public class VatomView: UIView {
             printBV(info: "Face model unchanged - Updating face view.")
 
             /*
-             Although the selected face model has not changed, other items in the vatom pack may have, these updates
+             Although the selected face model has not changed, other items in the vatom may have, these updates
              must be passed to the face view to give it a change to update its state.
              
              The VVLC should not be re-run (since the selected face view does not need replacing).
@@ -227,7 +215,7 @@ public class VatomView: UIView {
             // update currently selected face view (without replacement)
             self.selectedFaceView?.vatomUpdated(vatom)
 
-            //FXIME: How does the face view find out what has changed? Maybe the vatomPack must have a 'diff' property?
+            //FXIME: How does the face view find out what has changed? Maybe the vatom must have a 'diff' property?
 
         } else {
 

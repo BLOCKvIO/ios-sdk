@@ -112,18 +112,12 @@ class ImageFaceView: FaceView {
 
     // MARK: - Face View Lifecycle
 
-    private var _timer: Timer?
-
     /// Begin loading the face view's content.
     func load(completion: @escaping (Error?) -> Void) {
         print(#function)
 
-        // artificially wait so we can test the loader.
-        self._timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false) { _ in
-
-            // ugly completion handlers
-            self.doResourceStuff(completion: completion)
-        }
+        // download resources, fire completion when done
+        self.doResourceStuff(completion: completion)
 
     }
 
@@ -136,8 +130,9 @@ class ImageFaceView: FaceView {
 
         /*
          NOTE:
-         The ImageFaceView does not need to respond to vAtom updates. All the properties this face uses are immutable
-         once the vAtom has been emmited. Thus, no meaningful UI update can be made.
+         The ImageFaceView does not need to respond to vAtom updates.
+         All the properties this face uses are immutable once the vAtom has been emmited.
+         Thus, no meaningful UI update can be made.
          */
     }
 

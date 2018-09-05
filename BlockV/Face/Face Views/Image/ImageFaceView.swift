@@ -38,7 +38,8 @@ class ImageFaceView: FaceView {
         animatedImageView.frame = self.bounds
         animatedImageView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
 
-        try? self.extractConfig()
+        // extract config
+        self.extractConfig()
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -63,7 +64,7 @@ class ImageFaceView: FaceView {
     private var config = Config(scale: nil, imageName: "ActivatedImage")
 
     /// Extracts the face view's configuration.
-    private func extractConfig() throws {
+    private func extractConfig() {
         // extract scale
         if let scaleString = self.faceModel.properties.config?["scale"]?.stringValue {
             config.scale = Config.Scale(rawValue: scaleString)!
@@ -180,7 +181,7 @@ extension UIImageView {
                     completion?(error)
                     return
             }
-            
+
             DispatchQueue.main.async {
                 self.image = image
                 completion?(nil)

@@ -53,15 +53,18 @@ public class VatomView: UIView {
             case .loading:
                 self.selectedFaceView?.alpha = 0.000001
                 self.loadingView?.isHidden = false
+                self.loadingView?.startAnimating()
                 self.errorView?.isHidden = true
             case .error:
                 self.selectedFaceView?.alpha = 0.000001
                 self.loadingView?.isHidden = true
+                self.loadingView?.stopAnimating()
                 self.errorView?.isHidden = false
 
             case .completed:
                 self.selectedFaceView?.alpha = 1
                 self.loadingView?.isHidden = true
+                self.loadingView?.stopAnimating()
                 self.errorView?.isHidden = true
             }
         }
@@ -93,7 +96,7 @@ public class VatomView: UIView {
 
     //FIXME: How is the consumer going to set the loading and error views?
 
-    var loadingView: UIView?
+    var loadingView: (UIView & FaceViewLoader)?
     var errorView: UIView?
 
     // MARK: - Web Socket

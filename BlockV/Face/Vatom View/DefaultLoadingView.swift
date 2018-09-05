@@ -23,16 +23,16 @@ protocol FaceViewLoader where Self: UIView {
 
 /// Default loading view.
 internal final class DefaultLoadingView: UIView, FaceViewLoader {
-    
+
     // MARK: - Properties
-    
+
     private let activityIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(activityIndicatorStyle: .gray)
         return indicator
     }()
-    
+
     // MARK: - Init
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.addSubview(activityIndicator)
@@ -40,19 +40,19 @@ internal final class DefaultLoadingView: UIView, FaceViewLoader {
         activityIndicator.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         //        self.backgroundColor = UIColor.orange.withAlphaComponent(0.5)
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     // MARK: - FaceViewLoader
-    
+
     func startAnimating() {
         activityIndicator.startAnimating()
     }
-    
+
     func stopAnimating() {
         activityIndicator.stopAnimating()
     }
-    
+
 }

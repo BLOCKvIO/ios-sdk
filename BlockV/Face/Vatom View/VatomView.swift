@@ -94,12 +94,18 @@ public class VatomView: UIView {
     /// Selected face view (function of the selected face model).
     public private(set) var selectedFaceView: FaceView? //(UIView & FaceView)?
 
-    //FIXME: How is the consumer going to set the loading and error views?
+    // MARK: Customization
 
     var loadingView: (UIView & FaceViewLoader)?
     var errorView: UIView?
 
     // MARK: - Web Socket
+
+    /// A Boolean value that controls whether the receiver responds directly to Web socket updates.
+    ///
+    /// The recommended approach is to have vatom state managed by another type, e.g. inventory and propagrate changes
+    /// to VatomView via the update interface. The lessens the potential for 
+    var shouldLiveUpdate: Bool = false
 
     // TODO: Respond to the Web socket, pass events down to the face view, run FVLC.
 
@@ -116,12 +122,11 @@ public class VatomView: UIView {
     ///   - procedure: An face selection procedure (FSP) that determines which face to
     ///     display.
     public init(vatom: VatomModel,
-                procedure: @escaping FaceSelectionProcedure = EmbeddedProcedure.icon.procedure,
-                roster: FaceViewRoster = FaceViewRegistry.shared.roster) {
+                procedure: @escaping FaceSelectionProcedure = EmbeddedProcedure.icon.procedure) {
 
         self.vatom = vatom
         self.procedure = procedure
-        self.roster = roster
+        self.roster = FaceViewRegistry.shared.roster
 
         super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
 

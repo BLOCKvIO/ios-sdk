@@ -11,11 +11,25 @@
 
 import Foundation
 
+/// Type that manage vAtom should conform to this delegate to know when the face has completed loading.
+///
+/// This is usefull when you only want to show a vatomview once it's completed loading.
+protocol VatomViewLifecycleDelegte {
+
+    /// Called when the vatom view's selected face view has loaded successful of with an error.
+    func faceViewDidLoad(error: Error?)
+
+    /*
+     Additionally, the host would probably want to know more about the lifecycle of the vatom view.
+     */
+
+}
+
 /*
  Goals:
  1. Vatom View will ask for the best face (default routine for each view context).
- 2. Viewer's must be able to use pre-defined procedures.
- 3. Viewer's must be able supply a custom face selection procedure.
+ 2. Viewers must be able to use pre-defined procedures.
+ 3. Viewers must be able supply a custom face selection procedure.
  
  - Always defaults to the icon embedded FSP.
  - Always defaults to use the shared FaceRegistry roster.
@@ -143,9 +157,38 @@ public class VatomView: UIView {
         loadingView!.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         self.addSubview(loadingView!)
 
-        self.errorView = UIView() // or custom
+        self.errorView = DefaultErrorView(frame: self.bounds)
+        errorView!.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+        self.addSubview(errorView!)
+        self.state = .loading
 
     }
+    
+    // MARK: - Vatom View State Management
+    
+    /*
+     Goals:
+     - Viewers may want to manage the computation going on in a vatom view.
+     these are messages FROM the host
+     1. VVLC starts after calling start (not init).
+     2. VVLC can be cancelled (to stop expensive resource downloading for example).
+     */
+    
+    /// Starts the vatom view process (VVLC)
+    func startLoad() {
+        
+    }
+    
+    /// Host may want to inform the face view to cancel loading. For example, cancel loading large resources etc.
+    ///
+    /// This is helpful in talbe view
+    func cancelLoad() {
+        
+    }
+    
+    // part of this is the face view delegate (which send a message TO the host).
+    
+    // completed
 
     // MARK: - Methods
 
@@ -161,19 +204,27 @@ public class VatomView: UIView {
      
      */
 
-    public func update(usingVatom vatom: VatomModel,
+    public func update(usingVatom newVatom: VatomModel,
                        procedure: FaceSelectionProcedure? = nil) {
 
-        self.vatom = vatom
+        // check for a vatom change
+        if self.vatom?.id != newVatom.id {
+            self.state = .loading
+        }
+
+        self.vatom = newVatom
         procedure.flatMap { self.procedure = $0 } // assign if not nil
 
         runVatomViewLifecylce()
 
     }
 
+    /*
+     Suggestion: Rename VVLC to Vatom View Routine (VVR)
+     The lifecycle becomes the start, cancel, completed events.
+     */
+    
     /// Exectues the Vatom View Lifecycle (VVLC) on the current vAtom.
-    ///
-    /// Called
     ///
     /// 1. Run face selection procedure
     /// > Compare the selected face to the current face

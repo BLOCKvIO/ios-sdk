@@ -29,6 +29,21 @@
 import UIKit
 import BLOCKv
 
+/*
+ Alternative to VatomView
+ 
+ VatomView has a number of consequences when using it within a list object, e.g. uicollectionview controller.
+ VatomView itself does not provide a good way of being *reused* (by a reuse pool).
+ 
+ A (possibly) better soltion is to create a cell subclass for each face view.
+ 
+ Pros:
+ - This way each subclass can get a reuse identifier.
+ Cons:
+ - The viewer has to manage the face views directly.
+ 
+ */
+
 /// This view controller demonstrates how to fetch the current user's inventory.
 ///
 /// This example only shows the Activated Image of each vAtom. In future releases
@@ -212,7 +227,7 @@ class InventoryCollectionViewController: UICollectionViewController {
             self?.vatoms = vatomModels.sorted { $0.whenModified > $1.whenModified }
             
             // begin download
-            self?.dowloadActivatedImages()
+            //self?.dowloadActivatedImages()
             
         }
         
@@ -341,18 +356,25 @@ extension InventoryCollectionViewController {
         
         cell.backgroundColor = UIColor.gray.withAlphaComponent(0.1)
         
-        // get vatom id
-        let vatomID = filteredVatoms[indexPath.row].id
-        
-        // set the cell's vatom
-        cell.vatom = filteredVatoms[indexPath.row]
+        // replace cell's vatom
+        let vatom = filteredVatoms[indexPath.row]
+        cell.vatom = vatom
+        cell.vatomView.update(usingVatom: vatom)
 
-        // find image data
-        if let imageData = activatedImages[vatomID] {
-            cell.contentView.alpha = 0.2
-            cell.activatedImageView.image = UIImage.init(data: imageData)
-            cell.contentView.alphaIn()
-        }
+//        // defer vatom view routine execution until after scolling ends
+//        if (self.collectionView?.isDragging == false) && (self.collectionView?.isDecelerating == false) {
+//            cell.vatomView.update(usingVatom: vatom)
+//        }
+        
+//        // get vatom id
+//        let vatomID = filteredVatoms[indexPath.row].id
+//
+//        // find image data
+//        if let imageData = activatedImages[vatomID] {
+//            cell.contentView.alpha = 0.2
+//            cell.activatedImageView.image = UIImage.init(data: imageData)
+//            cell.contentView.alphaIn()
+//        }
         
         return cell
     }
@@ -369,6 +391,29 @@ extension InventoryCollectionViewController {
         
     }
 
+}
+
+extension InventoryCollectionViewController: UITableViewDataSourcePrefetching {
+    
+    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
+        /*
+         The goal here is to prefetch heavy resources.
+         We know the vatom that will be displayed, but we don't know the face that will be selected.
+         
+         We could try and download all the resources associated with the vatom, but that is wastefull.
+         
+         Best case, we find out at this point what resources are required (which means knowing the result of the
+         fsp), and then downloading the resources.
+         
+         The only common way to do this is to inspect the face model's resource array.
+         */
+        
+    }
+    
+    func tableView(_ tableView: UITableView, cancelPrefetchingForRowsAt indexPaths: [IndexPath]) {
+        //TODO:
+    }
+    
 }
 
 extension InventoryCollectionViewController: UICollectionViewDelegateFlowLayout {

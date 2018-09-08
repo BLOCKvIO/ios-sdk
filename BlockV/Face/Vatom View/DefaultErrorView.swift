@@ -18,7 +18,7 @@ internal final class DefaultErrorView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
 
-        self.backgroundColor = .red
+        self.backgroundColor = UIColor.red.withAlphaComponent(0.5)
     }
 
     required init?(coder aDecoder: NSCoder) {

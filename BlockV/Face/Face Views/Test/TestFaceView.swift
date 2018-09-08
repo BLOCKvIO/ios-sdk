@@ -62,12 +62,12 @@ class TestFaceView: FaceView, FaceModuleNibLoadable {
 
     // MARK: - Face View Lifecycle
 
-    var timer: Timer?
+    private var timer: Timer?
 
     func load(completion: @escaping (Error?) -> Void) {
         print(#function)
 
-        self.timer = Timer(timeInterval: 3, repeats: false) { (_) in
+        self.timer = Timer(timeInterval: 2, repeats: false) { (_) in
             completion(nil)
         }
 
@@ -80,6 +80,10 @@ class TestFaceView: FaceView, FaceModuleNibLoadable {
     }
 
     func unload() {
+        print(#function)
+    }
+
+    func prepareForReuse() {
         print(#function)
     }
 

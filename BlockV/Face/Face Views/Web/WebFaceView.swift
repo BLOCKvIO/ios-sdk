@@ -20,7 +20,7 @@ enum WebInterface: String {
 ///
 /// Displays a web face
 class WebFaceView: FaceView {
-    
+
     /*
      Goals:
      
@@ -42,19 +42,23 @@ class WebFaceView: FaceView {
      must be forwarded to the viewer, e.g. Open scanner.
      
      */
-    
+
     class var displayURL: String { return "http://*" }
-    
+
     func load(completion: @escaping (Error?) -> Void) {
         //
     }
-    
+
     func vatomUpdated(_ vatom: VatomModel) {
         //
     }
-    
+
     func unload() {
         //
+    }
+
+    func prepareForReuse() {
+        print(#function)
     }
 
 }

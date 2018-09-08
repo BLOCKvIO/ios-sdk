@@ -38,8 +38,8 @@ class EngagedVatomViewController: UIViewController {
         }
     }
     
-    var topFSP: FaceSelectionProcedure    = EmbeddedProcedure.card.procedure
-    var middleFSP: FaceSelectionProcedure = EmbeddedProcedure.card.procedure
+    var topFSP: FaceSelectionProcedure    = EmbeddedProcedure.icon.procedure
+    var middleFSP: FaceSelectionProcedure = EmbeddedProcedure.icon.procedure
     var bottomFSP: FaceSelectionProcedure = EmbeddedProcedure.card.procedure
     
     // MARK: - Lifecycle

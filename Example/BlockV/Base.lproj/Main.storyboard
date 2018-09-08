@@ -315,19 +315,20 @@
                                     <rect key="frame" x="0.0" y="0.0" width="130" height="130"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="grR-hz-WKP">
+                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jqg-xd-Muu" customClass="VatomView" customModule="BLOCKv">
                                             <rect key="frame" x="0.0" y="0.0" width="130" height="130"/>
-                                        </imageView>
+                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </view>
                                     </subviews>
                                 </view>
                                 <constraints>
-                                    <constraint firstItem="grR-hz-WKP" firstAttribute="top" secondItem="1BS-1M-1Es" secondAttribute="top" id="gJu-7I-JEl"/>
-                                    <constraint firstItem="grR-hz-WKP" firstAttribute="leading" secondItem="1BS-1M-1Es" secondAttribute="leading" id="rXP-Ef-dr6"/>
-                                    <constraint firstAttribute="trailing" secondItem="grR-hz-WKP" secondAttribute="trailing" id="x9D-Tp-x3d"/>
-                                    <constraint firstAttribute="bottom" secondItem="grR-hz-WKP" secondAttribute="bottom" id="xC0-fA-W68"/>
+                                    <constraint firstAttribute="trailing" secondItem="jqg-xd-Muu" secondAttribute="trailing" id="2Gk-bz-eLX"/>
+                                    <constraint firstItem="jqg-xd-Muu" firstAttribute="leading" secondItem="1BS-1M-1Es" secondAttribute="leading" id="pv3-Z3-b5g"/>
+                                    <constraint firstItem="jqg-xd-Muu" firstAttribute="top" secondItem="1BS-1M-1Es" secondAttribute="top" id="u5v-n9-TE2"/>
+                                    <constraint firstAttribute="bottom" secondItem="jqg-xd-Muu" secondAttribute="bottom" id="wWY-at-kk6"/>
                                 </constraints>
                                 <connections>
-                                    <outlet property="activatedImageView" destination="grR-hz-WKP" id="CLc-zB-yvw"/>
+                                    <outlet property="vatomView" destination="jqg-xd-Muu" id="Ihk-Zi-9Ru"/>
                                     <segue destination="1PY-y9-icg" kind="presentation" identifier="seg.vatom.faceviews" id="CyV-eb-bXr"/>
                                 </connections>
                             </collectionViewCell>

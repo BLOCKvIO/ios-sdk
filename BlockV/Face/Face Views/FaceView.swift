@@ -41,15 +41,19 @@ public protocol FaceViewInterface: class {
     /// Called
     func unload()
 
+    /// Optional method informs the face view to prepare to be reused.
+    /// 
+    func prepareForReuse()
+
 }
 
 open class BaseFaceView: UIView {
 
     /// Vatom for display.
-    public var vatom: VatomModel
+    public internal(set) var vatom: VatomModel
 
     /// Selected face model.
-    public var faceModel: FaceModel
+    public internal(set) var faceModel: FaceModel
 
     /// Initializes a BaseFaceView.
     public required init(vatom: VatomModel, faceModel: FaceModel) {

@@ -11,6 +11,48 @@
 
 import Foundation
 
+/*
+ 
+ Issues
+ 
+ If Face Views perform their own downloading of resources it leads to an interesting issue around async + reuse.
+ 
+ - Consider a long running download.
+ 1. Cell comes on screen, Vatom View runs it's routine, selects a face model
+    init's the face view and asks it to load. May show error, or loader.
+ - If the cell is on screen still, and the download completes it will set the imageView's image property (because it
+   has a reference to it.
+ - If the download is ongoing and the cell has gone off screen it may have been placed in reuse pool.
+ 
+ Now, it all depends on the implementation as to how this is handled.
+ - If the cell a reused by not nil-ing vatom view, then the
+ 
+ ###
+ 
+ When VatomView come out a the reuse pool, it's selected face view is most likely going to change. This means there
+ will be a flicker on the screen while the VVR runs followed by the face view loading it's content.
+ 
+ Is there any way to get around this? Maybe better caching?
+ 
+ -----------------------
+ 
+ Use Cases
+ 
+ 1. Stand alone
+    - must handle everything
+ 2. Reusable cell in a list
+    -
+ 
+ Using VatomView within a cell that is to be reused.
+ 
+ This is a common use case for devs that want to integrate vatoms into a table list interface in their own apps.
+ 
+ Options:
+ 1. nil out vAtom view (how will this work in storyboards)
+ 2. add a `prepareForReuse()` method to VatomView, vatom view will then propagate the change to it's selected face view.
+ 
+ */
+
 /// Type that manage vAtom should conform to this delegate to know when the face has completed loading.
 ///
 /// This is usefull when you only want to show a vatomview once it's completed loading.
@@ -70,7 +112,7 @@ public class VatomView: UIView {
                 self.loadingView?.startAnimating()
                 self.errorView?.isHidden = true
             case .error:
-                self.selectedFaceView?.alpha = 0.000001
+                self.selectedFaceView?.removeFromSuperview()
                 self.loadingView?.isHidden = true
                 self.loadingView?.stopAnimating()
                 self.errorView?.isHidden = false
@@ -87,7 +129,7 @@ public class VatomView: UIView {
     // MARK: - Properties
 
     /// The vatom to display.
-    public internal(set) var vatom: VatomModel?
+    public private(set) var vatom: VatomModel?
 
     /// The face selection procedure.
     ///
@@ -95,12 +137,12 @@ public class VatomView: UIView {
     ///
     /// For example, the viewer may change the procedure from 'icon' to 'engaged' while the VatomView is
     /// on screen.
-    public internal(set) var procedure: FaceSelectionProcedure
+    public private(set) var procedure: FaceSelectionProcedure
 
     /// List of all the installed face views.
     ///
     /// The roster is a consolidated list of the face views registered by both the SDK and Viewer.
-    public internal(set) var roster: FaceViewRoster
+    public private(set) var roster: FaceViewRoster
 
     /// Face model selected by the specifed face selection procedure (FSP).
     public private(set) var selectedFaceModel: FaceModel?
@@ -163,9 +205,9 @@ public class VatomView: UIView {
         self.state = .loading
 
     }
-    
+
     // MARK: - Vatom View State Management
-    
+
     /*
      Goals:
      - Viewers may want to manage the computation going on in a vatom view.
@@ -173,21 +215,32 @@ public class VatomView: UIView {
      1. VVLC starts after calling start (not init).
      2. VVLC can be cancelled (to stop expensive resource downloading for example).
      */
-    
+
     /// Starts the vatom view process (VVLC)
     func startLoad() {
-        
+        print(#function)
     }
-    
+
     /// Host may want to inform the face view to cancel loading. For example, cancel loading large resources etc.
     ///
     /// This is helpful in talbe view
     func cancelLoad() {
-        
+        print(#function)
     }
-    
+
+    ///
+    public func prepareForReuse() {
+        /*
+         I expect for this to stop the async-reuse-pool issue. But will cause flickering.
+         */
+        self.selectedFaceView?.removeFromSuperview()
+        self.selectedFaceView = nil
+//        self.selectedFaceModel = nil
+        self.selectedFaceView?.prepareForReuse()
+    }
+
     // part of this is the face view delegate (which send a message TO the host).
-    
+
     // completed
 
     // MARK: - Methods
@@ -223,7 +276,7 @@ public class VatomView: UIView {
      Suggestion: Rename VVLC to Vatom View Routine (VVR)
      The lifecycle becomes the start, cancel, completed events.
      */
-    
+
     /// Exectues the Vatom View Lifecycle (VVLC) on the current vAtom.
     ///
     /// 1. Run face selection procedure
@@ -249,6 +302,11 @@ public class VatomView: UIView {
         }
 
         printBV(info: "Face Selection Procedure (FSP) selected face model: \(selectedFaceModel)")
+
+        /*
+         check if selected face model has changed (rare cases where the face config was updated while the vatom is in
+         the unpublished state.
+         */
 
         // 2. check if the face model has not changed
         if selectedFaceModel == self.selectedFaceModel {
@@ -293,7 +351,7 @@ public class VatomView: UIView {
             let selectedFaceView: FaceView = faceViewType.init(vatom: vatom,
                                                                faceModel: selectedFaceModel)
 
-            // relace currently selected face view with newly selected
+            // replace currently selected face view with newly selected
             self.replaceFaceView(with: selectedFaceView)
 
         }
@@ -305,14 +363,19 @@ public class VatomView: UIView {
     /// Call this function only if you want a full replace of the current face view.
     ///
     /// Triggers the Face View Life Cycle (VVLC)
-    func replaceFaceView(with newFaceView: (FaceView)) {
+    private func replaceFaceView(with newFaceView: (FaceView)) {
 
         /*
          Options: This function could take in a FaceView instance, or take in a FaceView.Type and create the instance
          itself (using the generator)?
          */
 
+        // Update current state
         self.state = .loading
+
+        // remove before setting to nil
+        self.selectedFaceView?.removeFromSuperview()
+        self.selectedFaceView = nil
 
         // update currently selected face view
         self.selectedFaceView = newFaceView

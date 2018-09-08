@@ -34,15 +34,32 @@ class VatomCell: UICollectionViewCell {
     
     // MARK: - Outlets
     
-    @IBOutlet weak var activatedImageView: UIImageView!
+    @IBOutlet weak var vatomView: VatomView!
     
     // MARK: - Lifecycle
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        print(#function)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        
+        print(#function)
+        
+    }
     
     override func prepareForReuse() {
         super.prepareForReuse()
         
+        /*
+         At this point, nothing has been *set* for the new cell. The properties are still of the cell's old data model.
+         */
+        
         // reset
-        self.activatedImageView.image = nil
+        self.vatomView.prepareForReuse()
         
     }
     

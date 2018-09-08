@@ -36,6 +36,7 @@ public class FaceViewRegistry {
         let registry = FaceViewRegistry()
         // embedded
         registry.register(ImageFaceView.self)
+        registry.register(ProgressImageFaceView.self)
         // testing
         registry.register(TestFaceView.self)
         registry.register(SubclassTestFaceView.self)

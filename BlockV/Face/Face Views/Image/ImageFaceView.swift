@@ -11,11 +11,14 @@
 
 import UIKit
 import FLAnimatedImage
+// - Experimenting
+import AlamofireImage
+import Nuke
+
+let imageCache = AutoPurgingImageCache()
 
 /// Native Image face view
 class ImageFaceView: FaceView {
-
-    // MARK: - Face View Protocol
 
     class var displayURL: String { return "native://image" }
 
@@ -49,11 +52,13 @@ class ImageFaceView: FaceView {
 
     /// Face model face configuration specification.
     private struct Config {
+
         enum Scale: String {
             case fit, fill
         }
         var scale: Scale?
         var imageName: String
+
     }
 
     /// Face configuration (initialized with default values).
@@ -146,6 +151,11 @@ class ImageFaceView: FaceView {
         print(#function)
     }
 
+    func prepareForReuse() {
+        print(#function)
+        self.animatedImageView.image = nil
+    }
+
 }
 
 // MARK: - TEMPORARY
@@ -158,7 +168,46 @@ extension ImageFaceView {
 
         if let resourceModel = vatom.resources.first(where: { $0.name == config.imageName }) {
             if let url = try? BLOCKv.encodeURL(resourceModel.url) {
-                self.animatedImageView.downloaded(from: url, completion: completion)
+
+                /*
+                 Issues:
+                 1. No cache control headers
+                 2. Resouce urls must be encoded, this has the unfortunate effect of the url changing every so often,
+                 which is a issue for caching.
+                 3. Encoding the url is async, this means the loading images into views has some latency, this is not
+                 good for visual responsiveness.
+                 
+                 TODO:
+                 1. Cache using the unencoded url (to prevent the jwt from confusing the cache)
+                 2. Expand cache to include data for 3d files.
+                */
+
+                // A - Simple extension
+
+                //self.animatedImageView.downloaded(from: url, completion: completion)
+
+                // B - Alamofire (which is using URLCache by default) - is this enough?,
+                // are the server's cache headers good enough?
+
+//                self.animatedImageView.af_setImage(withURL: url) { (_) in
+//                    completion(nil)
+//                }
+
+                // create a scale filter
+                //                let cgSize = CGSize(width: 300, height: 300)
+                //                let sizeFilter = ScaledToSizeFilter(size: cgSize)
+                //
+                //                self.animatedImageView.af_setImage(withURL: url,
+                //                                                   filter: sizeFilter) { _ in
+                //                                                    completion(nil)
+                //                }
+                //
+
+                // C - Nuke
+                Nuke.loadImage(with: url, into: self.animatedImageView) { (_, _) in
+                    completion(nil)
+                }
+
             }
         }
 

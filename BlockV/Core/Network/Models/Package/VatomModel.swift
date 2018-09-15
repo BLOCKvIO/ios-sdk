@@ -29,7 +29,7 @@ public struct VatomModel: Equatable {
     /// Private properties.
     ///
     /// - note: Private properties are mutable by reactors.
-    public var privateProps: JSON?
+    public var `private`: JSON?
 
     /// Array of face models associated with this vAtom's template.
     ///
@@ -47,7 +47,7 @@ public struct VatomModel: Equatable {
         case whenCreated       = "when_created"
         case whenModified      = "when_modified"
         case props             = "vAtom::vAtomType"
-        case privateProps      = "private"
+        case `private`         = "private"
         case faceModels        = "faceModels"
         case actionModels      = "actionModels"
     }
@@ -65,7 +65,7 @@ extension VatomModel: Decodable {
         whenCreated       = try items.decode(Date.self, forKey: .whenCreated)
         whenModified      = try items.decode(Date.self, forKey: .whenModified)
         props             = try items.decode(RootProperties.self, forKey: .props)
-        privateProps      = try items.decodeIfPresent(JSON.self, forKey: .privateProps)
+        `private`         = try items.decodeIfPresent(JSON.self, forKey: .private)
         faceModels        = try items.decodeIfPresent([FaceModel].self, forKey: .faceModels) ?? []
         actionModels      = try items.decodeIfPresent([ActionModel].self, forKey: .actionModels) ?? []
     }

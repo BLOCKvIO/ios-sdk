@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Signals
 
 /// This subclass of `VatomView`
 ///
@@ -13,11 +14,11 @@ import Foundation
 /// This subclass should be used when a vAtom is presented in a standalone context. It should not be used with a list
 /// such as a UICollectionViewCell.
 ///
-/// Responds to the web socket and propagates the events t
+/// Responds to the web socket and propagates the events through to the face view.
 public class LiveVatomView: VatomView {
 
     // MARK: - Properties
-
+    
     // MARK: - Initialization
 
     /// Initializes with a `VatomModel` and a `FaceSelectionProcedure`.
@@ -25,7 +26,6 @@ public class LiveVatomView: VatomView {
         super.init(vatom: vatom, procedure: procedure)
 
         commonInit()
-
     }
 
     /// Initializes with a `NSCoder`.
@@ -48,28 +48,40 @@ public class LiveVatomView: VatomView {
         }
 
     }
+    
+    deinit {
+        
+        // TODO: Remove signal (if necessary)?
+        
+    }
 
     // MARK: - Web socket
 
+    /*
+     FXIME:
+     There is a point about efficiency here.
+     
+     1. `WebSocketManager` is receiving data, converting it to text.
+     2. `WebSocketManager` then converts the text to data, the data into a `WSStateUpdateEvent` (which init the generic
+     json).
+     3. Here in the update method, we then extract properties out of the `WSStateUpdateEvent`'s generic JSON to update
+     the properties.
+     
+     A more efficient solution would be to init a VatomProperties object from raw, and update the properties of the
+     VatomModel. This would save generic json piece; this would also allow common bits of init(decode) for VatomModel.
+     */
     func handleStateUpdate(vatomStateEvent: WSStateUpdateEvent) {
 
         print("\nViewer > State Update Event: \n\(vatomStateEvent)")
 
-        /*
-         Typically you would perfrom a localized update using the info inside of the event.
-         Refreshing the inventory off the back of the Web socket event is inefficient.
-         */
+        // create a copy with which to mutate
+        guard var vatomCopy = self.vatom else { return }
 
-        // example of extracting some bool value
-        if let isDropped = vatomStateEvent.vatomProperties["vAtom::vAtomType"]?["dropped"]?.boolValue {
-            print("\nViewer > State Update - isDropped \(isDropped)")
-        }
+        // perform a localized update of the vatom
+        vatomCopy.updateWithStateUpdate(vatomStateEvent)
 
-        // example of extracting array of float values
-        if let coordinates = vatomStateEvent.vatomProperties["vAtom::vAtomType"]?["geo_pos"]?["coordinates"]?
-            .arrayValue?.compactMap({ $0.floatValue }) {
-            print("\nViewer > State Update - vAtom coordinates: \(coordinates)")
-        }
+        // ask vAtom view to update it self with the
+        self.update(usingVatom: vatomCopy)
 
     }
 

@@ -784,7 +784,7 @@
                                             <constraint firstAttribute="height" constant="464" id="HB8-D5-Oaa"/>
                                         </constraints>
                                     </view>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pd0-Fd-93d" customClass="VatomView" customModule="BLOCKv">
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pd0-Fd-93d" customClass="LiveVatomView" customModule="BLOCKv">
                                         <rect key="frame" x="37" y="320" width="301" height="160"/>
                                         <color key="backgroundColor" red="0.90980392160000001" green="0.91764705879999997" blue="0.91764705879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
@@ -835,14 +835,14 @@
                     <connections>
                         <outlet property="bottomContainerView" destination="NYV-fp-8BC" id="3hN-Qa-jqP"/>
                         <outlet property="descriptionLabel" destination="Q5f-KU-IYE" id="Qwt-5Y-TXp"/>
-                        <outlet property="middleVatomView" destination="pd0-Fd-93d" id="aRI-Ms-jsR"/>
+                        <outlet property="middleVatomView" destination="pd0-Fd-93d" id="Nhg-Ti-3fB"/>
                         <outlet property="titleLabel" destination="wnX-Ru-iqG" id="4Du-7b-QdE"/>
                         <outlet property="topVatomView" destination="dUp-u6-SGt" id="neL-lf-Y1k"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="OMH-NZ-VGj" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="6566" y="-466"/>
+            <point key="canvasLocation" x="6578" y="-466"/>
         </scene>
         <!--vAtom-->
         <scene sceneID="d13-os-Xy4">

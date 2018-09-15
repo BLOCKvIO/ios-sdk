@@ -11,6 +11,13 @@
 
 import Foundation
 
+/// FIXME: This operator has a drawback in that it always makes an assignment.
+infix operator ?=
+internal func ?=<T> (lhs: inout T, rhs: T?) {
+    lhs = rhs ?? lhs
+}
+
+/// Composite type that all face views must adopt.
 public typealias FaceView = BaseFaceView & FaceViewInterface
 
 /// The protocol that face views must conform to.
@@ -38,15 +45,25 @@ public protocol FaceViewInterface: class {
     /// E.g. A vAtom's root or private section are updated and the signal come down via the Web socket state update.
     func vatomUpdated(_ vatom: VatomModel)
 
-    /// Called
+    /// Called when the face view is no longer being displayed.
+    ///
+    /// The face view should perform a clean up operation, e.g. cancel all downloads, remove any listers, nil out any
+    /// reference and prepare for deallocation.
     func unload()
 
     /// Optional method informs the face view to prepare to be reused.
     /// 
     func prepareForReuse()
 
+    /// Array of resources uses by this face.
+    ///
+    /// Use this function when prefetching resources for a face view.
+    /// Extracts resources after the config section has been populated.
+    ///func resourcesForPrefetch() -> [URL]
+
 }
 
+/// Abstract class all face views must derive from.
 open class BaseFaceView: UIView {
 
     /// Vatom for display.

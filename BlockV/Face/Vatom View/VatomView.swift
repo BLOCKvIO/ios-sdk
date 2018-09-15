@@ -68,6 +68,9 @@ protocol VatomViewLifecycleDelegte {
 }
 
 /*
+ Main renderer.
+ 
+ 
  Goals:
  1. Vatom View will ask for the best face (default routine for each view context).
  2. Viewers must be able to use pre-defined procedures.

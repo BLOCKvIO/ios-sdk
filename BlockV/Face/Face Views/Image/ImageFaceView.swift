@@ -31,24 +31,7 @@ class ImageFaceView: FaceView {
         return imageView
     }()
 
-    // MARK: - Initialization
-
-    required init(vatom: VatomModel, faceModel: FaceModel) {
-        super.init(vatom: vatom, faceModel: faceModel)
-
-        // add image view
-        self.addSubview(animatedImageView)
-        animatedImageView.frame = self.bounds
-
-        // extract config
-        self.extractConfig()
-    }
-
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) should not be called on Face Views. Please use VatomView.")
-    }
-
-    // MARK: - Face Config
+    // MARK: - Config
 
     /// Face model face configuration specification.
     private struct Config {
@@ -56,27 +39,48 @@ class ImageFaceView: FaceView {
         enum Scale: String {
             case fit, fill
         }
-        var scale: Scale?
-        var imageName: String
+
+        // defaults
+        var scale: Scale = .fit
+        var imageName: String = "ActivatedImage"
+
+        /// Initialize using face configuration.
+        init(_ faceConfig: JSON?) {
+
+            guard let config = faceConfig else { return }
+
+            // assign iff not nil
+            if let scaleString = config["scale"]?.stringValue {
+                self.scale ?= Config.Scale(rawValue: scaleString)
+            }
+            self.imageName ?= config["name"]?.stringValue
+        
+        }
+    }
+
+    /// Face configuration (immutable).
+    ///
+    /// It is best practice to keep this property immutable. The config of the face should not change over the lifetime
+    /// of the face view.
+    private let config: Config
+
+    // MARK: - Initialization
+
+    required init(vatom: VatomModel, faceModel: FaceModel) {
+
+        // init face config
+        self.config = Config(faceModel.properties.config)
+
+        super.init(vatom: vatom, faceModel: faceModel)
+
+        // add image view
+        self.addSubview(animatedImageView)
+        animatedImageView.frame = self.bounds
 
     }
 
-    /// Face configuration (initialized with default values).
-    ///
-    /// - `scale`: defaults to `nil`.
-    /// - `imageName`: defaults to `"ActivatedImage"`
-    private var config = Config(scale: .fit, imageName: "ActivatedImage")
-
-    /// Extracts the face view's configuration.
-    private func extractConfig() {
-        // extract scale
-        if let scaleString = self.faceModel.properties.config?["scale"]?.stringValue {
-            config.scale = Config.Scale(rawValue: scaleString)!
-        }
-        // extract image name
-        if let imageNameString = self.faceModel.properties.config?["name"]?.stringValue {
-            config.imageName = imageNameString
-        }
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) should not be called on Face Views. Please use VatomView.")
     }
 
     // MARK: - View Lifecylce
@@ -87,21 +91,24 @@ class ImageFaceView: FaceView {
         updateContentMode()
     }
 
+    /// FIXME: This method is only necessary if the scale config will change after init. In GV, the content mode of the
+    /// image view changes based on bounds of the view - will this logic be needed?
+    ///
     /// Update the content mode of the image view.
     ///
     /// Inspects the face config first and uses the scale if available. If no face config is found, a simple heuristic
     /// is used to choose the best content mode.
     private func updateContentMode() {
 
-        guard animatedImageView.image != nil else { return }
+       // guard animatedImageView.image != nil else { return }
 
         // check face config
-        if let scale = config.scale {
-            switch scale {
+        switch config.scale {
             case .fill: animatedImageView.contentMode = .scaleAspectFill
             case .fit:  animatedImageView.contentMode = .scaleAspectFit
-            }
         }
+
+        //FXIME: Is this still needed?
 
 //        // no face config supplied (try and do the right thing)
 //        else if self.faceModel.properties.constraints.viewMode == "card" {
@@ -168,7 +175,9 @@ extension ImageFaceView {
 
         if let resourceModel = vatom.resources.first(where: { $0.name == config.imageName }) {
             if let url = try? BLOCKv.encodeURL(resourceModel.url) {
-
+                
+                // onUnload() { task.cancel }
+        
                 /*
                  Issues:
                  1. No cache control headers
@@ -216,6 +225,8 @@ extension ImageFaceView {
 }
 
 extension UIImageView {
+    
+    ///
     func downloaded(from url: URL,
                     contentMode mode: UIViewContentMode = .scaleAspectFit,
                     completion: ((Error?) -> Void)? = nil) {
@@ -238,6 +249,8 @@ extension UIImageView {
             }
             }.resume()
     }
+    
+    ///
     func downloaded(from link: String, contentMode mode: UIViewContentMode = .scaleAspectFit) {
         guard let url = URL(string: link) else { return }
         downloaded(from: url, contentMode: mode, completion: nil)

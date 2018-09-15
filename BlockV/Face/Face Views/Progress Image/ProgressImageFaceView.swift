@@ -12,12 +12,6 @@
 import Foundation
 import FLAnimatedImage
 
-/// FIXME: This operator has a drawback in that it always makes an assignment.
-infix operator ?=
-internal func ?=<T> (lhs: inout T, rhs: T?) {
-    lhs = rhs ?? lhs
-}
-
 class ProgressImageFaceView: FaceView {
 
     // computed class var allows subclasses to override
@@ -87,25 +81,31 @@ class ProgressImageFaceView: FaceView {
         var paddingStart: Double = 0
         var showPercentage: Bool = false
 
-        init() {}
-
-        init(_ faceConfig: JSON) {
+        /// Initialize using face configuration.
+        init(_ faceConfig: JSON?) {
+            
+            guard let config = faceConfig else { return }
+            
             // assign iff not nil
-            self.emptyImageName ?= faceConfig["empty_image"]?.stringValue
-            self.fullImageName ?= faceConfig["full_image"]?.stringValue
-            self.direction ?= faceConfig["direction"]?.stringValue
+            self.emptyImageName ?= config["empty_image"]?.stringValue
+            self.fullImageName ?= config["full_image"]?.stringValue
+            self.direction ?= config["direction"]?.stringValue
             //FIXME: The spec must be changed to make padding values doubles
-            self.paddingEnd ?= Double(faceConfig["padding_end"]?.stringValue ?? "0")
-            self.paddingStart ?= Double(faceConfig["padding_start"]?.stringValue ?? "0")
-            self.showPercentage ?= faceConfig["show_percentage"]?.boolValue
+            self.paddingEnd ?= Double(config["padding_end"]?.stringValue ?? "0")
+            self.paddingStart ?= Double(config["padding_start"]?.stringValue ?? "0")
+            self.showPercentage ?= config["show_percentage"]?.boolValue
         }
 
     }
 
-    /// Face configuration.
+    /// Face configuration (immutable).
     ///
-    /// The configuraton is immutable. If the face config is updated during a template's *unpublished* phase, vatom
-    /// view should discard the face view and bring up a new one.
+    /// On the server, Faces and Actions are mutable (irrespective of the published state of the template). Face Views
+    /// however treat face config as immutable. If the face config changes (typically by the publisher deleting and
+    /// re-adding the face) the Face View should be torn down and recreated.
+    ///
+    /// Dynamically responding to face and action changes is not a function of Face Views. For this reason, the config
+    /// struct immutalbe and is ONLY populated on init.
     private let config: Config
 
     // MARK: - Initialization
@@ -113,13 +113,7 @@ class ProgressImageFaceView: FaceView {
     required init(vatom: VatomModel, faceModel: FaceModel) {
 
         // init face config
-        if let faceConfig = faceModel.properties.config {
-            // use specific config
-            self.config = Config(faceConfig)
-        } else {
-            // use default config
-            self.config = Config()
-        }
+        self.config = Config(faceModel.properties.config)
 
         super.init(vatom: vatom, faceModel: faceModel)
 
@@ -160,6 +154,7 @@ class ProgressImageFaceView: FaceView {
 
         // request layout
         self.setNeedsLayout()
+        self.layoutIfNeeded()
     }
 
     func unload() {

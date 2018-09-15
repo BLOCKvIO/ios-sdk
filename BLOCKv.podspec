@@ -33,7 +33,7 @@ Pod::Spec.new do |s|
         s.dependency 'FLAnimatedImage', '~> 1.0' # native://image
         s.dependency 'Nuke'
         s.resource_bundles = {
-            'FaceModule' => ['BlockV/Face/**/*.{xib}']
+            'FaceModule' => ['BlockV/Face/Face Views/**/*.{xib}']
         }
         #s.exclude_files = "**/Info*.plist"
     end

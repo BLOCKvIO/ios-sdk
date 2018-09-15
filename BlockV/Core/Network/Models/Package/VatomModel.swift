@@ -13,7 +13,7 @@ import Foundation
 public struct VatomModel: Equatable {
 
     // MARK: - Properties
-    
+
     // constants
     public let id: String
     public let version: String
@@ -21,7 +21,7 @@ public struct VatomModel: Equatable {
     // variables
     public var whenModified: Date
     public var isUnpublished: Bool
-    
+
     /// Template properties.
     ///
     /// - note: Some template properties are mutable by reactors.
@@ -30,7 +30,7 @@ public struct VatomModel: Equatable {
     ///
     /// - note: Private properties are mutable by reactors.
     public var privateProps: JSON?
-    
+
     /// Array of face models associated with this vAtom's template.
     ///
     /// - note: Subject to change over the life of the vAtom.
@@ -84,14 +84,14 @@ extension VatomModel: Hashable {
 // MARK: - Vatom Root Properties
 
 public struct RootProperties: Equatable {
-    
+
     // constants
     public let author: String
     public let rootType: String
     public let templateID: String
     public let templateVariationID: String
     public let publisherFqdn: String
-    
+
     // variables
     public var category: String
     public var childPolicy: [VatomChildPolicy]
@@ -109,19 +109,19 @@ public struct RootProperties: Equatable {
     public var title: String
     public var transferredBy: String
     public var visibility: Visibility
-    
+
     public var isAcquirable: Bool
     public var isRedeemable: Bool
     public var isDisabled: Bool
     public var isDropped: Bool
     public var isTradeable: Bool
     public var isTransferable: Bool
-    
+
     public var geoPosition: GeoPosition
     public var resources: [VatomResourceModel] // `var` only to allow for resource encoding
-    
+
     enum CodingKeys: String, CodingKey {
-        
+
         case author
         case category
         case childPolicy         = "child_policy"
@@ -143,10 +143,10 @@ public struct RootProperties: Equatable {
         case templateID          = "template"
         case templateVariationID = "template_variation"
         case title
-        
+
         case transferredBy       = "transferred_by"
         case visibility
-        
+
         case isAcquirable        = "acquirable"
         case isRedeemable        = "redeemable"
         case isDisabled          = "disabled"
@@ -154,16 +154,16 @@ public struct RootProperties: Equatable {
         case isTradeable         = "tradeable"
         case isTransferable      = "transferable"
     }
-    
+
     public struct Visibility: Codable, Equatable {
         public let type: String
         public let value: String
     }
-    
+
     public struct Commerce: Codable, Equatable {
         public let pricing: VatomPricing
     }
-    
+
     //TODO: Updgrade to full GeoJSON support.
     /// The geographic position of the vAtom.
     ///
@@ -176,12 +176,12 @@ public struct RootProperties: Equatable {
         /// Format: `[lon, lat]`
         public var coordinates: [Double]
     }
-    
+
 }
 
 //TODO: Add Encodable conformance too.
 extension RootProperties: Decodable {
-    
+
     public init(from decoder: Decoder) throws {
 
         let items = try decoder.container(keyedBy: CodingKeys.self)
@@ -213,19 +213,19 @@ extension RootProperties: Decodable {
         isTransferable      = try items.decode(Bool.self, forKey: .isTransferable)
         transferredBy       = try items.decode(String.self, forKey: .transferredBy)
         visibility          = try items.decode(Visibility.self, forKey: .visibility)
-        
+
         // keys are potentially absent from container
         tags                = try items.decodeIfPresent([String].self, forKey: .tags) ?? []
         childPolicy         = try items.decodeIfPresent([VatomChildPolicy].self, forKey: .childPolicy) ?? []
-        
+
     }
-    
+
 //    public func encode(to encoder: Encoder) throws {
 //        var container = encoder.container(keyedBy: CodingKeys.self)
 //        try container.encode(pricingType, forKey: .pricingType)
 //
 //    }
-    
+
 }
 
 // MARK: - Vatom Pricing

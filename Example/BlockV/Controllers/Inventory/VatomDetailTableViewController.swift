@@ -138,22 +138,22 @@ class VatomDetailTableViewController: UITableViewController {
     fileprivate func updateUI() {
         
         // info
-        titleValueLabel.text          = vatom.title
-        descriptionValueLabel.text    = vatom.description
-        categoryValueLabel.text       = vatom.category
-        visibilityValueLabel.text     = vatom.visibility.type
+        titleValueLabel.text          = vatom.props.title
+        descriptionValueLabel.text    = vatom.props.description
+        categoryValueLabel.text       = vatom.props.category
+        visibilityValueLabel.text     = vatom.props.visibility.type
         vatomIdValueLabel.text        = vatom.id
         // hierarchy
-        rootTypeValueLabel.text       = vatom.rootType
-        templateIDLabel.text          = vatom.templateID
-        templateVariationIDLabel.text = vatom.templateVariationID
-        parentIDValueLabel.text       = vatom.parentID
+        rootTypeValueLabel.text       = vatom.props.rootType
+        templateIDLabel.text          = vatom.props.templateID
+        templateVariationIDLabel.text = vatom.props.templateVariationID
+        parentIDValueLabel.text       = vatom.props.parentID
         // flags
-        acquirableValueLabel.text     = prettyBool(vatom.isAcquirable)
-        redeemableValueLabel.text     = prettyBool(vatom.isRedeemable)
-        tradableValueLabel.text       = prettyBool(vatom.isTradeable)
-        transferableValueLabel.text   = prettyBool(vatom.isTransferable)
-        droppedValueLabel.text        = prettyBool(vatom.isDropped)
+        acquirableValueLabel.text     = prettyBool(vatom.props.isAcquirable)
+        redeemableValueLabel.text     = prettyBool(vatom.props.isRedeemable)
+        tradableValueLabel.text       = prettyBool(vatom.props.isTradeable)
+        transferableValueLabel.text   = prettyBool(vatom.props.isTransferable)
+        droppedValueLabel.text        = prettyBool(vatom.props.isDropped)
         // meta
         dateCreatedValueLabel.text    = dateFormatter.string(from: vatom.whenCreated)
         dateModifiedValueLabel.text   = dateFormatter.string(from: vatom.whenModified)

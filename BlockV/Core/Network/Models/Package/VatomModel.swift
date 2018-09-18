@@ -12,17 +12,79 @@ import Foundation
 
 public struct VatomModel: Equatable {
 
-    // Top Level Properties
+    // MARK: - Properties
+
     // constants
     public let id: String
     public let version: String
     public let whenCreated: Date
-
     // variables
     public var whenModified: Date
     public var isUnpublished: Bool
 
-    // Second Level (de-nested one level)
+    /// Template properties.
+    ///
+    /// - note: Some template properties are mutable by reactors.
+    public var props: RootProperties
+    /// Private properties.
+    ///
+    /// - note: Private properties are mutable by reactors.
+    public var `private`: JSON?
+
+    /// Array of face models associated with this vAtom's template.
+    ///
+    /// - note: Subject to change over the life of the vAtom.
+    public var faceModels: [FaceModel]
+    /// Array of action models associated with this vAtom's template.
+    ///
+    /// - note: Subject to change over the life of the vAtom.
+    public var actionModels: [ActionModel]
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case version
+        case isUnpublished     = "unpublished"
+        case whenCreated       = "when_created"
+        case whenModified      = "when_modified"
+        case props             = "vAtom::vAtomType"
+        case `private`         = "private"
+        case faceModels        = "faceModels"
+        case actionModels      = "actionModels"
+    }
+
+}
+
+// MARK: Codable
+extension VatomModel: Decodable {
+
+    public init(from decoder: Decoder) throws { // swiftlint:disable:this function_body_length
+        let items = try decoder.container(keyedBy: CodingKeys.self)
+        id                = try items.decode(String.self, forKey: .id)
+        version           = try items.decode(String.self, forKey: .version)
+        isUnpublished     = try items.decode(Bool.self, forKey: .isUnpublished)
+        whenCreated       = try items.decode(Date.self, forKey: .whenCreated)
+        whenModified      = try items.decode(Date.self, forKey: .whenModified)
+        props             = try items.decode(RootProperties.self, forKey: .props)
+        `private`         = try items.decodeIfPresent(JSON.self, forKey: .private)
+        faceModels        = try items.decodeIfPresent([FaceModel].self, forKey: .faceModels) ?? []
+        actionModels      = try items.decodeIfPresent([ActionModel].self, forKey: .actionModels) ?? []
+    }
+
+}
+
+// MARK: Hashable
+extension VatomModel: Hashable {
+
+    /// vAtoms are uniquely identified by their platform identifier.
+    public var hashValue: Int {
+        return id.hashValue
+    }
+}
+
+// MARK: - Vatom Root Properties
+
+public struct RootProperties: Equatable {
+
     // constants
     public let author: String
     public let rootType: String
@@ -57,25 +119,8 @@ public struct VatomModel: Equatable {
 
     public var geoPosition: GeoPosition
     public var resources: [VatomResourceModel] // `var` only to allow for resource encoding
-    public var privateProperties: JSON? // Private section may contain JSON of any structure.
-    /// Array of face models associated with this vAtom's template.
-    public var faceModels: [FaceModel]
-    /// Array of action models associated with this vAtom's template.
-    public var actionModels: [ActionModel]
 
     enum CodingKeys: String, CodingKey {
-        case id
-        case version
-        case isUnpublished     = "unpublished"
-        case whenCreated       = "when_created"
-        case whenModified      = "when_modified"
-        case properties        = "vAtom::vAtomType"
-        case privateProperties = "private"
-        case faceModels        = "faceModels"
-        case actionModels      = "actionModels"
-    }
-
-    enum PropertiesCodingKeys: String, CodingKey {
 
         case author
         case category
@@ -134,67 +179,53 @@ public struct VatomModel: Equatable {
 
 }
 
-// MARK: Codable
-extension VatomModel: Decodable {
+//TODO: Add Encodable conformance too.
+extension RootProperties: Decodable {
 
-    public init(from decoder: Decoder) throws { // swiftlint:disable:this function_body_length
+    public init(from decoder: Decoder) throws {
+
         let items = try decoder.container(keyedBy: CodingKeys.self)
-        id                = try items.decode(String.self, forKey: .id)
-        version           = try items.decode(String.self, forKey: .version)
-        isUnpublished     = try items.decode(Bool.self, forKey: .isUnpublished)
-        whenCreated       = try items.decode(Date.self, forKey: .whenCreated)
-        whenModified      = try items.decode(Date.self, forKey: .whenModified)
-        privateProperties = try items.decodeIfPresent(JSON.self, forKey: .privateProperties)
-        faceModels        = try items.decodeIfPresent([FaceModel].self, forKey: .faceModels) ?? []
-        actionModels      = try items.decodeIfPresent([ActionModel].self, forKey: .actionModels) ?? []
-
-        // de-nest properties to top level
-        let propertiesContainer = try items.nestedContainer(keyedBy: PropertiesCodingKeys.self, forKey: .properties)
-        isAcquirable        = try propertiesContainer.decode(Bool.self, forKey: .isAcquirable)
-        author              = try propertiesContainer.decode(String.self, forKey: .author)
-        category            = try propertiesContainer.decode(String.self, forKey: .category)
-        clonedFrom          = try propertiesContainer.decode(String.self, forKey: .clonedFrom)
-        cloningScore        = try propertiesContainer.decode(Double.self, forKey: .cloningScore)
-        commerce            = try propertiesContainer.decode(Commerce.self, forKey: .commerce)
-        description         = try propertiesContainer.decode(String.self, forKey: .description)
-        isDisabled          = try propertiesContainer.decode(Bool.self, forKey: .isDisabled)
-        isDropped           = try propertiesContainer.decode(Bool.self, forKey: .isDropped)
-        geoPosition         = try propertiesContainer.decode(GeoPosition.self, forKey: .geoPosition)
-        isInContract        = try propertiesContainer.decode(Bool.self, forKey: .isInContract)
-        inContractWith      = try propertiesContainer.decode(String.self, forKey: .inContractWith)
-        notifyMessage       = try propertiesContainer.decode(String.self, forKey: .notifyMessage)
-        numberDirectClones  = try propertiesContainer.decode(Int.self, forKey: .numberDirectClones)
-        owner               = try propertiesContainer.decode(String.self, forKey: .owner)
-        parentID            = try propertiesContainer.decode(String.self, forKey: .parentID)
-        publisherFqdn       = try propertiesContainer.decode(String.self, forKey: .publisherFqdn)
-        isRedeemable        = try propertiesContainer.decode(Bool.self, forKey: .isRedeemable)
-        resources           = try propertiesContainer.decode([Safe<VatomResourceModel>].self,
+        isAcquirable        = try items.decode(Bool.self, forKey: .isAcquirable)
+        author              = try items.decode(String.self, forKey: .author)
+        category            = try items.decode(String.self, forKey: .category)
+        clonedFrom          = try items.decode(String.self, forKey: .clonedFrom)
+        cloningScore        = try items.decode(Double.self, forKey: .cloningScore)
+        commerce            = try items.decode(Commerce.self, forKey: .commerce)
+        description         = try items.decode(String.self, forKey: .description)
+        isDisabled          = try items.decode(Bool.self, forKey: .isDisabled)
+        isDropped           = try items.decode(Bool.self, forKey: .isDropped)
+        geoPosition         = try items.decode(GeoPosition.self, forKey: .geoPosition)
+        isInContract        = try items.decode(Bool.self, forKey: .isInContract)
+        inContractWith      = try items.decode(String.self, forKey: .inContractWith)
+        notifyMessage       = try items.decode(String.self, forKey: .notifyMessage)
+        numberDirectClones  = try items.decode(Int.self, forKey: .numberDirectClones)
+        owner               = try items.decode(String.self, forKey: .owner)
+        parentID            = try items.decode(String.self, forKey: .parentID)
+        publisherFqdn       = try items.decode(String.self, forKey: .publisherFqdn)
+        isRedeemable        = try items.decode(Bool.self, forKey: .isRedeemable)
+        resources           = try items.decode([Safe<VatomResourceModel>].self,
                                                              forKey: .resources).compactMap { $0.value }
-        rootType            = try propertiesContainer.decode(String.self, forKey: .rootType)
-        templateID          = try propertiesContainer.decode(String.self, forKey: .templateID)
-        templateVariationID = try propertiesContainer.decode(String.self, forKey: .templateVariationID)
-        title               = try propertiesContainer.decode(String.self, forKey: .title)
-        isTradeable         = try propertiesContainer.decode(Bool.self, forKey: .isTradeable)
-        isTransferable      = try propertiesContainer.decode(Bool.self, forKey: .isTransferable)
-        transferredBy       = try propertiesContainer.decode(String.self, forKey: .transferredBy)
-        visibility          = try propertiesContainer.decode(Visibility.self, forKey: .visibility)
+        rootType            = try items.decode(String.self, forKey: .rootType)
+        templateID          = try items.decode(String.self, forKey: .templateID)
+        templateVariationID = try items.decode(String.self, forKey: .templateVariationID)
+        title               = try items.decode(String.self, forKey: .title)
+        isTradeable         = try items.decode(Bool.self, forKey: .isTradeable)
+        isTransferable      = try items.decode(Bool.self, forKey: .isTransferable)
+        transferredBy       = try items.decode(String.self, forKey: .transferredBy)
+        visibility          = try items.decode(Visibility.self, forKey: .visibility)
 
-        // potentially absent from container
-        tags                = try propertiesContainer.decodeIfPresent([String].self,
-                                                                      forKey: .tags) ?? []
-        childPolicy         = try propertiesContainer.decodeIfPresent([VatomChildPolicy].self,
-                                                                      forKey: .childPolicy) ?? []
+        // keys are potentially absent from container
+        tags                = try items.decodeIfPresent([String].self, forKey: .tags) ?? []
+        childPolicy         = try items.decodeIfPresent([VatomChildPolicy].self, forKey: .childPolicy) ?? []
+
     }
 
-}
+//    public func encode(to encoder: Encoder) throws {
+//        var container = encoder.container(keyedBy: CodingKeys.self)
+//        try container.encode(pricingType, forKey: .pricingType)
+//
+//    }
 
-// MARK: Hashable
-extension VatomModel: Hashable {
-
-    /// vAtoms are uniquely identified by their platform identifier.
-    public var hashValue: Int {
-        return id.hashValue
-    }
 }
 
 // MARK: - Vatom Pricing
@@ -252,6 +283,7 @@ extension VatomPricing: Codable {
 }
 
 // MARK: - Vatom Child Policy
+
 public struct VatomChildPolicy: Codable, Equatable {
     public let count: Int
     public let creationPolicy: CreationPolicy

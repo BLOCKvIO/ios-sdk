@@ -48,9 +48,9 @@ class InventoryCollectionViewController: UICollectionViewController {
         didSet {
             filteredVatoms = vatoms.filter {
                 // filter out: dropped, avatar, and coin wallet vatoms
-                (!$0.isDropped)
-                    && (!$0.templateID.hasSuffix("::vAtom::Avatar"))
-                    && (!$0.templateID.hasSuffix("::vAtom::CoinWallet"))
+                (!$0.props.isDropped)
+                    && (!$0.props.templateID.hasSuffix("::vAtom::Avatar"))
+                    && (!$0.props.templateID.hasSuffix("::vAtom::CoinWallet"))
             }
         }
     }
@@ -254,7 +254,7 @@ class InventoryCollectionViewController: UICollectionViewController {
         for vatom in filteredVatoms {
             
             // find the vatom's activated image url
-            guard let activatedImageURL = vatom.resources.first(where: { $0.name == "ActivatedImage"} )?.url else {
+            guard let activatedImageURL = vatom.props.resources.first(where: { $0.name == "ActivatedImage"} )?.url else {
                 // oops, not found, skip this vatom
                 continue
             }

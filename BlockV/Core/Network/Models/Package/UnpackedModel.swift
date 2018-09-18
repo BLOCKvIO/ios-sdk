@@ -96,8 +96,8 @@ public struct UnpackedModel: Decodable, Equatable {
         // associate actions and faces with each vatom
         var packedVatoms = self.vatoms
         for (index, vatom) in packedVatoms.enumerated() {
-            packedVatoms[index].faceModels = facesByTemplate[vatom.templateID] ?? []
-            packedVatoms[index].actionModels = actionsByTemplate[vatom.templateID] ?? []
+            packedVatoms[index].faceModels = facesByTemplate[vatom.props.templateID] ?? []
+            packedVatoms[index].actionModels = actionsByTemplate[vatom.props.templateID] ?? []
         }
 
         // return the packed vatoms

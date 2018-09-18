@@ -66,7 +66,7 @@ class ActionListTableViewController: UITableViewController {
     /// Fetches all the actions configured / associated with our vAtom's template.
     fileprivate func fetchActions() {
         
-        let templateID = self.vatom.templateID
+        let templateID = self.vatom.props.templateID
         
         BLOCKv.getActions(forTemplateID: templateID) { (actions, error) in
             

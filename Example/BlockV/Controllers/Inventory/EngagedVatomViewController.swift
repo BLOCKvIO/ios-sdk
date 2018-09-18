@@ -47,8 +47,8 @@ class EngagedVatomViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.titleLabel.text = vatom?.title ?? "--"
-        self.descriptionLabel.text = vatom?.description ?? "--"
+        self.titleLabel.text = vatom?.props.title ?? "--"
+        self.descriptionLabel.text = vatom?.props.description ?? "--"
         
         // setup
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneTapped))

@@ -173,7 +173,7 @@ extension ImageFaceView {
 
     func doResourceStuff(completion: @escaping (Error?) -> Void) {
 
-        if let resourceModel = vatom.resources.first(where: { $0.name == config.imageName }) {
+        if let resourceModel = vatom.props.resources.first(where: { $0.name == config.imageName }) {
             if let url = try? BLOCKv.encodeURL(resourceModel.url) {
                 
                 // onUnload() { task.cancel }

@@ -335,38 +335,38 @@ extension VatomModel {
         
         // ---
         stateUpdate.vatomProperties["vAtom::vAtomType"]?["category"]?.stringValue
-            .flatMap { self.category = $0 }
+            .flatMap { self.props.category = $0 }
         stateUpdate.vatomProperties["vAtom::vAtomType"]?["description"]?.stringValue
-            .flatMap { self.description = $0 }
+            .flatMap { self.props.description = $0 }
         
         // ---
         stateUpdate.vatomProperties["vAtom::vAtomType"]?["num_direct_clones"]?.floatValue
-            .flatMap { self.numberDirectClones = Int($0) }
+            .flatMap { self.props.numberDirectClones = Int($0) }
         stateUpdate.vatomProperties["vAtom::vAtomType"]?["owner"]?.stringValue
-            .flatMap { self.owner = $0 }
+            .flatMap { self.props.owner = $0 }
         stateUpdate.vatomProperties["vAtom::vAtomType"]?["parentID"]?.stringValue
-            .flatMap { self.parentID = $0 }
+            .flatMap { self.props.parentID = $0 }
         
         stateUpdate.vatomProperties["vAtom::vAtomType"]?["cloned_from"]?.stringValue
-            .flatMap { self.clonedFrom = $0 }
+            .flatMap { self.props.clonedFrom = $0 }
         stateUpdate.vatomProperties["vAtom::vAtomType"]?["cloning_score"]?.floatValue
-            .flatMap { self.cloningScore = Double($0) }
+            .flatMap { self.props.cloningScore = Double($0) }
         
         // ---
         stateUpdate.vatomProperties["vAtom::vAtomType"]?["acquirable"]?.boolValue
-            .flatMap { self.isAcquirable = $0 }
+            .flatMap { self.props.isAcquirable = $0 }
         stateUpdate.vatomProperties["vAtom::vAtomType"]?["redeemable"]?.boolValue
-            .flatMap { self.isRedeemable = $0 }
+            .flatMap { self.props.isRedeemable = $0 }
         stateUpdate.vatomProperties["vAtom::vAtomType"]?["disabled"]?.boolValue
-            .flatMap { self.isDisabled = $0 }
+            .flatMap { self.props.isDisabled = $0 }
         stateUpdate.vatomProperties["vAtom::vAtomType"]?["dropped"]?.boolValue
-            .flatMap { self.isDropped = $0 }
+            .flatMap { self.props.isDropped = $0 }
         stateUpdate.vatomProperties["vAtom::vAtomType"]?["tradeable"]?.boolValue
-            .flatMap { self.isTradeable = $0 }
+            .flatMap { self.props.isTradeable = $0 }
         stateUpdate.vatomProperties["vAtom::vAtomType"]?["transferable"]?.boolValue
-            .flatMap { self.isTransferable = $0 }
+            .flatMap { self.props.isTransferable = $0 }
         
-        self.privateProperties = stateUpdate.vatomProperties["private"]
+//        self.private = stateUpdate.vatomProperties["private"]
         
     }
     

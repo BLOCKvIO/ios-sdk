@@ -63,7 +63,7 @@ class ProgressImageFaceView: FaceView {
     // MARK: - Dynamic Vatom Private Properties
 
     private var progress: CGFloat {
-        return  CGFloat(min(1, max(0, vatom.cloningScore)))
+        return  CGFloat(min(1, max(0, vatom.props.cloningScore)))
     }
 
     // MARK: - Config
@@ -261,8 +261,8 @@ class ProgressImageFaceView: FaceView {
 
         // ensure required resources are present
         guard
-            let emptyImageResource = vatom.resources.first(where: { $0.name == "BaseImage" }),
-            let fullImageResource = vatom.resources.first(where: { $0.name == "ActivatedImage" })
+            let emptyImageResource = vatom.props.resources.first(where: { $0.name == "BaseImage" }),
+            let fullImageResource = vatom.props.resources.first(where: { $0.name == "ActivatedImage" })
             else {
                 printBV(error: "\(#file) - failed to extract resources.")
                 return

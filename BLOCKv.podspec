@@ -29,9 +29,8 @@ Pod::Spec.new do |s|
     s.subspec 'Face' do |s|
         s.ios.source_files = 'BlockV/Face/**/*.{swift}'
         s.dependency 'BLOCKv/Core'
-        s.dependency 'AlamofireImage', '~> 3.3'
-        s.dependency 'FLAnimatedImage', '~> 1.0' # native://image
-        s.dependency 'Nuke'
+        s.dependency 'FLAnimatedImage', '~> 1.0' # Gifs
+        s.dependency 'Nuke',            '~> 7.0' # Image downloading
         s.resource_bundles = {
             'FaceModule' => ['BlockV/Face/Face Views/**/*.{xib}']
         }

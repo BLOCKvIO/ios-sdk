@@ -10,19 +10,126 @@
 //
 
 import UIKit
+import Nuke
 
-internal final class DefaultErrorView: UIView {
+public protocol VatomViewError where Self: UIView {
+    var vatom: VatomModel? { get set }
+}
+
+/// Default error view.
+///
+/// Shows:
+/// 1. vAtoms activated image.
+/// 2. Warning trigangle (that is tappable).
+internal final class DefaultErrorView: UIView & VatomViewError {
+
+    // MARK: - Debug
+
+    /// A Boolean value controlling whether the error view is in debug mode.
+    ///
+    /// Debug mode redueces the image's alpha and adds a info button.
+    public var isDebugEnabled = false {
+        didSet {
+            if isDebugEnabled {
+                self.activatedImageView.alpha = 0.3
+                self.infoButton.isEnabled = true
+            }
+        }
+    }
+
+    // MARK: - Properties
+
+    private let activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        return indicator
+    }()
+
+    private let infoButton: UIButton = {
+        let button = UIButton(type: UIButtonType.infoLight)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+
+    private let activatedImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFit
+        return imageView
+    }()
+
+    var errorMessage: String = ""
+
+    var vatom: VatomModel? {
+        didSet {
+            self.loadResources()
+        }
+    }
 
     // MARK: - Initializer
 
     override init(frame: CGRect) {
         super.init(frame: frame)
 
-        self.backgroundColor = UIColor.red.withAlphaComponent(0.5)
+        self.addSubview(activatedImageView)
+        self.addSubview(activityIndicator)
+        self.addSubview(infoButton)
+
+        activityIndicator.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
+        activityIndicator.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
+
+        infoButton.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 12).isActive = true
+        infoButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 12).isActive = true
+
+        activatedImageView.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
+        activatedImageView.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
+        activatedImageView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
+        activatedImageView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
+
+        commonInit()
+
+        isDebugEnabled = true
     }
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    func commonInit() {
+        self.isDebugEnabled = true
+    }
+
+    // MARK: - Logic
+
+    /// Loads the required resources.
+    ///
+    /// The error view uses the activated image as a placeholder.
+    private func loadResources() {
+
+        activityIndicator.startAnimating()
+
+        defer { self.activityIndicator.stopAnimating() }
+
+        // extract error
+        guard let vatom = vatom else {
+            fatalError()
+        }
+
+        // extract resource model
+        guard let resourceModel = vatom.props.resources.first(where: { $0.name == "ActivatedImage" }) else {
+            return
+        }
+
+        // encode url
+        guard let encodeURL = try? BLOCKv.encodeURL(resourceModel.url) else {
+            return
+        }
+
+        // load the image (reuse pool is automatically handled)
+        Nuke.loadImage(with: encodeURL, into: activatedImageView) { [weak self] (_, _) in
+            self?.activityIndicator.stopAnimating()
+        }
+
     }
 
 }

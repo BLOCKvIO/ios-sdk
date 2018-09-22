@@ -11,10 +11,10 @@
 
 import UIKit
 
-/// The `FaceViewLoader` protocol is adopted by a UIView that intends to act as a visual activity indicator.
+/// The `VatomViewLoader` protocol is adopted by a UIView that intends to act as a visual activity indicator.
 ///
 /// `VatomView` displays a loader before the selected face view has content of its own to display.
-protocol FaceViewLoader where Self: UIView {
+public protocol VatomViewLoader where Self: UIView {
     /// Informs the implementer that loading should start.
     func startAnimating()
     /// Informs the implementor that loading should stop.
@@ -22,12 +22,13 @@ protocol FaceViewLoader where Self: UIView {
 }
 
 /// Default loading view.
-internal final class DefaultLoadingView: UIView, FaceViewLoader {
+internal final class DefaultLoadingView: UIView, VatomViewLoader {
 
     // MARK: - Properties
 
     private let activityIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+        indicator.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         return indicator
     }()
 
@@ -37,7 +38,6 @@ internal final class DefaultLoadingView: UIView, FaceViewLoader {
         super.init(frame: frame)
         self.addSubview(activityIndicator)
         activityIndicator.frame = self.bounds
-        activityIndicator.autoresizingMask = [.flexibleWidth, .flexibleHeight]
 //        self.backgroundColor = UIColor.orange.withAlphaComponent(0.5)
     }
 

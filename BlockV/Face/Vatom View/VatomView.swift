@@ -12,8 +12,6 @@
 import Foundation
 
 /// Types that manage a `VatomView` should conform to this delegate to know when the face has completed loading.
-///
-/// This is usefull when you only want to show a vatomview once it's completed loading.
 protocol VatomViewLifecycleDelegate: class {
     /// Called when the vatom view's selected face view has loaded successful or with an error.
     func faceViewDidCompleteLoad(error: Error?)
@@ -136,7 +134,7 @@ public class VatomView: UIView {
     ///
     /// - Parameters:
     ///   - vatom: The vAtom to visualize.
-    ///   - procedure: The Face Selection Procedure (FSP) that determines which face view (if any) to display.
+    ///   - procedure: The Face Selection Procedure (FSP) that determines which face view to display.
     ///     Defaults to the `.icon` FSP.
     public init(vatom: VatomModel,
                 procedure: @escaping FaceSelectionProcedure = EmbeddedProcedure.icon.procedure) {
@@ -157,7 +155,7 @@ public class VatomView: UIView {
     ///
     /// - Parameters:
     ///   - vatom: The vAtom to visualize.
-    ///   - procedure: The Face Selection Procedure (FSP) that determines which face view (if any) to display.
+    ///   - procedure: The Face Selection Procedure (FSP) that determines which face view to display.
     ///     Defaults to the `.icon` FSP.
     ///   - loadingView: Custom loading view to show before the face view concludes loading. Defaults to the standard
     ///     loading view.
@@ -216,23 +214,19 @@ public class VatomView: UIView {
 
     // MARK: - State Management
 
-    /*
-     Both vatom and the procedure may be updated over the life of the vatom view.
-     This means if either is updated, the VVLC should run.
-     
-     Either update may (or may not) result in the selectedFaceModel changing. If it does a full FaceView replacement is
-     needed.
-     
-     If the vatom is updated, and the selectedFaceModel remains the same, then updates may (or may not) need to be
-     passed down to the currently selected face view.
-     
-     */
-
-    /// Updates the vAtom view and triggers a run of the VVLC.
+    /// Updates the vAtom and optionally the procedure.
+    ///
+    /// Both vatom and procedure may be updated over the lifespan of the `VatomView`. If either are updated the VVLC
+    /// will run. This and may (or may not) result in the selected face model changing.
+    ///
+    /// - If the selected face model remains the same, then updates will be passed down to the currently selected face
+    /// view.
+    /// - If the selected face model changes, then the current face view will be torndown an the newly selected face
+    /// view added to the view hierarchy.
     ///
     /// - Parameters:
-    ///   - newVatom: The new vAtom to be visualized.
-    ///   - procedure: The Face Selection Procedure (FSP) to use.
+    ///   - newVatom: The vAtom to be visualized.
+    ///   - procedure: The Face Selection Procedure (FSP) that determines which face view to display.
     public func update(usingVatom newVatom: VatomModel,
                        procedure: FaceSelectionProcedure? = nil) {
 
@@ -242,19 +236,21 @@ public class VatomView: UIView {
         }
 
         self.vatom = newVatom
-        procedure.flatMap { self.procedure = $0 } // assign if not nil
+        // assign if not nil
+        procedure.flatMap { self.procedure = $0 }
 
         runVVLC()
 
     }
 
-    /// Host may want to inform the face view to cancel loading. For example, cancel loading large resources etc.
+    /// Calling `unload` will inform the selected face view to unload its contents.
     ///
-    /// You should call this when:
-    /// - VatomView goes off screen.
-    /// - VatomView is in a reuse pool and the cell receives the `prepareForReuse` method call.
+    /// 'Unload' within the context of a face view means: Cancelling resource downloading, `nil`-ing out image data.
+    ///
+    /// Call this method when `VatomView`:
+    /// - goes off screen.
+    /// - should `prepareForReuse` (if within a reuse pool).
     public func unLoad() {
-        // pass the unload message along to selected face view
         self.selectedFaceView?.unload()
     }
 
@@ -288,8 +284,6 @@ public class VatomView: UIView {
     /// 4. Display the face view
     public func runVVLC() {
 
-        //FIXME: Part of this could run on a background thread, e.g fsp
-
         precondition(vatom != nil, "vatom must not be nil.")
 
         guard let vatom = vatom else { return } //FIXME: Show error?
@@ -309,8 +303,8 @@ public class VatomView: UIView {
         printBV(info: "Face Selection Procedure (FSP) selected face model: \(selectedFaceModel)")
 
         /*
-         check if selected face model has changed (rare cases where the face config was updated while the vatom is in
-         the unpublished state.
+         Here we check if selected face model is still equal to the current. This is necessary since the face may
+         change as a result of the publisher modifying the face (typically via a delete/add operation).
          */
 
         // 2. check if the face model has not changed
@@ -320,16 +314,13 @@ public class VatomView: UIView {
 
             /*
              Although the selected face model has not changed, other items in the vatom may have, these updates
-             must be passed to the face view to give it a change to update its state.
-             
-             The VVLC should not be re-run (since the selected face view does not need replacing).
+             must be passed to the face view to give it a change to update its state. The VVLC should not be re-run
+             (since the selected face view does not need replacing).
              */
 
             self.state = .completed
             // update currently selected face view (without replacement)
             self.selectedFaceView?.vatomUpdated(vatom)
-
-            //FXIME: How does the face view find out what has changed? Maybe the vatom must have a 'diff' property?
 
         } else {
 
@@ -364,18 +355,9 @@ public class VatomView: UIView {
     }
 
     /// Replaces the current face view (if any) with the specified face view and starts the FVLC.
-    ///
-    /// Call this function only if you want a full replace of the current face view.
-    ///
-    /// Triggers the Face View Life Cycle (VVLC)
     private func replaceFaceView(with newFaceView: (FaceView)) {
 
-        /*
-         Options: This function could take in a FaceView instance, or take in a FaceView.Type and create the instance
-         itself (using the generator)?
-         */
-
-        // Update current state
+        // update current state
         self.state = .loading
 
         // remove before setting to nil
@@ -395,9 +377,7 @@ public class VatomView: UIView {
 
             printBV(info: "Face view load completion called.")
 
-            /*
-             Error - Case 2 -  Display error view if the face view encounters an error during its load operation.
-             */
+             // Error - Case 2 -  Display error view if the face view encounters an error during its load operation.
 
             // ensure no error
             guard error == nil else {

@@ -36,8 +36,9 @@ public typealias FaceSelectionProcedure = (_ vatom: VatomModel, _ installedURLs:
 /// Models the embedded face selection procedures (FSP)s. This is a set of pre-built face selection procedures defined
 /// by the SDK to meet common use cases.
 ///
-/// It important to think of the cases simply as unique identifiers of stored face selection procedures. Cases loosely
-/// map to the server's 'view_mode' simply because the 'view_mode' is generally the predominant selection criteria.
+/// It is important to think of the cases simply as unique identifiers of stored face selection procedures. Cases
+/// loosely map to the server's 'view_mode' simply because the 'view_mode' is generally the predominant selection
+/// criteria.
 ///
 /// Embedded procedures:
 /// 1. find faces meeting the 'view mode' requirement
@@ -224,13 +225,13 @@ private struct EmbeddedProcedureBuilder {
                 //FIXME: Add native face view for web check.
                 continue
 
-//                // enusrue the native face is supported (i.e. the face code is installed)
-//                if installedURLs.contains(where: {
-//                    ($0.caseInsensitiveCompare("https://*") == .orderedSame) }) {
-//                } else {
-//                    // native code is not installed
-//                    continue
-//                }
+                // enusrue the native face is supported (i.e. the face code is installed)
+                if installedURLs.contains(where: {
+                    ($0.caseInsensitiveCompare("https://*") == .orderedSame) }) {
+                } else {
+                    // native code is not installed
+                    continue
+                }
 
             }
 

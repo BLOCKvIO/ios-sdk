@@ -18,12 +18,9 @@ internal func ?=<T> (lhs: inout T, rhs: T?) {
 }
 
 /// Composite type that all face views must adopt.
-public typealias FaceView = BaseFaceView & FaceViewInterface
+public typealias FaceView = BaseFaceView & FaceViewLifecycle & FaceViewIdentifiable
 
-/// The protocol that face views must conform to.
-public protocol FaceViewInterface: class {
-
-    // MARK: - Properties
+public protocol FaceViewIdentifiable {
 
     /// Uniqiue identifier of the face.
     ///
@@ -31,12 +28,17 @@ public protocol FaceViewInterface: class {
     /// `FaceSelectionProcedure` type.
     static var displayURL: String { get }
 
+}
+
+/// The protocol that face views must conform to.
+public protocol FaceViewLifecycle: class {
+
     // MARK: - Lifecycle
 
     /// Called to initiate the loading of the face code.
     ///
     /// This should trigger the downloading of all necessary face resources.
-    func load(completion: @escaping (Error?) -> Void)
+    func load(completion: ((Error?) -> Void)?)
 
     /// Called when the vatom pack is updated.
     ///
@@ -50,10 +52,6 @@ public protocol FaceViewInterface: class {
     /// The face view should perform a clean up operation, e.g. cancel all downloads, remove any listers, nil out any
     /// reference and prepare for deallocation.
     func unload()
-
-    /// Optional method informs the face view to prepare to be reused.
-    /// 
-    func prepareForReuse()
 
     /// Array of resources uses by this face.
     ///

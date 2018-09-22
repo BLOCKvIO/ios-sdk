@@ -284,9 +284,12 @@ public class VatomView: UIView {
     /// 4. Display the face view
     public func runVVLC() {
 
-        precondition(vatom != nil, "vatom must not be nil.")
-
-        guard let vatom = vatom else { return } //FIXME: Show error?
+        guard let vatom = vatom else {
+            assertionFailure("Developer error: vatom must not be nil.")
+            return
+        }
+        
+        //TODO: Offload FSP to a background queue.
 
         // 1. select the best face model
         guard let selectedFaceModel = procedure(vatom, Set(roster.keys)) else {
@@ -334,15 +337,14 @@ public class VatomView: UIView {
                 // viewer developer MUST have registered the face view with the face registry
                 assertionFailure(
                     """
-                    Face selection procedure (FSP) selected a face without the face view being installed. Your FSP
-                    MUST check if the face view has been registered with the FaceRegistry.
+                    Developer error: Face selection procedure (FSP) selected a face without the face view being
+                    installed. Your FSP MUST check if the face view has been registered with the FaceRegistry.
                     """)
                 return
             }
 
             printBV(info: "Face view for face model: \(faceViewType)")
 
-            //let faceViewType = FaceViewRegistry.shared.roster["native://image"]!
             //let selectedFaceView: FaceView = ImageFaceView(vatom: vatom, faceModel: selectedFace)
             let selectedFaceView: FaceView = faceViewType.init(vatom: vatom,
                                                                faceModel: selectedFaceModel)
@@ -360,11 +362,10 @@ public class VatomView: UIView {
         // update current state
         self.state = .loading
 
-        // remove before setting to nil
+        // request the face view unload it's contents
+        self.selectedFaceView?.unload()
         self.selectedFaceView?.removeFromSuperview()
         self.selectedFaceView = nil
-
-        // update currently selected face view
         self.selectedFaceView = newFaceView
 
         // insert face view into the view hierarcy

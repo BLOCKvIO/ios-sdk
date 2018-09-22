@@ -83,9 +83,9 @@ class ProgressImageFaceView: FaceView {
 
         /// Initialize using face configuration.
         init(_ faceConfig: JSON?) {
-            
+
             guard let config = faceConfig else { return }
-            
+
             // assign iff not nil
             self.emptyImageName ?= config["empty_image"]?.stringValue
             self.fullImageName ?= config["full_image"]?.stringValue
@@ -135,13 +135,13 @@ class ProgressImageFaceView: FaceView {
 
     // MARK: - FaceView Lifecycle
 
-    func load(completion: @escaping (Error?) -> Void) {
+    func load(completion: ((Error?) -> Void)?) {
         print(#function)
 
         //FIXME: Replace with resource end game
         self.doResourceStuff { (error) in
             self.setNeedsLayout()
-            completion(error)
+            completion?(error)
         }
 
     }
@@ -158,10 +158,6 @@ class ProgressImageFaceView: FaceView {
     }
 
     func unload() {
-        print(#function)
-    }
-
-    func prepareForReuse() {
         print(#function)
     }
 

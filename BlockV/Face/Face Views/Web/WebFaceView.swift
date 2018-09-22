@@ -45,7 +45,7 @@ class WebFaceView: FaceView {
 
     class var displayURL: String { return "http://*" }
 
-    func load(completion: @escaping (Error?) -> Void) {
+    func load(completion: ((Error?) -> Void)?) {
         //
     }
 
@@ -55,10 +55,6 @@ class WebFaceView: FaceView {
 
     func unload() {
         //
-    }
-
-    func prepareForReuse() {
-        print(#function)
     }
 
 }

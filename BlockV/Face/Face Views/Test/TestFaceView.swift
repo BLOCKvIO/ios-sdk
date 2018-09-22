@@ -64,11 +64,11 @@ class TestFaceView: FaceView, FaceModuleNibLoadable {
 
     private var timer: Timer?
 
-    func load(completion: @escaping (Error?) -> Void) {
+    func load(completion: ((Error?) -> Void)?) {
         print(#function)
 
         self.timer = Timer(timeInterval: 2, repeats: false) { (_) in
-            completion(nil)
+            completion?(nil)
         }
 
         // Download resource
@@ -80,10 +80,6 @@ class TestFaceView: FaceView, FaceModuleNibLoadable {
     }
 
     func unload() {
-        print(#function)
-    }
-
-    func prepareForReuse() {
         print(#function)
     }
 

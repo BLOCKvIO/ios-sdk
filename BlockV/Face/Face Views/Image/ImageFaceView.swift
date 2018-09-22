@@ -11,11 +11,7 @@
 
 import UIKit
 import FLAnimatedImage
-// - Experimenting
-import AlamofireImage
 import Nuke
-
-let imageCache = AutoPurgingImageCache()
 
 /// Native Image face view
 class ImageFaceView: FaceView {
@@ -54,14 +50,20 @@ class ImageFaceView: FaceView {
                 self.scale ?= Config.Scale(rawValue: scaleString)
             }
             self.imageName ?= config["name"]?.stringValue
-        
+
         }
     }
 
-    /// Face configuration (immutable).
+    /// Face configuration.
     ///
-    /// It is best practice to keep this property immutable. The config of the face should not change over the lifetime
-    /// of the face view.
+    /// This property is *immutable* by design.
+    ///
+    /// The BLOCKv platform allows faces to change overtime (through a delete/recreate operation) - however this is
+    /// rare and generally unadvised after a vAtom has been published. Viewers should treat the face config as
+    /// immutable.
+    ///
+    /// It is the responsibility of VatomView to detect a change in the face config (and to recreate the face view if
+    /// needed).
     private let config: Config
 
     // MARK: - Initialization
@@ -100,159 +102,72 @@ class ImageFaceView: FaceView {
     /// is used to choose the best content mode.
     private func updateContentMode() {
 
-       // guard animatedImageView.image != nil else { return }
-
         // check face config
         switch config.scale {
-            case .fill: animatedImageView.contentMode = .scaleAspectFill
-            case .fit:  animatedImageView.contentMode = .scaleAspectFit
+        case .fill: animatedImageView.contentMode = .scaleAspectFill
+        case .fit:  animatedImageView.contentMode = .scaleAspectFit
         }
-
-        //FXIME: Is this still needed?
-
-//        // no face config supplied (try and do the right thing)
-//        else if self.faceModel.properties.constraints.viewMode == "card" {
-//            animatedImageView.contentMode = .scaleAspectFill
-//        } else if image.size.width > animatedImageView.bounds.size.width ||
-//            image.size.height > animatedImageView.bounds.size.height {
-//            animatedImageView.contentMode = .scaleAspectFit
-//        } else {
-//            animatedImageView.contentMode = .center
-//        }
 
     }
 
     // MARK: - Face View Lifecycle
 
-    private var _timer: Timer?
-
     /// Begin loading the face view's content.
-    func load(completion: @escaping (Error?) -> Void) {
+    func load(completion: ((Error?) -> Void)?) {
         print(#function)
-
-        // artificially wait so we can test the loader.
-        self._timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false) { _ in
-
-            // ugly completion handlers
-            self.doResourceStuff(completion: completion)
-        }
-
+        updateResources(completion: completion)
     }
 
     /// Respond to updates to the packaged vatom.
     func vatomUpdated(_ vatom: VatomModel) {
         print(#function)
 
-        // replace current vatom
-        self.vatom = vatom
-
         /*
          NOTE:
-         The ImageFaceView does not need to respond to vAtom updates. All the properties this face uses are immutable
-         once the vAtom has been emmited. Thus, no meaningful UI update can be made.
+         - The ImageFaceView does not have any visually dynamic attributes.
+         - The properties this face references on the vAtom are immutable after the vAtom has been emmitted.
+         - Thus, no meaningful UI update can be made.
          */
+
+        // replace current vatom
+        self.vatom = vatom
+        updateResources(completion: nil)
+
     }
 
     /// Unload the face view.
+    ///
+    /// Also called before reuse (when used inside a reuse pool).
     func unload() {
         print(#function)
-    }
-
-    func prepareForReuse() {
-        print(#function)
         self.animatedImageView.image = nil
+        self.animatedImageView.animatedImage = nil
     }
 
-}
+    // MARK: - Resources
 
-// MARK: - TEMPORARY
+    private func updateResources(completion: ((Error?) -> Void)?) {
 
-///FIXME: Replace with resource manager
+        // extract resource model
+        guard let resourceModel = vatom.props.resources.first(where: { $0.name == config.imageName }) else {
+            return
+        }
 
-extension ImageFaceView {
+        // encode url
+        guard let encodeURL = try? BLOCKv.encodeURL(resourceModel.url) else {
+            return
+        }
 
-    func doResourceStuff(completion: @escaping (Error?) -> Void) {
+        //FIXME: Where should this go?
+        ImagePipeline.Configuration.isAnimatedImageDataEnabled = true
 
-        if let resourceModel = vatom.props.resources.first(where: { $0.name == config.imageName }) {
-            if let url = try? BLOCKv.encodeURL(resourceModel.url) {
-                
-                // onUnload() { task.cancel }
-        
-                /*
-                 Issues:
-                 1. No cache control headers
-                 2. Resouce urls must be encoded, this has the unfortunate effect of the url changing every so often,
-                 which is a issue for caching.
-                 3. Encoding the url is async, this means the loading images into views has some latency, this is not
-                 good for visual responsiveness.
-                 
-                 TODO:
-                 1. Cache using the unencoded url (to prevent the jwt from confusing the cache)
-                 2. Expand cache to include data for 3d files.
-                */
+        //TODO: Should the size of the VatomView be factoring in and the image be resized?
 
-                // A - Simple extension
-
-                //self.animatedImageView.downloaded(from: url, completion: completion)
-
-                // B - Alamofire (which is using URLCache by default) - is this enough?,
-                // are the server's cache headers good enough?
-
-//                self.animatedImageView.af_setImage(withURL: url) { (_) in
-//                    completion(nil)
-//                }
-
-                // create a scale filter
-                //                let cgSize = CGSize(width: 300, height: 300)
-                //                let sizeFilter = ScaledToSizeFilter(size: cgSize)
-                //
-                //                self.animatedImageView.af_setImage(withURL: url,
-                //                                                   filter: sizeFilter) { _ in
-                //                                                    completion(nil)
-                //                }
-                //
-
-                // C - Nuke
-                Nuke.loadImage(with: url, into: self.animatedImageView) { (_, _) in
-                    completion(nil)
-                }
-
-            }
+        // load image (automatically handles reuse)
+        Nuke.loadImage(with: encodeURL, into: self.animatedImageView) { (_, error) in
+            completion?(error)
         }
 
     }
 
-}
-
-extension UIImageView {
-    
-    ///
-    func downloaded(from url: URL,
-                    contentMode mode: UIViewContentMode = .scaleAspectFit,
-                    completion: ((Error?) -> Void)? = nil) {
-        contentMode = mode
-        URLSession.shared.dataTask(with: url) { data, response, error in
-            guard
-                let httpURLResponse = response as? HTTPURLResponse, httpURLResponse.statusCode == 200,
-                let mimeType = response?.mimeType, mimeType.hasPrefix("image"),
-                let data = data, error == nil,
-                let image = UIImage(data: data)
-                else {
-                    completion?(error)
-                    return
-            }
-
-            DispatchQueue.main.async {
-                self.image = image
-                completion?(nil)
-                printBV(info: "Image downloaded: \(url)")
-            }
-            }.resume()
-    }
-    
-    ///
-    func downloaded(from link: String, contentMode mode: UIViewContentMode = .scaleAspectFit) {
-        guard let url = URL(string: link) else { return }
-        downloaded(from: url, contentMode: mode, completion: nil)
-    }
 }

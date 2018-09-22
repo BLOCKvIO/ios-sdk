@@ -80,23 +80,6 @@ class InventoryCollectionViewController: UICollectionViewController {
     /// vAtom to pass to detail view controller.
     fileprivate var vatomToPass: VatomModel?
     
-    /// Dictionary mapping vatom IDs to image data (activated image).
-    fileprivate var activatedImages = [String : Data]()
-    
-    /// Download queue to manage concurrently downloading each vAtom's Activated Image.
-    ///
-    /// The host app is responsible for downloading and managing the association between the
-    /// vAtom and its Activated Image resource.
-    ///
-    /// Since many vAtoms share resources, a futher optimization would be made to check if
-    /// the same resource is being requested, and if so, return a cached version. However,
-    /// this is beyond the scope of this example app.
-    fileprivate lazy var downloadQueue: OperationQueue = {
-        let queue = OperationQueue()
-        queue.maxConcurrentOperationCount = 2 // limit concurrent downloads
-        return queue
-    }()
-    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -111,7 +94,7 @@ class InventoryCollectionViewController: UICollectionViewController {
     }
     
     deinit {
-        self.downloadQueue.cancelAllOperations()
+        //TODO: Cancell all downloads
     }
     
     // MARK: - Helpers
@@ -226,9 +209,6 @@ class InventoryCollectionViewController: UICollectionViewController {
              */
             self?.vatoms = vatomModels.sorted { $0.whenModified > $1.whenModified }
             
-            // begin download
-            //self?.dowloadActivatedImages()
-            
         }
         
     }
@@ -260,56 +240,7 @@ class InventoryCollectionViewController: UICollectionViewController {
         }
         
     }
-    
-    /// Creates a data download operation for each vatom's activated image and adds it to our download queue.
-    ///
-    /// On completion of the download, the data blob is mapped to the vatom ID in a dictionary.
-    func dowloadActivatedImages() {
-        
-        for vatom in filteredVatoms {
-            
-            // find the vatom's activated image url
-            guard let activatedImageURL = vatom.props.resources.first(where: { $0.name == "ActivatedImage"} )?.url else {
-                // oops, not found, skip this vatom
-                continue
-            }
-            
-            // encode the url
-            guard let encodedURL = try? BLOCKv.encodeURL(activatedImageURL) else {
-                continue
-            }
-            
-            // create network operation
-            let operation = NetworkDataOperation(urlString: encodedURL.absoluteString) { [weak self] (data, error) in
-                
-                // unwrap data, handle error
-                guard let data = data, error == nil else {
-                    print("\n>>> Error > Viewer: \(error!.localizedDescription)")
-                    return
-                }
-                
-                // handle success
-                
-                // store the image data
-                self?.activatedImages[vatom.id] = data
-                
-                // handle success
-                //print("Viewer > Downloaded 'ActivatedImage' for vAtom: \(vatom.id) Data: \(data)")
-                
-                // find the vatoms index
-                if let index = self?.filteredVatoms.index(where: { $0.id == vatom.id }) {
-                    // ask collection view to reload that cell
-                    self?.collectionView?.reloadItems(at: [IndexPath(row: index, section: 0)])
-                }
-                
-            }
-            
-            // add the operation to the download queue
-            downloadQueue.addOperation(operation)
-        }
-        
-    }
-    
+
     @objc
     fileprivate func handleRefresh() {
         print(#function)
@@ -353,18 +284,12 @@ extension InventoryCollectionViewController {
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: VatomCell.reuseIdentifier, for: indexPath) as! VatomCell
-        
         cell.backgroundColor = UIColor.gray.withAlphaComponent(0.1)
         
         // replace cell's vatom
         let vatom = filteredVatoms[indexPath.row]
         cell.vatom = vatom
         cell.vatomView.update(usingVatom: vatom)
-
-//        // defer vatom view routine execution until after scolling ends
-//        if (self.collectionView?.isDragging == false) && (self.collectionView?.isDecelerating == false) {
-//            cell.vatomView.update(usingVatom: vatom)
-//        }
         
 //        // get vatom id
 //        let vatomID = filteredVatoms[indexPath.row].id

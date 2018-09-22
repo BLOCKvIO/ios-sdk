@@ -18,7 +18,7 @@ import Signals
 public class LiveVatomView: VatomView {
 
     // MARK: - Properties
-    
+
     // MARK: - Initialization
 
     /// Initializes with a `VatomModel` and a `FaceSelectionProcedure`.
@@ -48,11 +48,11 @@ public class LiveVatomView: VatomView {
         }
 
     }
-    
+
     deinit {
-        
+
         // TODO: Remove signal (if necessary)?
-        
+
     }
 
     // MARK: - Web socket

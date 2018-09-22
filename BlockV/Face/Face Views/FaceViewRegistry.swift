@@ -11,6 +11,7 @@
 
 import Foundation
 
+/// Unique identifier of the face view.
 public typealias DisplayURL = String
 
 public typealias FaceViewRoster = [DisplayURL: FaceView.Type]
@@ -36,10 +37,10 @@ public class FaceViewRegistry {
         let registry = FaceViewRegistry()
         // embedded
         registry.register(ImageFaceView.self)
-        registry.register(ProgressImageFaceView.self)
+        //registry.register(ProgressImageFaceView.self)
         // testing
-        registry.register(TestFaceView.self)
-        registry.register(SubclassTestFaceView.self)
+//        registry.register(TestFaceView.self)
+//        registry.register(SubclassTestFaceView.self)
         return registry
     }()
 

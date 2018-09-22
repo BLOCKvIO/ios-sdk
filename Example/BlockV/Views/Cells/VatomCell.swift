@@ -48,7 +48,6 @@ class VatomCell: UICollectionViewCell {
         super.init(coder: aDecoder)
         
         print(#function)
-        
     }
     
     override func prepareForReuse() {
@@ -59,7 +58,7 @@ class VatomCell: UICollectionViewCell {
          */
         
         // reset
-        self.vatomView.prepareForReuse()
+        self.vatomView.unLoad()
         
     }
     

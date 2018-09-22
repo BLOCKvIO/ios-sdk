@@ -11,89 +11,37 @@
 
 import Foundation
 
-/*
- 
- Issues
- 
- If Face Views perform their own downloading of resources it leads to an interesting issue around async + reuse.
- 
- - Consider a long running download.
- 1. Cell comes on screen, Vatom View runs it's routine, selects a face model
-    init's the face view and asks it to load. May show error, or loader.
- - If the cell is on screen still, and the download completes it will set the imageView's image property (because it
-   has a reference to it.
- - If the download is ongoing and the cell has gone off screen it may have been placed in reuse pool.
- 
- Now, it all depends on the implementation as to how this is handled.
- - If the cell a reused by not nil-ing vatom view, then the
- 
- ###
- 
- When VatomView come out a the reuse pool, it's selected face view is most likely going to change. This means there
- will be a flicker on the screen while the VVR runs followed by the face view loading it's content.
- 
- Is there any way to get around this? Maybe better caching?
- 
- -----------------------
- 
- Use Cases
- 
- 1. Stand alone
-    - must handle everything
- 2. Reusable cell in a list
-    -
- 
- Using VatomView within a cell that is to be reused.
- 
- This is a common use case for devs that want to integrate vatoms into a table list interface in their own apps.
- 
- Options:
- 1. nil out vAtom view (how will this work in storyboards)
- 2. add a `prepareForReuse()` method to VatomView, vatom view will then propagate the change to it's selected face view.
- 
- */
-
-/// Type that manage vAtom should conform to this delegate to know when the face has completed loading.
+/// Types that manage a `VatomView` should conform to this delegate to know when the face has completed loading.
 ///
 /// This is usefull when you only want to show a vatomview once it's completed loading.
-protocol VatomViewLifecycleDelegte {
-
-    /// Called when the vatom view's selected face view has loaded successful of with an error.
-    func faceViewDidLoad(error: Error?)
-
-    /*
-     Additionally, the host would probably want to know more about the lifecycle of the vatom view.
-     */
-
+protocol VatomViewLifecycleDelegate: class {
+    /// Called when the vatom view's selected face view has loaded successful or with an error.
+    func faceViewDidCompleteLoad(error: Error?)
 }
 
 /*
- Main renderer.
- 
- 
- Goals:
+ Design Goals:
  1. Vatom View will ask for the best face (default routine for each view context).
- 2. Viewers must be able to use pre-defined procedures.
- 3. Viewers must be able supply a custom face selection procedure.
- 
- - Always defaults to the icon embedded FSP.
- - Always defaults to use the shared FaceRegistry roster.
- 
- Face selection routines do NOT validate:
- 1. Vatom private properties
- 2. Vatom resources
- 3. Vatom face model config
- > Rather, such errors are left to the face code to validate and display an error.
+ 2. Vatom View must use the global Face Registry (unless explicitly set).
+ 3. Vatom View must be reuseable in a list, .e.g. UICollectionView.
+ -  When VatomView is pulled from a reuse pool, it's selected face view is most likely going to change. Viewer should
+    prepareForReuse by calling `unLoad`.
+ 4. Viewers must be able to use embedded FSPs.
+ 5. Viewers must be able supply a custom FSP (defaults to the icon).
  */
 
-/// Displays a face view for the specified vAtom.
+/// Visualizes a vAtom by attempting to display one of the vAtom's face views.
 ///
-/// The face displayed is dependent on the face selection procedure (FSP).
+/// A `VatomView` is the main render of a vAtom. That is, it contains logic to both select the best face view and to
+/// coordinate the displaying and updating of the face view.
 ///
-/// Loading and error views may be customized.
+/// The face view displayed is dependent on the provided face selection procedure (FSP).
+///
+/// - note:
+/// Loading and error views may be customized for all `VatomView` or per instance.
 public class VatomView: UIView {
 
-    // MARK: - Enum
+    // MARK: - Enums
 
     /// Models the Vatom View Lifecycle (VVLC) state.
     public enum LifecycleState {
@@ -182,18 +130,14 @@ public class VatomView: UIView {
     /// Instance level error view. Use this to customize the default error view.
     public var errorView: VVErrorView
 
-    // TODO: Respond to the Web socket, pass events down to the face view, run FVLC.
-
     // MARK: - Initializer
 
-    //FIXME: Should this class be allowed to be initialized with no params?
-
-    /// Creates a vAtom view for the specifed vAtom.
+    /// Intializes using a vatom and optional procedure.
     ///
     /// - Parameters:
-    ///   - vatom: The vAtom to display (with its associated faces and actions).
-    ///   - procedure: An face selection procedure (FSP) that determines which face to
-    ///     display.
+    ///   - vatom: The vAtom to visualize.
+    ///   - procedure: The Face Selection Procedure (FSP) that determines which face view (if any) to display.
+    ///     Defaults to the `.icon` FSP.
     public init(vatom: VatomModel,
                 procedure: @escaping FaceSelectionProcedure = EmbeddedProcedure.icon.procedure) {
 
@@ -206,9 +150,20 @@ public class VatomView: UIView {
         super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
 
         commonInit()
-        //runVVLC()
+        runVVLC()
     }
 
+    /// Intializes using a vatom and a procedure. Optional loading and error views must be supplied.
+    ///
+    /// - Parameters:
+    ///   - vatom: The vAtom to visualize.
+    ///   - procedure: The Face Selection Procedure (FSP) that determines which face view (if any) to display.
+    ///     Defaults to the `.icon` FSP.
+    ///   - loadingView: Custom loading view to show before the face view concludes loading. Defaults to the standard
+    ///     loading view.
+    ///   - errorView: Custom error view to show in the event a face view is not selected or resolves an error.
+    ///     Defaults to the standard error view.
+    ///   - roster:
     public init(vatom: VatomModel,
                 procedure: @escaping FaceSelectionProcedure = EmbeddedProcedure.icon.procedure,
                 loadingView: VVLoaderView = VatomView.defaultLoadingView.init(),
@@ -224,14 +179,13 @@ public class VatomView: UIView {
         super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
 
         commonInit()
-        //runVVLC()
+        runVVLC()
     }
 
     /// Initialize using aDecoder.
     ///
-    /// This initializer does not automatically run the Vatom View Life Cycle (VVLC).
-    /// You must call `update(usingVatom:procedure:)` to begin the Vatom View Life Cycle.
-    /// To customize this instance's loading and error view
+    /// This initializer does not automatically run the VVLC. The caller must call `update(usingVatom:procedure:)`
+    /// to begin the VVLC.
     required public init?(coder aDecoder: NSCoder) {
 
         self.procedure = EmbeddedProcedure.icon.procedure
@@ -251,6 +205,7 @@ public class VatomView: UIView {
         self.addSubview(loadingView)
         self.addSubview(errorView)
 
+        // add error and loading views
         loadingView.frame = self.bounds
         loadingView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         errorView.frame = self.bounds

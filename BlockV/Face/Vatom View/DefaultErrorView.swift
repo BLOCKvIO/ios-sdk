@@ -12,8 +12,12 @@
 import UIKit
 import Nuke
 
+/// The protocol error views must conform to in order to be displayed by `VatomView`.
 public protocol VatomViewError where Self: UIView {
+    /// Vatom for which the error was generated.
     var vatom: VatomModel? { get set }
+    /// User facing error message.
+    var message: String { get set }
 }
 
 /// Default error view.
@@ -58,7 +62,7 @@ internal final class DefaultErrorView: UIView & VatomViewError {
         return imageView
     }()
 
-    var errorMessage: String = ""
+    var message: String = ""
 
     var vatom: VatomModel? {
         didSet {
@@ -86,17 +90,10 @@ internal final class DefaultErrorView: UIView & VatomViewError {
         activatedImageView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
         activatedImageView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
 
-        commonInit()
-
-        isDebugEnabled = true
     }
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-
-    func commonInit() {
-        self.isDebugEnabled = true
     }
 
     // MARK: - Logic
@@ -107,12 +104,12 @@ internal final class DefaultErrorView: UIView & VatomViewError {
     private func loadResources() {
 
         activityIndicator.startAnimating()
-
         defer { self.activityIndicator.stopAnimating() }
 
         // extract error
         guard let vatom = vatom else {
-            fatalError()
+            assertionFailure("vatom must not be nil.")
+            return
         }
 
         // extract resource model

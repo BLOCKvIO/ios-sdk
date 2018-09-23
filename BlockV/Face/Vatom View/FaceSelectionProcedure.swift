@@ -17,8 +17,6 @@ import Foundation
 /// faces models associated with the vatom's template. It is an algorithm that assists a vAtom in selecting the best
 /// face for a specific visual context.
 ///
-/// An FSP gives the Viewer optional control over the face selection procedure.
-///
 /// Closure inputs:
 /// - Packed vAtom to be displayed.
 /// - Installed display URLs. This is the set of native face display URLs (i.e. unique identifiers of the installed
@@ -185,7 +183,7 @@ private struct EmbeddedProcedureBuilder {
     ///
     /// This closure defines a procedure that is common to most embedded FSPs. The logic is therefor consoldated here.
     static let defaultSelectionProcedure: EmbeddedFaceSelectionProcedure = { (faceModels, installedURLs, constraints) in
-
+        
         var bestFace: FaceModel?
         var bestRank = -1
 
@@ -229,9 +227,6 @@ private struct EmbeddedProcedureBuilder {
             }
 
             if face.isWeb {
-
-                //FIXME: Add native face view for web check.
-                continue
 
                 // enusrue the native face is supported (i.e. the face code is installed)
                 if installedURLs.contains(where: {

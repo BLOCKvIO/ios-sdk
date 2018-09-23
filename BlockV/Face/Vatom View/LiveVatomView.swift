@@ -19,7 +19,7 @@ public class LiveVatomView: VatomView {
 
     // MARK: - Properties
 
-    // MARK: - Initialization
+    // MARK: - Initializer
 
     /// Initializes with a `VatomModel` and a `FaceSelectionProcedure`.
     public override init(vatom: VatomModel, procedure: @escaping FaceSelectionProcedure) {

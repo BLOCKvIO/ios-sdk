@@ -11,9 +11,7 @@
 
 import UIKit
 
-/// The `VatomViewLoader` protocol is adopted by a UIView that intends to act as a visual activity indicator.
-///
-/// `VatomView` displays a loader before the selected face view has content of its own to display.
+/// The protocol loading views must conform to in order to be displayed by `VatomView`.
 public protocol VatomViewLoader where Self: UIView {
     /// Informs the implementer that loading should start.
     func startAnimating()
@@ -22,6 +20,9 @@ public protocol VatomViewLoader where Self: UIView {
 }
 
 /// Default loading view.
+///
+/// Shows:
+/// 1. Activity indicator during loading.
 internal final class DefaultLoadingView: UIView, VatomViewLoader {
 
     // MARK: - Properties
@@ -32,13 +33,12 @@ internal final class DefaultLoadingView: UIView, VatomViewLoader {
         return indicator
     }()
 
-    // MARK: - Init
+    // MARK: - Initializer
 
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.addSubview(activityIndicator)
         activityIndicator.frame = self.bounds
-//        self.backgroundColor = UIColor.orange.withAlphaComponent(0.5)
     }
 
     required init?(coder aDecoder: NSCoder) {

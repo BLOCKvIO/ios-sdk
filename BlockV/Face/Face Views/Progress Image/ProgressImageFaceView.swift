@@ -275,12 +275,12 @@ class ProgressImageFaceView: FaceView {
 
         dispatchGroup.enter()
         dispatchGroup.enter()
-        emptyImageView.downloaded(from: emptyURL) { (_) in
-            self.dispatchGroup.leave() // FIXME: Propagate error
-        }
-        fullImageView.downloaded(from: fullURL) { (_) in
-            self.dispatchGroup.leave() // FIXME: Propagate error
-        }
+//        emptyImageView.downloaded(from: emptyURL) { (_) in
+//            self.dispatchGroup.leave() // FIXME: Propagate error
+//        }
+//        fullImageView.downloaded(from: fullURL) { (_) in
+//            self.dispatchGroup.leave() // FIXME: Propagate error
+//        }
 
         dispatchGroup.notify(queue: .main) {
             completion(nil)

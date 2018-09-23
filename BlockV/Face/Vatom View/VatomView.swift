@@ -89,7 +89,7 @@ public class VatomView: UIView {
     ///
     /// The roster is a consolidated list of the face views registered by both the SDK and Viewer.
     /// This list represents the face views that are *capable* of being rendered.
-    public private(set) var roster: FaceViewRoster
+    public private(set) var roster: Roster
 
     /// Face model selected by the specifed face selection procedure (FSP).
     public private(set) var selectedFaceModel: FaceModel?
@@ -141,7 +141,7 @@ public class VatomView: UIView {
 
         self.vatom = vatom
         self.procedure = procedure
-        self.roster = FaceViewRegistry.shared.roster
+        self.roster = FaceViewRoster.shared.roster
         self.loadingView = VatomView.defaultLoadingView.init()
         self.errorView = VatomView.defaultErrorView.init()
 
@@ -166,7 +166,7 @@ public class VatomView: UIView {
                 procedure: @escaping FaceSelectionProcedure = EmbeddedProcedure.icon.procedure,
                 loadingView: VVLoaderView = VatomView.defaultLoadingView.init(),
                 errorView: VVErrorView = VatomView.defaultErrorView.init(),
-                roster: FaceViewRoster = FaceViewRegistry.shared.roster) {
+                roster: Roster = FaceViewRoster.shared.roster) {
 
         self.vatom = vatom
         self.procedure = procedure
@@ -187,7 +187,7 @@ public class VatomView: UIView {
     required public init?(coder aDecoder: NSCoder) {
 
         self.procedure = EmbeddedProcedure.icon.procedure
-        self.roster = FaceViewRegistry.shared.roster
+        self.roster = FaceViewRoster.shared.roster
         self.loadingView = VatomView.defaultLoadingView.init()
         self.errorView = VatomView.defaultErrorView.init()
 
@@ -288,7 +288,7 @@ public class VatomView: UIView {
             assertionFailure("Developer error: vatom must not be nil.")
             return
         }
-        
+
         //TODO: Offload FSP to a background queue.
 
         // 1. select the best face model

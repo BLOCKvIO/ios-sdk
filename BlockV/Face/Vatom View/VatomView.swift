@@ -135,7 +135,7 @@ public class VatomView: UIView {
     /// - Parameters:
     ///   - vatom: The vAtom to visualize.
     ///   - procedure: The Face Selection Procedure (FSP) that determines which face view to display.
-    ///     Defaults to the `.icon` FSP.
+    ///     Defaults to `.icon`.
     public init(vatom: VatomModel,
                 procedure: @escaping FaceSelectionProcedure = EmbeddedProcedure.icon.procedure) {
 
@@ -156,7 +156,7 @@ public class VatomView: UIView {
     /// - Parameters:
     ///   - vatom: The vAtom to visualize.
     ///   - procedure: The Face Selection Procedure (FSP) that determines which face view to display.
-    ///     Defaults to the `.icon` FSP.
+    ///     Defaults to `.icon`.
     ///   - loadingView: Custom loading view to show before the face view concludes loading. Defaults to the standard
     ///     loading view.
     ///   - errorView: Custom error view to show in the event a face view is not selected or resolves an error.
@@ -183,7 +183,7 @@ public class VatomView: UIView {
     /// Initialize using aDecoder.
     ///
     /// This initializer does not automatically run the VVLC. The caller must call `update(usingVatom:procedure:)`
-    /// to begin the VVLC.
+    /// to begin the VVLC. Custom loaders and errors must be set prior to calling `update(usingVatom:procedure:)`.
     required public init?(coder aDecoder: NSCoder) {
 
         self.procedure = EmbeddedProcedure.icon.procedure

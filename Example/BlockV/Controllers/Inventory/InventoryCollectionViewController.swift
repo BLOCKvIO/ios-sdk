@@ -29,6 +29,21 @@
 import UIKit
 import BLOCKv
 
+/*
+ Alternative to VatomView
+ 
+ VatomView has a number of consequences when using it within a list object, e.g. uicollectionview controller.
+ VatomView itself does not provide a good way of being *reused* (by a reuse pool).
+ 
+ A (possibly) better soltion is to create a cell subclass for each face view.
+ 
+ Pros:
+ - This way each subclass can get a reuse identifier.
+ Cons:
+ - The viewer has to manage the face views directly.
+ 
+ */
+
 /// This view controller demonstrates how to fetch the current user's inventory.
 ///
 /// This example only shows the Activated Image of each vAtom. In future releases
@@ -65,23 +80,6 @@ class InventoryCollectionViewController: UICollectionViewController {
     /// vAtom to pass to detail view controller.
     fileprivate var vatomToPass: VatomModel?
     
-    /// Dictionary mapping vatom IDs to image data (activated image).
-    fileprivate var activatedImages = [String : Data]()
-    
-    /// Download queue to manage concurrently downloading each vAtom's Activated Image.
-    ///
-    /// The host app is responsible for downloading and managing the association between the
-    /// vAtom and its Activated Image resource.
-    ///
-    /// Since many vAtoms share resources, a futher optimization would be made to check if
-    /// the same resource is being requested, and if so, return a cached version. However,
-    /// this is beyond the scope of this example app.
-    fileprivate lazy var downloadQueue: OperationQueue = {
-        let queue = OperationQueue()
-        queue.maxConcurrentOperationCount = 2 // limit concurrent downloads
-        return queue
-    }()
-    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -96,7 +94,7 @@ class InventoryCollectionViewController: UICollectionViewController {
     }
     
     deinit {
-        self.downloadQueue.cancelAllOperations()
+        //TODO: Cancell all downloads
     }
     
     // MARK: - Helpers
@@ -211,9 +209,6 @@ class InventoryCollectionViewController: UICollectionViewController {
              */
             self?.vatoms = vatomModels.sorted { $0.whenModified > $1.whenModified }
             
-            // begin download
-            self?.dowloadActivatedImages()
-            
         }
         
     }
@@ -246,55 +241,6 @@ class InventoryCollectionViewController: UICollectionViewController {
         
     }
     
-    /// Creates a data download operation for each vatom's activated image and adds it to our download queue.
-    ///
-    /// On completion of the download, the data blob is mapped to the vatom ID in a dictionary.
-    func dowloadActivatedImages() {
-        
-        for vatom in filteredVatoms {
-            
-            // find the vatom's activated image url
-            guard let activatedImageURL = vatom.props.resources.first(where: { $0.name == "ActivatedImage"} )?.url else {
-                // oops, not found, skip this vatom
-                continue
-            }
-            
-            // encode the url
-            guard let encodedURL = try? BLOCKv.encodeURL(activatedImageURL) else {
-                continue
-            }
-            
-            // create network operation
-            let operation = NetworkDataOperation(urlString: encodedURL.absoluteString) { [weak self] (data, error) in
-                
-                // unwrap data, handle error
-                guard let data = data, error == nil else {
-                    print("\n>>> Error > Viewer: \(error!.localizedDescription)")
-                    return
-                }
-                
-                // handle success
-                
-                // store the image data
-                self?.activatedImages[vatom.id] = data
-                
-                // handle success
-                print("Viewer > Downloaded 'ActivatedImage' for vAtom: \(vatom.id) Data: \(data)")
-                
-                // find the vatoms index
-                if let index = self?.filteredVatoms.index(where: { $0.id == vatom.id }) {
-                    // ask collection view to reload that cell
-                    self?.collectionView?.reloadItems(at: [IndexPath(row: index, section: 0)])
-                }
-                
-            }
-            
-            // add the operation to the download queue
-            downloadQueue.addOperation(operation)
-        }
-        
-    }
-    
     @objc
     fileprivate func handleRefresh() {
         print(#function)
@@ -305,15 +251,17 @@ class InventoryCollectionViewController: UICollectionViewController {
     // MARK: - Navigation
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "seg.vatom.detail" {
-            let destination = segue.destination as! VatomDetailTableViewController
-            destination.vatom = vatomToPass
+        
+        if segue.identifier == "seg.vatom.faceviews" {
+            let destination = segue.destination as! UINavigationController
+            let engagedVatomVC = destination.viewControllers[0] as! EngagedVatomViewController
+            engagedVatomVC.vatom = vatomToPass
         }
     }
     
     override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
         // prevent the segue - we will do it programatically
-        if identifier == "seg.vatom.detail" {
+        if identifier == "seg.vatom.faceviews" {
             return false
         }
         return true
@@ -336,21 +284,22 @@ extension InventoryCollectionViewController {
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: VatomCell.reuseIdentifier, for: indexPath) as! VatomCell
-        
         cell.backgroundColor = UIColor.gray.withAlphaComponent(0.1)
         
-        // get vatom id
-        let vatomID = filteredVatoms[indexPath.row].id
+        // replace cell's vatom
+        let vatom = filteredVatoms[indexPath.row]
+        cell.vatom = vatom
+        cell.vatomView.update(usingVatom: vatom)
         
-        // set the cell's vatom
-        cell.vatom = filteredVatoms[indexPath.row]
-
-        // find image data
-        if let imageData = activatedImages[vatomID] {
-            cell.contentView.alpha = 0.2
-            cell.activatedImageView.image = UIImage.init(data: imageData)
-            cell.contentView.alphaIn()
-        }
+        //        // get vatom id
+        //        let vatomID = filteredVatoms[indexPath.row].id
+        //
+        //        // find image data
+        //        if let imageData = activatedImages[vatomID] {
+        //            cell.contentView.alpha = 0.2
+        //            cell.activatedImageView.image = UIImage.init(data: imageData)
+        //            cell.contentView.alphaIn()
+        //        }
         
         return cell
     }
@@ -362,15 +311,38 @@ extension InventoryCollectionViewController {
         // check if the cell has a vatom
         if let vatom = currentCell.vatom {
             self.vatomToPass = vatom
-            performSegue(withIdentifier: "seg.vatom.detail", sender: self)
+            performSegue(withIdentifier: "seg.vatom.faceviews", sender: self)
         }
         
     }
+    
+}
 
+extension InventoryCollectionViewController: UITableViewDataSourcePrefetching {
+    
+    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
+        /*
+         The goal here is to prefetch heavy resources.
+         We know the vatom that will be displayed, but we don't know the face that will be selected.
+         
+         We could try and download all the resources associated with the vatom, but that is wastefull.
+         
+         Best case, we find out at this point what resources are required (which means knowing the result of the
+         fsp), and then downloading the resources.
+         
+         The only common way to do this is to inspect the face model's resource array.
+         */
+        
+    }
+    
+    func tableView(_ tableView: UITableView, cancelPrefetchingForRowsAt indexPaths: [IndexPath]) {
+        //TODO:
+    }
+    
 }
 
 extension InventoryCollectionViewController: UICollectionViewDelegateFlowLayout {
-
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
         // Two columns

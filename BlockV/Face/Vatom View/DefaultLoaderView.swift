@@ -23,7 +23,7 @@ public protocol VatomViewLoader where Self: UIView {
 ///
 /// Shows:
 /// 1. Activity indicator during loading.
-internal final class DefaultLoadingView: UIView, VatomViewLoader {
+internal final class DefaultLoaderView: UIView, VatomViewLoader {
 
     // MARK: - Properties
 

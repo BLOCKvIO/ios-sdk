@@ -14,8 +14,10 @@ import Foundation
 // MARK: - Typealias
 
 /// A Face Selection Procedure (FSP) is an algorithm used to select the best face model from the (potentially) many
-/// faces models associated with the vatom's template. It is an algorithm that assists a vAtom in selecting the best
-/// face for a specific visual context.
+/// faces associated with the vatom's template. It is an algorithm that assists a vAtom in selecting the best face for
+/// a specific visual context.
+///
+/// An FSP gives the Viewer optional control over the face selection procedure.
 ///
 /// Closure inputs:
 /// - Packed vAtom to be displayed.
@@ -24,20 +26,6 @@ import Foundation
 ///
 /// Closure ouput:
 /// - Optional face model. The closure should return the 'best' face given the inputs, or `nil` if no face is selected.
-///
-///
-/// - important:
-/// Procedures should:
-/// 1. filter for faces meeting the 'view mode' requirement,
-/// 2. prefer platform specialized (iOS) faces over generic,
-/// 3. prefer 'native' over 'web' faces, and
-/// 4. ensure face view code is registered.
-///
-/// Procedures should not:
-/// 1. validate vAtom private properties,
-/// 2. validate vAtom resources,
-/// 3. validate vAtom face model config.
-/// > Rather, this validation is left to the face code to display an error.
 ///
 /// - Parameters:
 ///   - vatom: Packed vAtom from which the best face model should be selected from the vatom's packaged faces.
@@ -48,9 +36,14 @@ public typealias FaceSelectionProcedure = (_ vatom: VatomModel, _ installedURLs:
 /// Models the embedded face selection procedures (FSP)s. This is a set of pre-built face selection procedures defined
 /// by the SDK to meet common use cases.
 ///
-/// It is important to think of the cases simply as unique identifiers of stored face selection procedures. Cases
-/// loosely map to the server's 'view_mode' simply because the 'view_mode' is generally the predominant selection
-/// criteria.
+/// It important to think of the cases simply as unique identifiers of stored face selection procedures. Cases loosely
+/// map to the server's 'view_mode' simply because the 'view_mode' is generally the predominant selection criteria.
+///
+/// Embedded procedures:
+/// 1. find faces meeting the 'view mode' requirement
+/// 2. prefer platform specialized (iOS) faces over generic
+/// 3. prefer 'native' over 'web' faces
+/// 4. ensure native face code is installed
 public enum EmbeddedProcedure {
 
     /// Selects based on 'icon' view mode.
@@ -212,12 +205,12 @@ private struct EmbeddedProcedureBuilder {
                 continue
             }
 
+            // prefer 'native' over 'web'
             if face.isNative {
 
                 // enusrue the native face is supported (i.e. the face code is installed)
                 if installedURLs.contains(where: {
                     ($0.caseInsensitiveCompare(face.properties.displayURL) == .orderedSame) }) {
-                    // prefer 'native' over 'web'
                     rank += 1
                 } else {
                     // native code is not installed
@@ -226,17 +219,7 @@ private struct EmbeddedProcedureBuilder {
 
             }
 
-            if face.isWeb {
-
-                // enusrue the native face is supported (i.e. the face code is installed)
-                if installedURLs.contains(where: {
-                    ($0.caseInsensitiveCompare("https://*") == .orderedSame) }) {
-                } else {
-                    // native code is not installed
-                    continue
-                }
-
-            }
+            //TODO: Check if web face is installed
 
             // compare to best rank
             if rank > bestRank {

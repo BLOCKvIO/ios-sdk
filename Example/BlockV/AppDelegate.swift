@@ -40,8 +40,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         //: ## Setup
         
-        let MyAppID = "bb671748-9661-47de-9dc0-f56d00837da8"
-        
         BLOCKv.configure(appID: MyAppID)
         
         //: ## Control Flow

@@ -11,59 +11,47 @@
 
 import Foundation
 
-/// FIXME: This operator has a drawback in that it always makes an assignment.
-infix operator ?=
-internal func ?=<T> (lhs: inout T, rhs: T?) {
-    lhs = rhs ?? lhs
-}
+public typealias FaceView = BaseFaceView & FaceViewInterface
 
-/// Composite type that all face views must derive from and conform.
-public typealias FaceView = BaseFaceView & FaceViewLifecycle & FaceViewIdentifiable
+/// The protocol that face views must conform to.
+public protocol FaceViewInterface: class {
 
-/// The protocol that face view must adopt to be uniquely identified.
-public protocol FaceViewIdentifiable {
+    // MARK: - Properties
 
-    /// Uniqiue identifier of the face view.
+    /// Uniqiue identifier of the face.
     ///
     /// This id is used to register the face in the face registry. The face registry is an input to the
     /// `FaceSelectionProcedure` type.
     static var displayURL: String { get }
 
-}
+    // MARK: - Lifecycle
 
-/// The protocol that face views must adobt to receive lifcyle events.
-public protocol FaceViewLifecycle: class {
-
-    /// Called to initiate the loading of the face view.
+    /// Called to initiate the loading of the face code.
     ///
-    /// Face views should call the completion handler at once the face view has displayable content. Displayable content
-    /// means a *minimum first view*. The face view may continue loading content after calling the completion handler.
-    func load(completion: ((Error?) -> Void)?)
+    /// This should trigger the downloading of all necessary face resources.
+    func load(completion: @escaping (Error?) -> Void)
 
-    /// Called when the vatom is updated.
+    /// Called when the vatom pack is updated.
     ///
-    /// This may be called in response to numerous system events. Action handlers, brain code, etc. may all affect the
-    /// vAtom's root or private section. Face view may need to update their content in response.
+    /// This may be called in response to numerous events.
+    ///
+    /// E.g. A vAtom's root or private section are updated and the signal come down via the Web socket state update.
     func vatomUpdated(_ vatom: VatomModel)
 
-    /// Called when the face view is no longer being displayed.
-    ///
-    /// The face view should perform a clean up operation, e.g. cancel all downloads, remove any listers, nil out any
-    /// references and prepare for deallocation.
+    /// Called
     func unload()
 
 }
 
-/// Abstract class all face views must derive from.
 open class BaseFaceView: UIView {
 
-    /// Vatom to use during rendering.
-    public internal(set) var vatom: VatomModel
+    /// Vatom for display.
+    public var vatom: VatomModel
 
-    /// Face model to be rendered.
-    public internal(set) var faceModel: FaceModel
+    /// Selected face model.
+    public var faceModel: FaceModel
 
-    /// Initializes a BaseFaceView using a vatom and a face model.
+    /// Initializes a BaseFaceView.
     public required init(vatom: VatomModel, faceModel: FaceModel) {
         self.vatom = vatom
         self.faceModel = faceModel

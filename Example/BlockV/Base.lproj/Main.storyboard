@@ -324,7 +324,7 @@
                                 </constraints>
                                 <connections>
                                     <outlet property="activatedImageView" destination="grR-hz-WKP" id="CLc-zB-yvw"/>
-                                    <segue destination="ijj-mf-vv6" kind="show" id="xdW-dK-xnt"/>
+                                    <segue destination="ijj-mf-vv6" kind="show" identifier="seg.vatom.faceviews" id="xdW-dK-xnt"/>
                                 </connections>
                             </collectionViewCell>
                         </cells>

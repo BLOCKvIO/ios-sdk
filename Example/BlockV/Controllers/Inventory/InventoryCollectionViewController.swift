@@ -276,16 +276,6 @@ extension InventoryCollectionViewController {
         cell.vatom = vatom
         cell.vatomView.update(usingVatom: vatom)
         
-        //        // get vatom id
-        //        let vatomID = filteredVatoms[indexPath.row].id
-        //
-        //        // find image data
-        //        if let imageData = activatedImages[vatomID] {
-        //            cell.contentView.alpha = 0.2
-        //            cell.activatedImageView.image = UIImage.init(data: imageData)
-        //            cell.contentView.alphaIn()
-        //        }
-        
         return cell
     }
     
@@ -299,29 +289,6 @@ extension InventoryCollectionViewController {
             performSegue(withIdentifier: "seg.vatom.faceviews", sender: self)
         }
         
-    }
-    
-}
-
-extension InventoryCollectionViewController: UITableViewDataSourcePrefetching {
-    
-    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
-        /*
-         The goal here is to prefetch heavy resources.
-         We know the vatom that will be displayed, but we don't know the face that will be selected.
-         
-         We could try and download all the resources associated with the vatom, but that is wastefull.
-         
-         Best case, we find out at this point what resources are required (which means knowing the result of the
-         fsp), and then downloading the resources.
-         
-         The only common way to do this is to inspect the face model's resource array.
-         */
-        
-    }
-    
-    func tableView(_ tableView: UITableView, cancelPrefetchingForRowsAt indexPaths: [IndexPath]) {
-        //TODO:
     }
     
 }

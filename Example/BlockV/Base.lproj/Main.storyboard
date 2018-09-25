@@ -742,11 +742,11 @@
                         <viewControllerLayoutGuide type="bottom" id="BYo-cY-Bgo"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="6ap-pT-Llo">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="1000"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OnM-Wh-F31">
-                                <rect key="frame" x="0.0" y="64" width="375" height="936"/>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="OnM-Wh-F31">
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Bw-oI-GGI">
                                         <rect key="frame" x="170.5" y="24" width="34" height="21"/>
@@ -761,22 +761,22 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fMv-3H-uto" customClass="VatomView" customModule="BLOCKv">
-                                        <rect key="frame" x="117.5" y="114" width="140" height="140"/>
+                                        <rect key="frame" x="107.5" y="114" width="160" height="160"/>
                                         <color key="backgroundColor" red="0.97602712563451777" green="0.97602712563451777" blue="0.97602712563451777" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="fMv-3H-uto" secondAttribute="height" multiplier="1:1" id="AN1-Ff-Dy3"/>
-                                            <constraint firstAttribute="width" constant="140" id="KSa-eB-qR3"/>
+                                            <constraint firstAttribute="width" constant="160" id="KSa-eB-qR3"/>
                                         </constraints>
                                     </view>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PZH-We-e5C" customClass="VatomView" customModule="BLOCKv">
-                                        <rect key="frame" x="40" y="307" width="295" height="184.5"/>
+                                        <rect key="frame" x="40" y="327" width="295" height="184.5"/>
                                         <color key="backgroundColor" red="0.97636467218399048" green="0.97653168439865112" blue="0.97635418176651001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="PZH-We-e5C" secondAttribute="height" multiplier="16:10" id="XGh-oa-cwT"/>
                                         </constraints>
                                     </view>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0Ar-72-hmi">
-                                        <rect key="frame" x="20" y="531.5" width="335" height="536"/>
+                                        <rect key="frame" x="20" y="551.5" width="335" height="536"/>
                                         <color key="backgroundColor" red="0.97636467218399048" green="0.97653168439865112" blue="0.97635418176651001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="0Ar-72-hmi" secondAttribute="height" multiplier="10:16" id="044-lH-zP5"/>
@@ -784,7 +784,6 @@
                                     </view>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstItem="PZH-We-e5C" firstAttribute="leading" secondItem="OnM-Wh-F31" secondAttribute="leading" constant="40" id="3fC-f7-iEu"/>
                                     <constraint firstItem="0Ar-72-hmi" firstAttribute="centerX" secondItem="OnM-Wh-F31" secondAttribute="centerX" id="8VB-MM-XDe"/>
                                     <constraint firstItem="0Ar-72-hmi" firstAttribute="top" secondItem="PZH-We-e5C" secondAttribute="bottom" constant="40" id="9C7-AV-DaH"/>
                                     <constraint firstItem="8Lu-5q-1oH" firstAttribute="top" secondItem="7Bw-oI-GGI" secondAttribute="bottom" constant="12" id="DKf-GS-4Sc"/>
@@ -792,11 +791,14 @@
                                     <constraint firstItem="7Bw-oI-GGI" firstAttribute="top" secondItem="OnM-Wh-F31" secondAttribute="top" constant="24" id="I2T-0B-Lhk"/>
                                     <constraint firstItem="fMv-3H-uto" firstAttribute="centerX" secondItem="OnM-Wh-F31" secondAttribute="centerX" id="N0w-gB-ZWz"/>
                                     <constraint firstItem="7Bw-oI-GGI" firstAttribute="centerX" secondItem="OnM-Wh-F31" secondAttribute="centerX" id="PQY-i3-2DX"/>
-                                    <constraint firstAttribute="bottom" secondItem="0Ar-72-hmi" secondAttribute="bottom" constant="12" id="Tu0-j6-h81"/>
+                                    <constraint firstAttribute="trailing" secondItem="0Ar-72-hmi" secondAttribute="trailing" constant="20" id="TPD-gx-I0K"/>
+                                    <constraint firstAttribute="bottom" secondItem="0Ar-72-hmi" secondAttribute="bottom" constant="20" id="Tu0-j6-h81"/>
                                     <constraint firstItem="PZH-We-e5C" firstAttribute="centerX" secondItem="OnM-Wh-F31" secondAttribute="centerX" id="d8P-Ta-LaP"/>
                                     <constraint firstItem="PZH-We-e5C" firstAttribute="top" secondItem="fMv-3H-uto" secondAttribute="bottom" constant="53" id="fjX-AE-0ME"/>
+                                    <constraint firstAttribute="trailing" secondItem="PZH-We-e5C" secondAttribute="trailing" constant="40" id="gN3-4S-iSr"/>
+                                    <constraint firstItem="0Ar-72-hmi" firstAttribute="leading" secondItem="OnM-Wh-F31" secondAttribute="leading" constant="20" id="qcY-Nc-iq7"/>
                                     <constraint firstItem="fMv-3H-uto" firstAttribute="top" secondItem="8Lu-5q-1oH" secondAttribute="bottom" constant="40" id="se6-eY-oPP"/>
-                                    <constraint firstItem="0Ar-72-hmi" firstAttribute="leading" secondItem="OnM-Wh-F31" secondAttribute="leading" constant="20" id="wyy-ov-FVY"/>
+                                    <constraint firstItem="PZH-We-e5C" firstAttribute="leading" secondItem="OnM-Wh-F31" secondAttribute="leading" constant="40" id="wtf-UV-896"/>
                                 </constraints>
                             </scrollView>
                         </subviews>
@@ -822,7 +824,6 @@
                             </barButtonItem>
                         </rightBarButtonItems>
                     </navigationItem>
-                    <size key="freeformSize" width="375" height="1000"/>
                     <connections>
                         <outlet property="bottomContainerView" destination="0Ar-72-hmi" id="jHA-BX-8E4"/>
                         <outlet property="descriptionLabel" destination="8Lu-5q-1oH" id="faA-P5-2Q0"/>

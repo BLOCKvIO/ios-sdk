@@ -47,7 +47,7 @@ public class FaceViewRoster {
     public static let shared: FaceViewRoster = {
         let roster = FaceViewRoster()
         // embedded face views
-        //roster.register(ImageFaceView.self)
+        roster.register(ImageFaceView.self)
         return roster
     }()
 

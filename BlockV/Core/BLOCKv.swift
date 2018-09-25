@@ -102,7 +102,7 @@ public final class BLOCKv {
 
                 #if DEBUG
                 // environment for experimentation (safe to modify)
-                self.environment = .development
+                self.environment = .production
                 #else
                 // pre-mapped environment (do not modify)
                 self.environment = mappedEnvironment

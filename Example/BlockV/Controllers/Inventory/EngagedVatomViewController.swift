@@ -24,7 +24,7 @@ class EngagedVatomViewController: UIViewController {
     @IBOutlet weak var descriptionLabel: UILabel!
     
     @IBOutlet weak var topVatomView: VatomView! // using storyboards
-    @IBOutlet weak var middleVatomView: LiveVatomView! // using storyboards
+    @IBOutlet weak var middleVatomView: VatomView! // using storyboards
     @IBOutlet weak var bottomContainerView: UIView! // using code, this is just a container view
     
     // MARK: - Properties

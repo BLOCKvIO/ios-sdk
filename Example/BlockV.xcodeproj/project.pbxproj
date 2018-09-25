@@ -11,7 +11,7 @@
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
-		AD3DB5302157FD7200E00B67 /* EngagedVatomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD3DB52F2157FD7200E00B67 /* EngagedVatomViewController.swift */; };
+		AD3DB5302157FD7200E00B67 /* TappedVatomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD3DB52F2157FD7200E00B67 /* TappedVatomViewController.swift */; };
 		AD61462E213DC88700204E5B /* FaceSelectionProcedure_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD61462A213DC83D00204E5B /* FaceSelectionProcedure_Tests.swift */; };
 		AD61462F213DC88B00204E5B /* MockModelFaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD61462C213DC87100204E5B /* MockModelFaces.swift */; };
 		CDC268C7232CDB5AF1386116 /* Pods_BlockV_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DE93FD598C0B61200B996A4 /* Pods_BlockV_Example.framework */; };
@@ -76,7 +76,7 @@
 		A11EBD956A70C6C7890F053F /* Pods-BLOCKv_Unit_Tests.prod.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BLOCKv_Unit_Tests.prod.xcconfig"; path = "Pods/Target Support Files/Pods-BLOCKv_Unit_Tests/Pods-BLOCKv_Unit_Tests.prod.xcconfig"; sourceTree = "<group>"; };
 		A8F8F6BF41E2864BD8FA3FB7 /* Pods-BlockV_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Tests/Pods-BlockV_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		AC9D73DE9B5506A2FFBB74EE /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
-		AD3DB52F2157FD7200E00B67 /* EngagedVatomViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EngagedVatomViewController.swift; sourceTree = "<group>"; };
+		AD3DB52F2157FD7200E00B67 /* TappedVatomViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TappedVatomViewController.swift; sourceTree = "<group>"; };
 		AD61462A213DC83D00204E5B /* FaceSelectionProcedure_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceSelectionProcedure_Tests.swift; sourceTree = "<group>"; };
 		AD61462C213DC87100204E5B /* MockModelFaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockModelFaces.swift; sourceTree = "<group>"; };
 		B5A79A9FDD3524D3628C080E /* Pods-BlockV_Example.dev.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Example.dev.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Example/Pods-BlockV_Example.dev.xcconfig"; sourceTree = "<group>"; };
@@ -242,7 +242,7 @@
 		D519A849205E8360006B0D19 /* Inventory */ = {
 			isa = PBXGroup;
 			children = (
-				AD3DB52F2157FD7200E00B67 /* EngagedVatomViewController.swift */,
+				AD3DB52F2157FD7200E00B67 /* TappedVatomViewController.swift */,
 				D55B21FA2056E04B00B6D5C2 /* InventoryCollectionViewController.swift */,
 				D519A84A205E83AB006B0D19 /* VatomDetailTableViewController.swift */,
 			);
@@ -536,7 +536,7 @@
 				D5475764205D124100E6FE90 /* UIView+Ext.swift in Sources */,
 				D547576B205E67AD00E6FE90 /* VatomCell.swift in Sources */,
 				D519A84B205E83AB006B0D19 /* VatomDetailTableViewController.swift in Sources */,
-				AD3DB5302157FD7200E00B67 /* EngagedVatomViewController.swift in Sources */,
+				AD3DB5302157FD7200E00B67 /* TappedVatomViewController.swift in Sources */,
 				D55B21FB2056E04B00B6D5C2 /* InventoryCollectionViewController.swift in Sources */,
 				D55B21F52056745700B6D5C2 /* UIViewController+Ext.swift in Sources */,
 				D55B21EC2053D43600B6D5C2 /* UserInfoTableViewController.swift in Sources */,

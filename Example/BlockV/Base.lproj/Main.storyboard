@@ -736,7 +736,7 @@
         <!--Vatom View-->
         <scene sceneID="reg-rD-3cc">
             <objects>
-                <viewController id="aCn-k2-mju" customClass="EngagedVatomViewController" customModule="BlockV_Example" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="aCn-k2-mju" customClass="TappedVatomViewController" customModule="BlockV_Example" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="PHH-6S-6S0"/>
                         <viewControllerLayoutGuide type="bottom" id="BYo-cY-Bgo"/>
@@ -781,6 +781,11 @@
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="0Ar-72-hmi" secondAttribute="height" multiplier="10:16" id="044-lH-zP5"/>
                                         </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                <integer key="value" value="18"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
                                     </view>
                                 </subviews>
                                 <constraints>

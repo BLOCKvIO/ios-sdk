@@ -254,8 +254,8 @@ class InventoryCollectionViewController: UICollectionViewController {
         
         if segue.identifier == "seg.vatom.faceviews" {
             let destination = segue.destination as! UINavigationController
-            let engagedVatomVC = destination.viewControllers[0] as! EngagedVatomViewController
-            engagedVatomVC.vatom = vatomToPass
+            let tappedVatomVC = destination.viewControllers[0] as! TappedVatomViewController
+            tappedVatomVC.vatom = vatomToPass
         }
     }
     

@@ -25,8 +25,6 @@ public protocol VatomViewLoader where Self: UIView {
 public protocol VatomViewError where Self: UIView {
     /// Vatom for which the error was generated.
     var vatom: VatomModel? { get set }
-    /// User facing error message.
-    var message: String { get set }
 }
 
 /// Types that manage a `VatomView` should conform to this delegate to know when the face has completed loading.

@@ -54,8 +54,6 @@ internal final class DefaultErrorView: UIView & VatomViewError {
         return imageView
     }()
 
-    var message: String = ""
-
     var vatom: VatomModel? {
         didSet {
             self.loadResources()

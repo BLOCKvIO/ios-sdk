@@ -11,19 +11,11 @@
 
 import UIKit
 
-/// The protocol loading views must conform to in order to be displayed by `VatomView`.
-public protocol VatomViewLoader where Self: UIView {
-    /// Informs the implementer that loading should start.
-    func startAnimating()
-    /// Informs the implementor that loading should stop.
-    func stopAnimating()
-}
-
 /// Default loading view.
 ///
 /// Shows:
 /// 1. Activity indicator during loading.
-internal final class DefaultLoadingView: UIView, VatomViewLoader {
+internal final class DefaultLoaderView: UIView, VatomViewLoader {
 
     // MARK: - Properties
 

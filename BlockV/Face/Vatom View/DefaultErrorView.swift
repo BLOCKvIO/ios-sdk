@@ -12,14 +12,6 @@
 import UIKit
 import Nuke
 
-/// The protocol error views must conform to in order to be displayed by `VatomView`.
-public protocol VatomViewError where Self: UIView {
-    /// Vatom for which the error was generated.
-    var vatom: VatomModel? { get set }
-    /// User facing error message.
-    var message: String { get set }
-}
-
 /// Default error view.
 ///
 /// Shows:
@@ -61,8 +53,6 @@ internal final class DefaultErrorView: UIView & VatomViewError {
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
-
-    var message: String = ""
 
     var vatom: VatomModel? {
         didSet {

@@ -11,6 +11,22 @@
 
 import Foundation
 
+// MARK: - Protocols
+
+/// The protocol loading views must conform to in order to be displayed by `VatomView`.
+public protocol VatomViewLoader where Self: UIView {
+    /// Informs the implementer that loading should start.
+    func startAnimating()
+    /// Informs the implementor that loading should stop.
+    func stopAnimating()
+}
+
+/// The protocol error views must conform to in order to be displayed by `VatomView`.
+public protocol VatomViewError where Self: UIView {
+    /// Vatom for which the error was generated.
+    var vatom: VatomModel? { get set }
+}
+
 /// Types that manage a `VatomView` should conform to this delegate to know when the face has completed loading.
 protocol VatomViewLifecycleDelegate: class {
     /// Called when the vatom view's selected face view has loaded successful or with an error.
@@ -110,8 +126,8 @@ public class VatomView: UIView {
     /// calls its `load` completion handler.
     ///
     /// - note:
-    /// To customise the loading view per instance of `VatomView` see `loadingView`.
-    public static var defaultLoadingView: VVLoaderView.Type = DefaultLoadingView.self
+    /// To customise the loader view per instance of `VatomView` see `loaderView`.
+    public static var defaultLoaderView: VVLoaderView.Type = DefaultLoaderView.self
 
     /// Class-level error view used as the *default* error view.
     ///
@@ -142,7 +158,7 @@ public class VatomView: UIView {
         self.vatom = vatom
         self.procedure = procedure
         self.roster = FaceViewRoster.shared.roster
-        self.loadingView = VatomView.defaultLoadingView.init()
+        self.loadingView = VatomView.defaultLoaderView.init()
         self.errorView = VatomView.defaultErrorView.init()
 
         super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
@@ -164,7 +180,7 @@ public class VatomView: UIView {
     ///   - roster:
     public init(vatom: VatomModel,
                 procedure: @escaping FaceSelectionProcedure = EmbeddedProcedure.icon.procedure,
-                loadingView: VVLoaderView = VatomView.defaultLoadingView.init(),
+                loadingView: VVLoaderView = VatomView.defaultLoaderView.init(),
                 errorView: VVErrorView = VatomView.defaultErrorView.init(),
                 roster: Roster = FaceViewRoster.shared.roster) {
 
@@ -188,7 +204,7 @@ public class VatomView: UIView {
 
         self.procedure = EmbeddedProcedure.icon.procedure
         self.roster = FaceViewRoster.shared.roster
-        self.loadingView = VatomView.defaultLoadingView.init()
+        self.loadingView = VatomView.defaultLoaderView.init()
         self.errorView = VatomView.defaultErrorView.init()
 
         super.init(coder: aDecoder)

@@ -29,21 +29,6 @@
 import UIKit
 import BLOCKv
 
-/*
- Alternative to VatomView
- 
- VatomView has a number of consequences when using it within a list object, e.g. uicollectionview controller.
- VatomView itself does not provide a good way of being *reused* (by a reuse pool).
- 
- A (possibly) better soltion is to create a cell subclass for each face view.
- 
- Pros:
- - This way each subclass can get a reuse identifier.
- Cons:
- - The viewer has to manage the face views directly.
- 
- */
-
 /// This view controller demonstrates how to fetch the current user's inventory.
 ///
 /// This example only shows the Activated Image of each vAtom. In future releases

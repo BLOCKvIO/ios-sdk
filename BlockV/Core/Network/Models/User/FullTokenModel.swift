@@ -19,21 +19,21 @@ public struct FullTokenModel: Codable, Equatable {
     public let properties: Properties
 
     public struct Properties: Codable, Equatable {
-        public let appId: String
+        public let appID: String
         public let isConfirmed: Bool
         public let isDefault: Bool
         public let token: String
         public let tokenType: String
-        public let userId: String
+        public let userID: String
         public let verifyCodeExpires: Date
 
         enum CodingKeys: String, CodingKey {
-            case appId             = "app_id"
+            case appID             = "app_id"
             case isConfirmed       = "confirmed"
             case isDefault         = "is_default"
             case token             = "token"
             case tokenType         = "token_type"
-            case userId            = "user_id"
+            case userID            = "user_id"
             case verifyCodeExpires = "verify_code_expires"
         }
     }

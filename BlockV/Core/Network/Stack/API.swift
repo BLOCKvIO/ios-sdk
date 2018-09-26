@@ -204,7 +204,7 @@ extension API {
         ///
         /// - Parameters:
         ///   - message: Content of the message.
-        ///   - userId: Unique identifier of the recipient user.
+        ///   - userID: Unique identifier of the recipient user.
         /// - Returns: The endpoint is generic over a response model. This model is parsed on
         /// success responses (200...299).
         static func sendMessage(_ message: String, toUserId userId: String) -> Endpoint<BaseModel<GeneralModel>> {

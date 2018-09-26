@@ -273,7 +273,6 @@ extension InventoryCollectionViewController {
         
         // replace cell's vatom
         let vatom = filteredVatoms[indexPath.row]
-        cell.vatom = vatom
         cell.vatomView.update(usingVatom: vatom)
         
         return cell
@@ -284,7 +283,7 @@ extension InventoryCollectionViewController {
         // get the vatom to pass
         let currentCell = collectionView.cellForItem(at: indexPath) as! VatomCell
         // check if the cell has a vatom
-        if let vatom = currentCell.vatom {
+        if let vatom = currentCell.vatomView.vatom {
             self.vatomToPass = vatom
             performSegue(withIdentifier: "seg.vatom.faceviews", sender: self)
         }

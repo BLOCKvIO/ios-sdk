@@ -29,9 +29,7 @@ class VatomCell: UICollectionViewCell {
     // MARK: - Properties
     
     static let reuseIdentifier = "com.blockv.vatom-cell"
-    
-    var vatom: VatomModel?
-    
+        
     // MARK: - Outlets
     
     @IBOutlet weak var vatomView: VatomView!

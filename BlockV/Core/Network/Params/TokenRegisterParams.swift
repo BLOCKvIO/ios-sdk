@@ -136,8 +136,8 @@ public struct OAuthTokenRegisterParams: RegisterParams {
     let provider: String // e.g. FaceFacebook
     let oauthToken: String // e.g. oauth token
 
-    public init(userId: String, provider: String, oauthToken: String) {
-        self.userID = userId
+    public init(userID: String, provider: String, oauthToken: String) {
+        self.userID = userID
         self.provider = provider
         self.oauthToken = oauthToken
     }

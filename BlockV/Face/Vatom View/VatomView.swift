@@ -317,12 +317,12 @@ public class VatomView: UIView {
              Error - Case 1 - Show the error view if the FSP fails to select a face view.
              */
 
-            printBV(error: "Face Selection Procedure (FSP) returned without selecting a face model.")
+            //printBV(error: "Face Selection Procedure (FSP) returned without selecting a face model.")
             self.state = .error
             return
         }
 
-        printBV(info: "Face Selection Procedure (FSP) selected face model: \(selectedFaceModel)")
+        //printBV(info: "Face Selection Procedure (FSP) selected face model: \(selectedFaceModel)")
 
         /*
          Here we check:
@@ -338,7 +338,7 @@ public class VatomView: UIView {
         if (vatom.props.templateVariationID == oldVatom?.props.templateVariationID) &&
             (selectedFaceModel == self.selectedFaceModel) {
 
-            printBV(info: "Face model unchanged - Updating face view.")
+            //printBV(info: "Face model unchanged - Updating face view.")
 
             /*
              Although the selected face model has not changed, other items in the vatom may have, these updates
@@ -352,7 +352,7 @@ public class VatomView: UIView {
 
         } else {
 
-            printBV(info: "Face model changed - Replacing face view.")
+            //printBV(info: "Face model changed - Replacing face view.")
 
             // replace currently selected face model
             self.selectedFaceModel = selectedFaceModel
@@ -368,7 +368,7 @@ public class VatomView: UIView {
                 return
             }
 
-            printBV(info: "Face view for face model: \(faceViewType)")
+            //printBV(info: "Face view for face model: \(faceViewType)")
 
             //let selectedFaceView: FaceView = ImageFaceView(vatom: vatom, faceModel: selectedFace)
             let selectedFaceView: FaceView = faceViewType.init(vatom: vatom,
@@ -401,7 +401,7 @@ public class VatomView: UIView {
         // 1. instruct face view to load its content
         newFaceView.load { [weak self] (error) in
 
-            printBV(info: "Face view load completion called.")
+            ///printBV(info: "Face view load completion called.")
 
             // Error - Case 2 -  Display error view if the face view encounters an error during its load operation.
 

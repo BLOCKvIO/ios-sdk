@@ -128,7 +128,7 @@ extension UserToken: RegisterParams {}
 
 /// Models the Oauth parameters needed for an oauth token registration.
 ///
-/// - `userId`: Provider user id.
+/// - `userID`: Provider user id.
 /// - `provider`: Provider name, e.g. "Facebook".
 /// - `oauthToken`: Oauth token from the provider.
 public struct OAuthTokenRegisterParams: RegisterParams {

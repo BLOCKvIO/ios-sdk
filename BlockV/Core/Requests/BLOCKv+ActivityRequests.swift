@@ -88,7 +88,7 @@ extension BLOCKv {
     ///
     /// - Parameters:
     ///   - message: Content of the message.
-    ///   - userId: Unique identifier of the recipient user.
+    ///   - userID: Unique identifier of the recipient user.
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
     public static func sendMessage(_ message: String, toUserId userId: String,

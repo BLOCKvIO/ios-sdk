@@ -41,16 +41,31 @@ class ImageFaceView: FaceView {
         var imageName: String = "ActivatedImage"
 
         /// Initialize using face configuration.
+        ///
+        /// Passing in `nil` initializes the face config with default values.
         init(_ faceConfig: JSON?) {
-
             guard let config = faceConfig else { return }
-
             // assign iff not nil
             if let scaleString = config["scale"]?.stringValue {
                 self.scale ?= Config.Scale(rawValue: scaleString)
             }
             self.imageName ?= config["name"]?.stringValue
+        }
+        
+        /// Initialize using face model.
+        init(_ faceModel: FaceModel) {
 
+            // legacy: overwrite fallback if needed
+            self.imageName ?= faceModel.properties.resources.first
+            
+            if let config = faceModel.properties.config {
+                // assign iff not nil
+                if let scaleString = config["scale"]?.stringValue {
+                    self.scale ?= Config.Scale(rawValue: scaleString)
+                }
+                self.imageName ?= config["name"]?.stringValue
+            }
+            
         }
     }
 

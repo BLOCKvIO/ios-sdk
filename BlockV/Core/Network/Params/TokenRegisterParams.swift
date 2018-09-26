@@ -128,22 +128,22 @@ extension UserToken: RegisterParams {}
 
 /// Models the Oauth parameters needed for an oauth token registration.
 ///
-/// - `userId`: Provider user id.
+/// - `userID`: Provider user id.
 /// - `provider`: Provider name, e.g. "Facebook".
 /// - `oauthToken`: Oauth token from the provider.
 public struct OAuthTokenRegisterParams: RegisterParams {
-    let userId: String // e.g. Facebook id
+    let userID: String // e.g. Facebook id
     let provider: String // e.g. FaceFacebook
     let oauthToken: String // e.g. oauth token
 
-    public init(userId: String, provider: String, oauthToken: String) {
-        self.userId = userId
+    public init(userID: String, provider: String, oauthToken: String) {
+        self.userID = userID
         self.provider = provider
         self.oauthToken = oauthToken
     }
 
     enum CodingKeys: String, CodingKey {
-        case userId      = "token"
+        case userID      = "token"
         case provider    = "token_type"
         case authData    = "auth_data"
     }
@@ -158,7 +158,7 @@ extension OAuthTokenRegisterParams: Codable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(userId, forKey: .userId)
+        try container.encode(userID, forKey: .userID)
         try container.encode(provider, forKey: .provider)
 
         var authData = container.nestedContainer(keyedBy: AuthDataKeys.self, forKey: .authData)
@@ -167,7 +167,7 @@ extension OAuthTokenRegisterParams: Codable {
 
     public init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        userId = try values.decode(String.self, forKey: .userId)
+        userID = try values.decode(String.self, forKey: .userID)
         provider = try values.decode(String.self, forKey: .provider)
 
         let authData = try values.nestedContainer(keyedBy: AuthDataKeys.self, forKey: .authData)
@@ -179,7 +179,7 @@ extension OAuthTokenRegisterParams: Codable {
 extension OAuthTokenRegisterParams: DictionaryCodable {
     public func toDictionary() -> [String: Any] {
         return [
-            "token": userId,
+            "token": userID,
             "token_type": provider,
             "auth_data": [
                 "auth_token": oauthToken

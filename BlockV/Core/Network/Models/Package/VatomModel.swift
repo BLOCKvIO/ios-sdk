@@ -90,7 +90,7 @@ public struct RootProperties: Equatable {
     public let rootType: String
     public let templateID: String
     public let templateVariationID: String
-    public let publisherFqdn: String
+    public let publisherFQDN: String
 
     // variables
     public var category: String
@@ -201,7 +201,7 @@ extension RootProperties: Decodable {
         numberDirectClones  = try items.decode(Int.self, forKey: .numberDirectClones)
         owner               = try items.decode(String.self, forKey: .owner)
         parentID            = try items.decode(String.self, forKey: .parentID)
-        publisherFqdn       = try items.decode(String.self, forKey: .publisherFqdn)
+        publisherFQDN       = try items.decode(String.self, forKey: .publisherFqdn)
         isRedeemable        = try items.decode(Bool.self, forKey: .isRedeemable)
         resources           = try items.decode([Safe<VatomResourceModel>].self,
                                                              forKey: .resources).compactMap { $0.value }

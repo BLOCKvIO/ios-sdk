@@ -775,7 +775,7 @@
                                             <constraint firstAttribute="width" secondItem="PZH-We-e5C" secondAttribute="height" multiplier="16:10" id="XGh-oa-cwT"/>
                                         </constraints>
                                     </view>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0Ar-72-hmi">
+                                    <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0Ar-72-hmi">
                                         <rect key="frame" x="20" y="551.5" width="335" height="536"/>
                                         <color key="backgroundColor" red="0.97636467218399048" green="0.97653168439865112" blue="0.97635418176651001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>

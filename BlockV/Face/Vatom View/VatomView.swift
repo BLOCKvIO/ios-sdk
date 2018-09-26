@@ -251,11 +251,12 @@ public class VatomView: UIView {
             self.state = .loading
         }
 
+        let oldVatom = self.vatom
         self.vatom = newVatom
         // assign if not nil
         procedure.flatMap { self.procedure = $0 }
 
-        runVVLC()
+        runVVLC(oldVatom: oldVatom)
 
     }
 
@@ -298,7 +299,9 @@ public class VatomView: UIView {
     /// 2. Create face view
     /// 3. Inform the face view to load it's content
     /// 4. Display the face view
-    public func runVVLC() {
+    ///
+    /// - Parameter oldVatom: The previous vAtom being visualized by this VatomView.
+    internal func runVVLC(oldVatom: VatomModel? = nil) {
 
         guard let vatom = vatom else {
             assertionFailure("Developer error: vatom must not be nil.")
@@ -322,12 +325,18 @@ public class VatomView: UIView {
         printBV(info: "Face Selection Procedure (FSP) selected face model: \(selectedFaceModel)")
 
         /*
-         Here we check if selected face model is still equal to the current. This is necessary since the face may
+         Here we check:
+         
+         A. If selected face model is still equal to the current. This is necessary since the face may
          change as a result of the publisher modifying the face (typically via a delete/add operation).
+         
+         B. If the new vatom and the previous vatom share a template variation. This is needed since resources are
+         defined at the template variation level.
          */
 
         // 2. check if the face model has not changed
-        if selectedFaceModel == self.selectedFaceModel {
+        if (vatom.props.templateVariationID == oldVatom?.props.templateVariationID) &&
+            (selectedFaceModel == self.selectedFaceModel) {
 
             printBV(info: "Face model unchanged - Updating face view.")
 
@@ -343,7 +352,7 @@ public class VatomView: UIView {
 
         } else {
 
-            printBV(info: "Face model change - Replacing face view.")
+            printBV(info: "Face model changed - Replacing face view.")
 
             // replace currently selected face model
             self.selectedFaceModel = selectedFaceModel

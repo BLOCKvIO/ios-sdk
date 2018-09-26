@@ -39,18 +39,27 @@ class ImageFaceView: FaceView {
         // defaults
         var scale: Scale = .fit
         var imageName: String = "ActivatedImage"
+        
+        /// Initialize using face model.
+        ///
+        /// The config has a set of default values. If the face config section is present, those values are used in
+        /// place of the default ones.
+        ///
+        /// ### Legacy Support
+        /// The first resource name in the resources array (if present) is used in place of the activate image.
+        init(_ faceModel: FaceModel) {
 
-        /// Initialize using face configuration.
-        init(_ faceConfig: JSON?) {
-
-            guard let config = faceConfig else { return }
-
-            // assign iff not nil
-            if let scaleString = config["scale"]?.stringValue {
-                self.scale ?= Config.Scale(rawValue: scaleString)
+            // legacy: overwrite fallback if needed
+            self.imageName ?= faceModel.properties.resources.first
+            
+            if let config = faceModel.properties.config {
+                // assign iff not nil
+                if let scaleString = config["scale"]?.stringValue {
+                    self.scale ?= Config.Scale(rawValue: scaleString)
+                }
+                self.imageName ?= config["name"]?.stringValue
             }
-            self.imageName ?= config["name"]?.stringValue
-
+            
         }
     }
 
@@ -71,7 +80,7 @@ class ImageFaceView: FaceView {
     required init(vatom: VatomModel, faceModel: FaceModel) {
 
         // init face config
-        self.config = Config(faceModel.properties.config)
+        self.config = Config(faceModel)
 
         super.init(vatom: vatom, faceModel: faceModel)
 

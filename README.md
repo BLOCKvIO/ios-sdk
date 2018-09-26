@@ -9,7 +9,7 @@ This is the official BLOCKv SDK. It allows you to easily integrate your own apps
 ## Requirements
 
 - iOS 10.0+
-- Xcode 9.4+
+- Xcode 10+
 - Swift 4.1+
 
 ## Installation
@@ -52,16 +52,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 ## Example App
 
-The example app lets you try out the BLOCKv SDK. It's a great place to start if you're getting up to speed on the platform. It demonstrates the following features:
+The example app lets you try out the BLOCKv SDK. It's a great place to start if you're getting up to speed on the platform. It offeres the following features:
+
+#### Core Module
 
 - [x] Authentication (registration & login)
 - [x] Profile management
 - [x] Fetching the user's inventory of vAtoms
 - [x] Fetching individual vAtoms
-- [x] Fetching a vAtom's Activated Image
-- [x] Dispalying vAtoms in a UICollectionView
 - [x] Searching for vAtoms on the BLOCKv platform
-- [x] Responding to Web socket update stream
+- [x] Responding to Web socket events
+
+#### Face Module
+
+- [x] Visually representing vAtoms using faces
+- [x] Specicy an embedded or custom Face Selection Procedure (FSP)
+- [x] Customize `VatomView` loader and error views
+
+#### Sample App
+
+- [x] Basic onboarding flow
+- [x] Dispalying vAtoms in a UICollectionView
+- [x] Profile mangement
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 

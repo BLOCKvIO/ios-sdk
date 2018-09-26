@@ -44,6 +44,7 @@ internal final class DefaultErrorView: UIView & VatomViewError {
     private let infoButton: UIButton = {
         let button = UIButton(type: UIButtonType.infoLight)
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.tintColor = UIColor.orange
         return button
     }()
 

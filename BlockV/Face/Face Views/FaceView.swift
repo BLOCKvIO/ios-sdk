@@ -36,6 +36,9 @@ public protocol FaceViewIdentifiable {
 /// The protocol that face views must adopt to receive lifecycle events.
 public protocol FaceViewLifecycle: class {
 
+    /// Boolean value indicating whether the face view has loaded.
+    var isLoaded: Bool { get }
+
     /// Called to initiate the loading of the face view.
     ///
     /// - important:

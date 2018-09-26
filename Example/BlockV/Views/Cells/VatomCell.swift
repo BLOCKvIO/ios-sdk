@@ -38,14 +38,10 @@ class VatomCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
-        print(#function)
     }
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        
-        print(#function)
     }
     
     override func prepareForReuse() {

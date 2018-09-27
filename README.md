@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/cocoapods/l/BLOCKv.svg?style=flat)](http://cocoapods.org/pods/BLOCKv)
 [![Platform](https://img.shields.io/cocoapods/p/BLOCKv.svg?style=flat)](http://cocoapods.org/pods/BLOCKv)
 
-This is the official BLOCKv SDK. It allows you to easily integrate your own apps into the BLOCKv platform.
+This is the official BLOCKv SDK. It allows you to easily build your own vAtom Viewer app, or integrate your own apps into the BLOCKv platform.
 
 ## Requirements
 
@@ -50,11 +50,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 ```
 
-## Example App
+## Sample App
 
-The example app lets you try out the BLOCKv SDK. It's a great place to start if you're getting up to speed on the platform. It offeres the following features:
-
-#### Core Module
+The example app lets you try out the BLOCKv SDK. It's a great place to start if you're getting up to speed on the platform. It offers the following features:
 
 - [x] Authentication (registration & login)
 - [x] Profile management
@@ -62,28 +60,31 @@ The example app lets you try out the BLOCKv SDK. It's a great place to start if 
 - [x] Fetching individual vAtoms
 - [x] Searching for vAtoms on the BLOCKv platform
 - [x] Responding to Web socket events
-
-#### Face Module
-
-- [x] Visually representing vAtoms using faces
-- [x] Specicy an embedded or custom Face Selection Procedure (FSP)
-- [x] Customize `VatomView` loader and error views
-
-#### Sample App
-
-- [x] Basic onboarding flow
 - [x] Dispalying vAtoms in a UICollectionView
-- [x] Profile mangement
+- [x] Visually representing vAtoms using faces (new)
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
-## Production Support
+## Design
 
-The BLOCKv SDK for iOS is currently in public **beta**. Breaking changes may still be introduced in the coming months.  This is *important* to consider if you are planning on releasing the SDK as part of your application.
+The SDK has two logical modules: Core and Face. As a viewer developer you will most likely interact with both. 
+
+### Core
+
+- API integration
+- Native model parsing
+- User token management
+- Web socket integration
+
+#### Face Module
+
+- Infrastructure to build face views
+- Embedded face views e.g. ImageFace
+- Convenience class to assist in displaying vAtoms.
 
 ## Versioning
 
-Once the release is official, the SDK will adhere to [semantic versioning](https://semver.org).
+This SDK adheres to [semantic versioning](https://semver.org).
 
 ## Security Disclosure
 

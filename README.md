@@ -60,27 +60,26 @@ The example app lets you try out the BLOCKv SDK. It's a great place to start if 
 - [x] Fetching individual vAtoms
 - [x] Searching for vAtoms on the BLOCKv platform
 - [x] Responding to Web socket events
-- [x] Dispalying vAtoms in a UICollectionView
+- [x] Dispalying vAtoms in a `UICollectionView`
 - [x] Visually representing vAtoms using faces (new)
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
 ## Design
 
-The SDK has two logical modules: Core and Face. As a viewer developer you will most likely interact with both. 
+The SDK has two logical modules: Core and Face. The responsibilites are as follows:
 
 ### Core
 
 - API integration
-- Native model parsing
 - User token management
 - Web socket integration
 
-#### Face Module
+### Face
 
-- Infrastructure to build face views
-- Embedded face views e.g. ImageFace
-- Convenience class to assist in displaying vAtoms.
+- Face view infrastructure
+- Embedded face views e.g. `ImageFace`
+- Convenience classes to assist in displaying vAtoms e.g. `VatomView`
 
 ## Versioning
 

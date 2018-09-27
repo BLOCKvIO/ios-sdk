@@ -85,8 +85,9 @@ class TappedVatomViewController: UIViewController {
         vatomViewB.update(usingVatom: vatom!, procedure: engagedFSP)
         
         // C - VatomView (programmatically)
+        
         vatomViewC.update(usingVatom: vatom!, procedure: cardFSP)
-        vatomViewC.addSubview(vatomViewC)
+        containerView.addSubview(vatomViewC)
         vatomViewC.frame = containerView.bounds
         vatomViewC.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         

@@ -128,8 +128,8 @@ class ImageFaceView: FaceView {
         updateResources(completion: completion)
     }
 
-    /// Respond to updates to the packaged vatom.
-    func vatomUpdated(_ vatom: VatomModel) {
+    /// Respond to updates or replacement of the current vAtom.
+    func vatomChanged(_ vatom: VatomModel) {
 
         /*
          NOTE:

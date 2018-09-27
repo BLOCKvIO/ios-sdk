@@ -348,7 +348,7 @@ public class VatomView: UIView {
 
             self.state = .completed
             // update currently selected face view (without replacement)
-            self.selectedFaceView?.vatomUpdated(vatom)
+            self.selectedFaceView?.vatomChanged(vatom)
 
         } else {
 

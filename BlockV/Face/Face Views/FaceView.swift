@@ -60,7 +60,7 @@ public protocol FaceViewLifecycle: class {
     /// ### Use case
     /// This may be called in response to numerous system events. Action handlers, brain code, etc. may all affect the
     /// vAtom's root or private section. VatomView passes these updates on to the face view.
-    func vatomUpdated(_ vatom: VatomModel)
+    func vatomChanged(_ vatom: VatomModel)
 
     /// Called when the face view is no longer being displayed.
     ///

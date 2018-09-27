@@ -2,11 +2,10 @@ use_frameworks!
 
 target 'BlockV_Example' do
     
-  pod 'BLOCKv/Face', :path => '../'
+  pod 'BLOCKv', :path => '../'
 
   target 'BLOCKv_Unit_Tests' do
     inherit! :search_paths
-
     
   end
 end

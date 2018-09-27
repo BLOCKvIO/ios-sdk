@@ -73,18 +73,18 @@ public class VatomView: UIView {
             switch state {
             case .loading:
                 self.selectedFaceView?.alpha = 0.000001
-                self.loadingView.isHidden = false
-                self.loadingView.startAnimating()
+                self.loaderView.isHidden = false
+                self.loaderView.startAnimating()
                 self.errorView.isHidden = true
             case .error:
-                self.loadingView.isHidden = true
-                self.loadingView.stopAnimating()
+                self.loaderView.isHidden = true
+                self.loaderView.stopAnimating()
                 self.errorView.isHidden = false
                 self.errorView.vatom = self.vatom
             case .completed:
                 self.selectedFaceView?.alpha = 1
-                self.loadingView.isHidden = true
-                self.loadingView.stopAnimating()
+                self.loaderView.isHidden = true
+                self.loaderView.stopAnimating()
                 self.errorView.isHidden = true
             }
         }
@@ -139,8 +139,8 @@ public class VatomView: UIView {
     /// To customise the error view per instance of `VatomView` see `errorView`.
     public static var defaultErrorView: VVErrorView.Type = DefaultErrorView.self
 
-    /// Instance level loading view. Use this to customize the default loading view.
-    public var loadingView: VVLoaderView
+    /// Instance level loader view. Use this to customize the default loader view.
+    public var loaderView: VVLoaderView
     /// Instance level error view. Use this to customize the default error view.
     public var errorView: VVErrorView
 
@@ -158,7 +158,7 @@ public class VatomView: UIView {
         self.vatom = vatom
         self.procedure = procedure
         self.roster = FaceViewRoster.shared.roster
-        self.loadingView = VatomView.defaultLoaderView.init()
+        self.loaderView = VatomView.defaultLoaderView.init()
         self.errorView = VatomView.defaultErrorView.init()
 
         super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
@@ -186,7 +186,7 @@ public class VatomView: UIView {
 
         self.vatom = vatom
         self.procedure = procedure
-        self.loadingView = loadingView
+        self.loaderView = loadingView
         self.errorView = errorView
         self.roster = roster
 
@@ -204,7 +204,7 @@ public class VatomView: UIView {
 
         self.procedure = EmbeddedProcedure.icon.procedure
         self.roster = FaceViewRoster.shared.roster
-        self.loadingView = VatomView.defaultLoaderView.init()
+        self.loaderView = VatomView.defaultLoaderView.init()
         self.errorView = VatomView.defaultErrorView.init()
 
         super.init(coder: aDecoder)
@@ -216,12 +216,12 @@ public class VatomView: UIView {
     private func commonInit() {
         self.clipsToBounds = true
         self.layer.masksToBounds = true
-        self.addSubview(loadingView)
+        self.addSubview(loaderView)
         self.addSubview(errorView)
 
         // add error and loading views
-        loadingView.frame = self.bounds
-        loadingView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+        loaderView.frame = self.bounds
+        loaderView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         errorView.frame = self.bounds
         errorView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
 

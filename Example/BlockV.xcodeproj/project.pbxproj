@@ -11,6 +11,7 @@
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
+		AD36A59F215D1CE4009EFD55 /* CustomLoaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD36A59E215D1CE4009EFD55 /* CustomLoaderView.swift */; };
 		AD3DB5302157FD7200E00B67 /* TappedVatomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD3DB52F2157FD7200E00B67 /* TappedVatomViewController.swift */; };
 		AD61462E213DC88700204E5B /* FaceSelectionProcedure_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD61462A213DC83D00204E5B /* FaceSelectionProcedure_Tests.swift */; };
 		AD61462F213DC88B00204E5B /* MockModelFaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD61462C213DC87100204E5B /* MockModelFaces.swift */; };
@@ -76,6 +77,7 @@
 		A11EBD956A70C6C7890F053F /* Pods-BLOCKv_Unit_Tests.prod.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BLOCKv_Unit_Tests.prod.xcconfig"; path = "Pods/Target Support Files/Pods-BLOCKv_Unit_Tests/Pods-BLOCKv_Unit_Tests.prod.xcconfig"; sourceTree = "<group>"; };
 		A8F8F6BF41E2864BD8FA3FB7 /* Pods-BlockV_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Tests/Pods-BlockV_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		AC9D73DE9B5506A2FFBB74EE /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
+		AD36A59E215D1CE4009EFD55 /* CustomLoaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomLoaderView.swift; sourceTree = "<group>"; };
 		AD3DB52F2157FD7200E00B67 /* TappedVatomViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TappedVatomViewController.swift; sourceTree = "<group>"; };
 		AD61462A213DC83D00204E5B /* FaceSelectionProcedure_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceSelectionProcedure_Tests.swift; sourceTree = "<group>"; };
 		AD61462C213DC87100204E5B /* MockModelFaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockModelFaces.swift; sourceTree = "<group>"; };
@@ -220,6 +222,26 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		AD36A5A0215D382D009EFD55 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				D5E3AC9E2049883800CFFEEA /* LoginViewController.swift */,
+				D55B21EF20540AC200B6D5C2 /* RegisterTableViewController.swift */,
+				D55B21DF2052772400B6D5C2 /* VerifyTableViewController.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		AD36A5A1215D384A009EFD55 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				D55B21E62052BB7400B6D5C2 /* ProfileViewController.swift */,
+				D55B21EB2053D43600B6D5C2 /* UserInfoTableViewController.swift */,
+				D5A08F3A2066514900FB3CB7 /* PasswordTableViewController.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
 		AD614629213DC79D00204E5B /* Face Selection Procedure */ = {
 			isa = PBXGroup;
 			children = (
@@ -290,6 +312,7 @@
 			isa = PBXGroup;
 			children = (
 				D58E31B4205E95E10024BA0E /* Cells */,
+				AD36A59E215D1CE4009EFD55 /* CustomLoaderView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -307,12 +330,8 @@
 		D58E31B5205E962D0024BA0E /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				D5E3AC9E2049883800CFFEEA /* LoginViewController.swift */,
-				D55B21EF20540AC200B6D5C2 /* RegisterTableViewController.swift */,
-				D55B21DF2052772400B6D5C2 /* VerifyTableViewController.swift */,
-				D55B21E62052BB7400B6D5C2 /* ProfileViewController.swift */,
-				D55B21EB2053D43600B6D5C2 /* UserInfoTableViewController.swift */,
-				D5A08F3A2066514900FB3CB7 /* PasswordTableViewController.swift */,
+				AD36A5A0215D382D009EFD55 /* Onboarding */,
+				AD36A5A1215D384A009EFD55 /* Profile */,
 				D519A849205E8360006B0D19 /* Inventory */,
 				D5728D5A206130E40041F4F7 /* Actions */,
 			);
@@ -553,6 +572,7 @@
 				D5728D5E206155600041F4F7 /* ActionListTableViewController.swift in Sources */,
 				D519A845205E6EE3006B0D19 /* NetworkOperation.swift in Sources */,
 				D547576D205E6C6300E6FE90 /* AsynchronousOperation.swift in Sources */,
+				AD36A59F215D1CE4009EFD55 /* CustomLoaderView.swift in Sources */,
 				D5728D5C206131980041F4F7 /* TransferActionViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

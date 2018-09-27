@@ -93,6 +93,8 @@ public class VatomView: UIView {
     // MARK: - Properties
 
     /// The vatom to visualize.
+    ///
+    /// Setting the vatom will trigger the Vatom View Lifecylce (VVLC).
     public private(set) var vatom: VatomModel?
 
     /// The face selection procedure used to select a face view.
@@ -139,14 +141,42 @@ public class VatomView: UIView {
     /// To customise the error view per instance of `VatomView` see `errorView`.
     public static var defaultErrorView: VVErrorView.Type = DefaultErrorView.self
 
-    /// Instance level loader view. Use this to customize the default loader view.
-    public var loaderView: VVLoaderView
-    /// Instance level error view. Use this to customize the default error view.
-    public var errorView: VVErrorView
+    /// Instance level loader view. Use this to customize this view's loader view.
+    public var loaderView: VVLoaderView {
+        didSet {
+            oldValue.removeFromSuperview()
+            self.addSubview(loaderView)
+            loaderView.frame = self.bounds
+            loaderView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+        }
+    }
+
+    /// Instance level error view. Use this to customize this view's error view.
+    public var errorView: VVErrorView {
+        didSet {
+            oldValue.removeFromSuperview()
+            self.addSubview(errorView)
+            errorView.frame = self.bounds
+            errorView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+        }
+    }
 
     // MARK: - Initializer
 
+    /// Initialize without parameters.
+    ///
+    /// The Vatom View Lifecycle (VVLC) will only be run after calling `upadate(usingVatom:procedure:)`.
+    public init() {
+        self.procedure = EmbeddedProcedure.icon.procedure
+        self.roster = FaceViewRoster.shared.roster
+        self.loaderView = VatomView.defaultLoaderView.init()
+        self.errorView = VatomView.defaultErrorView.init()
+        super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+    }
+
     /// Intializes using a vatom and optional procedure.
+    ///
+    /// The Vatom View Lifecycle (VVLC) automatically run.
     ///
     /// - Parameters:
     ///   - vatom: The vAtom to visualize.
@@ -155,19 +185,25 @@ public class VatomView: UIView {
     public init(vatom: VatomModel,
                 procedure: @escaping FaceSelectionProcedure = EmbeddedProcedure.icon.procedure) {
 
-        self.vatom = vatom
         self.procedure = procedure
         self.roster = FaceViewRoster.shared.roster
         self.loaderView = VatomView.defaultLoaderView.init()
         self.errorView = VatomView.defaultErrorView.init()
-
+        self.vatom = vatom
         super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
 
-        commonInit()
-        runVVLC()
+        commonSetup()
+
+        // don't wait for the dispatched block
+        DispatchQueue.main.async {
+            self.runVVLC()
+        }
+
     }
 
     /// Intializes using a vatom and a procedure. Optional loading and error views must be supplied.
+    ///
+    /// The Vatom View Lifecycle (VVLC) automatically run.
     ///
     /// - Parameters:
     ///   - vatom: The vAtom to visualize.
@@ -184,19 +220,25 @@ public class VatomView: UIView {
                 errorView: VVErrorView = VatomView.defaultErrorView.init(),
                 roster: Roster = FaceViewRoster.shared.roster) {
 
-        self.vatom = vatom
         self.procedure = procedure
         self.loaderView = loadingView
         self.errorView = errorView
         self.roster = roster
-
+        self.vatom = vatom
         super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
 
-        commonInit()
-        runVVLC()
+        commonSetup()
+
+        // don't wait for the dispatched block
+        DispatchQueue.main.async {
+            self.runVVLC()
+        }
+
     }
 
     /// Initialize using aDecoder.
+    ///
+    /// The Vatom View Lifecycle (VVLC) will only be run after calling `upadate(usingVatom:procedure:)`.
     ///
     /// This initializer does not automatically run the VVLC. The caller must call `update(usingVatom:procedure:)`
     /// to begin the VVLC. Custom loaders and errors must be set prior to calling `update(usingVatom:procedure:)`.
@@ -206,14 +248,13 @@ public class VatomView: UIView {
         self.roster = FaceViewRoster.shared.roster
         self.loaderView = VatomView.defaultLoaderView.init()
         self.errorView = VatomView.defaultErrorView.init()
-
         super.init(coder: aDecoder)
 
-        commonInit()
+        commonSetup()
     }
 
-    /// Common initializer
-    private func commonInit() {
+    /// Common setup tasks
+    private func commonSetup() {
         self.clipsToBounds = true
         self.layer.masksToBounds = true
         self.addSubview(loaderView)
@@ -251,11 +292,11 @@ public class VatomView: UIView {
             self.state = .loading
         }
 
-        let oldVatom = self.vatom
-        self.vatom = newVatom
         // assign if not nil
         procedure.flatMap { self.procedure = $0 }
 
+        let oldVatom = self.vatom
+        self.vatom = newVatom
         runVVLC(oldVatom: oldVatom)
 
     }

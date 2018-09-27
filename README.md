@@ -78,7 +78,7 @@ The SDK has two logical modules: Core and Face. The responsibilites are as follo
 ### Face
 
 - Face view infrastructure
-- Embedded face views e.g. `ImageFace`
+- Embedded face views e.g. `ImageFaceView`
 - Convenience classes to assist in displaying vAtoms e.g. `VatomView`
 
 ## Versioning

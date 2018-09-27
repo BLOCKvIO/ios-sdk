@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
     s.social_media_url      = 'https://twitter.com/blockv_io'
     s.ios.deployment_target = '10.0'
     s.swift_version         = '4.1'
-    s.default_subspecs      = 'Core'
+    s.default_subspecs      = 'Face'
     
     s.subspec 'Core' do |s|
         s.source_files = 'BlockV/Core/**/*.{swift}'

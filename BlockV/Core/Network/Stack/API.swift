@@ -307,7 +307,7 @@ extension API {
         /// Builds the endpoint to search for vAtoms.
         ///
         /// - Parameter payload: Raw request payload.
-        /// - Returns: Endpoint generic over `PackModel`.
+        /// - Returns: Endpoint generic over `UnpackedModel`.
         static func discover(_ payload: [String: Any]) -> Endpoint<BaseModel<UnpackedModel>> {
 
             return Endpoint(method: .post,
@@ -325,7 +325,7 @@ extension API {
         ///   - topRightLat: Top right latitude coordinate.
         ///   - topRightLon: Top right longitude coordinte.
         ///   - filter: The vAtom filter option to apply.
-        /// - Returns: Endpoint generic over `PackModel`.
+        /// - Returns: Endpoint generic over `UnpackedModel`.
         static func geoDiscover(bottomLeftLat: Double,
                                 bottomLeftLon: Double,
                                 topRightLat: Double,

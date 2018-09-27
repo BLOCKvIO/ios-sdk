@@ -52,7 +52,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 ## Sample App
 
-The example app lets you try out the BLOCKv SDK. It's a great place to start if you're getting up to speed on the platform. It offers the following features:
+The sample app lets you try out the BLOCKv SDK. It's a great place to start if you're getting up to speed on the platform. It offers the following features:
 
 - [x] Authentication (registration & login)
 - [x] Profile management

@@ -175,7 +175,7 @@ class InventoryCollectionViewController: UICollectionViewController {
             }
             
             // handle success
-            print("\nViewer > Fetched inventory PackModel")
+            print("\nViewer > Fetched inventory")
             
             /*
              NOTE

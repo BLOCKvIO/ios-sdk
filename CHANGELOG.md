@@ -13,11 +13,11 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [2.0.0](todo)
+## [2.0.0](https://github.com/BLOCKvIO/ios-sdk/releases/tag/2.0.0)
 Released on 2018-09-27
 
 ### Added 
-- Face module
+- Face module for visually rendering vAtoms using faces.
     - Pull Request [#todo](todo)
     
 ### Updated

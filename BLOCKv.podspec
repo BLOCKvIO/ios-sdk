@@ -31,9 +31,9 @@ Pod::Spec.new do |s|
         s.dependency 'BLOCKv/Core'
         s.dependency 'FLAnimatedImage', '~> 1.0' # Gifs
         s.dependency 'Nuke',            '~> 7.0' # Image downloading
-        s.resource_bundles = {
-            'FaceModule' => ['BlockV/Face/Face Views/**/*.{xib}']
-        }
+        #s.resource_bundles = {
+        #    'FaceModule' => ['BlockV/Face/Face\ Views/**/*.{xib}']
+        #}
         #s.exclude_files = "**/Info*.plist"
     end
     

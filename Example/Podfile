@@ -4,9 +4,8 @@ target 'BlockV_Example' do
     
   pod 'BLOCKv', :path => '../'
 
-  target 'BlockV_Tests' do
+  target 'BLOCKv_Unit_Tests' do
     inherit! :search_paths
-
     
   end
 end

@@ -21,11 +21,6 @@
 //  SOFTWARE.
 //
 
-//
-//  InventoryCollectionViewController.swift
-//  BlockV_Example
-//
-
 import UIKit
 import BLOCKv
 
@@ -47,8 +42,10 @@ class InventoryCollectionViewController: UICollectionViewController {
     fileprivate var vatoms: [VatomModel] = [] {
         didSet {
             filteredVatoms = vatoms.filter {
-                // filter out dropped vAtoms & coin wallet
-                (!$0.isDropped) && ($0.templateID != "vatomic::v1::vAtom::CoinWallet")
+                // filter out: dropped, avatar, and coin wallet vatoms
+                (!$0.props.isDropped)
+                    && (!$0.props.templateID.hasSuffix("::vAtom::Avatar"))
+                    && (!$0.props.templateID.hasSuffix("::vAtom::CoinWallet"))
             }
         }
     }
@@ -62,23 +59,6 @@ class InventoryCollectionViewController: UICollectionViewController {
     
     /// vAtom to pass to detail view controller.
     fileprivate var vatomToPass: VatomModel?
-    
-    /// Dictionary mapping vatom IDs to image data (activated image).
-    fileprivate var activatedImages = [String : Data]()
-    
-    /// Download queue to manage concurrently downloading each vAtom's Activated Image.
-    ///
-    /// The host app is responsible for downloading and managing the association between the
-    /// vAtom and its Activated Image resource.
-    ///
-    /// Since many vAtoms share resources, a futher optimization would be made to check if
-    /// the same resource is being requested, and if so, return a cached version. However,
-    /// this is beyond the scope of this example app.
-    fileprivate lazy var downloadQueue: OperationQueue = {
-        let queue = OperationQueue()
-        queue.maxConcurrentOperationCount = 2 // limit concurrent downloads
-        return queue
-    }()
     
     // MARK: - Lifecycle
     
@@ -94,7 +74,7 @@ class InventoryCollectionViewController: UICollectionViewController {
     }
     
     deinit {
-        self.downloadQueue.cancelAllOperations()
+        //TODO: Cancell all downloads
     }
     
     // MARK: - Helpers
@@ -185,17 +165,17 @@ class InventoryCollectionViewController: UICollectionViewController {
     /// Note: Input parameters are left to their defautls.
     fileprivate func fetchInventory() {
         
-        BLOCKv.getInventory { [weak self] (packModel, error) in
+        BLOCKv.getInventory { [weak self] (vatomModels, error) in
             
             // handle error
-            guard let model = packModel, error == nil else {
+            guard error == nil else {
                 print("\n>>> Error > Viewer: \(error!.localizedDescription)")
                 self?.present(UIAlertController.errorAlert(error!), animated: true)
                 return
             }
             
             // handle success
-            print("\nViewer > Fetched inventory PackModel")
+            print("\nViewer > Fetched inventory")
             
             /*
              NOTE
@@ -207,10 +187,7 @@ class InventoryCollectionViewController: UICollectionViewController {
              `whenModifed` date. For example, if a vAtom is picked up off the map, its
              `droppped` flag is set as `false` and the `whenModified` date updated.
              */
-            self?.vatoms = model.vatoms.sorted { $0.whenModified > $1.whenModified }
-            
-            // begin download
-            self?.dowloadActivatedImages()
+            self?.vatoms = vatomModels.sorted { $0.whenModified > $1.whenModified }
             
         }
         
@@ -227,68 +204,19 @@ class InventoryCollectionViewController: UICollectionViewController {
         builder.addDefinedFilter(forField: .templateID, filterOperator: .equal, value: "vatomic.prototyping::DrinkCoupon::v1", combineOperator: .and)
         
         // execute the discover call
-        BLOCKv.discover(builder) { [weak self] (packModel, error) in
+        BLOCKv.discover(builder) { [weak self] (vatomModels, error) in
             
             // handle error
-            guard let model = packModel, error == nil else {
+            guard error == nil else {
                 print("\n>>> Error > Viewer: \(error!.localizedDescription)")
                 self?.present(UIAlertController.errorAlert(error!), animated: true)
                 return
             }
             
             // handle success
-            print("\nViewer > Fetched discover group model")
-            print("\n\(model)")
+            print("\nViewer > Fetched discover vatom models")
+            print("\n\(vatomModels)")
             
-        }
-        
-    }
-    
-    /// Creates a data download operation for each vatom's activated image and adds it to our download queue.
-    ///
-    /// On completion of the download, the data blob is mapped to the vatom ID in a dictionary.
-    func dowloadActivatedImages() {
-        
-        for vatom in filteredVatoms {
-            
-            // find the vatom's activated image url
-            guard let activatedImageURL = vatom.resources.first(where: { $0.name == "ActivatedImage"} )?.url else {
-                // oops, not found, skip this vatom
-                continue
-            }
-            
-            // encode the url
-            guard let encodedURL = try? BLOCKv.encodeURL(activatedImageURL) else {
-                continue
-            }
-            
-            // create network operation
-            let operation = NetworkDataOperation(urlString: encodedURL.absoluteString) { [weak self] (data, error) in
-                
-                // unwrap data, handle error
-                guard let data = data, error == nil else {
-                    print("\n>>> Error > Viewer: \(error!.localizedDescription)")
-                    return
-                }
-                
-                // handle success
-                
-                // store the image data
-                self?.activatedImages[vatom.id] = data
-                
-                // handle success
-                print("Viewer > Downloaded 'ActivatedImage' for vAtom: \(vatom.id) Data: \(data)")
-                
-                // find the vatoms index
-                if let index = self?.filteredVatoms.index(where: { $0.id == vatom.id }) {
-                    // ask collection view to reload that cell
-                    self?.collectionView?.reloadItems(at: [IndexPath(row: index, section: 0)])
-                }
-                
-            }
-            
-            // add the operation to the download queue
-            downloadQueue.addOperation(operation)
         }
         
     }
@@ -303,15 +231,17 @@ class InventoryCollectionViewController: UICollectionViewController {
     // MARK: - Navigation
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "seg.vatom.detail" {
-            let destination = segue.destination as! VatomDetailTableViewController
-            destination.vatom = vatomToPass
+        
+        if segue.identifier == "seg.vatom.faceviews" {
+            let destination = segue.destination as! UINavigationController
+            let tappedVatomVC = destination.viewControllers[0] as! TappedVatomViewController
+            tappedVatomVC.vatom = vatomToPass
         }
     }
     
     override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
         // prevent the segue - we will do it programatically
-        if identifier == "seg.vatom.detail" {
+        if identifier == "seg.vatom.faceviews" {
             return false
         }
         return true
@@ -334,21 +264,11 @@ extension InventoryCollectionViewController {
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: VatomCell.reuseIdentifier, for: indexPath) as! VatomCell
-        
         cell.backgroundColor = UIColor.gray.withAlphaComponent(0.1)
         
-        // get vatom id
-        let vatomID = filteredVatoms[indexPath.row].id
-        
-        // set the cell's vatom
-        cell.vatom = filteredVatoms[indexPath.row]
-
-        // find image data
-        if let imageData = activatedImages[vatomID] {
-            cell.contentView.alpha = 0.2
-            cell.activatedImageView.image = UIImage.init(data: imageData)
-            cell.contentView.alphaIn()
-        }
+        // replace cell's vatom
+        let vatom = filteredVatoms[indexPath.row]
+        cell.vatomView.update(usingVatom: vatom)
         
         return cell
     }
@@ -358,17 +278,17 @@ extension InventoryCollectionViewController {
         // get the vatom to pass
         let currentCell = collectionView.cellForItem(at: indexPath) as! VatomCell
         // check if the cell has a vatom
-        if let vatom = currentCell.vatom {
+        if let vatom = currentCell.vatomView.vatom {
             self.vatomToPass = vatom
-            performSegue(withIdentifier: "seg.vatom.detail", sender: self)
+            performSegue(withIdentifier: "seg.vatom.faceviews", sender: self)
         }
         
     }
-
+    
 }
 
 extension InventoryCollectionViewController: UICollectionViewDelegateFlowLayout {
-
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
         // Two columns

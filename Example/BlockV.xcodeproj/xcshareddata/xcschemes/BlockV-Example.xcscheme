@@ -52,6 +52,16 @@
                ReferencedContainer = "container:BlockV.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "D530759021119E0E00DE7FD0"
+               BuildableName = "BLOCKv_Unit_Tests.xctest"
+               BlueprintName = "BLOCKv_Unit_Tests"
+               ReferencedContainer = "container:BlockV.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
@@ -89,7 +99,7 @@
       </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
-      buildConfiguration = "Release"
+      buildConfiguration = "Debug"
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
@@ -109,7 +119,7 @@
       buildConfiguration = "Debug">
    </AnalyzeAction>
    <ArchiveAction
-      buildConfiguration = "Release"
+      buildConfiguration = "App Store"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>

@@ -21,11 +21,6 @@
 //  SOFTWARE.
 //
 
-//
-//  InventoryCollectionViewController.swift
-//  BlockV_Example
-//
-
 import UIKit
 import BLOCKv
 
@@ -180,7 +175,7 @@ class InventoryCollectionViewController: UICollectionViewController {
             }
             
             // handle success
-            print("\nViewer > Fetched inventory PackModel")
+            print("\nViewer > Fetched inventory")
             
             /*
              NOTE

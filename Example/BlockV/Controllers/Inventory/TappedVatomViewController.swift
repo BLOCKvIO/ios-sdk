@@ -1,9 +1,24 @@
+//  MIT License
 //
-//  TappedVatomViewController.swift
-//  BlockV_Example
+//  Copyright (c) 2018 BlockV AG
 //
-//  Created by Cameron McOnie on 2018/08/21.
-//  Copyright © 2018 CocoaPods. All rights reserved.
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in all
+//  copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//  SOFTWARE.
 //
 
 import UIKit
@@ -12,11 +27,11 @@ import BLOCKv
 /*
  Goals
  - This VC is intended to show the how to use VatomView to visually display a vAtom.
- - Three view are shown each presenting a VatomView.
- - Each Vatom View has a different Face Selection Procedure (FSP).
+ - Three VatomViews are shown.
+ - Each has a different Face Selection Procedure (FSP).
  */
 
-///
+/// A simple view controller that presents a single vatom using three vatom views.
 class TappedVatomViewController: UIViewController {
 
     // MARK: - Outlets
@@ -24,24 +39,25 @@ class TappedVatomViewController: UIViewController {
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var descriptionLabel: UILabel!
     
-    @IBOutlet weak var topVatomView: VatomView! // using storyboards
-    @IBOutlet weak var middleVatomView: VatomView! // using storyboards
-    @IBOutlet weak var bottomContainerView: UIView! // using code, this is just a container view to hold a VatomView
+    @IBOutlet weak var vatomViewA: VatomView! // using storyboards
+    @IBOutlet weak var vatomViewB: VatomView! // using storyboards
+    @IBOutlet weak var containerView: UIView! // using code (container view)
     
     // MARK: - Properties
     
-    private var bottomVatomView: VatomView!
-    
     /// Backing vAtom for display.
-    var vatom: VatomModel? {
-        didSet {
-            print("Vatom Updated: \(vatom?.id ?? "nil")")
-        }
-    }
+    var vatom: VatomModel?
     
-    var topFSP    = EmbeddedProcedure.icon.procedure
-    var middleFSP = EmbeddedProcedure.engaged.procedure
-    var bottomFSP = EmbeddedProcedure.card.procedure
+    var iconFSP = EmbeddedProcedure.icon.procedure
+    var engagedFSP = EmbeddedProcedure.engaged.procedure
+    var cardFSP = EmbeddedProcedure.card.procedure
+    
+    /// VatomView (constructed programmatically)
+    let vatomViewC: VatomView = {
+        let vatomView = VatomView()
+        vatomView.loaderView = CustomLoaderView()
+        return vatomView
+    }()
     
     // MARK: - Lifecycle
     
@@ -54,19 +70,26 @@ class TappedVatomViewController: UIViewController {
         // setup
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneTapped))
 
-        // top - VatomView via storyboard
-        // here we must call `update` in order to pass the vatom and the procedure to the VV. The default roster
-        // will be used.
-        topVatomView.update(usingVatom: vatom!, procedure: topFSP)
+        // A - VatomView (via storyboard)
         
-        // middle - VatomView via storyboard
-        middleVatomView.update(usingVatom: vatom!, procedure: middleFSP)
+        /*
+         Here we call `update` in order to pass the vatom and the procedure to the Vatom View.
+         This will trigger the Vatom View Life Cycle (VVLC).
+         */
+        vatomViewA.update(usingVatom: vatom!, procedure: iconFSP)
         
-        // bottom - VatomView programmatically
-        bottomVatomView = VatomView(vatom: vatom!, procedure: bottomFSP)
-        bottomContainerView.addSubview(bottomVatomView)
-        bottomVatomView.frame = bottomContainerView.bounds
-        bottomVatomView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        // B - VatomView (via storyboard)
+        
+        // Shows passing in a custom loader to this instance of vatom view.
+        vatomViewB.loaderView = CustomLoaderView()
+        vatomViewB.update(usingVatom: vatom!, procedure: engagedFSP)
+        
+        // C - VatomView (programmatically)
+        
+        vatomViewC.update(usingVatom: vatom!, procedure: cardFSP)
+        containerView.addSubview(vatomViewC)
+        vatomViewC.frame = containerView.bounds
+        vatomViewC.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         
     }
     
@@ -95,11 +118,11 @@ class TappedVatomViewController: UIViewController {
             self?.vatom = responseVatom
             
             // update the vatom view
-            self?.topVatomView.update(usingVatom: responseVatom)
-            
+            self?.vatomViewA.update(usingVatom: responseVatom)
+            self?.vatomViewB.update(usingVatom: responseVatom)
+            self?.vatomViewC.update(usingVatom: responseVatom)
 
         }
-        
         
     }
     

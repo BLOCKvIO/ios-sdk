@@ -57,7 +57,7 @@ public struct VatomModel: Equatable {
 // MARK: Codable
 extension VatomModel: Decodable {
 
-    public init(from decoder: Decoder) throws { // swiftlint:disable:this function_body_length
+    public init(from decoder: Decoder) throws {
         let items = try decoder.container(keyedBy: CodingKeys.self)
         id                = try items.decode(String.self, forKey: .id)
         version           = try items.decode(String.self, forKey: .version)

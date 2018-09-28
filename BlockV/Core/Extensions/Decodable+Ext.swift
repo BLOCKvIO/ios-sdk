@@ -20,8 +20,7 @@ public struct Safe<Base: Decodable>: Decodable {
             let container = try decoder.singleValueContainer()
             self.value = try container.decode(Base.self)
         } catch {
-            //assertionFailure("ERROR: \(error)")
-            print("\nBV SDK >>> Error: Decoding failed with error \(error)")
+            //printBV(error: "Decoding failed with error \(error)")
             self.value = nil
         }
     }

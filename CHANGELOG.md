@@ -17,12 +17,13 @@ All notable changes to this project will be documented in this file.
 Released on 2018-09-27
 
 ### Added 
+
 - Face module for visually rendering vAtoms using faces.
-    - Pull Request [#todo](todo)
+    - Pull Request [#104](https://github.com/BLOCKvIO/ios-sdk/pull/104)
     
 ### Updated
 
-- Renamed `privateProps` to `private`
+- Renamed `privateProps` to `private`.
     - Pull Request [#84](https://github.com/BLOCKvIO/ios-sdk/pull/84), [#85](https://github.com/BLOCKvIO/ios-sdk/pull/85)
 - Update discover queury to complete with an array of `VatomModel`. Update permitted discover query builder field types.
     - Pull Request [#78](https://github.com/BLOCKvIO/ios-sdk/pull/78)
@@ -48,7 +49,7 @@ Released on 2018-09-27
     - Pull Request [#60](https://github.com/BLOCKvIO/ios-sdk/pull/60)
 - Rename `templateName` to `templateID` .
     - Pull Request [#59](https://github.com/BLOCKvIO/ios-sdk/pull/59)
-- Add SwiftLint.
+- Add Swift Lint.
     - Pull Request [#58](https://github.com/BLOCKvIO/ios-sdk/pull/58)
 - Improve environement configuration handling.
     - Pull Request [#57](https://github.com/BLOCKvIO/ios-sdk/pull/57)
@@ -70,7 +71,6 @@ Released on 2018-09-27
     - Pull Request [#48](https://github.com/BLOCKvIO/ios-sdk/pull/48)
 - Add trash vatom endpoint
     - Pull Request [#45](https://github.com/BLOCKvIO/ios-sdk/pull/45)
-
 
 ---
 

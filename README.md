@@ -1,4 +1,4 @@
-# BLOCKv SDK for iOS (BETA)
+# BLOCKv SDK for iOS
 
 [![Version](https://img.shields.io/cocoapods/v/BLOCKv.svg?style=flat)](http://cocoapods.org/pods/BLOCKv)
 [![License](https://img.shields.io/cocoapods/l/BLOCKv.svg?style=flat)](http://cocoapods.org/pods/BLOCKv)

@@ -16,9 +16,9 @@
 		AD3DB5302157FD7200E00B67 /* TappedVatomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD3DB52F2157FD7200E00B67 /* TappedVatomViewController.swift */; };
 		AD61462E213DC88700204E5B /* FaceSelectionProcedure_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD61462A213DC83D00204E5B /* FaceSelectionProcedure_Tests.swift */; };
 		AD61462F213DC88B00204E5B /* MockModelFaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD61462C213DC87100204E5B /* MockModelFaces.swift */; };
-		AD920A4E215FAD6900CEFC1D /* PasswordTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD920A4B215FAD6900CEFC1D /* PasswordTableViewController.swift */; };
-		AD920A4F215FAD6900CEFC1D /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD920A4C215FAD6900CEFC1D /* ProfileViewController.swift */; };
-		AD920A50215FAD6900CEFC1D /* UserInfoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD920A4D215FAD6900CEFC1D /* UserInfoTableViewController.swift */; };
+		AD920A5B215FB47200CEFC1D /* UserInfoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD920A58215FB47100CEFC1D /* UserInfoTableViewController.swift */; };
+		AD920A5C215FB47200CEFC1D /* PasswordTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD920A59215FB47200CEFC1D /* PasswordTableViewController.swift */; };
+		AD920A5D215FB47200CEFC1D /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD920A5A215FB47200CEFC1D /* ProfileViewController.swift */; };
 		CDC268C7232CDB5AF1386116 /* Pods_BlockV_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DE93FD598C0B61200B996A4 /* Pods_BlockV_Example.framework */; };
 		D519A845205E6EE3006B0D19 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D519A844205E6EE3006B0D19 /* NetworkOperation.swift */; };
 		D519A848205E76EB006B0D19 /* NetworkDataOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D519A847205E76EB006B0D19 /* NetworkDataOperation.swift */; };
@@ -83,9 +83,9 @@
 		AD3DB52F2157FD7200E00B67 /* TappedVatomViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TappedVatomViewController.swift; sourceTree = "<group>"; };
 		AD61462A213DC83D00204E5B /* FaceSelectionProcedure_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceSelectionProcedure_Tests.swift; sourceTree = "<group>"; };
 		AD61462C213DC87100204E5B /* MockModelFaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockModelFaces.swift; sourceTree = "<group>"; };
-		AD920A4B215FAD6900CEFC1D /* PasswordTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordTableViewController.swift; sourceTree = "<group>"; };
-		AD920A4C215FAD6900CEFC1D /* ProfileViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
-		AD920A4D215FAD6900CEFC1D /* UserInfoTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserInfoTableViewController.swift; sourceTree = "<group>"; };
+		AD920A58215FB47100CEFC1D /* UserInfoTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserInfoTableViewController.swift; sourceTree = "<group>"; };
+		AD920A59215FB47200CEFC1D /* PasswordTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordTableViewController.swift; sourceTree = "<group>"; };
+		AD920A5A215FB47200CEFC1D /* ProfileViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		B5A79A9FDD3524D3628C080E /* Pods-BlockV_Example.dev.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Example.dev.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Example/Pods-BlockV_Example.dev.xcconfig"; sourceTree = "<group>"; };
 		BC27A08D03F2D2401C48F394 /* Pods-BlockV_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Example/Pods-BlockV_Example.release.xcconfig"; sourceTree = "<group>"; };
 		C55D0BD7FD8ECD417C235202 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
@@ -244,14 +244,14 @@
 			path = "Face Selection Procedure";
 			sourceTree = "<group>";
 		};
-		AD920A4A215FAD5200CEFC1D /* Profile */ = {
+		AD920A51215FB3EA00CEFC1D /* User Profile */ = {
 			isa = PBXGroup;
 			children = (
-				AD920A4B215FAD6900CEFC1D /* PasswordTableViewController.swift */,
-				AD920A4C215FAD6900CEFC1D /* ProfileViewController.swift */,
-				AD920A4D215FAD6900CEFC1D /* UserInfoTableViewController.swift */,
+				AD920A59215FB47200CEFC1D /* PasswordTableViewController.swift */,
+				AD920A5A215FB47200CEFC1D /* ProfileViewController.swift */,
+				AD920A58215FB47100CEFC1D /* UserInfoTableViewController.swift */,
 			);
-			path = Profile;
+			path = "User Profile";
 			sourceTree = "<group>";
 		};
 		D519A846205E76C9006B0D19 /* Operations */ = {
@@ -333,7 +333,7 @@
 		D58E31B5205E962D0024BA0E /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				AD920A4A215FAD5200CEFC1D /* Profile */,
+				AD920A51215FB3EA00CEFC1D /* User Profile */,
 				AD36A5A0215D382D009EFD55 /* Onboarding */,
 				D519A849205E8360006B0D19 /* Inventory */,
 				D5728D5A206130E40041F4F7 /* Actions */,
@@ -554,23 +554,23 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AD920A4E215FAD6900CEFC1D /* PasswordTableViewController.swift in Sources */,
 				D519A848205E76EB006B0D19 /* NetworkDataOperation.swift in Sources */,
 				D5475764205D124100E6FE90 /* UIView+Ext.swift in Sources */,
+				AD920A5C215FB47200CEFC1D /* PasswordTableViewController.swift in Sources */,
 				D547576B205E67AD00E6FE90 /* VatomCell.swift in Sources */,
 				D519A84B205E83AB006B0D19 /* VatomDetailTableViewController.swift in Sources */,
 				AD3DB5302157FD7200E00B67 /* TappedVatomViewController.swift in Sources */,
+				AD920A5D215FB47200CEFC1D /* ProfileViewController.swift in Sources */,
 				D55B21FB2056E04B00B6D5C2 /* InventoryCollectionViewController.swift in Sources */,
 				D55B21F52056745700B6D5C2 /* UIViewController+Ext.swift in Sources */,
 				D597FF272051305A009B2910 /* UIAlertController+Etx.swift in Sources */,
 				D55B21EE2053E24900B6D5C2 /* TitleValueCell.swift in Sources */,
-				AD920A50215FAD6900CEFC1D /* UserInfoTableViewController.swift in Sources */,
 				D55B21E520527EB400B6D5C2 /* TokenCell.swift in Sources */,
 				D55B21F020540AC200B6D5C2 /* RegisterTableViewController.swift in Sources */,
 				D5E3AC9F2049883900CFFEEA /* LoginViewController.swift in Sources */,
+				AD920A5B215FB47200CEFC1D /* UserInfoTableViewController.swift in Sources */,
 				D55B21E02052772400B6D5C2 /* VerifyTableViewController.swift in Sources */,
 				D55B21F92056DE6D00B6D5C2 /* UIColor+Ext.swift in Sources */,
-				AD920A4F215FAD6900CEFC1D /* ProfileViewController.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 				D55B21EA2052E38000B6D5C2 /* RoundedImageView.swift in Sources */,
 				D5728D5E206155600041F4F7 /* ActionListTableViewController.swift in Sources */,

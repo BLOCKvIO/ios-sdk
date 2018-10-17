@@ -28,61 +28,16 @@ class ImagePolicyFaceView: FaceView {
     }()
 
     public private(set) var isLoaded: Bool = false
-
+    
     // MARK: - Config
-
-    /// Face model face configuration specification.
-    private struct Config {
-
-        enum Scale: String {
-            case fit, fill
-        }
-
-        // defaults
-        var scale: Scale = .fit
-        var imageName: String = "ActivatedImage"
-
-        /// Initialize using face model.
-        ///
-        /// The config has a set of default values. If the face config section is present, those values are used in
-        /// place of the default ones.
-        ///
-        /// ### Legacy Support
-        /// The first resource name in the resources array (if present) is used in place of the activate image.
-        init(_ faceModel: FaceModel) {
-
-            // legacy: overwrite fallback if needed
-            self.imageName ?= faceModel.properties.resources.first
-
-            if let config = faceModel.properties.config {
-                // assign iff not nil
-                if let scaleString = config["scale"]?.stringValue {
-                    self.scale ?= Config.Scale(rawValue: scaleString)
-                }
-                self.imageName ?= config["name"]?.stringValue
-            }
-
-        }
-    }
-
-    /// Face configuration.
-    ///
-    /// This property is *immutable* by design.
-    ///
-    /// The BLOCKv platform allows faces to change overtime (through a delete/recreate operation) - however this is
-    /// rare and generally unadvised after a vAtom has been published. Viewers should treat the face config as
-    /// immutable.
-    ///
-    /// It is the responsibility of VatomView to detect a change in the face config (and to recreate the face view if
-    /// needed).
-    private let config: Config
+    
+    /*
+     The config section of the image policy face does not lend itself to being typed so it is left as `JSON`.
+     */
 
     // MARK: - Initialization
 
     required init(vatom: VatomModel, faceModel: FaceModel) {
-
-        // init face config
-        self.config = Config(faceModel)
 
         super.init(vatom: vatom, faceModel: faceModel)
 
@@ -100,24 +55,6 @@ class ImagePolicyFaceView: FaceView {
 
     override func layoutSubviews() {
         super.layoutSubviews()
-
-        updateContentMode()
-    }
-
-    /// FIXME: This method is only necessary if the scale config will change after init. In GV, the content mode of the
-    /// image view changes based on bounds of the view - will this logic be needed?
-    ///
-    /// Update the content mode of the image view.
-    ///
-    /// Inspects the face config first and uses the scale if available. If no face config is found, a simple heuristic
-    /// is used to choose the best content mode.
-    private func updateContentMode() {
-
-        // check face config
-        switch config.scale {
-        case .fill: animatedImageView.contentMode = .scaleAspectFill
-        case .fit:  animatedImageView.contentMode = .scaleAspectFit
-        }
 
     }
 
@@ -153,7 +90,28 @@ class ImagePolicyFaceView: FaceView {
     }
 
     // MARK: - Resources
+    
+    private var childCount: Int = 0
 
+    /// Fetches the count of child vAtoms for the backing vAtom.
+    ///
+    /// - note:
+    /// Asynchronous network operation.
+    ///
+    /// - Parameter completetion: Completion handler to call once the the child count is known.
+    private func fetchChildCount(completion: ((Int?, Error?) -> Void)) {
+        
+        // FIXME: Hardcoded
+        completion(1, nil)
+        
+    }
+    
+    /// Updates the displayed resources.
+    ///
+    /// - note:
+    /// Asynchronous network operation.
+    ///
+    /// - Parameter completion: <#completion description#>
     private func updateResources(completion: ((Error?) -> Void)?) {
 
         // extract resource model

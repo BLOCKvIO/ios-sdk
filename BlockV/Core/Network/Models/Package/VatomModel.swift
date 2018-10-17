@@ -316,3 +316,15 @@ public struct VatomChildPolicy: Codable, Equatable {
     }
 
 }
+
+// MARK: - Vatom Update
+
+extension VatomModel {
+    
+    /// Update
+    func updated(with stateUpdate: WSStateUpdateEvent) -> VatomModel? {
+        
+        
+    }
+    
+}

@@ -172,7 +172,7 @@ public struct RootProperties: Equatable {
     }
 
     public struct Commerce: Codable, Equatable {
-        public let pricing: VatomPricing
+        public var pricing: VatomPricing
     }
 
     //TODO: Updgrade to full GeoJSON support.
@@ -242,12 +242,12 @@ extension RootProperties: Decodable {
 // MARK: - Vatom Pricing
 public struct VatomPricing: Equatable {
 
-    public let pricingType: String
-    public let currency: String
-    public let price: String
-    public let validFrom: String
-    public let validThrough: String
-    public let isVatIncluded: Bool
+    public var pricingType: String
+    public var currency: String
+    public var price: String
+    public var validFrom: String
+    public var validThrough: String
+    public var isVatIncluded: Bool
 
     enum CodingKeys: String, CodingKey {
         case pricingType

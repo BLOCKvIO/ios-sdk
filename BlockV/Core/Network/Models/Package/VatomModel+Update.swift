@@ -38,25 +38,25 @@ extension VatomModel {
             rootProperties["notify_msg"]?.stringValue.flatMap { vatom.props.notifyMessage = $0 }
             rootProperties["tags"]?.arrayValue.flatMap { vatom.props.tags = $0.compactMap { $0.stringValue } }
             rootProperties["notify_msg"]?.stringValue.flatMap { vatom.props.notifyMessage = $0 }
-            
+
             rootProperties["in_contract"]?.boolValue.flatMap { vatom.props.isInContract = $0 }
             rootProperties["in_contract_with"]?.stringValue.flatMap { vatom.props.inContractWith = $0 }
-            
+
             rootProperties["num_direct_clones"]?.floatValue.flatMap { vatom.props.numberDirectClones = Int($0) }
             rootProperties["cloned_from"]?.stringValue.flatMap { vatom.props.clonedFrom = $0 }
             rootProperties["cloning_score"]?.floatValue.flatMap { vatom.props.cloningScore = Double($0) }
-            
+
             rootProperties["acquirable"]?.boolValue.flatMap { vatom.props.isAcquirable = $0 }
             rootProperties["redeemable"]?.boolValue.flatMap { vatom.props.isRedeemable = $0 }
             rootProperties["disabled"]?.boolValue.flatMap { vatom.props.isDisabled = $0 }
             rootProperties["dropped"]?.boolValue.flatMap { vatom.props.isDropped = $0 }
             rootProperties["tradeable"]?.boolValue.flatMap { vatom.props.isTradeable = $0 }
             rootProperties["transferable"]?.boolValue.flatMap { vatom.props.isTransferable = $0 }
-            
+
             rootProperties["geo_pos"]?["coordinates"]?.arrayValue.flatMap {
                 vatom.props.geoPosition.coordinates = $0.compactMap { $0.floatValue }.map { Double($0) }
             }
-            
+
             // TODO:
             // 1. Commerce
             // 2. Visibility
@@ -64,14 +64,14 @@ extension VatomModel {
             // 6. Unpublished
 
         }
-        
+
         // update EOS
         if let eosPropsPartial = stateUpdate.vatomProperties["eos"] {
             if let updatedEOS = vatom.eos?.updated(applying: eosPropsPartial) {
                 vatom.eos = updatedEOS
             }
         }
-        
+
         if let ethPropsPartial = stateUpdate.vatomProperties["eth"] {
             if let updatedETH = vatom.eos?.updated(applying: ethPropsPartial) {
                 vatom.eth = updatedETH

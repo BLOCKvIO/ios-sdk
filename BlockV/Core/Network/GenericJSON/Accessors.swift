@@ -146,6 +146,14 @@ public extension JSON {
             }
         }
     }
+    
+    /// Dynamic member lookup sugar for string subscripts
+    ///
+    /// This lets you write `json.foo` instead of `json["foo"]`.
+    public subscript(dynamicMember member: String) -> JSON? {
+        return self[member]
+    }
+    
 }
 
 // MARK: - JSON Partial Update
@@ -158,16 +166,16 @@ extension JSON {
     /// Primative values which are present are overwritten.
     /// Array values are appended.
     /// Nested JSON is handled in the same way.
-    private mutating func merge(with other: JSON) throws {
-        try self.merge(with: other, typecheck: true)
+    private mutating func merge(with other: JSON) {
+        self.merge(with: other, typecheck: true)
     }
 
     /// Merges a JSON type into this JSON and returns a copy.
     ///
-    internal func merged(with other: JSON) throws -> JSON {
-        var merged = self
-        try merged.merge(with: other, typecheck: true)
-        return merged
+    internal func updated(applying other: JSON) -> JSON {
+        var copy = self
+        copy.merge(with: other, typecheck: true)
+        return copy
     }
 
     /// Worker function which performs a mutating merge.
@@ -175,7 +183,7 @@ extension JSON {
     /// The keys of other are used to merge into self.
     /// Both self and other must have the same top level json structure.
     /// Type checking is not enforced. If types do not match, the right replaces the left.
-    private mutating func merge(with other: JSON, typecheck: Bool) throws {
+    private mutating func merge(with other: JSON, typecheck: Bool) {
 
         switch self {
         case .object:

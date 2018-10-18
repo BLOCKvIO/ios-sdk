@@ -27,25 +27,17 @@ class VatomModelUpdate_Tests: XCTestCase {
 
     func testRootPropertyUpdate() {
         
-//        let props: JSON =  [
-//                    "vAtom::vAtomType": [
-//                            ["num_direct_clones" : 3]
-//                        ]
-//                ]
+        let properties: JSON =  [
+            "vAtom::vAtomType": [
+                ["num_direct_clones" : 3]
+            ]
+        ]
         
-//        let props: [String: JSON] =
-//
-//        let properties = [
-//            "vAtom::vAtomType": [
-//                    ["num_direct_clones" : 3]
-//                ]
-//        ]
-//
-//        let mockStateUpdate = WSStateUpdateEvent(eventId: "1",
-//                                                 operation: "mock",
-//                                                 vatomId: "1234",
-//                                                 vatomProperties: properties,
-//                                                 timestamp: Date())
+        let mockStateUpdate = WSStateUpdateEvent(eventId: "1",
+                                                 operation: "mock",
+                                                 vatomId: "1234",
+                                                 vatomProperties: properties,
+                                                 timestamp: Date())
         
     }
     

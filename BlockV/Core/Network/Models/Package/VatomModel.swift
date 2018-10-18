@@ -8,6 +8,7 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
+
 import Foundation
 
 public struct VatomModel: Equatable {
@@ -315,16 +316,4 @@ public struct VatomChildPolicy: Codable, Equatable {
         }
     }
 
-}
-
-// MARK: - Vatom Update
-
-extension VatomModel {
-    
-    /// Update
-    func updated(with stateUpdate: WSStateUpdateEvent) -> VatomModel? {
-        
-        
-    }
-    
 }

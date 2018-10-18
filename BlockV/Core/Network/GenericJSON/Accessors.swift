@@ -146,14 +146,14 @@ public extension JSON {
             }
         }
     }
-    
+
     /// Dynamic member lookup sugar for string subscripts
     ///
     /// This lets you write `json.foo` instead of `json["foo"]`.
     public subscript(dynamicMember member: String) -> JSON? {
         return self[member]
     }
-    
+
 }
 
 // MARK: - JSON Partial Update

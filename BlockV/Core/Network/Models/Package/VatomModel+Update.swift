@@ -60,17 +60,28 @@ extension VatomModel {
             // TODO:
             // 1. Commerce
             // 2. Visibility
-            // 3. EOS
-            // 4. ETH
             // 5. Version
             // 6. Unpublished
 
         }
+        
+        // update EOS
+        if let eosPropsPartial = stateUpdate.vatomProperties["eos"] {
+            if let updatedEOS = vatom.eos?.updated(applying: eosPropsPartial) {
+                vatom.eos = updatedEOS
+            }
+        }
+        
+        if let ethPropsPartial = stateUpdate.vatomProperties["eth"] {
+            if let updatedETH = vatom.eos?.updated(applying: ethPropsPartial) {
+                vatom.eth = updatedETH
+            }
+        }
 
         // update private
-        if let privateProperties = stateUpdate.vatomProperties["private"] {
-            if let newPrivate = vatom.private?.updated(applying: privateProperties) {
-                vatom.private = newPrivate
+        if let privatePropsPartial = stateUpdate.vatomProperties["private"] {
+            if let updatedPrivate = vatom.private?.updated(applying: privatePropsPartial) {
+                vatom.private = updatedPrivate
             }
         }
 

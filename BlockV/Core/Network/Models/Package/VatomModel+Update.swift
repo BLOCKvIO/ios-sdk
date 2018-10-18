@@ -14,12 +14,19 @@ import Foundation
 extension VatomModel {
 
     /// Returns a new `VatomModel` updated with the properties of the partial state update.
+    ///
+    /// Both vAtoms must have the same identifier.
     public mutating func updated(applying stateUpdate: WSStateUpdateEvent) -> VatomModel? {
 
         /*
          This function operates by creating a mutable copy of self, and then updating each property present in the
          partial state update.
          */
+
+        // ensure vatom ids match
+        guard self.id == stateUpdate.vatomId else {
+            return nil
+        }
 
         // create a copy
         var vatom = self
@@ -33,7 +40,7 @@ extension VatomModel {
         // update root
         if let rootProperties = stateUpdate.vatomProperties["vAtom::vAtomType"] {
 
-            rootProperties["parentID"]?.stringValue.flatMap { vatom.props.parentID = $0 }
+            rootProperties["parent_id"]?.stringValue.flatMap { vatom.props.parentID = $0 }
             rootProperties["owner"]?.stringValue.flatMap { vatom.props.owner = $0 }
             rootProperties["notify_msg"]?.stringValue.flatMap { vatom.props.notifyMessage = $0 }
             rootProperties["tags"]?.arrayValue.flatMap { vatom.props.tags = $0.compactMap { $0.stringValue } }
@@ -41,6 +48,7 @@ extension VatomModel {
 
             rootProperties["in_contract"]?.boolValue.flatMap { vatom.props.isInContract = $0 }
             rootProperties["in_contract_with"]?.stringValue.flatMap { vatom.props.inContractWith = $0 }
+            rootProperties["transferred_by"]?.stringValue.flatMap { vatom.props.transferredBy = $0 }
 
             rootProperties["num_direct_clones"]?.floatValue.flatMap { vatom.props.numberDirectClones = Int($0) }
             rootProperties["cloned_from"]?.stringValue.flatMap { vatom.props.clonedFrom = $0 }
@@ -53,13 +61,17 @@ extension VatomModel {
             rootProperties["tradeable"]?.boolValue.flatMap { vatom.props.isTradeable = $0 }
             rootProperties["transferable"]?.boolValue.flatMap { vatom.props.isTransferable = $0 }
 
+            //FIXME: There is precision loss here. [18.68768, -33.824017] is converted to
+            // [18.687679290771484, -33.82401657104492]
             rootProperties["geo_pos"]?["coordinates"]?.arrayValue.flatMap {
                 vatom.props.geoPosition.coordinates = $0.compactMap { $0.floatValue }.map { Double($0) }
             }
 
+            rootProperties["visibility"]?["type"]?.stringValue.flatMap { vatom.props.visibility.type = $0 }
+            rootProperties["visibility"]?["value"]?.stringValue.flatMap { vatom.props.visibility.value = $0 }
+
             // TODO:
             // 1. Commerce
-            // 2. Visibility
             // 5. Version
             // 6. Unpublished
 
@@ -72,8 +84,9 @@ extension VatomModel {
             }
         }
 
+        // update ETH
         if let ethPropsPartial = stateUpdate.vatomProperties["eth"] {
-            if let updatedETH = vatom.eos?.updated(applying: ethPropsPartial) {
+            if let updatedETH = vatom.eth?.updated(applying: ethPropsPartial) {
                 vatom.eth = updatedETH
             }
         }

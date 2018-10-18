@@ -83,14 +83,12 @@ extension VatomModel {
                 vatom.eos = updatedEOS
             }
         }
-
         // update ETH
         if let ethPropsPartial = stateUpdate.vatomProperties["eth"] {
             if let updatedETH = vatom.eth?.updated(applying: ethPropsPartial) {
                 vatom.eth = updatedETH
             }
         }
-
         // update private
         if let privatePropsPartial = stateUpdate.vatomProperties["private"] {
             if let updatedPrivate = vatom.private?.updated(applying: privatePropsPartial) {

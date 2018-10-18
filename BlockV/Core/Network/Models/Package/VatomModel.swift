@@ -167,8 +167,8 @@ public struct RootProperties: Equatable {
     }
 
     public struct Visibility: Codable, Equatable {
-        public let type: String
-        public let value: String
+        public var type: String
+        public var value: String
     }
 
     public struct Commerce: Codable, Equatable {

@@ -48,6 +48,7 @@ public class FaceViewRoster {
         let roster = FaceViewRoster()
         // embedded face views
         roster.register(ImageFaceView.self)
+        roster.register(LayeredImageFaceView.self)
         return roster
     }()
 

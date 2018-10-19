@@ -30,11 +30,6 @@ import BLOCKv
 class LiveVatomView: VatomView {
 
     // MARK: - Initialization
-    
-    override init() {
-        super.init()
-        commonInit()
-    }
 
     override init(vatom: VatomModel, procedure: @escaping FaceSelectionProcedure) {
         super.init(vatom: vatom, procedure: procedure)
@@ -53,15 +48,13 @@ class LiveVatomView: VatomView {
             // reload from remote on socket reconnect
             self.reloadFromRemote()
         }
-
+        
         BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { stateUpdateEvent in
             // apply partial update on socket state event
-            guard var copy = self.vatom,
-                let updatedVatom = copy.updated(applying: stateUpdateEvent) else {
-                return
+            if let updatedVatom = self.vatom?.updated(applying: stateUpdateEvent) {
+                // update vatom view using updated vatom
+                self.update(usingVatom: updatedVatom)
             }
-            // update vatom view using updated vatom
-            self.update(usingVatom: updatedVatom)
         }
 
     }

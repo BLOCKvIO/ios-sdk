@@ -397,13 +397,13 @@
                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="6" translatesAutoresizingMaskIntoConstraints="NO" id="KbU-y7-X0l">
                                     <rect key="frame" x="100.33333333333333" y="142" width="174.66666666666669" height="55.666666666666657"/>
                                     <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="252" text="First Last Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Lh7-yR-TAF">
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="252" ambiguous="YES" text="First Last Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Lh7-yR-TAF">
                                             <rect key="frame" x="0.0" y="0.0" width="174.66666666666666" height="31.666666666666668"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="26"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="252" text="User ID" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UCX-NW-lcw">
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="252" ambiguous="YES" text="User ID" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UCX-NW-lcw">
                                             <rect key="frame" x="61.666666666666671" y="37.666666666666657" width="51" height="18"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                             <color key="textColor" red="0.17994527284263961" green="0.17994527284263961" blue="0.17994527284263961" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -772,7 +772,7 @@
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fMv-3H-uto" customClass="VatomView" customModule="BLOCKv">
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fMv-3H-uto" customClass="LiveVatomView" customModule="BlockV_Example" customModuleProvider="target">
                                         <rect key="frame" x="107.66666666666669" y="114" width="160" height="160"/>
                                         <color key="backgroundColor" red="0.97602712563451777" green="0.97602712563451777" blue="0.97602712563451777" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
@@ -780,7 +780,7 @@
                                             <constraint firstAttribute="width" constant="160" id="KSa-eB-qR3"/>
                                         </constraints>
                                     </view>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PZH-We-e5C" customClass="VatomView" customModule="BLOCKv">
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PZH-We-e5C" customClass="LiveVatomView" customModule="BlockV_Example" customModuleProvider="target">
                                         <rect key="frame" x="40" y="314" width="295" height="184.33333333333337"/>
                                         <color key="backgroundColor" red="0.97636467218399048" green="0.97653168439865112" blue="0.97635418176651001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>

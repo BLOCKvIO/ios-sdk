@@ -12,34 +12,6 @@
 import Foundation
 import BLOCKv
 
-/*
- Design Goals:
- - Respond to the web socket state update.
- 
- Challenges:
- - Should vatom view work for only owned vatoms, or all vatoms?
-   > Viewer may use for any vAtom.
-   - Similarly, should LiveVatomView only work for owned vatoms (web socket updates are only for owned vatoms).
-   > Viewer may use for any vAtom (but the update aspect will only work for owned vatoms).
- - How should VatomView respond to a vAtom being removed form the inventory while on screen.
-   > We will leave this to the viewer to handle.
- 
- State update
- - State update only allowed vatoms for a vatom with the same id.
-   > Change assertionFailure, and return nil.
- 
- - How to handle child vatoms?
-  > This will be handled later (each platform will do their own thing for now).
-  > Create an observer object which will manage the children (id's only).
- - How to handle child vatom state updates.
-  > Observer object
- - Options:
-   1. VatomObserver object that managed the relationship between the paren (backing vatom) and its children. The
-      observer can notify the listen via blocks, delegates, notifications etc.
-   2. Add children array to `VatomModel`. Some external object, e.g. inventory, will need to maintain those relationships
-      over time.
- */
-
 /// Subclass of `VatomView` designed to visually represent a vAtom *and* respond to live updates to the backing vAtom.
 /// To receive state updates the backing vAtom must be *owned* by the current user.
 ///

@@ -8,6 +8,7 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
+
 import Foundation
 
 public struct VatomModel: Equatable {
@@ -31,6 +32,10 @@ public struct VatomModel: Equatable {
     /// - note: Private properties are mutable by reactors.
     public var `private`: JSON?
 
+    // crypto
+    public var eos: JSON?
+    public var eth: JSON?
+
     /// Array of face models associated with this vAtom's template.
     ///
     /// - note: Subject to change over the life of the vAtom.
@@ -50,6 +55,8 @@ public struct VatomModel: Equatable {
         case `private`         = "private"
         case faceModels        = "faceModels"
         case actionModels      = "actionModels"
+        case eos               = "eos"
+        case eth               = "eth"
     }
 
 }
@@ -65,7 +72,10 @@ extension VatomModel: Decodable {
         whenCreated       = try items.decode(Date.self, forKey: .whenCreated)
         whenModified      = try items.decode(Date.self, forKey: .whenModified)
         props             = try items.decode(RootProperties.self, forKey: .props)
+
         `private`         = try items.decodeIfPresent(JSON.self, forKey: .private)
+        eos               = try items.decodeIfPresent(JSON.self, forKey: .eos)
+        eth               = try items.decodeIfPresent(JSON.self, forKey: .eth)
         faceModels        = try items.decodeIfPresent([FaceModel].self, forKey: .faceModels) ?? []
         actionModels      = try items.decodeIfPresent([ActionModel].self, forKey: .actionModels) ?? []
     }
@@ -91,6 +101,8 @@ public struct RootProperties: Equatable {
     public let templateID: String
     public let templateVariationID: String
     public let publisherFQDN: String
+    public let title: String
+    public let description: String
 
     // variables
     public var category: String
@@ -98,7 +110,6 @@ public struct RootProperties: Equatable {
     public var clonedFrom: String
     public var cloningScore: Double
     public var commerce: Commerce
-    public var description: String
     public var isInContract: Bool
     public var inContractWith: String
     public var notifyMessage: String
@@ -106,7 +117,6 @@ public struct RootProperties: Equatable {
     public var owner: String
     public var parentID: String
     public var tags: [String]
-    public var title: String
     public var transferredBy: String
     public var visibility: Visibility
 
@@ -153,15 +163,16 @@ public struct RootProperties: Equatable {
         case isDropped           = "dropped"
         case isTradeable         = "tradeable"
         case isTransferable      = "transferable"
+
     }
 
     public struct Visibility: Codable, Equatable {
-        public let type: String
-        public let value: String
+        public var type: String
+        public var value: String
     }
 
     public struct Commerce: Codable, Equatable {
-        public let pricing: VatomPricing
+        public var pricing: VatomPricing
     }
 
     //TODO: Updgrade to full GeoJSON support.
@@ -231,12 +242,12 @@ extension RootProperties: Decodable {
 // MARK: - Vatom Pricing
 public struct VatomPricing: Equatable {
 
-    public let pricingType: String
-    public let currency: String
-    public let price: String
-    public let validFrom: String
-    public let validThrough: String
-    public let isVatIncluded: Bool
+    public var pricingType: String
+    public var currency: String
+    public var price: String
+    public var validFrom: String
+    public var validThrough: String
+    public var isVatIncluded: Bool
 
     enum CodingKeys: String, CodingKey {
         case pricingType

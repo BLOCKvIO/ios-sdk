@@ -9,9 +9,11 @@
 //  governing permissions and limitations under the License.
 //
 
-import Foundation
+import UIKit
 import FLAnimatedImage
+import Nuke
 
+/// Native progress image face view
 class ProgressImageFaceView: FaceView {
 
     class var displayURL: String { return "native://progress-image-overlay" }
@@ -22,12 +24,11 @@ class ProgressImageFaceView: FaceView {
 
     private lazy var progressLabel: UILabel = {
         let label = UILabel()
-        label.frame = CGRect(x: 10, y: 0, width: self.bounds.size.width - 10, height: 20)
-        label.autoresizingMask = [ .flexibleWidth ]
+        label.translatesAutoresizingMaskIntoConstraints = false
         label.text = "0%"
         label.textAlignment = .right
         label.textColor = UIColor.lightGray
-        label.font = UIFont.systemFont(ofSize: 13)
+        label.font = UIFont.systemFont(ofSize: 13, weight: .medium)
         return label
     }()
 
@@ -126,6 +127,12 @@ class ProgressImageFaceView: FaceView {
         emptyImageContainer.addSubview(emptyImageView)
         fullImageContainer.addSubview(fullImageView)
 
+        // progress label
+        self.addSubview(progressLabel)
+        progressLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: 10).isActive = true
+        progressLabel.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -10).isActive = true
+        progressLabel.heightAnchor.constraint(equalToConstant: 20).isActive = true
+
         self.backgroundColor = UIColor.yellow.withAlphaComponent(0.5)
 
     }
@@ -139,9 +146,9 @@ class ProgressImageFaceView: FaceView {
     func load(completion: ((Error?) -> Void)?) {
         print(#function)
 
-        //FIXME: Replace with resource end game
-        self.doResourceStuff { (error) in
+        self.updateResources { (error) in
             self.setNeedsLayout()
+            self.updateUI()
             completion?(error)
         }
 
@@ -153,9 +160,7 @@ class ProgressImageFaceView: FaceView {
         // update vatom
         self.vatom = vatom
 
-        // request layout
-        self.setNeedsLayout()
-        self.layoutIfNeeded()
+        updateUI()
     }
 
     func unload() {
@@ -164,7 +169,17 @@ class ProgressImageFaceView: FaceView {
 
     // MARK: - View Lifecycle
 
-    /// Set frame rectangles directly.
+    // Updates the UI using local data.
+    private func updateUI() {
+        self.progressLabel.isHidden = self.config.showPercentage
+        self.progressLabel.text = "\(Int(progress) * 100)%"
+
+        // request layout
+        self.setNeedsLayout()
+        self.layoutIfNeeded()
+    }
+
+    /// Sets frame rectangles directly.
     override func layoutSubviews() {
         super.layoutSubviews()
 
@@ -179,7 +194,8 @@ class ProgressImageFaceView: FaceView {
             let fullPaddingEnd = CGFloat(self.config.paddingEnd) / imageSize.height * self.bounds.size.height
 
             // top to bottom
-            let offset = floor(progress * (self.bounds.size.height - fullPaddingEnd - fullPaddingStart) - fullPaddingStart)
+            let offset = floor(progress * (self.bounds.size.height - fullPaddingEnd - fullPaddingStart)
+                - fullPaddingStart)
             emptyImageContainer.frame =
                 CGRect(x: 0, y: offset, width: self.bounds.size.width, height: self.bounds.size.height - offset)
             emptyImageView.frame =
@@ -233,7 +249,8 @@ class ProgressImageFaceView: FaceView {
             let fullPaddingEnd = CGFloat(self.config.paddingEnd) / imageSize.width * self.bounds.size.width
 
             // left to right
-            let offset = floor(progress * (self.bounds.size.width - fullPaddingEnd - fullPaddingStart) - fullPaddingStart)
+            let offset = floor(progress * (self.bounds.size.width - fullPaddingEnd - fullPaddingStart)
+                - fullPaddingStart)
             emptyImageContainer.frame =
                 CGRect(x: offset, y: 0, width: self.bounds.size.width - offset, height: self.bounds.size.height)
             emptyImageView.frame =
@@ -247,19 +264,17 @@ class ProgressImageFaceView: FaceView {
 
     }
 
-    // MARK: - Resource Management (TEMPORARY)
+    // MARK: - Resource Management
 
-    // gather async events
+    // group async events
     private let dispatchGroup = DispatchGroup()
 
-    private func doResourceStuff(completion: @escaping (Error?) -> Void) {
-
-        //FIXME: Use Config Section
+    private func updateResources(completion: ((Error?) -> Void)?) {
 
         // ensure required resources are present
         guard
-            let emptyImageResource = vatom.props.resources.first(where: { $0.name == "BaseImage" }),
-            let fullImageResource = vatom.props.resources.first(where: { $0.name == "ActivatedImage" })
+            let emptyImageResource = vatom.props.resources.first(where: { $0.name == self.config.emptyImageName }),
+            let fullImageResource = vatom.props.resources.first(where: { $0.name == self.config.fullImageName })
             else {
                 printBV(error: "\(#file) - failed to extract resources.")
                 return
@@ -276,15 +291,20 @@ class ProgressImageFaceView: FaceView {
 
         dispatchGroup.enter()
         dispatchGroup.enter()
-        //        emptyImageView.downloaded(from: emptyURL) { (_) in
-        //            self.dispatchGroup.leave() // FIXME: Propagate error
-        //        }
-        //        fullImageView.downloaded(from: fullURL) { (_) in
-        //            self.dispatchGroup.leave() // FIXME: Propagate error
-        //        }
+
+        // load image (automatically handles reuse)
+        Nuke.loadImage(with: emptyURL, into: self.emptyImageView) { (_, _) in
+            self.dispatchGroup.leave()
+        }
+
+        // load image (automatically handles reuse)
+        Nuke.loadImage(with: fullURL, into: self.fullImageView) { (_, _) in
+            self.dispatchGroup.leave()
+        }
 
         dispatchGroup.notify(queue: .main) {
-            completion(nil)
+            self.isLoaded = true
+            completion?(nil)
         }
 
     }

@@ -50,7 +50,7 @@ class LiveVatomView: VatomView {
         }
 
         BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { stateUpdateEvent in
-            // apply partial update on socket state evetn
+            // apply partial update on socket state event
             //self.vatom.update(applying: stateUpdateEvent)
         }
 

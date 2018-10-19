@@ -11,21 +11,6 @@ import XCTest
 
 class FaceModel_Tests: XCTestCase {
     
-    // MARK: - Properties
-    
-    //TODO: Replace with official blockv decoder
-    lazy private var decoder: JSONDecoder = {
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
-        return decoder
-    }()
-    
-    lazy private var encoder: JSONEncoder = {
-        let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
-        return encoder
-    }()
-    
     // MARK: - Lifecycle
     
     override func setUp() {
@@ -45,7 +30,7 @@ class FaceModel_Tests: XCTestCase {
         
         do {
             // decode server json into face model
-            let model = try decoder.decode(FaceModel.self, from: MockModel.FaceModel.nativeGenericIcon)
+            let model = try TestUtility.jsonDecoder.decode(FaceModel.self, from: MockModel.FaceModel.nativeGenericIcon)
             let faceModel = try self.require(model)
             // pack model tests
             XCTAssertEqual(faceModel.id, "48476b21-a4cf-45b6-a2f3-9a9c7b491237")
@@ -63,7 +48,7 @@ class FaceModel_Tests: XCTestCase {
         
         do {
             // decode server json into face model
-            let model = try decoder.decode(FaceModel.self, from: MockModel.FaceModel.webGenericFullscreen)
+            let model = try TestUtility.jsonDecoder.decode(FaceModel.self, from: MockModel.FaceModel.webGenericFullscreen)
             let faceModel = try self.require(model)
             // pack model tests
             XCTAssertEqual(faceModel.id, "856a8bc5-ada5-4158-840f-370d27171234c")
@@ -84,12 +69,12 @@ class FaceModel_Tests: XCTestCase {
         
         do {
             // decode server json into face model
-            let model = try decoder.decode(FaceModel.self, from: MockModel.FaceModel.nativeGenericIcon)
+            let model = try TestUtility.jsonDecoder.decode(FaceModel.self, from: MockModel.FaceModel.nativeGenericIcon)
             let modelFromJSONData = try self.require(model)
             // encode to data
-            let data = try encoder.encode(modelFromJSONData)
+            let data = try TestUtility.jsonEncoder.encode(modelFromJSONData)
             // decode into face model
-            let modelFromEncodedData = try decoder.decode(FaceModel.self, from: data)
+            let modelFromEncodedData = try TestUtility.jsonDecoder.decode(FaceModel.self, from: data)
             
             print(modelFromJSONData)
             print(modelFromEncodedData)

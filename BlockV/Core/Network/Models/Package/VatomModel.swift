@@ -8,6 +8,7 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
+
 import Foundation
 
 public struct VatomModel: Equatable {
@@ -166,12 +167,12 @@ public struct RootProperties: Equatable {
     }
 
     public struct Visibility: Codable, Equatable {
-        public let type: String
-        public let value: String
+        public var type: String
+        public var value: String
     }
 
     public struct Commerce: Codable, Equatable {
-        public let pricing: VatomPricing
+        public var pricing: VatomPricing
     }
 
     //TODO: Updgrade to full GeoJSON support.
@@ -241,12 +242,12 @@ extension RootProperties: Decodable {
 // MARK: - Vatom Pricing
 public struct VatomPricing: Equatable {
 
-    public let pricingType: String
-    public let currency: String
-    public let price: String
-    public let validFrom: String
-    public let validThrough: String
-    public let isVatIncluded: Bool
+    public var pricingType: String
+    public var currency: String
+    public var price: String
+    public var validFrom: String
+    public var validThrough: String
+    public var isVatIncluded: Bool
 
     enum CodingKeys: String, CodingKey {
         case pricingType

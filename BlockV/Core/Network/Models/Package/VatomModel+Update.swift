@@ -13,15 +13,15 @@ import Foundation
 
 extension VatomModel {
 
-    /*
-     This function operates by creating a mutable copy of self, and then updating each property present in the
-     partial state update.
-     */
-
-    /// Returns a new `VatomModel` updated with the properties of the partial state update.
+    /// Returns a new `VatomModel` updated with the properties of the partial state update. If the vAtom identifiers
+    /// do not match `nil` is returned.
     ///
-    /// Both vAtoms must have the same identifier.
-    public mutating func updated(applying stateUpdate: WSStateUpdateEvent) -> VatomModel? {
+    /// This function operates by creating a mutable copy of self, and then updating each property present in the
+    /// partial state update. The returned `VatomModel` represents the state *after* the state update event has been
+    /// applied.
+    ///
+    /// This method should be called when a state update event is received from the Web socket.
+    public mutating func updated(applying stateUpdate: WSStateUpdateEvent) -> VatomModel? { // swiftlint:disable:this function_body_length
 
         // ensure vatom ids match
         guard self.id == stateUpdate.vatomId else {
@@ -75,7 +75,7 @@ extension VatomModel {
             rootProperties["commerce"]?["pricing"]?["value"]?["vat_included"]?.boolValue
                 .flatMap { vatom.props.commerce.pricing.isVatIncluded = $0 }
 
-            //FIXME: There is precision loss here. [18.68768, -33.824017] is converted to
+            //FIXME: There is a data type issue here. [18.68768, -33.824017] is converted to
             // [18.687679290771484, -33.82401657104492]
             rootProperties["geo_pos"]?["coordinates"]?.arrayValue.flatMap {
                 vatom.props.geoPosition.coordinates = $0.compactMap { $0.floatValue }.map { Double($0) }

@@ -25,6 +25,7 @@ extension VatomModel {
 
         // ensure vatom ids match
         guard self.id == stateUpdate.vatomId else {
+            assertionFailure("Programmer error. Identifier of state update vAtom must match self's identifier.")
             return nil
         }
 

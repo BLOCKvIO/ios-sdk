@@ -41,28 +41,6 @@ class LiveVatomView: VatomView {
         commonInit()
     }
 
-    /// Reloads the contents of the vAtom from remote and updates vatom view.
-    private func reloadFromRemote() {
-
-        // get vatom id
-        guard let vatomID = self.vatom?.id else { return }
-
-        // fetch vatom model from remote
-        BLOCKv.getVatoms(withIDs: [vatomID], completion: { (vatomModels, error) in
-
-            // ensure no error
-            guard error == nil, let vatom = vatomModels.first else {
-                print(">>> Viewer: Unable to fetch vAtom.")
-                return
-            }
-
-            // update vatom view using the new state of the vatom
-            self.update(usingVatom: vatom)
-
-        })
-
-    }
-
     /// Common initializer
     private func commonInit() {
 
@@ -76,6 +54,30 @@ class LiveVatomView: VatomView {
             //self.vatom.update(applying: stateUpdateEvent)
         }
 
+    }
+    
+    // MARK: - Methods
+    
+    /// Reloads the contents of the vAtom from remote and updates vatom view.
+    private func reloadFromRemote() {
+        
+        // get vatom id
+        guard let vatomID = self.vatom?.id else { return }
+        
+        // fetch vatom model from remote
+        BLOCKv.getVatoms(withIDs: [vatomID], completion: { (vatomModels, error) in
+            
+            // ensure no error
+            guard error == nil, let vatom = vatomModels.first else {
+                print(">>> Viewer: Unable to fetch vAtom.")
+                return
+            }
+            
+            // update vatom view using the new state of the vatom
+            self.update(usingVatom: vatom)
+            
+        })
+        
     }
 
 }

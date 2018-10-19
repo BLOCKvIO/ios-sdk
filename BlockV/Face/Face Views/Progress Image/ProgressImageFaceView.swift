@@ -9,6 +9,8 @@
 //  governing permissions and limitations under the License.
 //
 
+// swiftlint:disable trailing_whitespace
+
 import UIKit
 import FLAnimatedImage
 import Nuke
@@ -72,7 +74,7 @@ class ProgressImageFaceView: FaceView {
 
     /// Face model face configuration specification.
     ///
-    /// Face congig is immutable.
+    /// Face config is immutable.
     private struct Config {
 
         // defaults
@@ -81,21 +83,22 @@ class ProgressImageFaceView: FaceView {
         var direction: String = "up"
         var paddingEnd: Double = 0
         var paddingStart: Double = 0
-        var showPercentage: Bool = false
+        var showPercentage: Bool = true
+
+        /// Initialize using default values.
+        init() {}
 
         /// Initialize using face configuration.
-        init(_ faceConfig: JSON?) {
-
-            guard let config = faceConfig else { return }
+        init(_ faceConfig: JSON) {
 
             // assign iff not nil
-            self.emptyImageName ?= config["empty_image"]?.stringValue
-            self.fullImageName ?= config["full_image"]?.stringValue
-            self.direction ?= config["direction"]?.stringValue
+            self.emptyImageName ?= faceConfig["empty_image"]?.stringValue
+            self.fullImageName  ?= faceConfig["full_image"]?.stringValue
+            self.direction      ?= faceConfig["direction"]?.stringValue
             //FIXME: The spec must be changed to make padding values doubles
-            self.paddingEnd ?= Double(config["padding_end"]?.stringValue ?? "0")
-            self.paddingStart ?= Double(config["padding_start"]?.stringValue ?? "0")
-            self.showPercentage ?= config["show_percentage"]?.boolValue
+            self.paddingEnd     ?= Double(faceConfig["padding_end"]?.stringValue ?? "0")
+            self.paddingStart   ?= Double(faceConfig["padding_start"]?.stringValue ?? "0")
+            self.showPercentage ?= faceConfig["show_percentage"]?.boolValue
         }
 
     }
@@ -114,8 +117,15 @@ class ProgressImageFaceView: FaceView {
 
     required init(vatom: VatomModel, faceModel: FaceModel) {
 
-        // init face config
-        self.config = Config(faceModel.properties.config)
+        // init face config (or legacy private section) fallback on default values
+
+        if let config = faceModel.properties.config {
+            self.config = Config(config) // face config
+        } else if let config = vatom.private {
+            self.config = Config(config) // private section
+        } else {
+            self.config = Config() // default values
+        }
 
         super.init(vatom: vatom, faceModel: faceModel)
 
@@ -133,7 +143,7 @@ class ProgressImageFaceView: FaceView {
         progressLabel.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -10).isActive = true
         progressLabel.heightAnchor.constraint(equalToConstant: 20).isActive = true
 
-        self.backgroundColor = UIColor.yellow.withAlphaComponent(0.5)
+        self.backgroundColor = UIColor.yellow.withAlphaComponent(0.3)
 
     }
 
@@ -144,7 +154,6 @@ class ProgressImageFaceView: FaceView {
     // MARK: - FaceView Lifecycle
 
     func load(completion: ((Error?) -> Void)?) {
-        print(#function)
 
         self.updateResources { (error) in
             self.setNeedsLayout()
@@ -155,7 +164,6 @@ class ProgressImageFaceView: FaceView {
     }
 
     func vatomChanged(_ vatom: VatomModel) {
-        print(#function)
 
         // update vatom
         self.vatom = vatom
@@ -163,15 +171,13 @@ class ProgressImageFaceView: FaceView {
         updateUI()
     }
 
-    func unload() {
-        print(#function)
-    }
+    func unload() { }
 
     // MARK: - View Lifecycle
 
     // Updates the UI using local data.
     private func updateUI() {
-        self.progressLabel.isHidden = self.config.showPercentage
+        self.progressLabel.isHidden = !self.config.showPercentage
         self.progressLabel.text = "\(Int(progress) * 100)%"
 
         // request layout
@@ -185,17 +191,26 @@ class ProgressImageFaceView: FaceView {
 
         // image size
         let imageSize = fullImageView.image?.size ?? CGSize(width: 320, height: 320)
+        
+        // normalized padding i.t.o the view size
+        var paddingStartNorm: CGFloat = 0
+        var paddingEndNorm: CGFloat = 0
+        
+        switch self.config.direction.lowercased() {
+        case "left", "right":
+            paddingStartNorm = CGFloat(self.config.paddingStart) / imageSize.width * self.bounds.size.width
+            paddingEndNorm = CGFloat(self.config.paddingEnd) / imageSize.width * self.bounds.size.width
+        default: // "up", "down"
+            paddingStartNorm = CGFloat(self.config.paddingStart) / imageSize.height * self.bounds.size.height
+            paddingEndNorm = CGFloat(self.config.paddingEnd) / imageSize.height * self.bounds.size.height
+        }
 
         // check direction
         if self.config.direction == "down" {
 
-            // convert padding to ratio
-            let fullPaddingStart = CGFloat(self.config.paddingStart) / imageSize.height * self.bounds.size.height
-            let fullPaddingEnd = CGFloat(self.config.paddingEnd) / imageSize.height * self.bounds.size.height
-
             // top to bottom
-            let offset = floor(progress * (self.bounds.size.height - fullPaddingEnd - fullPaddingStart)
-                - fullPaddingStart)
+            let offset = floor(progress * (self.bounds.size.height - paddingEndNorm - paddingStartNorm)
+                - paddingStartNorm)
             emptyImageContainer.frame =
                 CGRect(x: 0, y: offset, width: self.bounds.size.width, height: self.bounds.size.height - offset)
             emptyImageView.frame =
@@ -207,14 +222,9 @@ class ProgressImageFaceView: FaceView {
 
         } else if self.config.direction == "up" {
 
-            // get padding
-            let fullPaddingStart = CGFloat(self.config.paddingStart) / imageSize.height * self.bounds.size.height
-            let fullPaddingEnd = CGFloat(self.config.paddingEnd) / imageSize.height * self.bounds.size.height
-
             // bottom to top
-            let offsetRange = (self.bounds.size.height - fullPaddingEnd - fullPaddingStart)
-            let offset = floor((1-progress) * offsetRange + fullPaddingEnd)
-
+            let offsetRange = (self.bounds.size.height - paddingEndNorm - paddingStartNorm)
+            let offset = floor((1-progress) * offsetRange + paddingEndNorm)
             emptyImageContainer.frame =
                 CGRect(x: 0, y: 0, width: self.bounds.size.width, height: offset)
             emptyImageView.frame =
@@ -226,13 +236,9 @@ class ProgressImageFaceView: FaceView {
 
         } else if self.config.direction == "left" {
 
-            //gGet padding
-            let fullPaddingStart = CGFloat(self.config.paddingStart) / imageSize.width * self.bounds.size.width
-            let fullPaddingEnd = CGFloat(self.config.paddingEnd) / imageSize.width * self.bounds.size.width
-
             // right to left
-            let offsetRange = (self.bounds.size.width - fullPaddingEnd - fullPaddingStart)
-            let offset = floor((1-progress) * offsetRange + fullPaddingEnd)
+            let offsetRange = (self.bounds.size.width - paddingEndNorm - paddingStartNorm)
+            let offset = floor((1-progress) * offsetRange + paddingEndNorm)
             emptyImageContainer.frame =
                 CGRect(x: 0, y: 0, width: offset, height: self.bounds.size.height)
             emptyImageView.frame =
@@ -244,13 +250,9 @@ class ProgressImageFaceView: FaceView {
 
         } else {
 
-            // get padding
-            let fullPaddingStart = CGFloat(self.config.paddingStart) / imageSize.width * self.bounds.size.width
-            let fullPaddingEnd = CGFloat(self.config.paddingEnd) / imageSize.width * self.bounds.size.width
-
             // left to right
-            let offset = floor(progress * (self.bounds.size.width - fullPaddingEnd - fullPaddingStart)
-                - fullPaddingStart)
+            let offset = floor(progress * (self.bounds.size.width - paddingEndNorm - paddingStartNorm)
+                - paddingStartNorm)
             emptyImageContainer.frame =
                 CGRect(x: offset, y: 0, width: self.bounds.size.width - offset, height: self.bounds.size.height)
             emptyImageView.frame =

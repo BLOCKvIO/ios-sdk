@@ -16,6 +16,9 @@ import FLAnimatedImage
 import Nuke
 
 /// Native progress image face view
+///
+/// Assumption:
+/// Both the empty and full images have the same size.
 class ProgressImageFaceView: FaceView {
 
     class var displayURL: String { return "native://progress-image-overlay" }
@@ -95,10 +98,26 @@ class ProgressImageFaceView: FaceView {
             self.emptyImageName ?= faceConfig["empty_image"]?.stringValue
             self.fullImageName  ?= faceConfig["full_image"]?.stringValue
             self.direction      ?= faceConfig["direction"]?.stringValue
-            //FIXME: The spec must be changed to make padding values doubles
-            self.paddingEnd     ?= Double(faceConfig["padding_end"]?.stringValue ?? "0")
-            self.paddingStart   ?= Double(faceConfig["padding_start"]?.stringValue ?? "0")
             self.showPercentage ?= faceConfig["show_percentage"]?.boolValue
+
+            /*
+             Legacy Note:
+             The specification calls for `padding_end` and `padding_start` to be of type Float. However some older
+             vAtoms have these values as type String. This is temporary – String types will be depreciated.
+             */
+            if let paddingEnd = faceConfig["padding_end"]?.floatValue {
+                self.paddingEnd ?= Double(paddingEnd)
+            } else if let endString = faceConfig["padding_end"]?.stringValue, // legacy!
+                let end = Double(endString) {
+                self.paddingEnd = end
+            }
+            
+            if let paddingStart = faceConfig["padding_start"]?.floatValue {
+                self.paddingStart = Double(paddingStart)
+            } else if let startString = faceConfig["padding_start"]?.stringValue, // legacy!
+                let start = Double(startString) {
+                self.paddingStart = start
+            }
         }
 
     }
@@ -167,7 +186,6 @@ class ProgressImageFaceView: FaceView {
 
         // update vatom
         self.vatom = vatom
-
         updateUI()
     }
 
@@ -190,19 +208,20 @@ class ProgressImageFaceView: FaceView {
         super.layoutSubviews()
 
         // image size
-        let imageSize = fullImageView.image?.size ?? CGSize(width: 320, height: 320)
-        
-        // normalized padding i.t.o the view size
+        guard let image = fullImageView.image else { return }
+        // convert to points
+        let imagePoints = CGSize(width: image.size.width * image.scale, height: image.size.height * image.scale)
+        // normalize padding i.t.o the view's point size
         var paddingStartNorm: CGFloat = 0
         var paddingEndNorm: CGFloat = 0
         
         switch self.config.direction.lowercased() {
         case "left", "right":
-            paddingStartNorm = CGFloat(self.config.paddingStart) / imageSize.width * self.bounds.size.width
-            paddingEndNorm = CGFloat(self.config.paddingEnd) / imageSize.width * self.bounds.size.width
+            paddingStartNorm = CGFloat(self.config.paddingStart) / imagePoints.width * self.bounds.size.width
+            paddingEndNorm = CGFloat(self.config.paddingEnd) / imagePoints.width * self.bounds.size.width
         default: // "up", "down"
-            paddingStartNorm = CGFloat(self.config.paddingStart) / imageSize.height * self.bounds.size.height
-            paddingEndNorm = CGFloat(self.config.paddingEnd) / imageSize.height * self.bounds.size.height
+            paddingStartNorm = CGFloat(self.config.paddingStart) / imagePoints.height * self.bounds.size.height
+            paddingEndNorm = CGFloat(self.config.paddingEnd) / imagePoints.height * self.bounds.size.height
         }
 
         // check direction

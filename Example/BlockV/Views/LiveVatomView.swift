@@ -55,6 +55,10 @@ class LiveVatomView: VatomView {
         }
         
         BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { stateUpdateEvent in
+            
+            // ignore other vatom updates
+            guard self.vatom?.id == stateUpdateEvent.vatomId else { return }
+            
             // apply partial update on socket state event
             if let updatedVatom = self.vatom?.updated(applying: stateUpdateEvent) {
                 // update vatom view using updated vatom

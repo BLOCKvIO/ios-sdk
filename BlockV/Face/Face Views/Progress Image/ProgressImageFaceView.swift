@@ -201,7 +201,7 @@ class ProgressImageFaceView: FaceView {
         self.layoutIfNeeded()
     }
 
-    /// Sets frame rectangles directly.
+    /// Updates the empty and full images and their containers to show the "progress" of the vAtom.
     override func layoutSubviews() {
         super.layoutSubviews()
 
@@ -288,6 +288,8 @@ class ProgressImageFaceView: FaceView {
     // group async events
     private let dispatchGroup = DispatchGroup()
 
+    /// Fetches required resources and populates the relevant `ImageView`s. The completion handler is called once all
+    /// images are downloaded (or an error is encountered).
     private func updateResources(completion: ((Error?) -> Void)?) {
 
         // ensure required resources are present

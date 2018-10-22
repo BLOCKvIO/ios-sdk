@@ -39,8 +39,6 @@ class LayeredImageFaceView: FaceView {
 	
 	var childVatoms: [VatomModel] = []
 	var topLayers: [Layer] = []
-	// Loop over the children the add a layer ontop of the base 
-	//( check that the array keeps its index | is the order correct in other words )
 
     // MARK: - Config
 
@@ -84,20 +82,16 @@ class LayeredImageFaceView: FaceView {
         super.init(vatom: vatom, faceModel: faceModel)
 
 		baseLayer.frame = self.bounds
+		baseLayer.vatom = vatom
         self.addSubview(baseLayer)
 		
 		/*
 		BLCOKv.
 		*/
-		self.vAtomStateChanged(isAdded: true)
+		self.vAtomStateChanged()
 		
-		BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { (stateUpdateEvent) in
-			
-			guard let parentId = stateUpdateEvent.vatomProperties["vAtom::vAtomType"]?["parent_id"]?.stringValue else {
-				return 
-			}
-			
-			self.vAtomStateChanged(isAdded: parentId == "." ? false : true)
+		BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { ( _ stateUpdateEvent) in
+			self.vAtomStateChanged()
 		} 
     }
 
@@ -151,15 +145,52 @@ class LayeredImageFaceView: FaceView {
 			return
 		}
 
-		//FIXME: Where should this go?
-		ImagePipeline.Configuration.isAnimatedImageDataEnabled = true
-
 		//TODO: Should the size of the VatomView be factoring in and the image be resized?
 
 		// load image (automatically handles reuse)
 		Nuke.loadImage(with: encodeURL, into: self.baseLayer) { (_, error) in
 			self.isLoaded = true
 			completion?(error)
+		}
+	}
+	
+	func vAtomStateChanged() {		
+		BLOCKv.getInventory(id: self.vatom.id) { (vatomModels, error) in
+			
+			guard error == nil else {
+				printBV(info: "getInventory - \(error!.localizedDescription)")
+				return
+			}
+						
+			self.childVatoms = vatomModels
+			
+			var newLayers: [Layer] = []
+			for childVatom in self.childVatoms {
+			///investigate if the layer already exists
+				
+				var tempLayer: Layer!
+				for layer in self.topLayers where layer.vatom == childVatom {
+					tempLayer = layer
+				}
+				
+				if tempLayer == nil {
+					tempLayer = self.createLayer(childVatom)
+				}
+				
+				newLayers.append(tempLayer)
+			}
+			
+			var layersToRemove: [Layer] = []
+			for layer in self.topLayers {
+				/// Check if added
+				if newLayers.contains(where: { $0.vatom == layer.vatom }) {
+					continue
+				}
+				
+				layersToRemove.append(layer)
+			}
+			
+			self.removeLayers(layersToRemove)
 		}
 	}
 	
@@ -196,50 +227,28 @@ class LayeredImageFaceView: FaceView {
 	}
 	
 	private func removeLayers(_ layers: [Layer]) {
-		
-	}
-	
-	func vAtomStateChanged(isAdded: Bool) {
-		printBV(info: "State changed")
-		
-		BLOCKv.getInventory(id: self.vatom.id) { (vatomModels, error) in
-			
-			guard error == nil else {
-				printBV(info: "getInventory - \(error!.localizedDescription)")
-				return
-			}
-			
-			self.childVatoms = vatomModels
-			
-			var newLayers: [Layer] = []
-			for childVatom in self.childVatoms {
-				//investigate if the layer already exists
-				var tempLayer: Layer!
-				for layer in self.topLayers {
-					if layer.vatom == self.vatom {
-						tempLayer = layer
-						break
-					}
-				}
+		// Remove each layer
+		var timeOffset: TimeInterval = 0
+		for layer in layers.reversed() {
+			// Animate out
+			UIView.animate(withDuration: 0.25, delay: timeOffset, options: [], animations: {
 				
-				if tempLayer == nil {
-					tempLayer = self.createLayer(childVatom)
-				}
+				// Animate away
+				layer.transform = CGAffineTransform(scaleX: 1.25, y: 1.25)
+				layer.alpha = 0
 				
-				newLayers.append(tempLayer)
-			}
-			
-			var layersToRemove: [Layer] = []
-			for layer in self.topLayers {
-				// Check if added
-				if newLayers.contains(where: { $0.vatom == layer.vatom }) {
-					continue
-				}
+			}, completion: { (_) in
 				
-				layersToRemove.append(layer)
-			}
+				// Remove it
+				if let index = self.topLayers.index(of: layer) {
+					self.topLayers.remove(at: index)
+				}
+				layer.removeFromSuperview()
+				
+			})
 			
-			self.removeLayers(layersToRemove)
+			// Increase time offset
+			timeOffset += 0.2
 		}
 	}
 }

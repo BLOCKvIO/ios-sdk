@@ -10,7 +10,6 @@
 //
 
 import UIKit
-import FLAnimatedImage
 import Nuke
 
 /// Native progress image face view
@@ -35,8 +34,8 @@ class ProgressImageFaceView: FaceView {
         return label
     }()
 
-    private lazy var emptyImageView: FLAnimatedImageView = {
-        let imageView = FLAnimatedImageView()
+    private lazy var emptyImageView: UIImageView = {
+        let imageView = UIImageView()
         imageView.frame = self.bounds
         imageView.autoresizingMask = [ .flexibleWidth, .flexibleHeight ]
         imageView.contentMode = .scaleAspectFit
@@ -44,8 +43,8 @@ class ProgressImageFaceView: FaceView {
         return imageView
     }()
 
-    private lazy var fullImageView: FLAnimatedImageView = {
-        let imageView = FLAnimatedImageView()
+    private lazy var fullImageView: UIImageView = {
+        let imageView = UIImageView()
         imageView.frame = self.bounds
         imageView.autoresizingMask = [ .flexibleWidth, .flexibleHeight ]
         imageView.contentMode = .scaleAspectFit

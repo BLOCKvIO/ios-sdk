@@ -18,20 +18,26 @@ import Nuke
 class LayeredImageFaceView: FaceView {
     class var displayURL: String { return "native://layered-image" }
 	
-	// Layer
+	// Layer must be a class to inherit from UIImageview
 	class Layer: UIImageView {
 		/// Reference to the resource this layer displays.
 		var resource: VatomResourceModel?
 		/// Reference to the vAtom which this layer represents.
 		var vatom: VatomModel!
+		
+		convenience override init(frame: CGRect) {
+			self.init()
+			
+			// Layer class defaults
+			self.autoresizingMask = [ .flexibleWidth, .flexibleHeight ]
+			self.clipsToBounds = true
+		}
 	}
 
     // MARK: - Properties
 
     lazy var baseLayer: Layer = {
         let layer = Layer()
-		layer.autoresizingMask = [ .flexibleWidth, .flexibleHeight ]
-		layer.clipsToBounds = true
         return layer
     }()
 
@@ -77,10 +83,11 @@ class LayeredImageFaceView: FaceView {
 
     // MARK: - Init
     required init(vatom: VatomModel, faceModel: FaceModel) {
-        // init face config
+        /// init face config
         self.config = Config(faceModel)
         super.init(vatom: vatom, faceModel: faceModel)
 
+		///ensure base has correct bounds with the 'parent' vAtom
 		baseLayer.frame = self.bounds
 		baseLayer.vatom = vatom
         self.addSubview(baseLayer)
@@ -90,6 +97,7 @@ class LayeredImageFaceView: FaceView {
 		*/
 		self.vAtomStateChanged()
 		
+		/// listen to websocket for state changes on LayeredImageView
 		BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { ( _ stateUpdateEvent) in
 			self.vAtomStateChanged()
 		} 
@@ -103,15 +111,14 @@ class LayeredImageFaceView: FaceView {
 
 	override func layoutSubviews() {
 		super.layoutSubviews()
-
-		updateContentMode()
+		updateContentMode(forLayer: baseLayer)
 	}
 
-	private func updateContentMode() {
-		// check face config
+	private func updateContentMode(forLayer: Layer) {
+		/// check face config
 		switch config.scale {
-		case .fill: baseLayer.contentMode = .scaleAspectFill
-		case .fit:  baseLayer.contentMode = .scaleAspectFit
+		case .fill: forLayer.contentMode = .scaleAspectFill
+		case .fit:  forLayer.contentMode = .scaleAspectFit
 		}
 	}
 
@@ -135,26 +142,26 @@ class LayeredImageFaceView: FaceView {
 
 	private func updateResources(completion: ((Error?) -> Void)?) {
 
-		// extract resource model
+		/// extract resource model
 		guard let resourceModel = vatom.props.resources.first(where: { $0.name == config.imageName }) else {
 			return
 		}
 
-		// encode url
+		/// encode url
 		guard let encodeURL = try? BLOCKv.encodeURL(resourceModel.url) else {
 			return
 		}
 
-		//TODO: Should the size of the VatomView be factoring in and the image be resized?
-
-		// load image (automatically handles reuse)
+		/// load image (automatically handles reuse)
 		Nuke.loadImage(with: encodeURL, into: self.baseLayer) { (_, error) in
 			self.isLoaded = true
 			completion?(error)
 		}
 	}
 	
-	func vAtomStateChanged() {		
+	///Fetch the children of the given vAtom and apply the relevant layers
+	
+	func vAtomStateChanged() {	
 		BLOCKv.getInventory(id: self.vatom.id) { (vatomModels, error) in
 			
 			guard error == nil else {
@@ -166,23 +173,22 @@ class LayeredImageFaceView: FaceView {
 			
 			var newLayers: [Layer] = []
 			for childVatom in self.childVatoms {
-			///investigate if the layer already exists
 				
 				var tempLayer: Layer!
+				
+				///investigate if the layer already exists
 				for layer in self.topLayers where layer.vatom == childVatom {
 					tempLayer = layer
+					break 
 				}
 				
-				if tempLayer == nil {
-					tempLayer = self.createLayer(childVatom)
-				}
-				
-				newLayers.append(tempLayer)
+				/// added found layer to list or create a new one and add that
+				newLayers.append(tempLayer == nil ? self.createLayer(childVatom) : tempLayer)
 			}
 			
 			var layersToRemove: [Layer] = []
 			for layer in self.topLayers {
-				/// Check if added
+				/// check if added
 				if newLayers.contains(where: { $0.vatom == layer.vatom }) {
 					continue
 				}
@@ -198,18 +204,17 @@ class LayeredImageFaceView: FaceView {
 	
 	private func createLayer(_ vatom: VatomModel) -> Layer {
 		let layer  = Layer()
-		layer.autoresizingMask = [ .flexibleWidth, .flexibleHeight ]
-		layer.clipsToBounds = true
+		self.updateContentMode(forLayer: layer)
 		
 		layer.vatom = vatom
 		
-		// extract resource model
+		/// extract resource model
 		guard let resourceModel = vatom.props.resources.first(where: { $0.name == config.imageName }) else {
 			printBV(info: "could not find child vatom resource model")
 			return layer
 		}
 		
-		// encode url
+		/// encode url
 		guard let encodeURL = try? BLOCKv.encodeURL(resourceModel.url) else {
 			printBV(info: "could not encode child vatom resource")
 			return layer
@@ -227,27 +232,28 @@ class LayeredImageFaceView: FaceView {
 	}
 	
 	private func removeLayers(_ layers: [Layer]) {
-		// Remove each layer
+		
+		/// remove each layer
 		var timeOffset: TimeInterval = 0
 		for layer in layers.reversed() {
-			// Animate out
+			
+			// animate out
 			UIView.animate(withDuration: 0.25, delay: timeOffset, options: [], animations: {
 				
-				// Animate away
+				// animate away
 				layer.transform = CGAffineTransform(scaleX: 1.25, y: 1.25)
 				layer.alpha = 0
 				
-			}, completion: { (_) in
+			}, completion: { _ in
 				
-				// Remove it
+				// remove it
 				if let index = self.topLayers.index(of: layer) {
 					self.topLayers.remove(at: index)
 				}
 				layer.removeFromSuperview()
-				
 			})
 			
-			// Increase time offset
+			// increase time offset
 			timeOffset += 0.2
 		}
 	}

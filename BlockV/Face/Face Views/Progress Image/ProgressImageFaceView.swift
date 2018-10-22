@@ -191,7 +191,7 @@ class ProgressImageFaceView: FaceView {
 
     // MARK: - View Lifecycle
 
-    // Updates the UI using local data.
+    /// Updates the UI using local data.
     private func updateUI() {
         self.progressLabel.isHidden = !self.config.showPercentage
         self.progressLabel.text = "\(Int(progress * 100))%"

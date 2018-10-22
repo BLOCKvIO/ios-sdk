@@ -9,8 +9,6 @@
 //  governing permissions and limitations under the License.
 //
 
-// swiftlint:disable trailing_whitespace
-
 import UIKit
 import FLAnimatedImage
 import Nuke
@@ -111,7 +109,7 @@ class ProgressImageFaceView: FaceView {
                 let end = Double(endString) {
                 self.paddingEnd = end
             }
-            
+
             if let paddingStart = faceConfig["padding_start"]?.floatValue {
                 self.paddingStart = Double(paddingStart)
             } else if let startString = faceConfig["padding_start"]?.stringValue, // legacy!
@@ -214,7 +212,7 @@ class ProgressImageFaceView: FaceView {
         // normalize padding i.t.o the view's point size
         var paddingStartNorm: CGFloat = 0
         var paddingEndNorm: CGFloat = 0
-        
+
         switch self.config.direction.lowercased() {
         case "left", "right":
             paddingStartNorm = CGFloat(self.config.paddingStart) / imagePoints.width * self.bounds.size.width

@@ -11,6 +11,9 @@
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
+		AD0BCC8E217769D7001836DE /* GenericJsonMerge_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD0BCC8D217769D7001836DE /* GenericJsonMerge_Tests.swift */; };
+		AD0BCC922178828A001836DE /* VatomModelUpdate_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD0BCC912178828A001836DE /* VatomModelUpdate_Tests.swift */; };
+		AD0BCC98217A0106001836DE /* LiveVatomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD0BCC97217A0106001836DE /* LiveVatomView.swift */; };
 		AD36A59F215D1CE4009EFD55 /* CustomLoaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD36A59E215D1CE4009EFD55 /* CustomLoaderView.swift */; };
 		AD36A5B0215E3578009EFD55 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = AD36A5AF215E3578009EFD55 /* CHANGELOG.md */; };
 		AD3DB5302157FD7200E00B67 /* TappedVatomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD3DB52F2157FD7200E00B67 /* TappedVatomViewController.swift */; };
@@ -78,6 +81,9 @@
 		A11EBD956A70C6C7890F053F /* Pods-BLOCKv_Unit_Tests.prod.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BLOCKv_Unit_Tests.prod.xcconfig"; path = "Pods/Target Support Files/Pods-BLOCKv_Unit_Tests/Pods-BLOCKv_Unit_Tests.prod.xcconfig"; sourceTree = "<group>"; };
 		A8F8F6BF41E2864BD8FA3FB7 /* Pods-BlockV_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Tests/Pods-BlockV_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		AC9D73DE9B5506A2FFBB74EE /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
+		AD0BCC8D217769D7001836DE /* GenericJsonMerge_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericJsonMerge_Tests.swift; sourceTree = "<group>"; };
+		AD0BCC912178828A001836DE /* VatomModelUpdate_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VatomModelUpdate_Tests.swift; sourceTree = "<group>"; };
+		AD0BCC97217A0106001836DE /* LiveVatomView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LiveVatomView.swift; sourceTree = "<group>"; };
 		AD36A59E215D1CE4009EFD55 /* CustomLoaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomLoaderView.swift; sourceTree = "<group>"; };
 		AD36A5AF215E3578009EFD55 /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = CHANGELOG.md; path = ../CHANGELOG.md; sourceTree = "<group>"; };
 		AD3DB52F2157FD7200E00B67 /* TappedVatomViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TappedVatomViewController.swift; sourceTree = "<group>"; };
@@ -298,6 +304,8 @@
 			children = (
 				D5307588211199C200DE7FD0 /* MockModels.swift */,
 				D53075A32112E9E000DE7FD0 /* FaceModel_Tests.swift */,
+				AD0BCC8D217769D7001836DE /* GenericJsonMerge_Tests.swift */,
+				AD0BCC912178828A001836DE /* VatomModelUpdate_Tests.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -314,6 +322,7 @@
 		D58E31B0205E90DB0024BA0E /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				AD0BCC97217A0106001836DE /* LiveVatomView.swift */,
 				D58E31B4205E95E10024BA0E /* Cells */,
 				AD36A59E215D1CE4009EFD55 /* CustomLoaderView.swift */,
 			);
@@ -555,6 +564,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D519A848205E76EB006B0D19 /* NetworkDataOperation.swift in Sources */,
+				AD0BCC98217A0106001836DE /* LiveVatomView.swift in Sources */,
 				D5475764205D124100E6FE90 /* UIView+Ext.swift in Sources */,
 				AD920A5C215FB47200CEFC1D /* PasswordTableViewController.swift in Sources */,
 				D547576B205E67AD00E6FE90 /* VatomCell.swift in Sources */,
@@ -589,6 +599,8 @@
 				AD61462F213DC88B00204E5B /* MockModelFaces.swift in Sources */,
 				AD61462E213DC88700204E5B /* FaceSelectionProcedure_Tests.swift in Sources */,
 				D53075A42112E9E000DE7FD0 /* FaceModel_Tests.swift in Sources */,
+				AD0BCC922178828A001836DE /* VatomModelUpdate_Tests.swift in Sources */,
+				AD0BCC8E217769D7001836DE /* GenericJsonMerge_Tests.swift in Sources */,
 				D530759C21119E2A00DE7FD0 /* MockModels.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

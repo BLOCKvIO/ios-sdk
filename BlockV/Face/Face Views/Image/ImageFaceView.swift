@@ -59,7 +59,7 @@ class ImageFaceView: FaceView {
                 if let scaleString = config["scale"]?.stringValue {
                     self.scale ?= Config.Scale(rawValue: scaleString)
                 }
-                self.imageName ?= config["name"]?.stringValue
+                self.imageName ?= config["image"]?.stringValue
             }
 
         }

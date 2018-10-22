@@ -138,16 +138,6 @@ class InventoryCollectionViewController: UICollectionViewController {
             
         }
         
-        // subcribe to vatom state updates (where the event was either a drop or pick-up)
-        BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { vatomStateEvent in
-            
-            print("\nViewer > State Update - Filters in only Drop/Pick-Up events")
-            
-            }.filter {
-                // check the properties for the 'dropped' flag.
-                $0.vatomProperties.contains(where: { $0.key == "dropped" })
-        }
-        
         // MARK: - Activity
         
         // subcribe to an activity event

@@ -52,18 +52,6 @@ class ProgressImageFaceView: FaceView {
         return imageView
     }()
 
-    private let emptyImageContainer: UIView = {
-        let view = UIView()
-        view.clipsToBounds = true
-        return view
-    }()
-
-    private let fullImageContainer: UIView = {
-        let view = UIView()
-        view.clipsToBounds = true
-        return view
-    }()
-
     // MARK: - Dynamic Vatom Private Properties
 
     private var progress: CGFloat {
@@ -145,13 +133,8 @@ class ProgressImageFaceView: FaceView {
 
         super.init(vatom: vatom, faceModel: faceModel)
 
-        // setup
-        emptyImageContainer.frame = self.bounds
-        fullImageContainer.frame = self.bounds
-        self.addSubview(emptyImageContainer)
-        self.addSubview(fullImageContainer)
-        emptyImageContainer.addSubview(emptyImageView)
-        fullImageContainer.addSubview(fullImageView)
+        self.addSubview(emptyImageView)
+        self.addSubview(fullImageView)
 
         // progress label
         self.addSubview(progressLabel)
@@ -200,87 +183,67 @@ class ProgressImageFaceView: FaceView {
         self.layoutIfNeeded()
     }
 
-    /// Updates the empty and full images and their containers to show the "progress" of the vAtom.
     override func layoutSubviews() {
         super.layoutSubviews()
 
         // image size
         guard let image = fullImageView.image else { return }
-        // convert to points
-        let imagePoints = CGSize(width: image.size.width * image.scale, height: image.size.height * image.scale)
-        // normalize padding i.t.o the view's point size
-        var paddingStartNorm: CGFloat = 0
-        var paddingEndNorm: CGFloat = 0
+
+        // - Pixels
+        // size of image in pixels
+        let imagePixelSize = CGSize(width: (image.size.width * image.scale), height: (image.size.height * image.scale))
+
+        // rect of the image inside the image view
+        let contentClippingRect = self.fullImageView.contentClippingRect
+
+        let paddingStart = contentClippingRect.height * CGFloat(self.config.paddingStart) / imagePixelSize.height
+        let paddingEnd = contentClippingRect.width * CGFloat(self.config.paddingEnd) / imagePixelSize.width
+
+        let innerY = contentClippingRect.height - paddingStart - paddingEnd
+        let innerX = contentClippingRect.width - paddingStart - paddingEnd
+
+        let innerProgressY = (contentClippingRect.height - paddingStart - paddingEnd) * progress
+        let innerProgressX = (contentClippingRect.width - paddingStart - paddingEnd) * progress
+
+        // assuming up
+
+        var maskRect: CGRect!
 
         switch self.config.direction.lowercased() {
-        case "left", "right":
-            paddingStartNorm = CGFloat(self.config.paddingStart) / imagePoints.width * self.bounds.size.width
-            paddingEndNorm = CGFloat(self.config.paddingEnd) / imagePoints.width * self.bounds.size.width
-        default: // "up", "down"
-            paddingStartNorm = CGFloat(self.config.paddingStart) / imagePoints.height * self.bounds.size.height
-            paddingEndNorm = CGFloat(self.config.paddingEnd) / imagePoints.height * self.bounds.size.height
-        }
 
-        // check direction
-        if self.config.direction == "down" {
-
-            // top to bottom
-            let offset = floor(progress * (self.bounds.size.height - paddingEndNorm - paddingStartNorm)
-                - paddingStartNorm)
-            emptyImageContainer.frame =
-                CGRect(x: 0, y: offset, width: self.bounds.size.width, height: self.bounds.size.height - offset)
-            emptyImageView.frame =
-                CGRect(x: 0, y: -offset, width: self.bounds.size.width, height: self.bounds.size.height)
-            fullImageContainer.frame =
-                CGRect(x: 0, y: 0, width: self.bounds.size.width, height: offset)
-            fullImageView.frame =
-                CGRect(x: 0, y: 0, width: self.bounds.size.width, height: self.bounds.size.height)
-
-        } else if self.config.direction == "up" {
-
-            // bottom to top
-            let offsetRange = (self.bounds.size.height - paddingEndNorm - paddingStartNorm)
-            let offset = floor((1-progress) * offsetRange + paddingEndNorm)
-            emptyImageContainer.frame =
-                CGRect(x: 0, y: 0, width: self.bounds.size.width, height: offset)
-            emptyImageView.frame =
-                CGRect(x: 0, y: 0, width: self.bounds.size.width, height: self.bounds.size.height)
-            fullImageContainer.frame =
-                CGRect(x: 0, y: offset, width: self.bounds.size.width, height: self.bounds.size.height - offset)
-            fullImageView.frame =
-                CGRect(x: 0, y: -offset, width: self.bounds.size.width, height: self.bounds.size.height)
-
-        } else if self.config.direction == "left" {
-
-            // right to left
-            let offsetRange = (self.bounds.size.width - paddingEndNorm - paddingStartNorm)
-            let offset = floor((1-progress) * offsetRange + paddingEndNorm)
-            emptyImageContainer.frame =
-                CGRect(x: 0, y: 0, width: offset, height: self.bounds.size.height)
-            emptyImageView.frame =
-                CGRect(x: 0, y: 0, width: self.bounds.size.width, height: self.bounds.size.height)
-            fullImageContainer.frame =
-                CGRect(x: offset, y: 0, width: self.bounds.size.width - offset, height: self.bounds.size.height)
-            fullImageView.frame =
-                CGRect(x: -offset, y: 0, width: self.bounds.size.width, height: self.bounds.size.height)
-
-        } else {
-
-            // left to right
-            let offset = floor(progress * (self.bounds.size.width - paddingEndNorm - paddingStartNorm)
-                - paddingStartNorm)
-            emptyImageContainer.frame =
-                CGRect(x: offset, y: 0, width: self.bounds.size.width - offset, height: self.bounds.size.height)
-            emptyImageView.frame =
-                CGRect(x: -offset, y: 0, width: self.bounds.size.width, height: self.bounds.size.height)
-            fullImageContainer.frame =
-                CGRect(x: 0, y: 0, width: offset, height: self.bounds.size.height)
-            fullImageView.frame =
-                CGRect(x: 0, y: 0, width: self.bounds.size.width, height: self.bounds.size.height)
+        case "left":
+            let offset = paddingStart + innerProgressX
+            maskRect = CGRect(x: contentClippingRect.maxX - offset,
+                              y: 0,
+                              width: offset,
+                              height: self.bounds.height)
+        case "right":
+            maskRect = CGRect(x: contentClippingRect.minX,
+                              y: 0,
+                              width: paddingStart + innerProgressX,
+                              height: self.bounds.height)
+        case "down":
+            maskRect = CGRect(x: self.bounds.minX,
+                              y: contentClippingRect.minY,
+                              width: self.bounds.width,
+                              height: paddingStart + innerProgressY)
+        default: // "up"
+            let topOffset: CGFloat = paddingEnd + (innerY - innerProgressY)
+            maskRect = CGRect(x: self.bounds.minX,
+                                  y: contentClippingRect.minY + topOffset,
+                                  width: self.bounds.width,
+                                  height: contentClippingRect.height - topOffset)
 
         }
+
+        // mask in the full portion (as a function of the direction and progress)
+        let maskPath = CGPath.init(rect: maskRect, transform: nil)
+        maskLayer.path = maskPath
+        self.fullImageView.layer.mask = maskLayer
 
     }
+
+    private var maskLayer = CAShapeLayer()
 
     // MARK: - Resource Management
 

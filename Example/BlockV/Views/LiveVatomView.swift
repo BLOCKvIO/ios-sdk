@@ -30,7 +30,12 @@ import BLOCKv
 class LiveVatomView: VatomView {
 
     // MARK: - Initialization
-	
+    
+    override init() {
+        super.init()
+        commonInit()
+    }
+
     override init(vatom: VatomModel, procedure: @escaping FaceSelectionProcedure) {
         super.init(vatom: vatom, procedure: procedure)
         commonInit()

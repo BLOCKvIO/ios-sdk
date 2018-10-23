@@ -49,6 +49,8 @@ public class FaceViewRoster {
         // embedded face views
         roster.register(ImageFaceView.self)
         roster.register(LayeredImageFaceView.self)
+        roster.register(ProgressImageFaceView.self)
+
         return roster
     }()
 

@@ -38,9 +38,6 @@ controller to respond to the changes over the Web socket.
 - Image Face View looking for wrong image
   - Pull Request [#110](https://github.com/BLOCKvIO/ios-sdk/pull/110)
 
-#### Upgrade Notes
-This release has breaking changes.
-
 ## [2.0.1](https://github.com/BLOCKvIO/ios-sdk/releases/tag/2.0.1)
 
 ### Fixed

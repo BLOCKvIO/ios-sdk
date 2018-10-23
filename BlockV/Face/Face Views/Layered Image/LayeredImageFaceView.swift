@@ -142,10 +142,17 @@ class LayeredImageFaceView: FaceView {
 			completion?(error)
 		}
 	}
+<<<<<<< HEAD
 
 	/// Fetch the children of the given vAtom and apply the relevant layers
 
 	func vAtomStateChanged() {
+=======
+	
+	/// Fetch the children for the specified vAtom identifier and apply the relevant layers.
+	
+	func vAtomStateChanged() {	
+>>>>>>> 0b4f9d9ed50cd8770504922977ceaee0efc9e039
 		BLOCKv.getInventory(id: self.vatom.id) { (vatomModels, error) in
 
 			guard error == nil else {

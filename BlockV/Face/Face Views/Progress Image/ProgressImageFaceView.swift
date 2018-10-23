@@ -84,7 +84,7 @@ class ProgressImageFaceView: FaceView {
             self.fullImageName  ?= faceConfig["full_image"]?.stringValue
             self.direction      ?= faceConfig["direction"]?.stringValue
             self.showPercentage ?= faceConfig["show_percentage"]?.boolValue
-            
+
             if let paddingEnd = faceConfig["padding_end"]?.floatValue {
                 self.paddingEnd ?= Double(paddingEnd)
             }
@@ -129,8 +129,6 @@ class ProgressImageFaceView: FaceView {
         progressLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: 10).isActive = true
         progressLabel.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -10).isActive = true
         progressLabel.heightAnchor.constraint(equalToConstant: 20).isActive = true
-
-        self.backgroundColor = UIColor.yellow.withAlphaComponent(0.3)
 
     }
 

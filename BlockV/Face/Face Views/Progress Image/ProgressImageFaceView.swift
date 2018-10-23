@@ -84,7 +84,7 @@ class ProgressImageFaceView: FaceView {
             self.fullImageName  ?= faceConfig["full_image"]?.stringValue
             self.direction      ?= faceConfig["direction"]?.stringValue
             self.showPercentage ?= faceConfig["show_percentage"]?.boolValue
-            
+
             if let paddingEnd = faceConfig["padding_end"]?.floatValue {
                 self.paddingEnd ?= Double(paddingEnd)
             }

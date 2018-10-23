@@ -23,7 +23,7 @@ class LayeredImageFaceView: FaceView {
 		// Reference to the vAtom which this layer represents.
 		var vatom: VatomModel!
 
-		func layerDefaultValues(){
+		func layerDefaultValues() {
 			// Layer class defaults
 			self.autoresizingMask = [ .flexibleWidth, .flexibleHeight ]
 			self.clipsToBounds = true

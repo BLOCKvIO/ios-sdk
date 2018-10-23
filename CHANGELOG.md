@@ -24,7 +24,7 @@ All notable changes to this project will be documented in this file.
   - Pull Request [#116](https://github.com/BLOCKvIO/ios-sdk/pull/116)
 - `updated(applying:)` method to `VatomModel`. This method allows the partial update data in a state update to be applied to a vatom.
   - Pull Request [#115](https://github.com/BLOCKvIO/ios-sdk/pull/115)
-- EOS ans ETH properties to `VatomModel
+- EOS ans ETH properties to `VatomModel`.
   - Pull Request [#114](https://github.com/BLOCKvIO/ios-sdk/pull/114)
 
 ### Updated

@@ -130,8 +130,6 @@ class ProgressImageFaceView: FaceView {
         progressLabel.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -10).isActive = true
         progressLabel.heightAnchor.constraint(equalToConstant: 20).isActive = true
 
-        self.backgroundColor = UIColor.yellow.withAlphaComponent(0.3)
-
     }
 
     required init?(coder aDecoder: NSCoder) {

@@ -39,8 +39,8 @@ class TappedVatomViewController: UIViewController {
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var descriptionLabel: UILabel!
     
-    @IBOutlet weak var vatomViewA: VatomView! // using storyboards
-    @IBOutlet weak var vatomViewB: VatomView! // using storyboards
+    @IBOutlet weak var vatomViewA: LiveVatomView! // using storyboards
+    @IBOutlet weak var vatomViewB: LiveVatomView! // using storyboards
     @IBOutlet weak var containerView: UIView! // using code (container view)
     
     // MARK: - Properties
@@ -53,8 +53,8 @@ class TappedVatomViewController: UIViewController {
     var cardFSP = EmbeddedProcedure.card.procedure
     
     /// VatomView (constructed programmatically)
-    let vatomViewC: VatomView = {
-        let vatomView = VatomView()
+    let vatomViewC: LiveVatomView = {
+        let vatomView = LiveVatomView()
         vatomView.loaderView = CustomLoaderView()
         return vatomView
     }()

@@ -53,7 +53,7 @@ protocol VatomViewLifecycleDelegate: class {
 ///
 /// - note:
 /// Loading and error views may be customized for all `VatomView` or per instance.
-public class VatomView: UIView {
+open class VatomView: UIView {
 
     // MARK: - Enums
 

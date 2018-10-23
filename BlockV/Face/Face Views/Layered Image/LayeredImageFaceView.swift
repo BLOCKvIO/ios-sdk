@@ -23,9 +23,7 @@ class LayeredImageFaceView: FaceView {
 		// Reference to the vAtom which this layer represents.
 		var vatom: VatomModel!
 
-		convenience override init(frame: CGRect) {
-			self.init()
-
+		func layerDefaultValues(){
 			// Layer class defaults
 			self.autoresizingMask = [ .flexibleWidth, .flexibleHeight ]
 			self.clipsToBounds = true
@@ -36,6 +34,7 @@ class LayeredImageFaceView: FaceView {
 
     lazy var baseLayer: Layer = {
         let layer = Layer()
+		layer.layerDefaultValues()
         return layer
     }()
 
@@ -189,6 +188,7 @@ class LayeredImageFaceView: FaceView {
 	/// Create a standard Layer and add it to the base layer's subviews.
 	private func createLayer(_ vatom: VatomModel) -> Layer {
 		let layer  = Layer()
+		layer.layerDefaultValues()
 		self.updateContentMode(forLayer: layer)
 
 		layer.vatom = vatom

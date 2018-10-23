@@ -38,9 +38,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
-        //: ## Setup
+        //: ## Setup MyAppID
                 
-        BLOCKv.configure(appID: myAppId)
+        BLOCKv.configure(appID: MyAppID)
         
         //: ## Control Flow
 

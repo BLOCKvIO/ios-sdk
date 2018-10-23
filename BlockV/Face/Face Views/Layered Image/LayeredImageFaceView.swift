@@ -9,25 +9,23 @@
 //  governing permissions and limitations under the License.
 //
 
-// swiftlint:disable trailing_whitespace
-
 import Foundation
 import Nuke
 
 /// Native Layered face view
 class LayeredImageFaceView: FaceView {
     class var displayURL: String { return "native://layered-image" }
-	
+
 	// Layer must be a class to inherit from UIImageview
 	class Layer: UIImageView {
-		/// Reference to the resource this layer displays.
+		// Reference to the resource this layer displays.
 		var resource: VatomResourceModel?
-		/// Reference to the vAtom which this layer represents.
+		// Reference to the vAtom which this layer represents.
 		var vatom: VatomModel!
-		
+
 		convenience override init(frame: CGRect) {
 			self.init()
-			
+
 			// Layer class defaults
 			self.autoresizingMask = [ .flexibleWidth, .flexibleHeight ]
 			self.clipsToBounds = true
@@ -42,7 +40,7 @@ class LayeredImageFaceView: FaceView {
     }()
 
     public private(set) var isLoaded: Bool = false
-	
+
 	var childVatoms: [VatomModel] = []
 	var topLayers: [Layer] = []
 
@@ -50,12 +48,8 @@ class LayeredImageFaceView: FaceView {
 
     /// Face model face configuration specification.
     private struct Config {
-        enum Scale: String {
-            case fit, fill
-        }
 
         // defaults
-        var scale: Scale = .fit
         var imageName: String = "ActivatedImage"
 
         /// Initialize using face model.
@@ -70,11 +64,7 @@ class LayeredImageFaceView: FaceView {
             self.imageName ?= faceModel.properties.resources.first
 
             if let config = faceModel.properties.config {
-                // assign iff not nil
-                if let scaleString = config["scale"]?.stringValue {
-                    self.scale ?= Config.Scale(rawValue: scaleString)
-                }
-                self.imageName ?= config["name"]?.stringValue
+                self.imageName ?= config["image"]?.stringValue
             }
         }
     }
@@ -83,24 +73,22 @@ class LayeredImageFaceView: FaceView {
 
     // MARK: - Init
     required init(vatom: VatomModel, faceModel: FaceModel) {
-        /// init face config
+        // init face config
         self.config = Config(faceModel)
         super.init(vatom: vatom, faceModel: faceModel)
 
-		///ensure base has correct bounds with the 'parent' vAtom
+		//ensure base has correct bounds with the 'parent' vAtom
 		baseLayer.frame = self.bounds
 		baseLayer.vatom = vatom
         self.addSubview(baseLayer)
-		
-		/*
-		BLCOKv.
-		*/
+
+		// initial setup
 		self.vAtomStateChanged()
-		
-		/// listen to websocket for state changes on LayeredImageView
+
+		// listen to websocket for state changes on LayeredImageView
 		BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { ( _ stateUpdateEvent) in
 			self.vAtomStateChanged()
-		} 
+		}
     }
 
     required public init?(coder aDecoder: NSCoder) {
@@ -115,11 +103,7 @@ class LayeredImageFaceView: FaceView {
 	}
 
 	private func updateContentMode(forLayer: Layer) {
-		/// check face config
-		switch config.scale {
-		case .fill: forLayer.contentMode = .scaleAspectFill
-		case .fit:  forLayer.contentMode = .scaleAspectFit
-		}
+		forLayer.contentMode = .scaleAspectFit
 	}
 
     // MARK: - Face View Lifecycle
@@ -128,12 +112,12 @@ class LayeredImageFaceView: FaceView {
     func load(completion: ((Error?) -> Void)?) {
 		updateResources(completion: completion)
     }
-	
+
     func vatomChanged(_ vatom: VatomModel) {
 		self.vatom = vatom
 		updateResources(completion: nil)
     }
-	
+
     func unload() {
 		self.baseLayer.image = nil
     }
@@ -142,117 +126,119 @@ class LayeredImageFaceView: FaceView {
 
 	private func updateResources(completion: ((Error?) -> Void)?) {
 
-		/// extract resource model
+		// extract resource model
 		guard let resourceModel = vatom.props.resources.first(where: { $0.name == config.imageName }) else {
 			return
 		}
 
-		/// encode url
+		// encode url
 		guard let encodeURL = try? BLOCKv.encodeURL(resourceModel.url) else {
 			return
 		}
 
-		/// load image (automatically handles reuse)
+		// load image (automatically handles reuse)
 		Nuke.loadImage(with: encodeURL, into: self.baseLayer) { (_, error) in
 			self.isLoaded = true
 			completion?(error)
 		}
 	}
-	
-	///Fetch the children of the given vAtom and apply the relevant layers
-	
-	func vAtomStateChanged() {	
+
+	/// Fetch the children of the given vAtom and apply the relevant layers
+
+	func vAtomStateChanged() {
 		BLOCKv.getInventory(id: self.vatom.id) { (vatomModels, error) in
-			
+
 			guard error == nil else {
 				printBV(info: "getInventory - \(error!.localizedDescription)")
 				return
 			}
-						
+
 			self.childVatoms = vatomModels
-			
+
 			var newLayers: [Layer] = []
 			for childVatom in self.childVatoms {
-				
+
 				var tempLayer: Layer!
-				
-				///investigate if the layer already exists
+
+				//investigate if the layer already exists
 				for layer in self.topLayers where layer.vatom == childVatom {
 					tempLayer = layer
-					break 
+					break
 				}
-				
-				/// added found layer to list or create a new one and add that
+
+				// added found layer to list or create a new one and add that
 				newLayers.append(tempLayer == nil ? self.createLayer(childVatom) : tempLayer)
 			}
-			
+
 			var layersToRemove: [Layer] = []
 			for layer in self.topLayers {
-				/// check if added
+				// check if added
 				if newLayers.contains(where: { $0.vatom == layer.vatom }) {
 					continue
 				}
-				
+
 				layersToRemove.append(layer)
 			}
-			
+
 			self.removeLayers(layersToRemove)
 		}
 	}
-	
+
 	// MARK: - Creation Layer
-	
+
+	/// Create a standard Layer and add it to the base layer's subviews
 	private func createLayer(_ vatom: VatomModel) -> Layer {
 		let layer  = Layer()
 		self.updateContentMode(forLayer: layer)
-		
+
 		layer.vatom = vatom
-		
-		/// extract resource model
+
+		// extract resource model
 		guard let resourceModel = vatom.props.resources.first(where: { $0.name == config.imageName }) else {
 			printBV(info: "could not find child vatom resource model")
 			return layer
 		}
-		
-		/// encode url
+
+		// encode url
 		guard let encodeURL = try? BLOCKv.encodeURL(resourceModel.url) else {
 			printBV(info: "could not encode child vatom resource")
 			return layer
 		}
-		
+
 		Nuke.loadImage(with: encodeURL, into: layer) { (_, _) in
 			self.isLoaded = true
 		}
-		
+
 		layer.frame = self.bounds
 		self.baseLayer.addSubview(layer)
 		self.topLayers.append(layer)
-		
+
 		return layer
 	}
-	
+
+	/// Remove layers that are not part of the vAtoms children 
 	private func removeLayers(_ layers: [Layer]) {
-		
-		/// remove each layer
+
+		// remove each layer
 		var timeOffset: TimeInterval = 0
 		for layer in layers.reversed() {
-			
+
 			// animate out
 			UIView.animate(withDuration: 0.25, delay: timeOffset, options: [], animations: {
-				
+
 				// animate away
 				layer.transform = CGAffineTransform(scaleX: 1.25, y: 1.25)
 				layer.alpha = 0
-				
+
 			}, completion: { _ in
-				
+
 				// remove it
 				if let index = self.topLayers.index(of: layer) {
 					self.topLayers.remove(at: index)
 				}
 				layer.removeFromSuperview()
 			})
-			
+
 			// increase time offset
 			timeOffset += 0.2
 		}

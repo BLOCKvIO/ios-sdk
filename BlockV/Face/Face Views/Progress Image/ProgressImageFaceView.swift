@@ -84,24 +84,12 @@ class ProgressImageFaceView: FaceView {
             self.fullImageName  ?= faceConfig["full_image"]?.stringValue
             self.direction      ?= faceConfig["direction"]?.stringValue
             self.showPercentage ?= faceConfig["show_percentage"]?.boolValue
-
-            /*
-             Legacy Note:
-             The specification calls for `padding_end` and `padding_start` to be of type Float. However some older
-             vAtoms have these values as type String. This is temporary – String types will be depreciated.
-             */
+            
             if let paddingEnd = faceConfig["padding_end"]?.floatValue {
                 self.paddingEnd ?= Double(paddingEnd)
-            } else if let endString = faceConfig["padding_end"]?.stringValue, // legacy!
-                let end = Double(endString) {
-                self.paddingEnd = end
             }
-
             if let paddingStart = faceConfig["padding_start"]?.floatValue {
                 self.paddingStart = Double(paddingStart)
-            } else if let startString = faceConfig["padding_start"]?.stringValue, // legacy!
-                let start = Double(startString) {
-                self.paddingStart = start
             }
         }
 

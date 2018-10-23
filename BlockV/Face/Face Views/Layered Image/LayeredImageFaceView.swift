@@ -76,7 +76,7 @@ class LayeredImageFaceView: FaceView {
         self.config = Config(faceModel)
         super.init(vatom: vatom, faceModel: faceModel)
 
-		//ensure base has correct bounds with the 'parent' vAtom
+		// ensure base has correct bounds with the 'parent' vAtom
 		baseLayer.frame = self.bounds
 		baseLayer.vatom = vatom
         self.addSubview(baseLayer)
@@ -144,7 +144,7 @@ class LayeredImageFaceView: FaceView {
 
 	/// Fetch the children for the specified vAtom identifier and apply the relevant layers.
 
-	func vAtomStateChanged() {
+	private func vAtomStateChanged() {
 		BLOCKv.getInventory(id: self.vatom.id) { (vatomModels, error) in
 
 			guard error == nil else {
@@ -159,7 +159,7 @@ class LayeredImageFaceView: FaceView {
 
 				var tempLayer: Layer!
 
-				//investigate if the layer already exists
+				// investigate if the layer already exists
 				for layer in self.topLayers where layer.vatom == childVatom {
 					tempLayer = layer
 					break

@@ -11,8 +11,17 @@
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
+		AD0BCC8E217769D7001836DE /* GenericJsonMerge_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD0BCC8D217769D7001836DE /* GenericJsonMerge_Tests.swift */; };
+		AD0BCC922178828A001836DE /* VatomModelUpdate_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD0BCC912178828A001836DE /* VatomModelUpdate_Tests.swift */; };
+		AD0BCC98217A0106001836DE /* LiveVatomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD0BCC97217A0106001836DE /* LiveVatomView.swift */; };
+		AD36A59F215D1CE4009EFD55 /* CustomLoaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD36A59E215D1CE4009EFD55 /* CustomLoaderView.swift */; };
+		AD36A5B0215E3578009EFD55 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = AD36A5AF215E3578009EFD55 /* CHANGELOG.md */; };
+		AD3DB5302157FD7200E00B67 /* TappedVatomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD3DB52F2157FD7200E00B67 /* TappedVatomViewController.swift */; };
 		AD61462E213DC88700204E5B /* FaceSelectionProcedure_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD61462A213DC83D00204E5B /* FaceSelectionProcedure_Tests.swift */; };
 		AD61462F213DC88B00204E5B /* MockModelFaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD61462C213DC87100204E5B /* MockModelFaces.swift */; };
+		AD920A5B215FB47200CEFC1D /* UserInfoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD920A58215FB47100CEFC1D /* UserInfoTableViewController.swift */; };
+		AD920A5C215FB47200CEFC1D /* PasswordTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD920A59215FB47200CEFC1D /* PasswordTableViewController.swift */; };
+		AD920A5D215FB47200CEFC1D /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD920A5A215FB47200CEFC1D /* ProfileViewController.swift */; };
 		CDC268C7232CDB5AF1386116 /* Pods_BlockV_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DE93FD598C0B61200B996A4 /* Pods_BlockV_Example.framework */; };
 		D519A845205E6EE3006B0D19 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D519A844205E6EE3006B0D19 /* NetworkOperation.swift */; };
 		D519A848205E76EB006B0D19 /* NetworkDataOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D519A847205E76EB006B0D19 /* NetworkDataOperation.swift */; };
@@ -25,9 +34,7 @@
 		D547576D205E6C6300E6FE90 /* AsynchronousOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D547576C205E6C6300E6FE90 /* AsynchronousOperation.swift */; };
 		D55B21E02052772400B6D5C2 /* VerifyTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B21DF2052772400B6D5C2 /* VerifyTableViewController.swift */; };
 		D55B21E520527EB400B6D5C2 /* TokenCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B21E420527EB400B6D5C2 /* TokenCell.swift */; };
-		D55B21E72052BB7400B6D5C2 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B21E62052BB7400B6D5C2 /* ProfileViewController.swift */; };
 		D55B21EA2052E38000B6D5C2 /* RoundedImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B21E92052E38000B6D5C2 /* RoundedImageView.swift */; };
-		D55B21EC2053D43600B6D5C2 /* UserInfoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B21EB2053D43600B6D5C2 /* UserInfoTableViewController.swift */; };
 		D55B21EE2053E24900B6D5C2 /* TitleValueCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B21ED2053E24900B6D5C2 /* TitleValueCell.swift */; };
 		D55B21F020540AC200B6D5C2 /* RegisterTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B21EF20540AC200B6D5C2 /* RegisterTableViewController.swift */; };
 		D55B21F52056745700B6D5C2 /* UIViewController+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B21F42056745700B6D5C2 /* UIViewController+Ext.swift */; };
@@ -35,10 +42,8 @@
 		D55B21FB2056E04B00B6D5C2 /* InventoryCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B21FA2056E04B00B6D5C2 /* InventoryCollectionViewController.swift */; };
 		D5728D5C206131980041F4F7 /* TransferActionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5728D5B206131980041F4F7 /* TransferActionViewController.swift */; };
 		D5728D5E206155600041F4F7 /* ActionListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5728D5D206155600041F4F7 /* ActionListTableViewController.swift */; };
-		D584360A212C927F0045467F /* EngagedVatomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5843609212C927F0045467F /* EngagedVatomViewController.swift */; };
 		D597FF272051305A009B2910 /* UIAlertController+Etx.swift in Sources */ = {isa = PBXBuildFile; fileRef = D597FF262051305A009B2910 /* UIAlertController+Etx.swift */; };
 		D59C7DDD206CE1D000FCE1DD /* Actions.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D59C7DDC206CE1D000FCE1DD /* Actions.storyboard */; };
-		D5A08F3B2066514900FB3CB7 /* PasswordTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A08F3A2066514900FB3CB7 /* PasswordTableViewController.swift */; };
 		D5E3AC9F2049883900CFFEEA /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E3AC9E2049883800CFFEEA /* LoginViewController.swift */; };
 		FE05FFA026A3E5A0C79B6E20 /* Pods_BLOCKv_Unit_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7956FE101E9335CDDC8248F3 /* Pods_BLOCKv_Unit_Tests.framework */; };
 /* End PBXBuildFile section */
@@ -76,8 +81,17 @@
 		A11EBD956A70C6C7890F053F /* Pods-BLOCKv_Unit_Tests.prod.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BLOCKv_Unit_Tests.prod.xcconfig"; path = "Pods/Target Support Files/Pods-BLOCKv_Unit_Tests/Pods-BLOCKv_Unit_Tests.prod.xcconfig"; sourceTree = "<group>"; };
 		A8F8F6BF41E2864BD8FA3FB7 /* Pods-BlockV_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Tests/Pods-BlockV_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		AC9D73DE9B5506A2FFBB74EE /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
+		AD0BCC8D217769D7001836DE /* GenericJsonMerge_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericJsonMerge_Tests.swift; sourceTree = "<group>"; };
+		AD0BCC912178828A001836DE /* VatomModelUpdate_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VatomModelUpdate_Tests.swift; sourceTree = "<group>"; };
+		AD0BCC97217A0106001836DE /* LiveVatomView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LiveVatomView.swift; sourceTree = "<group>"; };
+		AD36A59E215D1CE4009EFD55 /* CustomLoaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomLoaderView.swift; sourceTree = "<group>"; };
+		AD36A5AF215E3578009EFD55 /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = CHANGELOG.md; path = ../CHANGELOG.md; sourceTree = "<group>"; };
+		AD3DB52F2157FD7200E00B67 /* TappedVatomViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TappedVatomViewController.swift; sourceTree = "<group>"; };
 		AD61462A213DC83D00204E5B /* FaceSelectionProcedure_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceSelectionProcedure_Tests.swift; sourceTree = "<group>"; };
 		AD61462C213DC87100204E5B /* MockModelFaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockModelFaces.swift; sourceTree = "<group>"; };
+		AD920A58215FB47100CEFC1D /* UserInfoTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserInfoTableViewController.swift; sourceTree = "<group>"; };
+		AD920A59215FB47200CEFC1D /* PasswordTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordTableViewController.swift; sourceTree = "<group>"; };
+		AD920A5A215FB47200CEFC1D /* ProfileViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		B5A79A9FDD3524D3628C080E /* Pods-BlockV_Example.dev.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Example.dev.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Example/Pods-BlockV_Example.dev.xcconfig"; sourceTree = "<group>"; };
 		BC27A08D03F2D2401C48F394 /* Pods-BlockV_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Example/Pods-BlockV_Example.release.xcconfig"; sourceTree = "<group>"; };
 		C55D0BD7FD8ECD417C235202 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
@@ -95,9 +109,7 @@
 		D547576C205E6C6300E6FE90 /* AsynchronousOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsynchronousOperation.swift; sourceTree = "<group>"; };
 		D55B21DF2052772400B6D5C2 /* VerifyTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyTableViewController.swift; sourceTree = "<group>"; };
 		D55B21E420527EB400B6D5C2 /* TokenCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenCell.swift; sourceTree = "<group>"; };
-		D55B21E62052BB7400B6D5C2 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		D55B21E92052E38000B6D5C2 /* RoundedImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedImageView.swift; sourceTree = "<group>"; };
-		D55B21EB2053D43600B6D5C2 /* UserInfoTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfoTableViewController.swift; sourceTree = "<group>"; };
 		D55B21ED2053E24900B6D5C2 /* TitleValueCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleValueCell.swift; sourceTree = "<group>"; };
 		D55B21EF20540AC200B6D5C2 /* RegisterTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterTableViewController.swift; sourceTree = "<group>"; };
 		D55B21F42056745700B6D5C2 /* UIViewController+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Ext.swift"; sourceTree = "<group>"; };
@@ -105,12 +117,8 @@
 		D55B21FA2056E04B00B6D5C2 /* InventoryCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryCollectionViewController.swift; sourceTree = "<group>"; };
 		D5728D5B206131980041F4F7 /* TransferActionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferActionViewController.swift; sourceTree = "<group>"; };
 		D5728D5D206155600041F4F7 /* ActionListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionListTableViewController.swift; sourceTree = "<group>"; };
-		D5843609212C927F0045467F /* EngagedVatomViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngagedVatomViewController.swift; sourceTree = "<group>"; };
 		D597FF262051305A009B2910 /* UIAlertController+Etx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Etx.swift"; sourceTree = "<group>"; };
 		D59C7DDC206CE1D000FCE1DD /* Actions.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Actions.storyboard; sourceTree = "<group>"; };
-		D5A08F3A2066514900FB3CB7 /* PasswordTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordTableViewController.swift; sourceTree = "<group>"; };
-		D5A482C22125B4C6009DD499 /* FaceSelectionProcedure_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceSelectionProcedure_Tests.swift; sourceTree = "<group>"; };
-		D5A482C42125B5A7009DD499 /* MockModelsFaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockModelsFaces.swift; sourceTree = "<group>"; };
 		D5E3AC9E2049883800CFFEEA /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -164,7 +172,6 @@
 				607FACD11AFB9204008FA782 /* Products */,
 				32B39594BEF1B7EDB269086E /* Pods */,
 				8C7B4899EFB41257035A54F2 /* Frameworks */,
-				AD5C612F213EB76F00153EC4 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -206,6 +213,7 @@
 		607FACF51AFB993E008FA782 /* Podspec Metadata */ = {
 			isa = PBXGroup;
 			children = (
+				AD36A5AF215E3578009EFD55 /* CHANGELOG.md */,
 				86A0806A35212DD33474BDB7 /* BLOCKv.podspec */,
 				C55D0BD7FD8ECD417C235202 /* README.md */,
 				AC9D73DE9B5506A2FFBB74EE /* LICENSE */,
@@ -223,13 +231,14 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		AD5C612F213EB76F00153EC4 /* Recovered References */ = {
+		AD36A5A0215D382D009EFD55 /* Onboarding */ = {
 			isa = PBXGroup;
 			children = (
-				D5A482C42125B5A7009DD499 /* MockModelsFaces.swift */,
-				D5A482C22125B4C6009DD499 /* FaceSelectionProcedure_Tests.swift */,
+				D5E3AC9E2049883800CFFEEA /* LoginViewController.swift */,
+				D55B21EF20540AC200B6D5C2 /* RegisterTableViewController.swift */,
+				D55B21DF2052772400B6D5C2 /* VerifyTableViewController.swift */,
 			);
-			name = "Recovered References";
+			path = Onboarding;
 			sourceTree = "<group>";
 		};
 		AD614629213DC79D00204E5B /* Face Selection Procedure */ = {
@@ -239,6 +248,16 @@
 				AD61462C213DC87100204E5B /* MockModelFaces.swift */,
 			);
 			path = "Face Selection Procedure";
+			sourceTree = "<group>";
+		};
+		AD920A51215FB3EA00CEFC1D /* User Profile */ = {
+			isa = PBXGroup;
+			children = (
+				AD920A59215FB47200CEFC1D /* PasswordTableViewController.swift */,
+				AD920A5A215FB47200CEFC1D /* ProfileViewController.swift */,
+				AD920A58215FB47100CEFC1D /* UserInfoTableViewController.swift */,
+			);
+			path = "User Profile";
 			sourceTree = "<group>";
 		};
 		D519A846205E76C9006B0D19 /* Operations */ = {
@@ -254,8 +273,8 @@
 		D519A849205E8360006B0D19 /* Inventory */ = {
 			isa = PBXGroup;
 			children = (
+				AD3DB52F2157FD7200E00B67 /* TappedVatomViewController.swift */,
 				D55B21FA2056E04B00B6D5C2 /* InventoryCollectionViewController.swift */,
-				D5843609212C927F0045467F /* EngagedVatomViewController.swift */,
 				D519A84A205E83AB006B0D19 /* VatomDetailTableViewController.swift */,
 			);
 			path = Inventory;
@@ -285,6 +304,8 @@
 			children = (
 				D5307588211199C200DE7FD0 /* MockModels.swift */,
 				D53075A32112E9E000DE7FD0 /* FaceModel_Tests.swift */,
+				AD0BCC8D217769D7001836DE /* GenericJsonMerge_Tests.swift */,
+				AD0BCC912178828A001836DE /* VatomModelUpdate_Tests.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -301,7 +322,9 @@
 		D58E31B0205E90DB0024BA0E /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				AD0BCC97217A0106001836DE /* LiveVatomView.swift */,
 				D58E31B4205E95E10024BA0E /* Cells */,
+				AD36A59E215D1CE4009EFD55 /* CustomLoaderView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -319,12 +342,8 @@
 		D58E31B5205E962D0024BA0E /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				D5E3AC9E2049883800CFFEEA /* LoginViewController.swift */,
-				D55B21EF20540AC200B6D5C2 /* RegisterTableViewController.swift */,
-				D55B21DF2052772400B6D5C2 /* VerifyTableViewController.swift */,
-				D55B21E62052BB7400B6D5C2 /* ProfileViewController.swift */,
-				D55B21EB2053D43600B6D5C2 /* UserInfoTableViewController.swift */,
-				D5A08F3A2066514900FB3CB7 /* PasswordTableViewController.swift */,
+				AD920A51215FB3EA00CEFC1D /* User Profile */,
+				AD36A5A0215D382D009EFD55 /* Onboarding */,
 				D519A849205E8360006B0D19 /* Inventory */,
 				D5728D5A206130E40041F4F7 /* Actions */,
 			);
@@ -441,6 +460,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */,
+				AD36A5B0215E3578009EFD55 /* CHANGELOG.md in Resources */,
 				607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */,
 				D59C7DDD206CE1D000FCE1DD /* Actions.storyboard in Resources */,
 				607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */,
@@ -544,27 +564,29 @@
 			buildActionMask = 2147483647;
 			files = (
 				D519A848205E76EB006B0D19 /* NetworkDataOperation.swift in Sources */,
-				D5A08F3B2066514900FB3CB7 /* PasswordTableViewController.swift in Sources */,
+				AD0BCC98217A0106001836DE /* LiveVatomView.swift in Sources */,
 				D5475764205D124100E6FE90 /* UIView+Ext.swift in Sources */,
+				AD920A5C215FB47200CEFC1D /* PasswordTableViewController.swift in Sources */,
 				D547576B205E67AD00E6FE90 /* VatomCell.swift in Sources */,
 				D519A84B205E83AB006B0D19 /* VatomDetailTableViewController.swift in Sources */,
+				AD3DB5302157FD7200E00B67 /* TappedVatomViewController.swift in Sources */,
+				AD920A5D215FB47200CEFC1D /* ProfileViewController.swift in Sources */,
 				D55B21FB2056E04B00B6D5C2 /* InventoryCollectionViewController.swift in Sources */,
 				D55B21F52056745700B6D5C2 /* UIViewController+Ext.swift in Sources */,
-				D55B21EC2053D43600B6D5C2 /* UserInfoTableViewController.swift in Sources */,
 				D597FF272051305A009B2910 /* UIAlertController+Etx.swift in Sources */,
 				D55B21EE2053E24900B6D5C2 /* TitleValueCell.swift in Sources */,
 				D55B21E520527EB400B6D5C2 /* TokenCell.swift in Sources */,
 				D55B21F020540AC200B6D5C2 /* RegisterTableViewController.swift in Sources */,
 				D5E3AC9F2049883900CFFEEA /* LoginViewController.swift in Sources */,
+				AD920A5B215FB47200CEFC1D /* UserInfoTableViewController.swift in Sources */,
 				D55B21E02052772400B6D5C2 /* VerifyTableViewController.swift in Sources */,
-				D584360A212C927F0045467F /* EngagedVatomViewController.swift in Sources */,
-				D55B21E72052BB7400B6D5C2 /* ProfileViewController.swift in Sources */,
 				D55B21F92056DE6D00B6D5C2 /* UIColor+Ext.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 				D55B21EA2052E38000B6D5C2 /* RoundedImageView.swift in Sources */,
 				D5728D5E206155600041F4F7 /* ActionListTableViewController.swift in Sources */,
 				D519A845205E6EE3006B0D19 /* NetworkOperation.swift in Sources */,
 				D547576D205E6C6300E6FE90 /* AsynchronousOperation.swift in Sources */,
+				AD36A59F215D1CE4009EFD55 /* CustomLoaderView.swift in Sources */,
 				D5728D5C206131980041F4F7 /* TransferActionViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -577,6 +599,8 @@
 				AD61462F213DC88B00204E5B /* MockModelFaces.swift in Sources */,
 				AD61462E213DC88700204E5B /* FaceSelectionProcedure_Tests.swift in Sources */,
 				D53075A42112E9E000DE7FD0 /* FaceModel_Tests.swift in Sources */,
+				AD0BCC922178828A001836DE /* VatomModelUpdate_Tests.swift in Sources */,
+				AD0BCC8E217769D7001836DE /* GenericJsonMerge_Tests.swift in Sources */,
 				D530759C21119E2A00DE7FD0 /* MockModels.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

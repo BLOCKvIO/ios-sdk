@@ -21,28 +21,8 @@
 //  SOFTWARE.
 //
 
-//
-//  InventoryCollectionViewController.swift
-//  BlockV_Example
-//
-
 import UIKit
 import BLOCKv
-
-/*
- Alternative to VatomView
- 
- VatomView has a number of consequences when using it within a list object, e.g. uicollectionview controller.
- VatomView itself does not provide a good way of being *reused* (by a reuse pool).
- 
- A (possibly) better soltion is to create a cell subclass for each face view.
- 
- Pros:
- - This way each subclass can get a reuse identifier.
- Cons:
- - The viewer has to manage the face views directly.
- 
- */
 
 /// This view controller demonstrates how to fetch the current user's inventory.
 ///
@@ -158,16 +138,6 @@ class InventoryCollectionViewController: UICollectionViewController {
             
         }
         
-        // subcribe to vatom state updates (where the event was either a drop or pick-up)
-        BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { vatomStateEvent in
-            
-            print("\nViewer > State Update - Filters in only Drop/Pick-Up events")
-            
-            }.filter {
-                // check the properties for the 'dropped' flag.
-                $0.vatomProperties.contains(where: { $0.key == "dropped" })
-        }
-        
         // MARK: - Activity
         
         // subcribe to an activity event
@@ -195,7 +165,7 @@ class InventoryCollectionViewController: UICollectionViewController {
             }
             
             // handle success
-            print("\nViewer > Fetched inventory PackModel")
+            print("\nViewer > Fetched inventory")
             
             /*
              NOTE
@@ -240,7 +210,7 @@ class InventoryCollectionViewController: UICollectionViewController {
         }
         
     }
-
+    
     @objc
     fileprivate func handleRefresh() {
         print(#function)
@@ -254,8 +224,8 @@ class InventoryCollectionViewController: UICollectionViewController {
         
         if segue.identifier == "seg.vatom.faceviews" {
             let destination = segue.destination as! UINavigationController
-            let engagedVatomVC = destination.viewControllers[0] as! EngagedVatomViewController
-            engagedVatomVC.vatom = vatomToPass
+            let tappedVatomVC = destination.viewControllers[0] as! TappedVatomViewController
+            tappedVatomVC.vatom = vatomToPass
         }
     }
     
@@ -288,18 +258,7 @@ extension InventoryCollectionViewController {
         
         // replace cell's vatom
         let vatom = filteredVatoms[indexPath.row]
-        cell.vatom = vatom
         cell.vatomView.update(usingVatom: vatom)
-        
-//        // get vatom id
-//        let vatomID = filteredVatoms[indexPath.row].id
-//
-//        // find image data
-//        if let imageData = activatedImages[vatomID] {
-//            cell.contentView.alpha = 0.2
-//            cell.activatedImageView.image = UIImage.init(data: imageData)
-//            cell.contentView.alphaIn()
-//        }
         
         return cell
     }
@@ -309,40 +268,17 @@ extension InventoryCollectionViewController {
         // get the vatom to pass
         let currentCell = collectionView.cellForItem(at: indexPath) as! VatomCell
         // check if the cell has a vatom
-        if let vatom = currentCell.vatom {
+        if let vatom = currentCell.vatomView.vatom {
             self.vatomToPass = vatom
             performSegue(withIdentifier: "seg.vatom.faceviews", sender: self)
         }
         
     }
-
-}
-
-extension InventoryCollectionViewController: UITableViewDataSourcePrefetching {
-    
-    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
-        /*
-         The goal here is to prefetch heavy resources.
-         We know the vatom that will be displayed, but we don't know the face that will be selected.
-         
-         We could try and download all the resources associated with the vatom, but that is wastefull.
-         
-         Best case, we find out at this point what resources are required (which means knowing the result of the
-         fsp), and then downloading the resources.
-         
-         The only common way to do this is to inspect the face model's resource array.
-         */
-        
-    }
-    
-    func tableView(_ tableView: UITableView, cancelPrefetchingForRowsAt indexPaths: [IndexPath]) {
-        //TODO:
-    }
     
 }
 
 extension InventoryCollectionViewController: UICollectionViewDelegateFlowLayout {
-
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
         // Two columns

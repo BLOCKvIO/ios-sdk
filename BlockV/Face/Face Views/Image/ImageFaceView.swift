@@ -27,6 +27,8 @@ class ImageFaceView: FaceView {
         return imageView
     }()
 
+    public private(set) var isLoaded: Bool = false
+
     // MARK: - Config
 
     /// Face model face configuration specification.
@@ -40,16 +42,25 @@ class ImageFaceView: FaceView {
         var scale: Scale = .fit
         var imageName: String = "ActivatedImage"
 
-        /// Initialize using face configuration.
-        init(_ faceConfig: JSON?) {
+        /// Initialize using face model.
+        ///
+        /// The config has a set of default values. If the face config section is present, those values are used in
+        /// place of the default ones.
+        ///
+        /// ### Legacy Support
+        /// The first resource name in the resources array (if present) is used in place of the activate image.
+        init(_ faceModel: FaceModel) {
 
-            guard let config = faceConfig else { return }
+            // legacy: overwrite fallback if needed
+            self.imageName ?= faceModel.properties.resources.first
 
-            // assign iff not nil
-            if let scaleString = config["scale"]?.stringValue {
-                self.scale ?= Config.Scale(rawValue: scaleString)
+            if let config = faceModel.properties.config {
+                // assign iff not nil
+                if let scaleString = config["scale"]?.stringValue {
+                    self.scale ?= Config.Scale(rawValue: scaleString)
+                }
+                self.imageName ?= config["image"]?.stringValue
             }
-            self.imageName ?= config["name"]?.stringValue
 
         }
     }
@@ -71,7 +82,7 @@ class ImageFaceView: FaceView {
     required init(vatom: VatomModel, faceModel: FaceModel) {
 
         // init face config
-        self.config = Config(faceModel.properties.config)
+        self.config = Config(faceModel)
 
         super.init(vatom: vatom, faceModel: faceModel)
 
@@ -114,13 +125,11 @@ class ImageFaceView: FaceView {
 
     /// Begin loading the face view's content.
     func load(completion: ((Error?) -> Void)?) {
-        print(#function)
         updateResources(completion: completion)
     }
 
-    /// Respond to updates to the packaged vatom.
-    func vatomUpdated(_ vatom: VatomModel) {
-        print(#function)
+    /// Respond to updates or replacement of the current vAtom.
+    func vatomChanged(_ vatom: VatomModel) {
 
         /*
          NOTE:
@@ -139,7 +148,6 @@ class ImageFaceView: FaceView {
     ///
     /// Also called before reuse (when used inside a reuse pool).
     func unload() {
-        print(#function)
         self.animatedImageView.image = nil
         self.animatedImageView.animatedImage = nil
     }
@@ -165,6 +173,7 @@ class ImageFaceView: FaceView {
 
         // load image (automatically handles reuse)
         Nuke.loadImage(with: encodeURL, into: self.animatedImageView) { (_, error) in
+            self.isLoaded = true
             completion?(error)
         }
 

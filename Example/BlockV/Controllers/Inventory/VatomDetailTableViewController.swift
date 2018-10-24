@@ -21,11 +21,6 @@
 //  SOFTWARE.
 //
 
-//
-//  VatomTableViewController.swift
-//  BlockV_Example
-//
-
 import UIKit
 import BLOCKv
 

@@ -21,39 +21,41 @@
 //  SOFTWARE.
 //
 
-import UIKit
+import Foundation
 import BLOCKv
 
-class VatomCell: UICollectionViewCell {
+/// Example custom VatomView loader view.
+class CustomLoaderView: UIView, VatomViewLoader {
     
     // MARK: - Properties
     
-    static let reuseIdentifier = "com.blockv.vatom-cell"
-        
-    // MARK: - Outlets
+    private let activityIndicator: UIActivityIndicatorView = {
+        let view = UIActivityIndicatorView()
+        view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        view.color = .orange
+        return view
+    }()
     
-    @IBOutlet weak var vatomView: VatomView!
+    // MARK: - VatomViewLoader
     
-    // MARK: - Lifecycle
+    func startAnimating() {
+        activityIndicator.startAnimating()
+    }
+    
+    func stopAnimating() {
+        activityIndicator.stopAnimating()
+    }
+    
+    // MARK: - Initialize
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        self.addSubview(activityIndicator)
+        activityIndicator.frame = self.bounds
     }
     
     required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        
-        /*
-         At this point, nothing has been *set* for the new cell. The properties are still of the cell's old data model.
-         */
-        
-        // reset
-        self.vatomView.unLoad()
-        
+        fatalError("init(coder:) has not been implemented")
     }
     
 }

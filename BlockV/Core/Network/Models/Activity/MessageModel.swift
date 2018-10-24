@@ -28,32 +28,32 @@ public struct MessageModel: Equatable {
     // - Users
 
     /// Maps to "user_id"
-    public let triggerUserId: String
+    public let triggerUserID: String
     /// Maps to "triggered_by"
-    public let targetUserId: String
+    public let targetUserID: String
 
     // - Auxillary
 
     /// Array of associated vAtom identifiers.
-    public let vatomIds: [String]
+    public let vatomIdentifiers: [String]
     /// Array of templated variation identifiers (for each associated vAtom).
-    public let templateVariationIds: [String]
+    public let templateVariationIdentifiers: [String]
     /// Array of resources (for each associated vAtom).
     public let resources: [VatomResourceModel]
     ///
     public let geoPosition: [Double]? //FIXME: Convert to CLLocationCoordinate2D?
 
     enum CodingKeys: String, CodingKey {
-        case id                   = "msg_id"
-        case targetUserId         = "user_id"
-        case vatomIds             = "vatoms"
-        case templateVariationIds = "templ_vars"
-        case message              = "msg"
-        case actionName           = "action_name"
-        case whenCreated          = "when_created"
-        case triggerUserId        = "triggered_by"
-        case resources            = "generic"
-        case geoPosition          = "geo_pos"
+        case id                             = "msg_id"
+        case targetUserID                   = "user_id"
+        case vatomIdentifiers               = "vatoms"
+        case templateVariationIdentifiers   = "templ_vars"
+        case message                        = "msg"
+        case actionName                     = "action_name"
+        case whenCreated                    = "when_created"
+        case triggerUserID                  = "triggered_by"
+        case resources                      = "generic"
+        case geoPosition                    = "geo_pos"
     }
 
 }
@@ -64,16 +64,17 @@ extension MessageModel: Codable {
 
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id                   = try container.decode(Double.self, forKey: .id)
-        targetUserId         = try container.decode(String.self, forKey: .targetUserId)
+        targetUserID         = try container.decode(String.self, forKey: .targetUserID)
         message              = try container.decode(String.self, forKey: .message)
         actionName           = try container.decode(String.self, forKey: .actionName)
         whenCreated          = try container.decode(Date.self, forKey: .whenCreated)
-        triggerUserId        = try container.decode(String.self, forKey: .triggerUserId)
+        triggerUserID        = try container.decode(String.self, forKey: .triggerUserID)
 
         // potentially `null`
         geoPosition          = try container.decodeIfPresent([Double].self, forKey: .geoPosition)
-        templateVariationIds = try container.decodeIfPresent([String].self, forKey: .templateVariationIds) ?? []
-        vatomIds             = try container.decodeIfPresent([String].self, forKey: .vatomIds) ?? []
+        templateVariationIdentifiers = try container.decodeIfPresent([String].self,
+                                                                     forKey: .templateVariationIdentifiers) ?? []
+        vatomIdentifiers     = try container.decodeIfPresent([String].self, forKey: .vatomIdentifiers) ?? []
         resources            = container.decodeSafelyIfPresentArray(of: VatomResourceModel.self, forKey: .resources)
 
     }
@@ -82,13 +83,13 @@ extension MessageModel: Codable {
 
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
-        try container.encode(targetUserId, forKey: .targetUserId)
+        try container.encode(targetUserID, forKey: .targetUserID)
         try container.encode(message, forKey: .message)
         try container.encode(actionName, forKey: .actionName)
         try container.encode(whenCreated, forKey: .whenCreated)
-        try container.encode(triggerUserId, forKey: .triggerUserId)
-        try container.encode(templateVariationIds, forKey: .templateVariationIds)
-        try container.encode(vatomIds, forKey: .vatomIds)
+        try container.encode(triggerUserID, forKey: .triggerUserID)
+        try container.encode(templateVariationIdentifiers, forKey: .templateVariationIdentifiers)
+        try container.encode(vatomIdentifiers, forKey: .vatomIdentifiers)
         try container.encode(resources, forKey: .resources)
 
         try container.encodeIfPresent(geoPosition, forKey: .geoPosition)

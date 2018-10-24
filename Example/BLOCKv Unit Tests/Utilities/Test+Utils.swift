@@ -32,3 +32,22 @@ extension XCTestCase {
         return value
     }
 }
+
+
+class TestUtility {
+    
+    //TODO: Replace with blockv decoder
+    static var jsonDecoder: JSONDecoder = {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return decoder
+    }()
+    
+    //TODO: Replace with blockv encoder
+    static var jsonEncoder: JSONEncoder = {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        return encoder
+    }()
+    
+}

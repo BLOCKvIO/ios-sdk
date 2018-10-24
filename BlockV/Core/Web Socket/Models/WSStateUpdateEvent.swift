@@ -79,7 +79,7 @@ public struct WSStateUpdateEvent: WSEvent, Equatable {
     /// JSON object containing the only changed properties of the vAtom.
     ///
     /// In other words, this member contains a *diff* of of the previous version of the vAtom.
-    public let vatomProperties: [String: JSON]
+    public let vatomProperties: JSON
 
     // Client-side
 
@@ -114,7 +114,7 @@ extension WSStateUpdateEvent: Decodable {
         eventId         = try payloadContainer.decode(String.self, forKey: .eventId)
         operation       = try payloadContainer.decode(String.self, forKey: .operation)
         vatomId         = try payloadContainer.decode(String.self, forKey: .vatomId)
-        vatomProperties = try payloadContainer.decode([String: JSON].self, forKey: .vatomProperties)
+        vatomProperties = try payloadContainer.decode(JSON.self, forKey: .vatomProperties)
 
         // stamp this event with the current time
         timestamp = Date()

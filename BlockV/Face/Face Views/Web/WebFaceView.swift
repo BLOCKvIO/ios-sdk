@@ -20,6 +20,8 @@ enum WebInterface: String {
 ///
 /// Displays a web face
 class WebFaceView: FaceView {
+  
+    
 
     /*
      Goals:
@@ -45,11 +47,15 @@ class WebFaceView: FaceView {
 
     class var displayURL: String { return "http://*" }
 
+    
+    var isLoaded: Bool = false
+
+    
     func load(completion: ((Error?) -> Void)?) {
         //
     }
-
-    func vatomUpdated(_ vatom: VatomModel) {
+    
+    func vatomChanged(_ vatom: VatomModel) {
         //
     }
 

@@ -63,6 +63,8 @@ class TestFaceView: FaceView, FaceModuleNibLoadable {
     // MARK: - Face View Lifecycle
 
     private var timer: Timer?
+    
+    var isLoaded: Bool = false
 
     func load(completion: ((Error?) -> Void)?) {
         print(#function)
@@ -75,7 +77,7 @@ class TestFaceView: FaceView, FaceModuleNibLoadable {
 
     }
 
-    func vatomUpdated(_ vatom: VatomModel) {
+    func vatomChanged(_ vatom: VatomModel) {
         print(#function)
     }
 

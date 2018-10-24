@@ -102,7 +102,7 @@ public struct RootProperties: Equatable {
     public let templateVariationID: String
     public let publisherFQDN: String
     public let title: String
-    public let description: String
+    public var description: String
 
     // variables
     public var category: String
@@ -326,59 +326,4 @@ public struct VatomChildPolicy: Codable, Equatable {
         }
     }
 
-}
-
-// MARK: - Localized State Update
-
-extension VatomModel {
-    
-    /*
-     VatomModel is 
-     */
-    
-    /// Update the vAtom with the state update event.
-    public mutating func updateWithStateUpdate(_ stateUpdate: WSStateUpdateEvent) {
-        
-        if let dateString = stateUpdate.vatomProperties["when_modified"]?.stringValue,
-            let date = DateFormatter.blockvDateFormatter.date(from: dateString) {
-            self.whenModified = date
-        }
-        
-        // ---
-        stateUpdate.vatomProperties["vAtom::vAtomType"]?["category"]?.stringValue
-            .flatMap { self.props.category = $0 }
-        stateUpdate.vatomProperties["vAtom::vAtomType"]?["description"]?.stringValue
-            .flatMap { self.props.description = $0 }
-        
-        // ---
-        stateUpdate.vatomProperties["vAtom::vAtomType"]?["num_direct_clones"]?.floatValue
-            .flatMap { self.props.numberDirectClones = Int($0) }
-        stateUpdate.vatomProperties["vAtom::vAtomType"]?["owner"]?.stringValue
-            .flatMap { self.props.owner = $0 }
-        stateUpdate.vatomProperties["vAtom::vAtomType"]?["parentID"]?.stringValue
-            .flatMap { self.props.parentID = $0 }
-        
-        stateUpdate.vatomProperties["vAtom::vAtomType"]?["cloned_from"]?.stringValue
-            .flatMap { self.props.clonedFrom = $0 }
-        stateUpdate.vatomProperties["vAtom::vAtomType"]?["cloning_score"]?.floatValue
-            .flatMap { self.props.cloningScore = Double($0) }
-        
-        // ---
-        stateUpdate.vatomProperties["vAtom::vAtomType"]?["acquirable"]?.boolValue
-            .flatMap { self.props.isAcquirable = $0 }
-        stateUpdate.vatomProperties["vAtom::vAtomType"]?["redeemable"]?.boolValue
-            .flatMap { self.props.isRedeemable = $0 }
-        stateUpdate.vatomProperties["vAtom::vAtomType"]?["disabled"]?.boolValue
-            .flatMap { self.props.isDisabled = $0 }
-        stateUpdate.vatomProperties["vAtom::vAtomType"]?["dropped"]?.boolValue
-            .flatMap { self.props.isDropped = $0 }
-        stateUpdate.vatomProperties["vAtom::vAtomType"]?["tradeable"]?.boolValue
-            .flatMap { self.props.isTradeable = $0 }
-        stateUpdate.vatomProperties["vAtom::vAtomType"]?["transferable"]?.boolValue
-            .flatMap { self.props.isTransferable = $0 }
-        
-//        self.private = stateUpdate.vatomProperties["private"]
-        
-    }
-    
 }

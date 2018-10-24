@@ -134,6 +134,8 @@ class ProgressImageFaceViewOld: FaceView {
     }
 
     // MARK: - FaceView Lifecycle
+    
+    var isLoaded: Bool = false
 
     func load(completion: ((Error?) -> Void)?) {
         print(#function)
@@ -146,7 +148,7 @@ class ProgressImageFaceViewOld: FaceView {
 
     }
 
-    func vatomUpdated(_ vatom: VatomModel) {
+func vatomChanged(_ vatom: VatomModel) {
         print(#function)
 
         // update vatom

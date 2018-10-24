@@ -31,7 +31,7 @@ class VatomDetailTableViewController: UITableViewController {
     
     // MARK: - Inputs
     
-    /// vAtoms passed in by the presenting view controller.
+    /// vAtom passed in by the presenting view controller.
     var vatom: VatomModel!
     
     // MARK: - Properties

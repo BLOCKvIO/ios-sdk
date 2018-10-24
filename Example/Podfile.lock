@@ -12,9 +12,9 @@ PODS:
     - Nuke (~> 7.0)
   - FLAnimatedImage (1.0.12)
   - JWTDecode (2.1.1)
-  - Nuke (7.3.2)
+  - Nuke (7.5)
   - Signals (5.0.0)
-  - Starscream (3.0.5)
+  - Starscream (3.0.6)
   - SwiftLint (0.27.0)
 
 DEPENDENCIES:
@@ -39,9 +39,9 @@ SPEC CHECKSUMS:
   BLOCKv: 5ae1a4b64d552610bbcee55f578c481f9871c43c
   FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
   JWTDecode: 83e8b381aafe27158d9f692cbdca2b12d61d460c
-  Nuke: a9a31bbd6c6723753ab024ef22057dcaaf046c1b
+  Nuke: 799c0430f87b11c4dacfa80b13e1c4f0a1464b90
   Signals: 6c41253cc172e4251d6064341bbc555a589c8d9f
-  Starscream: faf918b2f2eff7d5dd21180646bf015a669673bd
+  Starscream: ef3ece99d765eeccb67de105bfa143f929026cf5
   SwiftLint: 3207c1faa2240bf8973b191820a116113cd11073
 
 PODFILE CHECKSUM: 685a036e175d74c7d4278f3d230083008fafd4bf

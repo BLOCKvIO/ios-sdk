@@ -2,6 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 #### 2.x Releases (API v1)
+- `2.1.x` Releases -  [2.1.0](#210)
 - `2.0.x` Releases -  [2.0.0](#200)
 
 #### 1.x Releases (API v1)
@@ -12,6 +13,37 @@ All notable changes to this project will be documented in this file.
 - `0.9.x` Releases - [0.9.9](#099) | [0.9.10](#0910)
 
 ---
+
+## [2.1.0](https://github.com/BLOCKvIO/ios-sdk/releases/tag/2.1.0)
+
+### Added
+
+- Progress Image Face View
+  - Pull Rrequest [#119](https://github.com/BLOCKvIO/ios-sdk/pull/119)
+- `LiveVatomView` demonstrating responding to Web socket state updates. 
+  - Pull Request [#116](https://github.com/BLOCKvIO/ios-sdk/pull/116)
+- `updated(applying:)` method to `VatomModel`. This method allows the partial update data in a state update to be applied to a vatom.
+  - Pull Request [#115](https://github.com/BLOCKvIO/ios-sdk/pull/115)
+- EOS ans ETH properties to `VatomModel`.
+  - Pull Request [#114](https://github.com/BLOCKvIO/ios-sdk/pull/114)
+
+### Updated
+
+- `TappedVatomViewController` now uses the new `LiveVatomView` instead of the base class `VatomView`. This allows the view
+controller to respond to the changes over the Web socket.
+  - Pull Request [#117](https://github.com/BLOCKvIO/ios-sdk/pull/117)
+
+### Fixed
+
+- Image Face View looking for wrong image
+  - Pull Request [#110](https://github.com/BLOCKvIO/ios-sdk/pull/110)
+
+## [2.0.1](https://github.com/BLOCKvIO/ios-sdk/releases/tag/2.0.1)
+
+### Fixed
+
+- Missing files in Example app
+   - Pull Request [#108](https://github.com/BLOCKvIO/ios-sdk/pull/108)
 
 ## [2.0.0](https://github.com/BLOCKvIO/ios-sdk/releases/tag/2.0.0)
 Released on 2018-09-28

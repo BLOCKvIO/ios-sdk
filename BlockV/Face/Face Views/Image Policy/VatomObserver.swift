@@ -61,9 +61,9 @@ class VatomObserver {
     /// Direct children are those vAtoms whose parent ID matches the root vAtom's ID.
     public private(set) var childVatoms: Set<VatomModel> = [] {
         didSet {
-            // call closures with changes
             let added = childVatoms.subtracting(oldValue)
             let removed = oldValue.subtracting(childVatoms)
+            // notify delegate of changes
             added.forEach { self.delegate?.vatomObserver(self, didAddChildVatom: $0) }
             removed.forEach { self.delegate?.vatomObserver(self, didRemoveChildVatom: $0) }
         }
@@ -179,7 +179,7 @@ class VatomObserver {
             }
 
             // ensure the vatom is still a child
-            // there is a case, due to the async arch, where the retrieved vAtom may no longer be a child.
+            // there is a case, due to the async arch, where the retrieved vAtom may no longer be a child
             if childVatom.props.parentID == self?.rootVatomID {
                 // insert child (async)
                 self?.childVatoms.insert(childVatom)

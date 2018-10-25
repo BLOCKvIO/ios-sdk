@@ -127,6 +127,8 @@ class ImagePolicyFaceView: FaceView {
 
     /// Update the face view using *local* data.
     ///
+    /// Do not call directly. Rather call `debouncedUpdateUI()`.
+    ///
     /// Loops over the array of image policies - stops if a policie's critera are satisfied and downloads the required
     /// resource and updates the image view.
     private func updateUI() {
@@ -142,8 +144,8 @@ class ImagePolicyFaceView: FaceView {
                     break
                 }
 
-//            } else if let policy = policy as? Config.FieldLookup {
-//
+            } else if let policy = policy as? Config.FieldLookup {
+                
 //                // create key path and split into head and tail
 //                // only private section lookups are allowed
 //                guard let component = KeyPath(policy.field).headAndTail(),
@@ -152,13 +154,13 @@ class ImagePolicyFaceView: FaceView {
 //                        continue
 //                }
 //
-//                if  compare(vatomValue, policy.value) {
+//                if vatomValue == policy.value {
 //                    // update image
 //                    //print(">>:: vAtom Value: \(vatomValue) | Policy Value: \(policy.value)\n")
 //                    resourceName = policy.resourceName
 //                    break
 //                }
-//
+
             } else if policy is Config.Fallback {
                 // update image
                 resourceName = policy.resourceName

@@ -72,9 +72,9 @@ func debounce<T>(delay: DispatchTimeInterval,
                  queue: DispatchQueue = .main,
                  action: @escaping ((T) -> Void)) -> (T) -> Void {
     var currentWorkItem: DispatchWorkItem?
-    return { (p1: T) in
+    return { (param1: T) in
         currentWorkItem?.cancel()
-        currentWorkItem = DispatchWorkItem { action(p1) }
+        currentWorkItem = DispatchWorkItem { action(param1) }
         queue.asyncAfter(deadline: .now() + delay, execute: currentWorkItem!)
     }
 }
@@ -92,9 +92,9 @@ func debounce<T, U>(delay: DispatchTimeInterval,
                     queue: DispatchQueue = .main,
                     action: @escaping ((T, U) -> Void)) -> (T, U) -> Void {
     var currentWorkItem: DispatchWorkItem?
-    return { (p1: T, p2: U) in
+    return { (param1: T, param2: U) in
         currentWorkItem?.cancel()
-        currentWorkItem = DispatchWorkItem { action(p1, p2) }
+        currentWorkItem = DispatchWorkItem { action(param1, param2) }
         queue.asyncAfter(deadline: .now() + delay, execute: currentWorkItem!)
     }
 }

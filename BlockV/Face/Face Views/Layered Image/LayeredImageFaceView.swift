@@ -63,7 +63,7 @@ class LayeredImageFaceView: FaceView {
             self.imageName ?= faceModel.properties.resources.first
 
             if let config = faceModel.properties.config {
-                self.imageName ?= config["image"]?.stringValue
+                self.imageName ?= config["layerImage"]?.stringValue
             }
         }
     }

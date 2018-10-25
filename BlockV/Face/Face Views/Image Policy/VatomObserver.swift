@@ -110,14 +110,14 @@ class VatomObserver {
                 if newParentID == self.rootVatomID {
                     // filter out duplicates
                     if !self.childVatoms.contains(where: { $0.id == stateUpdate.vatomId }) {
-                        // a child will be added
+                        // notify delegate of imminent addition
                         self.delegate?.vatomObserver(self, willAddChildVatom: stateUpdate.vatomId)
                         // add child (async)
                         self.addChildVatom(withID: stateUpdate.vatomId)
                     }
                 } else {
                     // if the vatom's parentID is not the rootID and is in the list of children
-                    if let vatom = self.childVatoms.first(where: { $0.id == stateUpdate.vatomId }) {
+                    if let index = self.childVatoms.firstIndex(where: { $0.id == stateUpdate.vatomId }) {
                         /*
                          GOTCHA:
                          If for some reason, local children become out of sync with the remote there is no sensible way
@@ -129,8 +129,10 @@ class VatomObserver {
                          where the observer suspects remote-local sync issues, e.g. connetion drops.
                          */
 
-                        // a child vatom was removed
-                        self.delegate?.vatomObserver(self, didRemoveChildVatom: vatom)
+                        // remove child vatom
+                        let removedVatom = self.childVatoms.remove(at: index)
+                        // notify delegate of removal
+                        self.delegate?.vatomObserver(self, didRemoveChildVatom: removedVatom)
                     }
                 }
 

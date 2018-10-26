@@ -25,6 +25,7 @@ class ImagePolicyFaceView: FaceView {
     lazy var animatedImageView: FLAnimatedImageView = {
         let imageView = FLAnimatedImageView()
         imageView.autoresizingMask = [ .flexibleWidth, .flexibleHeight ]
+        imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
         return imageView
     }()
@@ -98,7 +99,7 @@ class ImagePolicyFaceView: FaceView {
 
         // replace current vatom
         self.vatom = vatom
-        // FIXME: When refresh completes, the ui shoudl be updated.
+        self.debouncedUpdateUI()
 
     }
 
@@ -111,7 +112,7 @@ class ImagePolicyFaceView: FaceView {
 
     /// Current count of child vAtoms.
     private var currentChildCount: Int {
-        return vatomObserver.childVatoms.count
+        return vatomObserver.childVatomIDs.count
     }
 
     /// Debounced version of update UI.
@@ -119,9 +120,9 @@ class ImagePolicyFaceView: FaceView {
     /// Debounced the UI update. This avoids the case where numerous parent ID state changes could cause unecessary
     /// resource downloads. Essentially, it ensure the the vAtom is "settled" before updating the UI.
     private lazy var debouncedUpdateUI: (() -> Void) = {
-        return debounce(delay: DispatchTimeInterval.seconds(1)) {
+        return debounce(delay: DispatchTimeInterval.milliseconds(500)) {
             self.updateUI()
-            printBV(info: "Debounced: updateUI called")
+            //printBV(info: "Debounced: updateUI called")
         }
     }()
 
@@ -145,21 +146,22 @@ class ImagePolicyFaceView: FaceView {
                 }
 
             } else if let policy = policy as? Config.FieldLookup {
-                
-//                // create key path and split into head and tail
-//                // only private section lookups are allowed
-//                guard let component = KeyPath(policy.field).headAndTail(),
-//                    component.head == "private",
-//                    let vatomValue = self.vatom.properties[keyPath: component.tail] else {
-//                        continue
-//                }
-//
-//                if vatomValue == policy.value {
-//                    // update image
-//                    //print(">>:: vAtom Value: \(vatomValue) | Policy Value: \(policy.value)\n")
-//                    resourceName = policy.resourceName
-//                    break
-//                }
+
+                // create key path and split into head and tail
+                // only private section lookups are allowed
+                guard let component = KeyPath(policy.field).headAndTail(),
+                    component.head == "private",
+                    // current value on the vatom
+                    let vatomValue = self.vatom.private?[keyPath: component.tail] else {
+                        continue
+                }
+
+                if vatomValue == policy.value {
+                    // update image
+                    //print(">>:: vAtom Value: \(vatomValue) | Policy Value: \(policy.value)\n")
+                    resourceName = policy.resourceName
+                    break
+                }
 
             } else if policy is Config.Fallback {
                 // update image
@@ -268,7 +270,7 @@ private extension ImagePolicyFaceView {
             /// Property name to lookup on the vAtom.
             let field: String
             /// Property value to campare to.
-            let value: Any
+            let value: JSON
         }
 
         struct Fallback: ImagePolicy {
@@ -334,29 +336,11 @@ private extension ImagePolicyFaceView {
 
 extension ImagePolicyFaceView: VatomObserverDelegate {
 
-    func vatomObserver(_ observer: VatomObserver, rootVatomStateUpdated: VatomModel) {
-        print(#function)
-
-    }
-
-    func vatomObserver(_ observer: VatomObserver, childVatomStateUpdated: VatomModel) {
-        print(#function)
-
-    }
-
-    func vatomObserver(_ observer: VatomObserver, willAddChildVatom vatomID: String) {
-        print(#function)
-
-    }
-
-    func vatomObserver(_ observer: VatomObserver, didAddChildVatom childVatom: VatomModel) {
-        print(#function)
+    func vatomObserver(_ observer: VatomObserver, didAddChildVatom vatomID: String) {
         self.debouncedUpdateUI()
     }
 
-    func vatomObserver(_ observer: VatomObserver, didRemoveChildVatom childVatom: VatomModel) {
-        print(#function)
-        // debounce since the "split" action causes state updates for all children to come through in close proximity
+    func vatomObserver(_ observer: VatomObserver, didRemoveChildVatom vatomID: String) {
         self.debouncedUpdateUI()
     }
 

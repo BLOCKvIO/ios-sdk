@@ -154,6 +154,33 @@ public extension JSON {
         return self[member]
     }
 
+    /// Keypath
+    subscript(keyPath keyPath: KeyPath) -> JSON? {
+
+        switch keyPath.headAndTail() {
+        case nil:
+            // key path is empty.
+            return nil
+        case let (head, remainingKeyPath)? where remainingKeyPath.isEmpty:
+            // reached the end of the key path.
+            let key = Key(stringLiteral: head)
+            return self[key]
+        case let (head, remainingKeyPath)?:
+            // key path has a tail we need to traverse.
+            let key = Key(stringLiteral: head)
+            if let innerJSON = self[key], case .object = innerJSON {
+                // next nest level is a dictionary.
+                // start over with remaining key path.
+                return innerJSON[keyPath: remainingKeyPath]
+            } else {
+                // next nest level isn't a dictionary.
+                // invalid key path, abort.
+                return nil
+            }
+        }
+
+    }
+
 }
 
 // MARK: - JSON Partial Update
@@ -190,7 +217,7 @@ extension JSON {
             if let otherObject = other.objectValue {
                 for (key, _) in otherObject {
                     if self[key] != nil {
-                        try self[key]!.merge(with: otherObject[key]!, typecheck: false)
+                        self[key]!.merge(with: otherObject[key]!, typecheck: false)
                     } else {
                         self[key] = otherObject[key] // add it
                     }

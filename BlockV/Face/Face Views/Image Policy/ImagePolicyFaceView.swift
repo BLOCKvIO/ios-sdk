@@ -20,6 +20,13 @@ class ImagePolicyFaceView: FaceView {
 
     class var displayURL: String { return "native://image-policy" }
 
+    // MARK: - Errors
+
+    /// Models the errors that may be thrown by the Image Policy Face View.
+    enum PolicyError: Error {
+        case missingVatomResource
+    }
+
     // MARK: - Properties
 
     lazy var animatedImageView: FLAnimatedImageView = {
@@ -85,8 +92,8 @@ class ImagePolicyFaceView: FaceView {
 
     /// Begin loading the face view's content.
     func load(completion: ((Error?) -> Void)?) {
-        updateUI()
-        completion?(nil) //FIXME: Wait for resources to download
+        // update resources
+        updateUI(completion: completion)
     }
 
     /// Respond to updates or replacement of the current vAtom.
@@ -95,17 +102,16 @@ class ImagePolicyFaceView: FaceView {
         /*
          NOTE:
          - Changes to to the backing vAtom must be reflected in the face view.
+         - Specifically, updates to the backing vAtom or it's children may afect the required image policy image.
          */
 
         // replace current vatom
         self.vatom = vatom
-        self.debouncedUpdateUI()
+        self.updateUIDebounced()
 
     }
 
     /// Unload the face view.
-    ///
-    /// Also called before reuse (when used inside a reuse pool).
     func unload() { }
 
     // MARK: - Face Code
@@ -115,13 +121,23 @@ class ImagePolicyFaceView: FaceView {
         return vatomObserver.childVatomIDs.count
     }
 
-    /// Debounced version of update UI.
+    /// Updates the interface using local state.
     ///
-    /// Debounced the UI update. This avoids the case where numerous parent ID state changes could cause unecessary
-    /// resource downloads. Essentially, it ensure the the vAtom is "settled" before updating the UI.
-    private lazy var debouncedUpdateUI: (() -> Void) = {
+    /// - Extracts the resource name.
+    /// - Starts download of the resource.
+    private func updateUI(completion: ((Error?) -> Void)?) {
+        let resourceName = self.extractImageName()
+        self.updateImageView(withResource: resourceName, completion: completion)
+    }
+
+    /// Updates the interface using local state (debounced).
+    ///
+    /// This property debounces the UI update. This avoids the case where numerous parent ID state changes could cause
+    /// unecessary resource downloads. Essentially, it ensure the the vAtom is "settled" before updating the UI.
+    private lazy var updateUIDebounced = {
+        // NOTE: Debounce will cancel work items.
         return debounce(delay: DispatchTimeInterval.milliseconds(500)) {
-            self.updateUI()
+            self.updateUI(completion: nil)
             //printBV(info: "Debounced: updateUI called")
         }
     }()
@@ -130,9 +146,8 @@ class ImagePolicyFaceView: FaceView {
     ///
     /// Do not call directly. Rather call `debouncedUpdateUI()`.
     ///
-    /// Loops over the array of image policies - stops if a policie's critera are satisfied and downloads the required
-    /// resource and updates the image view.
-    private func updateUI() {
+    /// Loops over the array of image policies - stops if a policy's critera are satisfied.
+    private func extractImageName() -> String {
 
         // loop over polices - use first passing policy
         for policy in config.policies {
@@ -141,15 +156,14 @@ class ImagePolicyFaceView: FaceView {
                 // check criteria
                 if policy.countMax >= currentChildCount {
                     // update image
-                    resourceName = policy.resourceName
-                    break
+                    return policy.resourceName
                 }
 
             } else if let policy = policy as? Config.FieldLookup {
 
                 // create key path and split into head and tail
-                // only private section lookups are allowed
                 guard let component = KeyPath(policy.field).headAndTail(),
+                    // only private section lookups are allowed
                     component.head == "private",
                     // current value on the vatom
                     let vatomValue = self.vatom.private?[keyPath: component.tail] else {
@@ -159,30 +173,22 @@ class ImagePolicyFaceView: FaceView {
                 if vatomValue == policy.value {
                     // update image
                     //print(">>:: vAtom Value: \(vatomValue) | Policy Value: \(policy.value)\n")
-                    resourceName = policy.resourceName
-                    break
+                    return policy.resourceName
                 }
 
             } else if policy is Config.Fallback {
                 // update image
-                resourceName = policy.resourceName
-                break
+                return policy.resourceName
             }
 
         }
+
+        // This is the last resort fallback (evaluated *after* the face developer assigned fallback).
+        return "ActivatedImage"
 
     }
 
     // MARK: - Resources
-
-    /// Name of the resource to display.
-    private var resourceName: String? {
-        didSet {
-            if resourceName != nil {
-                updateResources(completion: nil)
-            }
-        }
-    }
 
     /// Updates image view with the specified resource.
     ///
@@ -191,24 +197,41 @@ class ImagePolicyFaceView: FaceView {
     ///
     /// - Parameter completion: The completion handler is called once the image is downloaded (or an error is
     ///                         encountered).
-    private func updateResources(completion: ((Error?) -> Void)?) {
+    private func updateImageView(withResource resourceName: String, completion: ((Error?) -> Void)?) {
 
         // extract resource model
         guard let resourceModel = vatom.props.resources.first(where: { $0.name == resourceName }) else {
+            completion?(PolicyError.missingVatomResource)
             return
         }
 
-        // encode url
-        guard let encodeURL = try? BLOCKv.encodeURL(resourceModel.url) else {
-            return
-        }
+        do {
+            // encode url
+            let encodeURL = try BLOCKv.encodeURL(resourceModel.url)
 
-        // load image (automatically handles reuse)
-        Nuke.loadImage(with: encodeURL, into: self.animatedImageView) { (_, error) in
-            self.isLoaded = true
+            // load image (automatically handles reuse)
+            Nuke.loadImage(with: encodeURL, into: self.animatedImageView) { (_, error) in
+                self.isLoaded = true
+                completion?(error)
+            }
+        } catch {
             completion?(error)
         }
 
+    }
+
+}
+
+// MARK: - Vatom Observer Delegate
+
+extension ImagePolicyFaceView: VatomObserverDelegate {
+
+    func vatomObserver(_ observer: VatomObserver, didAddChildVatom vatomID: String) {
+        self.updateUIDebounced()
+    }
+
+    func vatomObserver(_ observer: VatomObserver, didRemoveChildVatom vatomID: String) {
+        self.updateUIDebounced()
     }
 
 }
@@ -324,24 +347,8 @@ private extension ImagePolicyFaceView {
 
             }
 
-            // This is the last resort fallback (evaluated *after* the face developer assigned fallback).
-            let activatedImageFallbackPolicy = Fallback(resourceName: "ActivatedImage")
-            self.policies.append(activatedImageFallbackPolicy)
-
         }
 
-    }
-
-}
-
-extension ImagePolicyFaceView: VatomObserverDelegate {
-
-    func vatomObserver(_ observer: VatomObserver, didAddChildVatom vatomID: String) {
-        self.debouncedUpdateUI()
-    }
-
-    func vatomObserver(_ observer: VatomObserver, didRemoveChildVatom vatomID: String) {
-        self.debouncedUpdateUI()
     }
 
 }

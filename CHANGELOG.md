@@ -2,6 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 #### 2.x Releases (API v1)
+- `2.2.x` Releases -  [2.2.0](#220)
 - `2.1.x` Releases -  [2.1.0](#210)
 - `2.0.x` Releases -  [2.0.0](#200)
 
@@ -14,11 +15,24 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.2.0](https://github.com/BLOCKvIO/ios-sdk/releases/tag/2.2.0)
+
+### Added
+
+- Image Policy Face View
+  - Pull Rrequest [#134](https://github.com/BLOCKvIO/ios-sdk/pull/134)
+  
+  ### Updated
+  
+  - Prevent `InventoryViewController` from refreshing the inventory after a state update event. This is bad pratice. Rather, an object should
+be created which performs localized updates using the state events.
+  - Pull Rrequest [#133](https://github.com/BLOCKvIO/ios-sdk/pull/133)
+
 ## [2.1.0](https://github.com/BLOCKvIO/ios-sdk/releases/tag/2.1.0)
 
 ### Added
 
-- Progress Image Face View
+- Image Progress Face View
   - Pull Rrequest [#119](https://github.com/BLOCKvIO/ios-sdk/pull/119)
 - `LiveVatomView` demonstrating responding to Web socket state updates. 
   - Pull Request [#116](https://github.com/BLOCKvIO/ios-sdk/pull/116)

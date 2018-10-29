@@ -123,9 +123,6 @@ class InventoryCollectionViewController: UICollectionViewController {
              Refreshing the inventory off the back of the Web socket event is inefficient.
              */
             
-            // refresh inventory
-            self?.fetchInventory()
-            
             // example of extracting some bool value
             if let isDropped = vatomStateEvent.vatomProperties["vAtom::vAtomType"]?["dropped"]?.boolValue {
                 print("\nViewer > State Update - isDropped \(isDropped)")

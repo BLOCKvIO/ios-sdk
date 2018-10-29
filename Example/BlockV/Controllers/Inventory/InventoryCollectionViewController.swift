@@ -86,7 +86,7 @@ class InventoryCollectionViewController: UICollectionViewController {
         
         BLOCKv.socket.connect()
         
-        BLOCKv.socket.onConnected.subscribe(with: self) {
+        BLOCKv.socket.onConnected.subscribe(with: self) { _ in
             print("\nViewer > Web socket - Connected")
         }
         
@@ -97,7 +97,7 @@ class InventoryCollectionViewController: UICollectionViewController {
         // MARK: - Inventory
         
         // subscribe to inventory update events
-        BLOCKv.socket.onInventoryUpdate.subscribe(with: self) { inventoryEvent in
+        BLOCKv.socket.onInventoryUpdate.subscribe(with: self) { [weak self] inventoryEvent in
             
             print("\nViewer > Inventory Update Event: \n\(inventoryEvent)")
             
@@ -107,14 +107,14 @@ class InventoryCollectionViewController: UICollectionViewController {
              */
             
             // refresh inventory
-            self.fetchInventory()
+            self?.fetchInventory()
             
         }
         
         // MARK: - State Update
         
         // subscribe to vatom state update events
-        BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { vatomStateEvent in
+        BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { [weak self] vatomStateEvent in
             
             print("\nViewer > State Update Event: \n\(vatomStateEvent)")
             
@@ -122,9 +122,6 @@ class InventoryCollectionViewController: UICollectionViewController {
              Typically you would perfrom a localized update using the info inside of the event.
              Refreshing the inventory off the back of the Web socket event is inefficient.
              */
-            
-            // refresh inventory
-            self.fetchInventory()
             
             // example of extracting some bool value
             if let isDropped = vatomStateEvent.vatomProperties["vAtom::vAtomType"]?["dropped"]?.boolValue {
@@ -141,7 +138,7 @@ class InventoryCollectionViewController: UICollectionViewController {
         // MARK: - Activity
         
         // subcribe to an activity event
-        BLOCKv.socket.onActivityUpdate.subscribe(with: self) { activityEvent in
+        BLOCKv.socket.onActivityUpdate.subscribe(with: self) { [weak self] activityEvent in
             
             print("\nViewer > Activity Event: \n\(activityEvent)")
             

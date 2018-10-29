@@ -97,11 +97,6 @@ class LayeredImageFaceView: FaceView {
 
 		// initial setup
 		self.vAtomStateChanged()
-
-		// listen to websocket for state changes on LayeredImageView
-//		BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { ( _ stateUpdateEvent) in
-//			self.vAtomStateChanged()
-//		}
     }
 
     required public init?(coder aDecoder: NSCoder) {

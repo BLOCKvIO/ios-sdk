@@ -16,7 +16,7 @@ import Nuke
 ///
 /// Assumption:
 /// Both the empty and full images have the same size.
-class ProgressImageFaceView: FaceView {
+class ImageProgressFaceView: FaceView {
 
     class var displayURL: String { return "native://progress-image-overlay" }
 

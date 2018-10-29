@@ -69,13 +69,13 @@ class LayeredImageFaceView: FaceView {
     }
 
     private let config: Config
-	
+
 	/*
 	NOTE
 	The `vatomChanged()` method called by `VatomView` does not handle child vatom updates.
 	The `VatomObserver` class is used to receive these events. This is required for the Child Count policy type.
 	*/
-	
+
 	/// Class responsible for observing changes related backing vAtom.
 	private var vatomObserver: VatomObserver
 
@@ -83,11 +83,11 @@ class LayeredImageFaceView: FaceView {
     required init(vatom: VatomModel, faceModel: FaceModel) {
         // init face config
         self.config = Config(faceModel)
-		
+
 		// create an observer for the backing vatom
 		self.vatomObserver = VatomObserver(vatomID: vatom.id)
         super.init(vatom: vatom, faceModel: faceModel)
-		
+
 		self.vatomObserver.delegate = self
 
 		// ensure base has correct bounds with the 'parent' vAtom
@@ -260,13 +260,13 @@ class LayeredImageFaceView: FaceView {
 }
 
 extension LayeredImageFaceView: VatomObserverDelegate {
-	
+
 	func vatomObserver(_ observer: VatomObserver, didAddChildVatom vatomID: String) {
 		self.vAtomStateChanged()
 	}
-	
+
 	func vatomObserver(_ observer: VatomObserver, didRemoveChildVatom vatomID: String) {
 		self.vAtomStateChanged()
 	}
-	
+
 }

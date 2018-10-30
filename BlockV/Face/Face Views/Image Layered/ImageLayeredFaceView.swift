@@ -43,13 +43,11 @@ class ImageLayeredFaceView: FaceView {
     public private(set) var isLoaded: Bool = false
     
 	private var topLayers: [Layer] = []
-    /// Array of child vAtoms.
-    private var childVatoms: [VatomModel] = [] {
-        didSet {
-            self.updateLayers()
-        }
+    
+    private var childVatoms: [VatomModel] {
+        // observer store manages the child vatoms
+        return Array(vatomObserverStore.childVatoms)
     }
-
     
     // MARK: - Config
 
@@ -85,26 +83,19 @@ class ImageLayeredFaceView: FaceView {
 	*/
 
 	/// Class responsible for observing changes related backing vAtom.
-	private var vatomObserver: VatomObserver
+	private var vatomObserverStore: VatomObserverStore?
 
     // MARK: - Init
     required init(vatom: VatomModel, faceModel: FaceModel) {
         // init face config
         self.config = Config(faceModel)
-
-		// create an observer for the backing vatom
-		self.vatomObserver = VatomObserver(vatomID: vatom.id)
         super.init(vatom: vatom, faceModel: faceModel)
-
-		self.vatomObserver.delegate = self
 
 		// ensure base has correct bounds with the 'parent' vAtom
 		baseLayer.frame = self.bounds
 		baseLayer.vatom = vatom
         self.addSubview(baseLayer)
 
-		// refresh from remote
-        self.refresh()
     }
 
     required public init?(coder aDecoder: NSCoder) {
@@ -115,11 +106,17 @@ class ImageLayeredFaceView: FaceView {
 
     /// Begin loading the face view's content.
     func load(completion: ((Error?) -> Void)?) {
+        
+        // create an observer for the backing vatom
+        self.vatomObserverStore = VatomObserverStore(vatomID: vatom.id)
+        self.vatomObserverStore?.delegate = self
+        //
 		updateResources(completion: completion)
     }
 
     func vatomChanged(_ vatom: VatomModel) {
 		self.vatom = vatom
+        // FIXME: New vatom could in with different children.
 		updateResources(completion: nil)
     }
 
@@ -152,26 +149,9 @@ class ImageLayeredFaceView: FaceView {
     // MARK: - Refresh Using Remote
 
     private func refresh() {
-        self.fetchChildVatoms()
+        self.vatomObserverStore?.refresh()
         self.updateLayers()
     }
-
-	/// Fetches all child vAtoms of the backing vAtom from remote.
-	private func fetchChildVatoms() {
-
-		BLOCKv.getInventory(id: self.vatom.id) { (vatomModels, error) in
-
-            // ensure no error
-			guard error == nil else {
-                printBV(error: "Get inventory failed: \(error!.localizedDescription)")
-				return
-			}
-            // update child vatoms
-			self.childVatoms = vatomModels
-
-		}
-
-	}
 
     // MARK: - Layer Management
 
@@ -270,14 +250,35 @@ class ImageLayeredFaceView: FaceView {
 
 }
 
-extension ImageLayeredFaceView: VatomObserverDelegate {
+extension ImageLayeredFaceView: VatomObserverStoreDelegate {
+    
+    func vatomObserver(_ observer: VatomObserverStore, rootVatomStateUpdated: VatomModel) {
+        //
+    }
+    
+    func vatomObserver(_ observer: VatomObserverStore, childVatomStateUpdated: VatomModel) {
+        //
+    }
+    
+    func vatomObserver(_ observer: VatomObserverStore, willAddChildVatom vatomID: String) {
+        <#code#>
+    }
+    
+    func vatomObserver(_ observer: VatomObserverStore, didAddChildVatom childVatom: VatomModel) {
+        self.
+    }
+    
+    func vatomObserver(_ observer: VatomObserverStore, didRemoveChildVatom childVatom: VatomModel) {
+        <#code#>
+    }
+    
 
-	func vatomObserver(_ observer: VatomObserver, didAddChildVatom vatomID: String) {
-		self.updateLayers()
-	}
-
-	func vatomObserver(_ observer: VatomObserver, didRemoveChildVatom vatomID: String) {
-		self.childVatoms.removeAll(where: { $0.id == vatomID })
-	}
+//    func vatomObserver(_ observer: VatomObserver, didAddChildVatom vatomID: String) {
+//        self.updateLayers()
+//    }
+//
+//    func vatomObserver(_ observer: VatomObserver, didRemoveChildVatom vatomID: String) {
+//        self.childVatoms.removeAll(where: { $0.id == vatomID })
+//    }
 
 }

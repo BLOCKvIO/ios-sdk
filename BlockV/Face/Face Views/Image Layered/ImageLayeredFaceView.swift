@@ -197,13 +197,13 @@ class ImageLayeredFaceView: FaceView {
 
 		// extract resource model
 		guard let resourceModel = vatom.props.resources.first(where: { $0.name == config.imageName }) else {
-			printBV(info: "could not find child vatom resource model")
+			printBV(info: "Could not find child vatom resource model")
 			return layer
 		}
 
 		// encode url
 		guard let encodeURL = try? BLOCKv.encodeURL(resourceModel.url) else {
-			printBV(info: "could not encode child vatom resource")
+			printBV(info: "Could not encode child vatom resource")
 			return layer
 		}
 

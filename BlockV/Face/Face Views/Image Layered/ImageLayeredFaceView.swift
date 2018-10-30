@@ -41,10 +41,16 @@ class ImageLayeredFaceView: FaceView {
     }()
 
     public private(set) var isLoaded: Bool = false
-
-	private var childVatoms: [VatomModel] = []
+    
 	private var topLayers: [Layer] = []
+    /// Array of child vAtoms.
+    private var childVatoms: [VatomModel] = [] {
+        didSet {
+            self.updateLayers()
+        }
+    }
 
+    
     // MARK: - Config
 
     /// Face model face configuration specification.
@@ -97,8 +103,8 @@ class ImageLayeredFaceView: FaceView {
 		baseLayer.vatom = vatom
         self.addSubview(baseLayer)
 
-		// initial setup
-		self.vAtomStateChanged()
+		// refresh from remote
+        self.refresh()
     }
 
     required public init?(coder aDecoder: NSCoder) {
@@ -140,11 +146,18 @@ class ImageLayeredFaceView: FaceView {
 			self.isLoaded = true
 			completion?(error)
 		}
+
 	}
 
-	/// Fetch the children for the specified vAtom identifier and apply the relevant layers.
+    // MARK: - Refresh Using Remote
 
-	private func vAtomStateChanged() {
+    private func refresh() {
+        self.fetchChildVatoms()
+        self.updateLayers()
+    }
+
+	/// Fetches all child vAtoms of the backing vAtom from remote.
+	private func fetchChildVatoms() {
 
 		BLOCKv.getInventory(id: self.vatom.id) { (vatomModels, error) in
 
@@ -153,40 +166,48 @@ class ImageLayeredFaceView: FaceView {
                 printBV(error: "Get inventory failed: \(error!.localizedDescription)")
 				return
 			}
-
+            // update child vatoms
 			self.childVatoms = vatomModels
 
-			var newLayers: [Layer] = []
-			for childVatom in self.childVatoms {
-
-				var tempLayer: Layer!
-
-				// investigate if the layer already exists
-				for layer in self.topLayers where layer.vatom == childVatom {
-					tempLayer = layer
-					break
-				}
-
-				// added found layer to list or create a new one and add that
-				newLayers.append(tempLayer == nil ? self.createLayer(childVatom) : tempLayer)
-			}
-
-			var layersToRemove: [Layer] = []
-			for layer in self.topLayers {
-				// check if added
-				if newLayers.contains(where: { $0.vatom == layer.vatom }) {
-					continue
-				}
-
-				layersToRemove.append(layer)
-			}
-
-			self.removeLayers(layersToRemove)
 		}
 
 	}
 
-	// MARK: - Layer Management
+    // MARK: - Layer Management
+
+    /// Traverses the child vatoms and ensure the layer hierarchy matches the current child vAtoms.
+    ///
+    /// This method uses *local* data.
+    private func updateLayers() {
+
+        var newLayers: [Layer] = []
+        for childVatom in self.childVatoms {
+
+            var tempLayer: Layer!
+
+            // investigate if the layer already exists
+            for layer in self.topLayers where layer.vatom == childVatom {
+                tempLayer = layer
+                break
+            }
+
+            // added found layer to list or create a new one and add that
+            newLayers.append(tempLayer == nil ? self.createLayer(childVatom) : tempLayer)
+        }
+
+        var layersToRemove: [Layer] = []
+        for layer in self.topLayers {
+            // check if added
+            if newLayers.contains(where: { $0.vatom == layer.vatom }) {
+                continue
+            }
+
+            layersToRemove.append(layer)
+        }
+
+        self.removeLayers(layersToRemove)
+
+    }
 
 	/// Create a standard Layer and add it to the base layer's subviews.
 	private func createLayer(_ vatom: VatomModel) -> Layer {
@@ -252,11 +273,11 @@ class ImageLayeredFaceView: FaceView {
 extension ImageLayeredFaceView: VatomObserverDelegate {
 
 	func vatomObserver(_ observer: VatomObserver, didAddChildVatom vatomID: String) {
-		self.vAtomStateChanged()
+		self.updateLayers()
 	}
 
 	func vatomObserver(_ observer: VatomObserver, didRemoveChildVatom vatomID: String) {
-		self.vAtomStateChanged()
+		self.childVatoms.removeAll(where: { $0.id == vatomID })
 	}
 
 }

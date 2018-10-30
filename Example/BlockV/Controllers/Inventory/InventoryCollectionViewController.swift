@@ -30,6 +30,25 @@ import BLOCKv
 /// vAtom Face Code will be added to this example.
 class InventoryCollectionViewController: UICollectionViewController {
     
+    
+    
+    /// This face selection procedure filters out "heavy" faces
+    let NoHeavyIcons : FaceSelectionProcedure = { vatom, urls -> FaceModel? in
+        
+        // Run standard Icon face selection
+        let result : FaceModel? = EmbeddedProcedure.icon.procedure(vatom, urls)
+        
+        // Check if it's one of our heavy faces
+        if result?.properties.displayURL.lowercased() == "native://generic-3d" {
+            return nil
+        }
+        
+        // Not heavy, allow it
+        return result
+        
+    }
+    
+    
     // MARK: - Properties
     
     fileprivate lazy var refreshControl: UIRefreshControl = {
@@ -255,7 +274,7 @@ extension InventoryCollectionViewController {
         
         // replace cell's vatom
         let vatom = filteredVatoms[indexPath.row]
-        cell.vatomView.update(usingVatom: vatom)
+        cell.vatomView.update(usingVatom: vatom, procedure: NoHeavyIcons)
         
         return cell
     }

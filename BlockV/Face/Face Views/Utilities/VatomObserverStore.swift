@@ -10,6 +10,7 @@
 //
 
 import Foundation
+import Signals
 
 protocol VatomObserverStoreDelegate: class {
     
@@ -72,27 +73,36 @@ class VatomObserverStore {
     
     /// Initialize using a vAtom ID.
     init(vatomID: String) {
-        
         self.rootVatomID = vatomID
-        
-        // move block out of init
-        DispatchQueue.main.async {
-            self.refresh()
-        }
-        
-        self.subscribeToUpdates()
-        
     }
+    
+    // MARK: - Life Cycle
+    
+    /// Start observing the vAtom and it's children.
+    func start() {
+        // subscribe to observation updates
+        self.subscribeToUpdates()
+    }
+    
+    /// Stop observing the vAtom and it's children.
+    func stop() {
+        // cancel observation updates
+        self.onConnected?.cancel()
+        self.onVatomStateUpdate?.cancel()
+    }
+    
+    private var onConnected: SignalSubscription<Void>?
+    private var onVatomStateUpdate: SignalSubscription<WSStateUpdateEvent>?
     
     // MARK: - Push State Update (Real-Time)
     
     private func subscribeToUpdates() {
         
-        BLOCKv.socket.onConnected.subscribe(with: self) { [weak self] in
+        self.onConnected = BLOCKv.socket.onConnected.subscribe(with: self) { [weak self] in
             self?.refresh()
         }
         
-        BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { [weak self] stateUpdate in
+        self.onVatomStateUpdate = BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { [weak self] stateUpdate in
             
             guard let `self` = self else { return }
             
@@ -156,25 +166,33 @@ class VatomObserverStore {
     
     // MARK: - Pull State Update
     
+    typealias Completion = (Error?) -> Void
+    
     /// Refresh root and child vatoms using remote state.
-    public func refresh() {
-        self.updateRootVatom()
-        self.updateChildVatoms()
+    ///
+    /// - Parameters:
+    ///   - rootCompletion: Completion handler that is called once the root vAtom has completed loading.
+    ///   - childrenCompletion: Completion handler that is called once the children vAtoms has completed loading.
+    public func refresh(rootCompletion: Completion? = nil, childCompletion: Completion? = nil) {
+        // refresh
+        self.updateRootVatom(completion: rootCompletion)
+        self.updateChildVatoms(completion: childCompletion)
     }
     
     /// Fetch root vAtom's remote state.
-    private func updateRootVatom() {
+    private func updateRootVatom(completion: Completion?) {
         
         BLOCKv.getVatoms(withIDs: [self.rootVatomID]) { [weak self] (vatoms, error) in
             
             // ensure no error
             guard let rootVatom = vatoms.first, error == nil else {
                 //printBV(error: "Unable to fetch root vAtom. Error: \(String(describing: error?.localizedDescription))")
+                completion?(error)
                 return
             }
             // update root vAtom
             self?.rootVatom = rootVatom
-            
+            completion?(nil)
         }
         
     }
@@ -202,19 +220,21 @@ class VatomObserverStore {
     }
     
     /// Replace all the root vAtom's direct children using remote state.
-    private func updateChildVatoms() {
+    private func updateChildVatoms(completion: Completion?) {
         
         BLOCKv.getInventory(id: self.rootVatomID) { [weak self] (vatoms, error) in
             
             // ensure no error
             guard error == nil else {
                 //printBV(error: "Unable to fetch children. Error: \(String(describing: error?.localizedDescription))")
+                completion?(error)
                 return
             }
             // ensure correct parent ID
             let validChildren = vatoms.filter { $0.props.parentID == self?.rootVatomID }
             // replace the list of children
             self?.childVatoms = Set(validChildren)
+            completion?(nil)
             
         }
         

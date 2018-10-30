@@ -19,6 +19,7 @@ class ImageLayeredFaceView: FaceView {
 
 	// Layer must be a class to inherit from UIImageview
 	private class Layer: UIImageView {
+
 		/// Resource this layer displays.
 		var resource: VatomResourceModel?
 		/// vAtom this layer displays.
@@ -41,14 +42,14 @@ class ImageLayeredFaceView: FaceView {
     }()
 
     public private(set) var isLoaded: Bool = false
-    
-	private var topLayers: [Layer] = []
-    
+
+	private var childLayers: [Layer] = []
+
     private var childVatoms: [VatomModel] {
         // observer store manages the child vatoms
         return Array(vatomObserverStore.childVatoms)
     }
-    
+
     // MARK: - Config
 
     /// Face model face configuration specification.
@@ -83,13 +84,18 @@ class ImageLayeredFaceView: FaceView {
 	*/
 
 	/// Class responsible for observing changes related backing vAtom.
-	private var vatomObserverStore: VatomObserverStore?
+	private var vatomObserverStore: VatomObserverStore
 
     // MARK: - Init
     required init(vatom: VatomModel, faceModel: FaceModel) {
         // init face config
         self.config = Config(faceModel)
+
+        // create an observer for the backing vatom
+        self.vatomObserverStore = VatomObserverStore(vatomID: vatom.id)
+
         super.init(vatom: vatom, faceModel: faceModel)
+        self.vatomObserverStore.delegate = self
 
 		// ensure base has correct bounds with the 'parent' vAtom
 		baseLayer.frame = self.bounds
@@ -106,50 +112,51 @@ class ImageLayeredFaceView: FaceView {
 
     /// Begin loading the face view's content.
     func load(completion: ((Error?) -> Void)?) {
-        
-        // create an observer for the backing vatom
-        self.vatomObserverStore = VatomObserverStore(vatomID: vatom.id)
-        self.vatomObserverStore?.delegate = self
-        //
-		updateResources(completion: completion)
+        print(#function)
+        /*
+         Business logic:
+         This face is considered to be 'loaded' once the base image has been downloaded and loaded into the view.
+         */
+        loadBaseResource { (error) in
+            self.refreshUI()
+            self.vatomObserverStore.start() // FIXME: Should start still be called?
+            completion?(error)
+        }
+
+        // continue loading by reloading all required data
+        self.refreshData()
+
     }
 
     func vatomChanged(_ vatom: VatomModel) {
+        print(#function)
 		self.vatom = vatom
-        // FIXME: New vatom could in with different children.
-		updateResources(completion: nil)
+
+        self.refreshUI()
+
+        // FIXME: VatomObserverStore should be recreated if vAtom id is different.
+        // FIXME: Update UI
     }
 
     func unload() {
+        print(#function)
 		self.baseLayer.image = nil
+        self.vatomObserverStore.stop()
     }
 
-	// MARK: - Resources
+    // MARK: - Refresh
 
-	private func updateResources(completion: ((Error?) -> Void)?) {
+    /// Refresh the model layer (triggers a view layer update).
+    private func refreshData() {
+        print(#function)
+        self.vatomObserverStore.refresh()
+        self.refreshUI()
+    }
 
-		// extract resource model
-		guard let resourceModel = vatom.props.resources.first(where: { $0.name == config.imageName }) else {
-			return
-		}
-
-		// encode url
-		guard let encodeURL = try? BLOCKv.encodeURL(resourceModel.url) else {
-			return
-		}
-
-		// load image (automatically handles reuse)
-		Nuke.loadImage(with: encodeURL, into: self.baseLayer) { (_, error) in
-			self.isLoaded = true
-			completion?(error)
-		}
-
-	}
-
-    // MARK: - Refresh Using Remote
-
-    private func refresh() {
-        self.vatomObserverStore?.refresh()
+    /// Refresh the view layer (does not refresh data layer).
+    private func refreshUI() {
+        print(#function)
+        self.loadBaseResource(completion: nil)
         self.updateLayers()
     }
 
@@ -160,13 +167,14 @@ class ImageLayeredFaceView: FaceView {
     /// This method uses *local* data.
     private func updateLayers() {
 
+        print(#function)
         var newLayers: [Layer] = []
         for childVatom in self.childVatoms {
 
             var tempLayer: Layer!
 
             // investigate if the layer already exists
-            for layer in self.topLayers where layer.vatom == childVatom {
+            for layer in self.childLayers where layer.vatom == childVatom {
                 tempLayer = layer
                 break
             }
@@ -176,7 +184,7 @@ class ImageLayeredFaceView: FaceView {
         }
 
         var layersToRemove: [Layer] = []
-        for layer in self.topLayers {
+        for layer in self.childLayers {
             // check if added
             if newLayers.contains(where: { $0.vatom == layer.vatom }) {
                 continue
@@ -214,7 +222,7 @@ class ImageLayeredFaceView: FaceView {
 
 		layer.frame = self.bounds
 		self.baseLayer.addSubview(layer)
-		self.topLayers.append(layer)
+		self.childLayers.append(layer)
 
 		return layer
 
@@ -237,8 +245,8 @@ class ImageLayeredFaceView: FaceView {
 			}, completion: { _ in
 
 				// remove it
-				if let index = self.topLayers.index(of: layer) {
-					self.topLayers.remove(at: index)
+				if let index = self.childLayers.index(of: layer) {
+					self.childLayers.remove(at: index)
 				}
 				layer.removeFromSuperview()
 			})
@@ -248,37 +256,58 @@ class ImageLayeredFaceView: FaceView {
 		}
 	}
 
+    // MARK: - Resources
+
+    /// Loads the resource for the backing vAtom's "layerImage" into the base layer.
+    private func loadBaseResource(completion: ((Error?) -> Void)?) {
+
+        print(#function)
+
+        // extract resource model
+        guard let resourceModel = vatom.props.resources.first(where: { $0.name == config.imageName }) else {
+            return
+        }
+
+        // encode url
+        guard let encodeURL = try? BLOCKv.encodeURL(resourceModel.url) else {
+            return
+        }
+
+        // load image (automatically handles reuse)
+        Nuke.loadImage(with: encodeURL, into: self.baseLayer) { (_, error) in
+            self.isLoaded = true
+            completion?(error)
+        }
+
+    }
+
 }
 
 extension ImageLayeredFaceView: VatomObserverStoreDelegate {
-    
-    func vatomObserver(_ observer: VatomObserverStore, rootVatomStateUpdated: VatomModel) {
-        //
-    }
-    
-    func vatomObserver(_ observer: VatomObserverStore, childVatomStateUpdated: VatomModel) {
-        //
-    }
-    
-    func vatomObserver(_ observer: VatomObserverStore, willAddChildVatom vatomID: String) {
-        <#code#>
-    }
-    
-    func vatomObserver(_ observer: VatomObserverStore, didAddChildVatom childVatom: VatomModel) {
-        self.
-    }
-    
-    func vatomObserver(_ observer: VatomObserverStore, didRemoveChildVatom childVatom: VatomModel) {
-        <#code#>
-    }
-    
 
-//    func vatomObserver(_ observer: VatomObserver, didAddChildVatom vatomID: String) {
-//        self.updateLayers()
-//    }
-//
-//    func vatomObserver(_ observer: VatomObserver, didRemoveChildVatom vatomID: String) {
-//        self.childVatoms.removeAll(where: { $0.id == vatomID })
-//    }
+    func vatomObserver(_ observer: VatomObserverStore, rootVatomStateUpdated: VatomModel) {
+        print(#function)
+        // nothing to do
+    }
+
+    func vatomObserver(_ observer: VatomObserverStore, childVatomStateUpdated: VatomModel) {
+        print(#function)
+        // nothing to do
+    }
+
+    func vatomObserver(_ observer: VatomObserverStore, willAddChildVatom vatomID: String) {
+        print(#function)
+        // nothing to do
+    }
+
+    func vatomObserver(_ observer: VatomObserverStore, didAddChildVatom childVatom: VatomModel) {
+        print(#function)
+        self.refreshUI()
+    }
+
+    func vatomObserver(_ observer: VatomObserverStore, didRemoveChildVatom childVatom: VatomModel) {
+        print(#function)
+        self.refreshUI()
+    }
 
 }

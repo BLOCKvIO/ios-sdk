@@ -34,8 +34,6 @@ protocol VatomObserverStoreDelegate: class {
     
 }
 
-//TODO: Add start and stop methods
-
 /// This class provides a simple means of observing an *owned* vAtom and its immediate children.
 ///
 /// Handles fetching the root and child vatoms' state directly from the platform. Additionally, performs partial updates
@@ -67,7 +65,7 @@ class VatomObserverStore {
     }
     
     /// Delegate
-    weak var delegate: VatomObserverStoreDelegate?
+    private weak var delegate: VatomObserverStoreDelegate?
     
     // MARK: - Initialization
     
@@ -96,12 +94,15 @@ class VatomObserverStore {
     
     // MARK: - Push State Update (Real-Time)
     
+    /// Subscribes to Web socket signals.
     private func subscribeToUpdates() {
         
+        // subscribe to web socket connect
         self.onConnected = BLOCKv.socket.onConnected.subscribe(with: self) { [weak self] in
             self?.refresh()
         }
         
+        // subscribe to state update
         self.onVatomStateUpdate = BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { [weak self] stateUpdate in
             
             guard let `self` = self else { return }

@@ -18,9 +18,9 @@ class LayeredImageFaceView: FaceView {
 
 	// Layer must be a class to inherit from UIImageview
 	class Layer: UIImageView {
-		// Reference to the resource this layer displays.
+		// Resource this layer displays.
 		var resource: VatomResourceModel?
-		// Reference to the vAtom which this layer represents.
+		// vAtom this layer displays.
 		var vatom: VatomModel!
 
 		func layerDefaultValues() {
@@ -105,11 +105,6 @@ class LayeredImageFaceView: FaceView {
 
 	// MARK: - View Lifecylce
 
-	override func layoutSubviews() {
-		super.layoutSubviews()
-		updateContentMode(forLayer: baseLayer)
-	}
-
 	private func updateContentMode(forLayer: Layer) {
 		forLayer.contentMode = .scaleAspectFit
 	}
@@ -157,7 +152,7 @@ class LayeredImageFaceView: FaceView {
 		BLOCKv.getInventory(id: self.vatom.id) { (vatomModels, error) in
 
 			guard error == nil else {
-				printBV(info: "getInventory - \(error!.localizedDescription)")
+				printBV(error: "getInventory - \(error!.localizedDescription)")
 				return
 			}
 

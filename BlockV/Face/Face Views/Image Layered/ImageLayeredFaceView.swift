@@ -110,18 +110,22 @@ class ImageLayeredFaceView: FaceView {
 
     // MARK: - Face View Lifecycle
 
+    /// Holds the completion to call when the face view has completed loading.
+    private var loadCompletion: ((Error?) -> Void)?
+
     /// Begin loading the face view's content.
     func load(completion: ((Error?) -> Void)?) {
         print(#function)
+
+        // assign a single load completion closure
+        loadCompletion = { (error) in
+            completion?(error)
+        }
         /*
          Business logic:
          This face is considered to be 'loaded' once the base image has been downloaded and loaded into the view.
          */
-        loadBaseResource { (error) in
-            self.refreshUI()
-            self.vatomObserverStore.start() // FIXME: Should start still be called?
-            completion?(error)
-        }
+        self.loadBaseResource()
 
         // continue loading by reloading all required data
         self.refreshData()
@@ -130,18 +134,22 @@ class ImageLayeredFaceView: FaceView {
 
     func vatomChanged(_ vatom: VatomModel) {
         print(#function)
-		self.vatom = vatom
+
+        self.vatom = vatom
+        if vatom.id != self.vatomObserverStore.rootVatomID {
+            // replace vAtom observer
+            printBV(info: "Image Layered: Vatom Changed. Replacing VatomObserverStore")
+            self.vatomObserverStore = VatomObserverStore(vatomID: vatom.id)
+            self.vatomObserverStore.refresh()
+        }
 
         self.refreshUI()
-
-        // FIXME: VatomObserverStore should be recreated if vAtom id is different.
-        // FIXME: Update UI
     }
 
     func unload() {
         print(#function)
 		self.baseLayer.image = nil
-        self.vatomObserverStore.stop()
+        self.vatomObserverStore.cancel()
     }
 
     // MARK: - Refresh
@@ -149,14 +157,15 @@ class ImageLayeredFaceView: FaceView {
     /// Refresh the model layer (triggers a view layer update).
     private func refreshData() {
         print(#function)
-        self.vatomObserverStore.refresh()
-        self.refreshUI()
+        self.vatomObserverStore.refresh(rootCompletion: nil) { _ in
+            self.refreshUI()
+        }
     }
 
     /// Refresh the view layer (does not refresh data layer).
     private func refreshUI() {
         print(#function)
-        self.loadBaseResource(completion: nil)
+        self.loadBaseResource()
         self.updateLayers()
     }
 
@@ -206,19 +215,17 @@ class ImageLayeredFaceView: FaceView {
 
 		// extract resource model
 		guard let resourceModel = vatom.props.resources.first(where: { $0.name == config.imageName }) else {
-			printBV(info: "Could not find child vatom resource model")
+			printBV(error: "Could not find child vAtom resource model.")
 			return layer
 		}
 
 		// encode url
 		guard let encodeURL = try? BLOCKv.encodeURL(resourceModel.url) else {
-			printBV(info: "Could not encode child vatom resource")
+			printBV(error: "Could not encode child vAtom resource.")
 			return layer
 		}
 
-		Nuke.loadImage(with: encodeURL, into: layer) { (_, _) in
-			self.isLoaded = true
-		}
+		Nuke.loadImage(with: encodeURL, into: layer)
 
 		layer.frame = self.bounds
 		self.baseLayer.addSubview(layer)
@@ -259,24 +266,31 @@ class ImageLayeredFaceView: FaceView {
     // MARK: - Resources
 
     /// Loads the resource for the backing vAtom's "layerImage" into the base layer.
-    private func loadBaseResource(completion: ((Error?) -> Void)?) {
+    ///
+    /// Calls the `loadCompletion` closure asynchronously. Note: the mechanics of `loadImage(with:into:)` mean only the
+    /// latest completion handler will be executed since all previous tasks are cancelled.
+    private func loadBaseResource() {
 
         print(#function)
 
         // extract resource model
         guard let resourceModel = vatom.props.resources.first(where: { $0.name == config.imageName }) else {
+            loadCompletion?(FaceError.missingVatomResource)
             return
         }
 
-        // encode url
-        guard let encodeURL = try? BLOCKv.encodeURL(resourceModel.url) else {
-            return
-        }
+        do {
+            // encode url
+            let encodeURL = try BLOCKv.encodeURL(resourceModel.url)
 
-        // load image (automatically handles reuse)
-        Nuke.loadImage(with: encodeURL, into: self.baseLayer) { (_, error) in
-            self.isLoaded = true
-            completion?(error)
+            // load image (automatically handles reuse)
+            // GOTCHA: Upon calling load, previous requests are cancelled allong with their completion handlers.
+            Nuke.loadImage(with: encodeURL, into: self.baseLayer) { (_, error) in
+                self.isLoaded = true
+                self.loadCompletion?(error)
+            }
+        } catch {
+            loadCompletion?(error)
         }
 
     }

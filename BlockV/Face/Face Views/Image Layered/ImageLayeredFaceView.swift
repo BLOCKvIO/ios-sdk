@@ -12,32 +12,38 @@
 import Foundation
 import Nuke
 
+// Subclass of UIImageView which represents a vatom image layer.
+private class Layer: UIImageView {
+
+    /// Template variation this layer represents. Template variations all point to the same resource.
+    var vatomID: String
+
+    init(vatom: VatomModel) {
+        self.vatomID = vatom.id
+        super.init(frame: CGRect.zero)
+        // layer class defaults
+        self.autoresizingMask = [ .flexibleWidth, .flexibleHeight ]
+        self.clipsToBounds = true
+        self.contentMode = .scaleAspectFit
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+}
+
 /// Layered image face view
 class ImageLayeredFaceView: FaceView {
 
     class var displayURL: String { return "native://layered-image" }
 
-	// Layer must be a class to inherit from UIImageview
-	private class Layer: UIImageView {
-
-		/// Resource this layer displays.
-		var resource: VatomResourceModel?
-		/// vAtom this layer displays.
-		var vatom: VatomModel!
-
-		func layerDefaultValues() {
-			// Layer class defaults
-			self.autoresizingMask = [ .flexibleWidth, .flexibleHeight ]
-			self.clipsToBounds = true
-            self.contentMode = .scaleAspectFit
-		}
-	}
-
     // MARK: - Properties
 
+    /// Layer used to render the base vAtom.
     private lazy var baseLayer: Layer = {
-        let layer = Layer()
-		layer.layerDefaultValues()
+        let layer = Layer(vatom: self.vatom)
+        layer.frame = self.bounds
         return layer
     }()
 
@@ -97,9 +103,6 @@ class ImageLayeredFaceView: FaceView {
         super.init(vatom: vatom, faceModel: faceModel)
         self.vatomObserverStore.delegate = self
 
-		// ensure base has correct bounds with the 'parent' vAtom
-		baseLayer.frame = self.bounds
-		baseLayer.vatom = vatom
         self.addSubview(baseLayer)
 
     }
@@ -183,7 +186,7 @@ class ImageLayeredFaceView: FaceView {
             var tempLayer: Layer!
 
             // investigate if the layer already exists
-            for layer in self.childLayers where layer.vatom == childVatom {
+            for layer in self.childLayers where layer.vatomID == childVatom.id {
                 tempLayer = layer
                 break
             }
@@ -195,7 +198,7 @@ class ImageLayeredFaceView: FaceView {
         var layersToRemove: [Layer] = []
         for layer in self.childLayers {
             // check if added
-            if newLayers.contains(where: { $0.vatom == layer.vatom }) {
+            if newLayers.contains(where: { $0.vatomID == layer.vatomID }) {
                 continue
             }
 
@@ -209,9 +212,7 @@ class ImageLayeredFaceView: FaceView {
 	/// Create a standard Layer and add it to the base layer's subviews.
 	private func createLayer(_ vatom: VatomModel) -> Layer {
 
-		let layer  = Layer()
-		layer.layerDefaultValues()
-		layer.vatom = vatom
+		let layer  = Layer(vatom: vatom)
 
 		// extract resource model
 		guard let resourceModel = vatom.props.resources.first(where: { $0.name == config.imageName }) else {

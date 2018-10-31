@@ -73,22 +73,13 @@ class VatomObserverStore {
     /// Initialize using a vAtom ID.
     init(vatomID: String) {
         self.rootVatomID = vatomID
+        self.subscribeToUpdates()
     }
 
     // MARK: - Life Cycle
 
-    /// Start observing the vAtom and it's children.
-    func start() {
-        DispatchQueue.mainThreadPrecondition()
-
-        // subscribe to observation updates
-        self.subscribeToUpdates()
-
-        //FIXME: The didSet on ChildVatoms is still firing the delegate irrespective.
-    }
-
-    /// Stop observing the vAtom and it's children.
-    func stop() {
+    /// Cancel observing the vAtom and it's children.
+    func cancel() {
         // cancel observation updates
         self.onConnected?.cancel()
         self.onVatomStateUpdate?.cancel()
@@ -100,6 +91,8 @@ class VatomObserverStore {
     // MARK: - Push State Update (Real-Time)
 
     /// Subscribes to Web socket signals.
+    ///
+    /// - important: This method should only be called once. Signal subscription is additive.
     private func subscribeToUpdates() {
 
         // subscribe to web socket connect

@@ -94,3 +94,8 @@ open class BaseFaceView: UIView {
     }
 
 }
+
+/// Models the errors that may be thrown by face views.
+enum FaceError: Error {
+    case missingVatomResource
+}

@@ -439,7 +439,7 @@ open class VatomView: UIView {
         newFaceView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         self.insertSubview(newFaceView, at: 0)
 
-        // 1. instruct face view to load its content
+        // 1. instruct face view to load its content (must be able to handle being called multiple times).
         newFaceView.load { [weak self] (error) in
 
             ///printBV(info: "Face view load completion called.")

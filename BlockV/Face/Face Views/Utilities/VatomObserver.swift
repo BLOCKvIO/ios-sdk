@@ -10,6 +10,7 @@
 //
 
 import Foundation
+import Signals
 
 protocol VatomObserverDelegate: class {
 
@@ -79,14 +80,28 @@ class VatomObserver {
 
     // MARK: - Push State Update (Real-Time)
 
+    /// Cancel observing the vAtom and it's children.
+    func cancel() {
+        // cancel observation updates
+        self.onConnected?.cancel()
+        self.onConnected = nil
+        self.onVatomStateUpdate?.cancel()
+        self.onVatomStateUpdate = nil
+    }
+
+    private var onConnected: SignalSubscription<Void>?
+    private var onVatomStateUpdate: SignalSubscription<WSStateUpdateEvent>?
+
     /// Subscribe to state updates
     private func subscribeToUpdates() {
 
-        BLOCKv.socket.onConnected.subscribe(with: self) { [weak self] in
+        // subscribe to web socket connect
+        self.onConnected = BLOCKv.socket.onConnected.subscribe(with: self) { [weak self] in
             self?.refresh()
         }
 
-        BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { [weak self] stateUpdate in
+        // subscribe to state update
+        self.onVatomStateUpdate = BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { [weak self] stateUpdate in
 
             guard let `self` = self else { return }
 

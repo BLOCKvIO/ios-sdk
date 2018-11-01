@@ -12,13 +12,14 @@
 import Foundation
 import Signals
 
+/// Aggregates updates from remote data pull and update stream push.
 protocol VatomObserverStoreDelegate: class {
-    
+
     /// Called when the root vAtom has experienced a property change.
     func vatomObserver(_ observer: VatomObserverStore, rootVatomStateUpdated: VatomModel)
     /// Called when a child vAtom has experienced a property change.
     func vatomObserver(_ observer: VatomObserverStore, childVatomStateUpdated: VatomModel)
-    
+
     /// Called when the observer is about to add a child vAtom.
     ///
     /// Use this event to be notified of an imminent child vAtom beign added to the root vAtom, e.g. beginning an
@@ -31,7 +32,7 @@ protocol VatomObserverStoreDelegate: class {
     func vatomObserver(_ observer: VatomObserverStore, didAddChildVatom childVatom: VatomModel)
     /// Called after the observer has removed a child vAtom.
     func vatomObserver(_ observer: VatomObserverStore, didRemoveChildVatom childVatom: VatomModel)
-    
+
 }
 
 /// This class provides a simple means of observing an *owned* vAtom and its immediate children.
@@ -43,14 +44,14 @@ protocol VatomObserverStoreDelegate: class {
 /// - Access level: Internal
 /// - vAtom ownership: Owner only
 class VatomObserverStore {
-    
+
     // MARK: - Properties
-    
+
     /// Unique identifier of the root vAtom.
     public private(set) var rootVatomID: String
-    
+
     public private(set) var rootVatom: VatomModel?
-    
+
     /// Set of **direct** child vAtoms.
     ///
     /// Direct children are those vAtoms whose parent ID matches the root vAtom's ID.
@@ -63,52 +64,49 @@ class VatomObserverStore {
             removed.forEach { self.delegate?.vatomObserver(self, didRemoveChildVatom: $0) }
         }
     }
-    
+
     /// Delegate
-    private weak var delegate: VatomObserverStoreDelegate?
-    
+    weak var delegate: VatomObserverStoreDelegate?
+
     // MARK: - Initialization
-    
+
     /// Initialize using a vAtom ID.
     init(vatomID: String) {
         self.rootVatomID = vatomID
-    }
-    
-    // MARK: - Life Cycle
-    
-    /// Start observing the vAtom and it's children.
-    func start() {
-        // subscribe to observation updates
         self.subscribeToUpdates()
     }
-    
-    /// Stop observing the vAtom and it's children.
-    func stop() {
+
+    // MARK: - Life Cycle
+
+    /// Cancel observing the vAtom and it's children.
+    func cancel() {
         // cancel observation updates
         self.onConnected?.cancel()
         self.onVatomStateUpdate?.cancel()
     }
-    
+
     private var onConnected: SignalSubscription<Void>?
     private var onVatomStateUpdate: SignalSubscription<WSStateUpdateEvent>?
-    
+
     // MARK: - Push State Update (Real-Time)
-    
+
     /// Subscribes to Web socket signals.
+    ///
+    /// - important: This method should only be called once. Signal subscription is additive.
     private func subscribeToUpdates() {
-        
+
         // subscribe to web socket connect
         self.onConnected = BLOCKv.socket.onConnected.subscribe(with: self) { [weak self] in
             self?.refresh()
         }
-        
+
         // subscribe to state update
         self.onVatomStateUpdate = BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { [weak self] stateUpdate in
-            
+
             guard let `self` = self else { return }
-            
+
             // - Raw Update
-            
+
             // check if root vatom
             if stateUpdate.vatomId == self.rootVatomID,
                 let updatedVatom = self.rootVatom?.updated(applying: stateUpdate) {
@@ -120,16 +118,16 @@ class VatomObserverStore {
                     self.delegate?.vatomObserver(self, childVatomStateUpdated: updatedVatom)
                 }
             }
-            
+
             // - Parent ID Change
-            
+
             // check for parent id changes
             if let newParentID = stateUpdate.vatomProperties["vAtom::vAtomType"]?["parent_id"]?.stringValue {
-                
+
                 /*
                  Use the parent ID and the known list of children to determine if a child was added or removed.
                  */
-                
+
                 if newParentID == self.rootVatomID {
                     // filter out duplicates
                     if !self.childVatoms.contains(where: { $0.id == stateUpdate.vatomId }) {
@@ -151,24 +149,24 @@ class VatomObserverStore {
                          child). To reduce the likelyhood of this, a remote state pull should be performed in cases
                          where the observer suspects remote-local sync issues, e.g. connetion drops.
                          */
-                        
+
                         // remove child vatom
                         let removedVatom = self.childVatoms.remove(at: index)
                         // notify delegate of removal
                         self.delegate?.vatomObserver(self, didRemoveChildVatom: removedVatom)
                     }
                 }
-                
+
             }
-            
+
         }
-        
+
     }
-    
+
     // MARK: - Pull State Update
-    
+
     typealias Completion = (Error?) -> Void
-    
+
     /// Refresh root and child vatoms using remote state.
     ///
     /// - Parameters:
@@ -179,15 +177,15 @@ class VatomObserverStore {
         self.updateRootVatom(completion: rootCompletion)
         self.updateChildVatoms(completion: childCompletion)
     }
-    
+
     /// Fetch root vAtom's remote state.
     private func updateRootVatom(completion: Completion?) {
-        
+
         BLOCKv.getVatoms(withIDs: [self.rootVatomID]) { [weak self] (vatoms, error) in
-            
+
             // ensure no error
             guard let rootVatom = vatoms.first, error == nil else {
-                //printBV(error: "Unable to fetch root vAtom. Error: \(String(describing: error?.localizedDescription))")
+                //printBV(error: "Unable to fetch root vAtom: \(String(describing: error?.localizedDescription))")
                 completion?(error)
                 return
             }
@@ -195,36 +193,36 @@ class VatomObserverStore {
             self?.rootVatom = rootVatom
             completion?(nil)
         }
-        
+
     }
-    
+
     /// Fetch remote state for the specified child vAtom and adds it to the list of children.
     private func addChildVatom(withID childID: String) {
-        
+
         BLOCKv.getVatoms(withIDs: [childID]) { [weak self] (vatoms, error) in
-            
+
             // ensure no error
             guard let childVatom = vatoms.first, error == nil else {
                 //printBV(error: "Unable to vAtom. Error: \(String(describing: error?.localizedDescription))")
                 return
             }
-            
+
             // ensure the vatom is still a child
             // there is a case, due to the async arch, where the retrieved vAtom may no longer be a child
             if childVatom.props.parentID == self?.rootVatomID {
                 // insert child (async)
                 self?.childVatoms.insert(childVatom)
             }
-            
+
         }
-        
+
     }
-    
+
     /// Replace all the root vAtom's direct children using remote state.
     private func updateChildVatoms(completion: Completion?) {
-        
+
         BLOCKv.getInventory(id: self.rootVatomID) { [weak self] (vatoms, error) in
-            
+
             // ensure no error
             guard error == nil else {
                 //printBV(error: "Unable to fetch children. Error: \(String(describing: error?.localizedDescription))")
@@ -236,9 +234,9 @@ class VatomObserverStore {
             // replace the list of children
             self?.childVatoms = Set(validChildren)
             completion?(nil)
-            
+
         }
-        
+
     }
-    
+
 }

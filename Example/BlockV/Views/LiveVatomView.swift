@@ -49,20 +49,20 @@ class LiveVatomView: VatomView {
     /// Common initializer
     private func commonInit() {
 
-        BLOCKv.socket.onConnected.subscribe(with: self) {
+        BLOCKv.socket.onConnected.subscribe(with: self) { [weak self] in
             // reload from remote on socket reconnect
-            self.reloadFromRemote()
+            self?.reloadFromRemote()
         }
         
-        BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { stateUpdateEvent in
+        BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { [weak self] stateUpdateEvent in
             
             // ignore other vatom updates
-            guard self.vatom?.id == stateUpdateEvent.vatomId else { return }
-            
+            guard self?.vatom?.id == stateUpdateEvent.vatomId else { return }
+
             // apply partial update on socket state event
-            if let updatedVatom = self.vatom?.updated(applying: stateUpdateEvent) {
+            if let updatedVatom = self?.vatom?.updated(applying: stateUpdateEvent) {
                 // update vatom view using updated vatom
-                self.update(usingVatom: updatedVatom)
+                self?.update(usingVatom: updatedVatom)
             }
         }
 

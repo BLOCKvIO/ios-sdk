@@ -766,14 +766,14 @@
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Description" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Lu-5q-1oH">
-                                        <rect key="frame" x="150.66666666666666" y="57" width="74" height="17"/>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Description" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Lu-5q-1oH">
+                                        <rect key="frame" x="20" y="67" width="335" height="17"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                        <nil key="textColor"/>
+                                        <color key="textColor" red="0.14956773477157359" green="0.14956773477157359" blue="0.14956773477157359" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fMv-3H-uto" customClass="LiveVatomView" customModule="BlockV_Example" customModuleProvider="target">
-                                        <rect key="frame" x="107.66666666666669" y="114" width="160" height="160"/>
+                                        <rect key="frame" x="107.66666666666669" y="124" width="160" height="160"/>
                                         <color key="backgroundColor" red="0.97602712563451777" green="0.97602712563451777" blue="0.97602712563451777" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="fMv-3H-uto" secondAttribute="height" multiplier="1:1" id="AN1-Ff-Dy3"/>
@@ -781,14 +781,14 @@
                                         </constraints>
                                     </view>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PZH-We-e5C" customClass="LiveVatomView" customModule="BlockV_Example" customModuleProvider="target">
-                                        <rect key="frame" x="40" y="314" width="295" height="184.33333333333337"/>
+                                        <rect key="frame" x="40" y="324" width="295" height="184.33333333333337"/>
                                         <color key="backgroundColor" red="0.97636467218399048" green="0.97653168439865112" blue="0.97635418176651001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="PZH-We-e5C" secondAttribute="height" multiplier="16:10" id="XGh-oa-cwT"/>
                                         </constraints>
                                     </view>
                                     <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0Ar-72-hmi">
-                                        <rect key="frame" x="20" y="538.33333333333337" width="335" height="536.00000000000011"/>
+                                        <rect key="frame" x="20" y="548.33333333333337" width="335" height="536.00000000000011"/>
                                         <color key="backgroundColor" red="0.97636467218399048" green="0.97653168439865112" blue="0.97635418176651001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="0Ar-72-hmi" secondAttribute="height" multiplier="10:16" id="044-lH-zP5"/>
@@ -803,9 +803,10 @@
                                 <constraints>
                                     <constraint firstItem="0Ar-72-hmi" firstAttribute="centerX" secondItem="OnM-Wh-F31" secondAttribute="centerX" id="8VB-MM-XDe"/>
                                     <constraint firstItem="0Ar-72-hmi" firstAttribute="top" secondItem="PZH-We-e5C" secondAttribute="bottom" constant="40" id="9C7-AV-DaH"/>
-                                    <constraint firstItem="8Lu-5q-1oH" firstAttribute="top" secondItem="7Bw-oI-GGI" secondAttribute="bottom" constant="12" id="DKf-GS-4Sc"/>
-                                    <constraint firstItem="8Lu-5q-1oH" firstAttribute="centerX" secondItem="OnM-Wh-F31" secondAttribute="centerX" id="Hov-dT-PQh"/>
+                                    <constraint firstItem="8Lu-5q-1oH" firstAttribute="leading" secondItem="OnM-Wh-F31" secondAttribute="leading" constant="20" id="CeT-46-Knc"/>
+                                    <constraint firstItem="8Lu-5q-1oH" firstAttribute="top" secondItem="7Bw-oI-GGI" secondAttribute="bottom" constant="22" id="DKf-GS-4Sc"/>
                                     <constraint firstItem="7Bw-oI-GGI" firstAttribute="top" secondItem="OnM-Wh-F31" secondAttribute="top" constant="24" id="I2T-0B-Lhk"/>
+                                    <constraint firstAttribute="trailing" secondItem="8Lu-5q-1oH" secondAttribute="trailing" constant="20" id="LMY-lD-Ex3"/>
                                     <constraint firstItem="fMv-3H-uto" firstAttribute="centerX" secondItem="OnM-Wh-F31" secondAttribute="centerX" id="N0w-gB-ZWz"/>
                                     <constraint firstItem="7Bw-oI-GGI" firstAttribute="centerX" secondItem="OnM-Wh-F31" secondAttribute="centerX" id="PQY-i3-2DX"/>
                                     <constraint firstAttribute="trailing" secondItem="0Ar-72-hmi" secondAttribute="trailing" constant="20" id="TPD-gx-I0K"/>
@@ -831,7 +832,7 @@
                         <rightBarButtonItems>
                             <barButtonItem title="Info" id="7gT-Ed-Q8P">
                                 <connections>
-                                    <segue destination="OCf-oV-sVa" kind="show" id="bgI-jh-Z7a"/>
+                                    <segue destination="OCf-oV-sVa" kind="show" identifier="seg.vatom.detail" id="bgI-jh-Z7a"/>
                                 </connections>
                             </barButtonItem>
                             <barButtonItem systemItem="refresh" id="Ywa-J5-r6C">

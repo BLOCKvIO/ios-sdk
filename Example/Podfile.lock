@@ -1,26 +1,35 @@
 PODS:
   - Alamofire (4.7.3)
-  - BLOCKv (2.1.0):
-    - BLOCKv/Face (= 2.1.0)
-  - BLOCKv/Core (2.1.0):
+  - BLOCKv (2.2.0):
+    - BLOCKv/Face (= 2.2.0)
+  - BLOCKv/Core (2.2.0):
     - Alamofire (~> 4.7)
     - JWTDecode (~> 2.1)
     - Signals (~> 5.0)
     - Starscream (~> 3.0)
     - SwiftLint (~> 0.26)
-  - BLOCKv/Face (2.1.0):
+  - BLOCKv/Face (2.2.0):
     - BLOCKv/Core
     - FLAnimatedImage (~> 1.0)
     - Nuke (~> 7.0)
   - FLAnimatedImage (1.0.12)
   - JWTDecode (2.1.1)
-  - Nuke (7.4.2)
+  - Nuke (7.5)
+  - NVActivityIndicatorView (4.4.0):
+    - NVActivityIndicatorView/Presenter (= 4.4.0)
+  - NVActivityIndicatorView/Presenter (4.4.0)
   - Signals (5.0.0)
   - Starscream (3.0.6)
   - SwiftLint (0.27.0)
+  - VatomFace3D (1.0.4):
+    - BLOCKv/Face
+    - FLAnimatedImage
+    - Nuke
+    - NVActivityIndicatorView
 
 DEPENDENCIES:
   - BLOCKv (from `../`)
+  - VatomFace3D
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -28,9 +37,11 @@ SPEC REPOS:
     - FLAnimatedImage
     - JWTDecode
     - Nuke
+    - NVActivityIndicatorView
     - Signals
     - Starscream
     - SwiftLint
+    - VatomFace3D
 
 EXTERNAL SOURCES:
   BLOCKv:
@@ -38,14 +49,16 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
-  BLOCKv: 0d8fb7f96628f812dcb05779f9034484ebabe637
+  BLOCKv: efebdfa36a1106e23d677298b6766734b621702e
   FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
   JWTDecode: 83e8b381aafe27158d9f692cbdca2b12d61d460c
-  Nuke: aee5c42001369902798f7b844611b8ae930ce333
+  Nuke: 799c0430f87b11c4dacfa80b13e1c4f0a1464b90
+  NVActivityIndicatorView: ec7440a57af2450319d3a4181cca7da6fc127064
   Signals: 6c41253cc172e4251d6064341bbc555a589c8d9f
   Starscream: ef3ece99d765eeccb67de105bfa143f929026cf5
   SwiftLint: 3207c1faa2240bf8973b191820a116113cd11073
+  VatomFace3D: 6a77f5f2b0cb99664a8e0237ce171276956df384
 
-PODFILE CHECKSUM: b04c959d6ec711133119e7401fb991f376917339
+PODFILE CHECKSUM: 572540b34367caffea356b90ca04601e730b047d
 
 COCOAPODS: 1.5.3

@@ -17,21 +17,20 @@
 		AD36A59F215D1CE4009EFD55 /* CustomLoaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD36A59E215D1CE4009EFD55 /* CustomLoaderView.swift */; };
 		AD36A5B0215E3578009EFD55 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = AD36A5AF215E3578009EFD55 /* CHANGELOG.md */; };
 		AD3DB5302157FD7200E00B67 /* TappedVatomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD3DB52F2157FD7200E00B67 /* TappedVatomViewController.swift */; };
+		AD46B8132182D744005C2567 /* KeyPath_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD46B8122182D744005C2567 /* KeyPath_Tests.swift */; };
 		AD61462E213DC88700204E5B /* FaceSelectionProcedure_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD61462A213DC83D00204E5B /* FaceSelectionProcedure_Tests.swift */; };
 		AD61462F213DC88B00204E5B /* MockModelFaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD61462C213DC87100204E5B /* MockModelFaces.swift */; };
+		AD6AE088218857C7005105E2 /* CustomProcedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD6AE087218857C7005105E2 /* CustomProcedure.swift */; };
 		AD920A5B215FB47200CEFC1D /* UserInfoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD920A58215FB47100CEFC1D /* UserInfoTableViewController.swift */; };
 		AD920A5C215FB47200CEFC1D /* PasswordTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD920A59215FB47200CEFC1D /* PasswordTableViewController.swift */; };
 		AD920A5D215FB47200CEFC1D /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD920A5A215FB47200CEFC1D /* ProfileViewController.swift */; };
-		CDC268C7232CDB5AF1386116 /* Pods_BlockV_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DE93FD598C0B61200B996A4 /* Pods_BlockV_Example.framework */; };
-		D519A845205E6EE3006B0D19 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D519A844205E6EE3006B0D19 /* NetworkOperation.swift */; };
-		D519A848205E76EB006B0D19 /* NetworkDataOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D519A847205E76EB006B0D19 /* NetworkDataOperation.swift */; };
+		CDC268C7232CDB5AF1386116 /* Pods_BlockV_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DE93FD598C0B61200B996A4 /* Pods_BlockV_Example.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		D519A84B205E83AB006B0D19 /* VatomDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D519A84A205E83AB006B0D19 /* VatomDetailTableViewController.swift */; };
 		D530759C21119E2A00DE7FD0 /* MockModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5307588211199C200DE7FD0 /* MockModels.swift */; };
 		D530759F2111CC5200DE7FD0 /* Test+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = D530759E2111CC5200DE7FD0 /* Test+Utils.swift */; };
 		D53075A42112E9E000DE7FD0 /* FaceModel_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D53075A32112E9E000DE7FD0 /* FaceModel_Tests.swift */; };
 		D5475764205D124100E6FE90 /* UIView+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5475763205D124100E6FE90 /* UIView+Ext.swift */; };
 		D547576B205E67AD00E6FE90 /* VatomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D547576A205E67AD00E6FE90 /* VatomCell.swift */; };
-		D547576D205E6C6300E6FE90 /* AsynchronousOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D547576C205E6C6300E6FE90 /* AsynchronousOperation.swift */; };
 		D55B21E02052772400B6D5C2 /* VerifyTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B21DF2052772400B6D5C2 /* VerifyTableViewController.swift */; };
 		D55B21E520527EB400B6D5C2 /* TokenCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B21E420527EB400B6D5C2 /* TokenCell.swift */; };
 		D55B21EA2052E38000B6D5C2 /* RoundedImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B21E92052E38000B6D5C2 /* RoundedImageView.swift */; };
@@ -87,8 +86,10 @@
 		AD36A59E215D1CE4009EFD55 /* CustomLoaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomLoaderView.swift; sourceTree = "<group>"; };
 		AD36A5AF215E3578009EFD55 /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = CHANGELOG.md; path = ../CHANGELOG.md; sourceTree = "<group>"; };
 		AD3DB52F2157FD7200E00B67 /* TappedVatomViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TappedVatomViewController.swift; sourceTree = "<group>"; };
+		AD46B8122182D744005C2567 /* KeyPath_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyPath_Tests.swift; sourceTree = "<group>"; };
 		AD61462A213DC83D00204E5B /* FaceSelectionProcedure_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceSelectionProcedure_Tests.swift; sourceTree = "<group>"; };
 		AD61462C213DC87100204E5B /* MockModelFaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockModelFaces.swift; sourceTree = "<group>"; };
+		AD6AE087218857C7005105E2 /* CustomProcedure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomProcedure.swift; sourceTree = "<group>"; };
 		AD920A58215FB47100CEFC1D /* UserInfoTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserInfoTableViewController.swift; sourceTree = "<group>"; };
 		AD920A59215FB47200CEFC1D /* PasswordTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordTableViewController.swift; sourceTree = "<group>"; };
 		AD920A5A215FB47200CEFC1D /* ProfileViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
@@ -96,8 +97,6 @@
 		BC27A08D03F2D2401C48F394 /* Pods-BlockV_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Example/Pods-BlockV_Example.release.xcconfig"; sourceTree = "<group>"; };
 		C55D0BD7FD8ECD417C235202 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		CB05032DBDAACFFC17BA9C27 /* Pods-BlockV_Tests.dev.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Tests.dev.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Tests/Pods-BlockV_Tests.dev.xcconfig"; sourceTree = "<group>"; };
-		D519A844205E6EE3006B0D19 /* NetworkOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkOperation.swift; sourceTree = "<group>"; };
-		D519A847205E76EB006B0D19 /* NetworkDataOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkDataOperation.swift; sourceTree = "<group>"; };
 		D519A84A205E83AB006B0D19 /* VatomDetailTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VatomDetailTableViewController.swift; sourceTree = "<group>"; };
 		D5307588211199C200DE7FD0 /* MockModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockModels.swift; sourceTree = "<group>"; };
 		D530759121119E0E00DE7FD0 /* BLOCKv_Unit_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BLOCKv_Unit_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -106,7 +105,6 @@
 		D53075A32112E9E000DE7FD0 /* FaceModel_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceModel_Tests.swift; sourceTree = "<group>"; };
 		D5475763205D124100E6FE90 /* UIView+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Ext.swift"; sourceTree = "<group>"; };
 		D547576A205E67AD00E6FE90 /* VatomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VatomCell.swift; sourceTree = "<group>"; };
-		D547576C205E6C6300E6FE90 /* AsynchronousOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsynchronousOperation.swift; sourceTree = "<group>"; };
 		D55B21DF2052772400B6D5C2 /* VerifyTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyTableViewController.swift; sourceTree = "<group>"; };
 		D55B21E420527EB400B6D5C2 /* TokenCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenCell.swift; sourceTree = "<group>"; };
 		D55B21E92052E38000B6D5C2 /* RoundedImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedImageView.swift; sourceTree = "<group>"; };
@@ -260,16 +258,6 @@
 			path = "User Profile";
 			sourceTree = "<group>";
 		};
-		D519A846205E76C9006B0D19 /* Operations */ = {
-			isa = PBXGroup;
-			children = (
-				D547576C205E6C6300E6FE90 /* AsynchronousOperation.swift */,
-				D519A844205E6EE3006B0D19 /* NetworkOperation.swift */,
-				D519A847205E76EB006B0D19 /* NetworkDataOperation.swift */,
-			);
-			path = Operations;
-			sourceTree = "<group>";
-		};
 		D519A849205E8360006B0D19 /* Inventory */ = {
 			isa = PBXGroup;
 			children = (
@@ -283,10 +271,11 @@
 		D530759221119E0E00DE7FD0 /* BLOCKv Unit Tests */ = {
 			isa = PBXGroup;
 			children = (
+				D530759521119E0E00DE7FD0 /* Info.plist */,
 				AD614629213DC79D00204E5B /* Face Selection Procedure */,
 				D53075A02111DBD600DE7FD0 /* Models */,
 				D530759D2111CADC00DE7FD0 /* Utilities */,
-				D530759521119E0E00DE7FD0 /* Info.plist */,
+				AD46B8122182D744005C2567 /* KeyPath_Tests.swift */,
 			);
 			path = "BLOCKv Unit Tests";
 			sourceTree = "<group>";
@@ -354,7 +343,7 @@
 			isa = PBXGroup;
 			children = (
 				D55B21E92052E38000B6D5C2 /* RoundedImageView.swift */,
-				D519A846205E76C9006B0D19 /* Operations */,
+				AD6AE087218857C7005105E2 /* CustomProcedure.swift */,
 			);
 			path = Utility;
 			sourceTree = "<group>";
@@ -524,9 +513,11 @@
 				"${BUILT_PRODUCTS_DIR}/BLOCKv/BLOCKv.framework",
 				"${BUILT_PRODUCTS_DIR}/FLAnimatedImage/FLAnimatedImage.framework",
 				"${BUILT_PRODUCTS_DIR}/JWTDecode/JWTDecode.framework",
+				"${BUILT_PRODUCTS_DIR}/NVActivityIndicatorView/NVActivityIndicatorView.framework",
 				"${BUILT_PRODUCTS_DIR}/Nuke/Nuke.framework",
 				"${BUILT_PRODUCTS_DIR}/Signals/Signals.framework",
 				"${BUILT_PRODUCTS_DIR}/Starscream/Starscream.framework",
+				"${BUILT_PRODUCTS_DIR}/VatomFace3D/VatomFace3D.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -534,9 +525,11 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BLOCKv.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FLAnimatedImage.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/JWTDecode.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/NVActivityIndicatorView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Nuke.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Signals.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Starscream.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VatomFace3D.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -554,7 +547,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "${PODS_ROOT}/SwiftLint/swiftlint";
+			shellScript = "${PODS_ROOT}/SwiftLint/swiftlint\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -563,7 +556,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D519A848205E76EB006B0D19 /* NetworkDataOperation.swift in Sources */,
 				AD0BCC98217A0106001836DE /* LiveVatomView.swift in Sources */,
 				D5475764205D124100E6FE90 /* UIView+Ext.swift in Sources */,
 				AD920A5C215FB47200CEFC1D /* PasswordTableViewController.swift in Sources */,
@@ -582,10 +574,9 @@
 				D55B21E02052772400B6D5C2 /* VerifyTableViewController.swift in Sources */,
 				D55B21F92056DE6D00B6D5C2 /* UIColor+Ext.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
+				AD6AE088218857C7005105E2 /* CustomProcedure.swift in Sources */,
 				D55B21EA2052E38000B6D5C2 /* RoundedImageView.swift in Sources */,
 				D5728D5E206155600041F4F7 /* ActionListTableViewController.swift in Sources */,
-				D519A845205E6EE3006B0D19 /* NetworkOperation.swift in Sources */,
-				D547576D205E6C6300E6FE90 /* AsynchronousOperation.swift in Sources */,
 				AD36A59F215D1CE4009EFD55 /* CustomLoaderView.swift in Sources */,
 				D5728D5C206131980041F4F7 /* TransferActionViewController.swift in Sources */,
 			);
@@ -601,6 +592,7 @@
 				D53075A42112E9E000DE7FD0 /* FaceModel_Tests.swift in Sources */,
 				AD0BCC922178828A001836DE /* VatomModelUpdate_Tests.swift in Sources */,
 				AD0BCC8E217769D7001836DE /* GenericJsonMerge_Tests.swift in Sources */,
+				AD46B8132182D744005C2567 /* KeyPath_Tests.swift in Sources */,
 				D530759C21119E2A00DE7FD0 /* MockModels.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -687,6 +679,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -734,6 +727,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 4.0;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Dev;
@@ -984,6 +978,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 4.0;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Prod;

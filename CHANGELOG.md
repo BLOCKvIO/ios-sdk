@@ -2,6 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 #### 2.x Releases (API v1)
+- `2.3.x` Releases -  [2.3.0](#230)
 - `2.2.x` Releases -  [2.2.0](#220)
 - `2.1.x` Releases -  [2.1.0](#210)
 - `2.0.x` Releases -  [2.0.0](#200)
@@ -14,6 +15,16 @@ All notable changes to this project will be documented in this file.
 - `0.9.x` Releases - [0.9.9](#099) | [0.9.10](#0910)
 
 ---
+
+## [2.3.0](https://github.com/BLOCKvIO/ios-sdk/releases/tag/2.3.0)
+
+### Added
+
+- Image Layered Face View
+  - Pull Rrequest [#143](https://github.com/BLOCKvIO/ios-sdk/pull/143)
+  
+- 3D Face View
+  - Pull Rrequest [#143](https://github.com/BLOCKvIO/ios-sdk/pull/143)
 
 ## [2.2.0](https://github.com/BLOCKvIO/ios-sdk/releases/tag/2.2.0)
 

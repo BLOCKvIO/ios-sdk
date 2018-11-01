@@ -147,6 +147,7 @@ class ImageLayeredFaceView: FaceView {
         self.refreshUI()
     }
 
+    /// Unload the face view (called when the VatomView must prepare for reuse).
     func unload() {
 		self.baseLayer.image = nil
         self.vatomObserverStore.cancel()

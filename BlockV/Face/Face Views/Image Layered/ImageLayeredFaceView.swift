@@ -118,7 +118,6 @@ class ImageLayeredFaceView: FaceView {
 
     /// Begin loading the face view's content.
     func load(completion: ((Error?) -> Void)?) {
-        print(#function)
 
         // assign a single load completion closure
         loadCompletion = { (error) in
@@ -136,7 +135,6 @@ class ImageLayeredFaceView: FaceView {
     }
 
     func vatomChanged(_ vatom: VatomModel) {
-        print(#function)
 
         self.vatom = vatom
         if vatom.id != self.vatomObserverStore.rootVatomID {
@@ -150,7 +148,6 @@ class ImageLayeredFaceView: FaceView {
     }
 
     func unload() {
-        print(#function)
 		self.baseLayer.image = nil
         self.vatomObserverStore.cancel()
     }
@@ -159,7 +156,6 @@ class ImageLayeredFaceView: FaceView {
 
     /// Refresh the model layer (triggers a view layer update).
     private func refreshData() {
-        print(#function)
         self.vatomObserverStore.refresh(rootCompletion: nil) { _ in
             self.refreshUI()
         }
@@ -167,7 +163,6 @@ class ImageLayeredFaceView: FaceView {
 
     /// Refresh the view layer (does not refresh data layer).
     private func refreshUI() {
-        print(#function)
         self.loadBaseResource()
         self.updateLayers()
     }
@@ -179,7 +174,6 @@ class ImageLayeredFaceView: FaceView {
     /// This method uses *local* data.
     private func updateLayers() {
 
-        print(#function)
         var newLayers: [Layer] = []
         for childVatom in self.childVatoms {
 
@@ -272,8 +266,6 @@ class ImageLayeredFaceView: FaceView {
     /// latest completion handler will be executed since all previous tasks are cancelled.
     private func loadBaseResource() {
 
-        print(#function)
-
         // extract resource model
         guard let resourceModel = vatom.props.resources.first(where: { $0.name == config.imageName }) else {
             loadCompletion?(FaceError.missingVatomResource)
@@ -301,27 +293,22 @@ class ImageLayeredFaceView: FaceView {
 extension ImageLayeredFaceView: VatomObserverStoreDelegate {
 
     func vatomObserver(_ observer: VatomObserverStore, rootVatomStateUpdated: VatomModel) {
-        print(#function)
         // nothing to do
     }
 
     func vatomObserver(_ observer: VatomObserverStore, childVatomStateUpdated: VatomModel) {
-        print(#function)
         // nothing to do
     }
 
     func vatomObserver(_ observer: VatomObserverStore, willAddChildVatom vatomID: String) {
-        print(#function)
         // nothing to do
     }
 
     func vatomObserver(_ observer: VatomObserverStore, didAddChildVatom childVatom: VatomModel) {
-        print(#function)
         self.refreshUI()
     }
 
     func vatomObserver(_ observer: VatomObserverStore, didRemoveChildVatom childVatom: VatomModel) {
-        print(#function)
         self.refreshUI()
     }
 

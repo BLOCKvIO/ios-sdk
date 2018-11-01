@@ -20,13 +20,6 @@ class ImagePolicyFaceView: FaceView {
 
     class var displayURL: String { return "native://image-policy" }
 
-    // MARK: - Errors
-
-    /// Models the errors that may be thrown by the Image Policy Face View.
-    enum PolicyError: Error {
-        case missingVatomResource
-    }
-
     // MARK: - Properties
 
     lazy var animatedImageView: FLAnimatedImageView = {
@@ -201,7 +194,7 @@ class ImagePolicyFaceView: FaceView {
 
         // extract resource model
         guard let resourceModel = vatom.props.resources.first(where: { $0.name == resourceName }) else {
-            completion?(PolicyError.missingVatomResource)
+            completion?(FaceError.missingVatomResource)
             return
         }
 

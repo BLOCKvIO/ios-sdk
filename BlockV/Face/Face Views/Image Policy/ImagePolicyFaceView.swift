@@ -104,8 +104,10 @@ class ImagePolicyFaceView: FaceView {
 
     }
 
-    /// Unload the face view.
-    func unload() { }
+    /// Unload the face view (called when the VatomView must prepare for reuse).
+    func unload() {
+        self.vatomObserver.cancel()
+    }
 
     // MARK: - Face Code
 

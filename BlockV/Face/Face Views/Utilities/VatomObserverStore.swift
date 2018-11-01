@@ -82,7 +82,9 @@ class VatomObserverStore {
     func cancel() {
         // cancel observation updates
         self.onConnected?.cancel()
+        self.onConnected = nil
         self.onVatomStateUpdate?.cancel()
+        self.onVatomStateUpdate = nil
     }
 
     private var onConnected: SignalSubscription<Void>?

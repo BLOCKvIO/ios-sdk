@@ -203,9 +203,12 @@ class ImagePolicyFaceView: FaceView {
         do {
             // encode url
             let encodeURL = try BLOCKv.encodeURL(resourceModel.url)
-
+            
+            var request = ImageRequest(url: encodeURL)
+            // use unencoded url as cache key
+            request.cacheKey = resourceModel.url
             // load image (automatically handles reuse)
-            Nuke.loadImage(with: encodeURL, into: self.animatedImageView) { (_, error) in
+            Nuke.loadImage(with: request, into: self.animatedImageView) { (_, error) in
                 self.isLoaded = true
                 completion?(error)
             }

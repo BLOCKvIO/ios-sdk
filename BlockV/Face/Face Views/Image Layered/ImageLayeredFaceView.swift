@@ -221,7 +221,11 @@ class ImageLayeredFaceView: FaceView {
 			return layer
 		}
 
-		Nuke.loadImage(with: encodeURL, into: layer)
+        var request = ImageRequest(url: encodeURL)
+        // use unencoded url as cache key
+        request.cacheKey = resourceModel.url
+        // load image (automatically handles reuse)
+		Nuke.loadImage(with: request, into: layer)
 
 		layer.frame = self.bounds
 		self.baseLayer.addSubview(layer)
@@ -276,10 +280,13 @@ class ImageLayeredFaceView: FaceView {
         do {
             // encode url
             let encodeURL = try BLOCKv.encodeURL(resourceModel.url)
-
+            
+            var request = ImageRequest(url: encodeURL)
+            // use unencoded url as cache key
+            request.cacheKey = resourceModel.url
             // load image (automatically handles reuse)
             // GOTCHA: Upon calling load, previous requests are cancelled allong with their completion handlers.
-            Nuke.loadImage(with: encodeURL, into: self.baseLayer) { (_, error) in
+            Nuke.loadImage(with: request, into: self.baseLayer) { (_, error) in
                 self.isLoaded = true
                 self.loadCompletion?(error)
             }

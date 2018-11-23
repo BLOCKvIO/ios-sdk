@@ -11,9 +11,9 @@
 
 import Foundation
 
-//FIXME: Sould API calls use weak capture?
-
-/// Core Bridge Version 1.0.0
+/// Core Bridge (Version 1.0.0)
+///
+/// Bridges into the Core module.
 class CoreBridgeV1: CoreBridge {
 
     // MARK: - Enums

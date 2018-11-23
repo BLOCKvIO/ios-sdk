@@ -10,7 +10,6 @@
 //
 
 import Foundation
-import WebKit
 
 /// Protocol to which face bridges should conform.
 ///

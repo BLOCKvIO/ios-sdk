@@ -16,7 +16,7 @@ import Foundation
 /// Bridges into the Core module.
 class CoreBridgeV2: CoreBridge {
 
-    // MARK: - Enum
+    // MARK: - Enums
 
     /// Represents the contract for the Web bridge (version 2).
     enum MessageName: String {

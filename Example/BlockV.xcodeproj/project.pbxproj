@@ -287,8 +287,8 @@
 		D530759221119E0E00DE7FD0 /* BLOCKv Unit Tests */ = {
 			isa = PBXGroup;
 			children = (
-				ADA07DE321A93F1C007A6322 /* Codable */,
 				D530759521119E0E00DE7FD0 /* Info.plist */,
+				ADA07DE321A93F1C007A6322 /* Codable */,
 				AD614629213DC79D00204E5B /* Face Selection Procedure */,
 				D53075A02111DBD600DE7FD0 /* Models */,
 				D530759D2111CADC00DE7FD0 /* Utilities */,

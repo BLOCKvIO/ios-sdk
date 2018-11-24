@@ -17,16 +17,17 @@
 		AD36A59F215D1CE4009EFD55 /* CustomLoaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD36A59E215D1CE4009EFD55 /* CustomLoaderView.swift */; };
 		AD36A5B0215E3578009EFD55 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = AD36A5AF215E3578009EFD55 /* CHANGELOG.md */; };
 		AD3DB5302157FD7200E00B67 /* TappedVatomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD3DB52F2157FD7200E00B67 /* TappedVatomViewController.swift */; };
-		AD46B8132182D744005C2567 /* KeyPath_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD46B8122182D744005C2567 /* KeyPath_Tests.swift */; };
 		AD61462E213DC88700204E5B /* FaceSelectionProcedure_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD61462A213DC83D00204E5B /* FaceSelectionProcedure_Tests.swift */; };
 		AD61462F213DC88B00204E5B /* MockModelFaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD61462C213DC87100204E5B /* MockModelFaces.swift */; };
 		AD6AE088218857C7005105E2 /* CustomProcedure.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD6AE087218857C7005105E2 /* CustomProcedure.swift */; };
 		AD920A5B215FB47200CEFC1D /* UserInfoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD920A58215FB47100CEFC1D /* UserInfoTableViewController.swift */; };
 		AD920A5C215FB47200CEFC1D /* PasswordTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD920A59215FB47200CEFC1D /* PasswordTableViewController.swift */; };
 		AD920A5D215FB47200CEFC1D /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD920A5A215FB47200CEFC1D /* ProfileViewController.swift */; };
-		ADA07DE721A93F1C007A6322 /* FaceModelCodable_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA07DE421A93F1C007A6322 /* FaceModelCodable_Tests.swift */; };
-		ADA07DE821A93F1C007A6322 /* VatomModelCodable_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA07DE521A93F1C007A6322 /* VatomModelCodable_Tests.swift */; };
-		ADA07DE921A93F1C007A6322 /* ActionModelCodable_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA07DE621A93F1C007A6322 /* ActionModelCodable_Tests.swift */; };
+		ADA07DF621A94061007A6322 /* BVError_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA07DEB21A94015007A6322 /* BVError_Tests.swift */; };
+		ADA07DF721A94061007A6322 /* KeyPath_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA07DEC21A94015007A6322 /* KeyPath_Tests.swift */; };
+		ADA07DF821A94068007A6322 /* FaceModelCodable_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA07DF021A94025007A6322 /* FaceModelCodable_Tests.swift */; };
+		ADA07DF921A94068007A6322 /* VatomModelCodable_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA07DF121A94025007A6322 /* VatomModelCodable_Tests.swift */; };
+		ADA07DFA21A94068007A6322 /* ActionModelCodable_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA07DF221A94025007A6322 /* ActionModelCodable_Tests.swift */; };
 		CDC268C7232CDB5AF1386116 /* Pods_BlockV_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DE93FD598C0B61200B996A4 /* Pods_BlockV_Example.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		D519A84B205E83AB006B0D19 /* VatomDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D519A84A205E83AB006B0D19 /* VatomDetailTableViewController.swift */; };
 		D530759C21119E2A00DE7FD0 /* MockModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5307588211199C200DE7FD0 /* MockModels.swift */; };
@@ -89,16 +90,17 @@
 		AD36A59E215D1CE4009EFD55 /* CustomLoaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomLoaderView.swift; sourceTree = "<group>"; };
 		AD36A5AF215E3578009EFD55 /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = CHANGELOG.md; path = ../CHANGELOG.md; sourceTree = "<group>"; };
 		AD3DB52F2157FD7200E00B67 /* TappedVatomViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TappedVatomViewController.swift; sourceTree = "<group>"; };
-		AD46B8122182D744005C2567 /* KeyPath_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyPath_Tests.swift; sourceTree = "<group>"; };
 		AD61462A213DC83D00204E5B /* FaceSelectionProcedure_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceSelectionProcedure_Tests.swift; sourceTree = "<group>"; };
 		AD61462C213DC87100204E5B /* MockModelFaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockModelFaces.swift; sourceTree = "<group>"; };
 		AD6AE087218857C7005105E2 /* CustomProcedure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomProcedure.swift; sourceTree = "<group>"; };
 		AD920A58215FB47100CEFC1D /* UserInfoTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserInfoTableViewController.swift; sourceTree = "<group>"; };
 		AD920A59215FB47200CEFC1D /* PasswordTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordTableViewController.swift; sourceTree = "<group>"; };
 		AD920A5A215FB47200CEFC1D /* ProfileViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
-		ADA07DE421A93F1C007A6322 /* FaceModelCodable_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FaceModelCodable_Tests.swift; sourceTree = "<group>"; };
-		ADA07DE521A93F1C007A6322 /* VatomModelCodable_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VatomModelCodable_Tests.swift; sourceTree = "<group>"; };
-		ADA07DE621A93F1C007A6322 /* ActionModelCodable_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActionModelCodable_Tests.swift; sourceTree = "<group>"; };
+		ADA07DEB21A94015007A6322 /* BVError_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BVError_Tests.swift; sourceTree = "<group>"; };
+		ADA07DEC21A94015007A6322 /* KeyPath_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyPath_Tests.swift; sourceTree = "<group>"; };
+		ADA07DF021A94025007A6322 /* FaceModelCodable_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FaceModelCodable_Tests.swift; sourceTree = "<group>"; };
+		ADA07DF121A94025007A6322 /* VatomModelCodable_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VatomModelCodable_Tests.swift; sourceTree = "<group>"; };
+		ADA07DF221A94025007A6322 /* ActionModelCodable_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActionModelCodable_Tests.swift; sourceTree = "<group>"; };
 		B5A79A9FDD3524D3628C080E /* Pods-BlockV_Example.dev.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Example.dev.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Example/Pods-BlockV_Example.dev.xcconfig"; sourceTree = "<group>"; };
 		BC27A08D03F2D2401C48F394 /* Pods-BlockV_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Example/Pods-BlockV_Example.release.xcconfig"; sourceTree = "<group>"; };
 		C55D0BD7FD8ECD417C235202 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
@@ -264,12 +266,21 @@
 			path = "User Profile";
 			sourceTree = "<group>";
 		};
-		ADA07DE321A93F1C007A6322 /* Codable */ = {
+		ADA07DEA21A94015007A6322 /* Miscellaneous */ = {
 			isa = PBXGroup;
 			children = (
-				ADA07DE421A93F1C007A6322 /* FaceModelCodable_Tests.swift */,
-				ADA07DE521A93F1C007A6322 /* VatomModelCodable_Tests.swift */,
-				ADA07DE621A93F1C007A6322 /* ActionModelCodable_Tests.swift */,
+				ADA07DEB21A94015007A6322 /* BVError_Tests.swift */,
+				ADA07DEC21A94015007A6322 /* KeyPath_Tests.swift */,
+			);
+			path = Miscellaneous;
+			sourceTree = "<group>";
+		};
+		ADA07DEF21A94025007A6322 /* Codable */ = {
+			isa = PBXGroup;
+			children = (
+				ADA07DF021A94025007A6322 /* FaceModelCodable_Tests.swift */,
+				ADA07DF121A94025007A6322 /* VatomModelCodable_Tests.swift */,
+				ADA07DF221A94025007A6322 /* ActionModelCodable_Tests.swift */,
 			);
 			path = Codable;
 			sourceTree = "<group>";
@@ -288,11 +299,10 @@
 			isa = PBXGroup;
 			children = (
 				D530759521119E0E00DE7FD0 /* Info.plist */,
-				ADA07DE321A93F1C007A6322 /* Codable */,
 				AD614629213DC79D00204E5B /* Face Selection Procedure */,
 				D53075A02111DBD600DE7FD0 /* Models */,
+				ADA07DEA21A94015007A6322 /* Miscellaneous */,
 				D530759D2111CADC00DE7FD0 /* Utilities */,
-				AD46B8122182D744005C2567 /* KeyPath_Tests.swift */,
 			);
 			path = "BLOCKv Unit Tests";
 			sourceTree = "<group>";
@@ -308,6 +318,7 @@
 		D53075A02111DBD600DE7FD0 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				ADA07DEF21A94025007A6322 /* Codable */,
 				D5307588211199C200DE7FD0 /* MockModels.swift */,
 				D53075A32112E9E000DE7FD0 /* FaceModel_Tests.swift */,
 				AD0BCC8D217769D7001836DE /* GenericJsonMerge_Tests.swift */,
@@ -576,14 +587,11 @@
 				AD0BCC98217A0106001836DE /* LiveVatomView.swift in Sources */,
 				D5475764205D124100E6FE90 /* UIView+Ext.swift in Sources */,
 				AD920A5C215FB47200CEFC1D /* PasswordTableViewController.swift in Sources */,
-				ADA07DE721A93F1C007A6322 /* FaceModelCodable_Tests.swift in Sources */,
 				D547576B205E67AD00E6FE90 /* VatomCell.swift in Sources */,
 				D519A84B205E83AB006B0D19 /* VatomDetailTableViewController.swift in Sources */,
 				AD3DB5302157FD7200E00B67 /* TappedVatomViewController.swift in Sources */,
 				AD920A5D215FB47200CEFC1D /* ProfileViewController.swift in Sources */,
-				ADA07DE821A93F1C007A6322 /* VatomModelCodable_Tests.swift in Sources */,
 				D55B21FB2056E04B00B6D5C2 /* InventoryCollectionViewController.swift in Sources */,
-				ADA07DE921A93F1C007A6322 /* ActionModelCodable_Tests.swift in Sources */,
 				D55B21F52056745700B6D5C2 /* UIViewController+Ext.swift in Sources */,
 				D597FF272051305A009B2910 /* UIAlertController+Etx.swift in Sources */,
 				D55B21EE2053E24900B6D5C2 /* TitleValueCell.swift in Sources */,
@@ -608,12 +616,16 @@
 			files = (
 				D530759F2111CC5200DE7FD0 /* Test+Utils.swift in Sources */,
 				AD61462F213DC88B00204E5B /* MockModelFaces.swift in Sources */,
+				ADA07DF621A94061007A6322 /* BVError_Tests.swift in Sources */,
+				ADA07DF821A94068007A6322 /* FaceModelCodable_Tests.swift in Sources */,
 				AD61462E213DC88700204E5B /* FaceSelectionProcedure_Tests.swift in Sources */,
 				D53075A42112E9E000DE7FD0 /* FaceModel_Tests.swift in Sources */,
+				ADA07DF721A94061007A6322 /* KeyPath_Tests.swift in Sources */,
 				AD0BCC922178828A001836DE /* VatomModelUpdate_Tests.swift in Sources */,
+				ADA07DFA21A94068007A6322 /* ActionModelCodable_Tests.swift in Sources */,
 				AD0BCC8E217769D7001836DE /* GenericJsonMerge_Tests.swift in Sources */,
-				AD46B8132182D744005C2567 /* KeyPath_Tests.swift in Sources */,
 				D530759C21119E2A00DE7FD0 /* MockModels.swift in Sources */,
+				ADA07DF921A94068007A6322 /* VatomModelCodable_Tests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

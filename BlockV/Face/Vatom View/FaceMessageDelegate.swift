@@ -46,26 +46,4 @@ public protocol FaceMessageDelegate: class {
                    withObject object: [String: JSON],
                    completion: FaceMessageDelegate.Completion?)
 
-    /// Returns a dictionary that indicates which face messages the view supports.
-    ///
-    /// As a viewer, you should respond with `true` for each message you support. This will allow face interact with
-    /// your viewer. Similiarly, you should return `false` if you do not support the message.
-    ///
-    /// - Parameter messageIdentifiers: Array of unique identifiers of the face messages.
-    /// - Returns: Dictionary mapping face messages to viewer support status. `true` if supported, `false` otherwise.
-    func determineSupport(forFaceMessages messageIdentifiers: [String]) -> [String: Bool]
-
-}
-
-extension FaceMessageDelegate {
-
-    /// This default implementation returns `false` for each message.
-    func determineSupport(forFaceMessages messageIdentifiers: [String]) -> [String: Bool] {
-        var dict: [String: Bool] = [:]
-        for id in messageIdentifiers {
-            dict[id] = false
-        }
-        return dict
-    }
-
 }

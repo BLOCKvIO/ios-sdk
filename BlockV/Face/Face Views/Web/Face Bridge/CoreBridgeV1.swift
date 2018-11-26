@@ -140,9 +140,9 @@ class CoreBridgeV1: CoreBridge {
 
     /// Invoked when a face would like to create the web bridge.
     ///
-    /// Creates the bridge initializtion JSON object.
+    /// Creates the bridge initializtion JSON data.
     ///
-    /// - Parameter completion: Completion handler to call with JSON object to be passed to the webpage.
+    /// - Parameter completion: Completion handler to call with JSON data to be passed to the webpage.
     private func setupBridge(_ completion: @escaping Completion) {
 
         // santiy check

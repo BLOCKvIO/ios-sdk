@@ -48,7 +48,7 @@ enum BridgeError: Error, LocalizedError {
     case caller(_ message: String)
 
     // Version 1
-    
+
     /// Returns the error formatted as a dictionary. This dictionary may be serialized into JSON data to be posted
     /// over the web bridge.
     var bridgeFormatV1: [String: String] {
@@ -57,15 +57,15 @@ enum BridgeError: Error, LocalizedError {
         case let .caller(message): return ["errorCode": "caller_error", "errorMessage": message]
         }
     }
-    
+
     /// Data encoded version of the error.
     var bridgeDataV1: Data {
         let data = try! JSONEncoder.blockv.encode(self.bridgeFormatV1)
         return data
     }
-    
+
     // Verion 2
-    
+
     /// Returns the error formatted as a dictionary. This dictionary may be serialized into JSON data to be posted
     /// over the web bridge.
     var bridgeFormatV2: [String: String] {
@@ -74,7 +74,7 @@ enum BridgeError: Error, LocalizedError {
         case let .caller(message): return ["error_code": "caller_error", "error_message": message]
         }
     }
-    
+
     /// Data encoded version of the error.
     var bridgeDataV2: Data {
         let data = try! JSONEncoder.blockv.encode(self.bridgeFormatV2)

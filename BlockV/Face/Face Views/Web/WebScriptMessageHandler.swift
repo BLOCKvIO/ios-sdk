@@ -79,8 +79,14 @@ extension WebFaceView: WKScriptMessageHandler {
     /// Sends an error message to the Web Face SDK.
     func postError(responseID: String = "error", _ error: BridgeError) {
 
-        self.postMessage(responseID, withJSONData: error.bridgeData)
-        printBV(error: "Posting error to bridge:\n \(error.localizedDescription)")
+        if coreBridge is CoreBridgeV1 {
+            self.postMessage(responseID, withJSONData: error.bridgeDataV1)
+            printBV(error: "Posting error to bridge:\n \(error.localizedDescription)")
+        } else {
+            self.postMessage(responseID, withJSONData: error.bridgeDataV2)
+            printBV(error: "Posting error to bridge:\n \(error.localizedDescription)")
+        }
+
     }
 
 }

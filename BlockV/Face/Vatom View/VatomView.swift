@@ -115,6 +115,9 @@ open class VatomView: UIView {
     /// Selected face view (function of the selected face model).
     public private(set) var selectedFaceView: FaceView?
 
+    /// Delegate intended to respond to face messages.
+    public weak var messageDelegate: FaceMessageDelegate?
+
     // MARK: Customization
 
     /// Loading views must derive from `UIView` and conform to `VatomViewLoader`.
@@ -160,11 +163,6 @@ open class VatomView: UIView {
             errorView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         }
     }
-
-    /// Face message delegate.
-    ///
-    /// Delegates will receive custom messages from face views.
-    public weak var messageDelegate: FaceMessageDelegate?
 
     // MARK: - Initializer
 
@@ -404,7 +402,15 @@ open class VatomView: UIView {
             self.selectedFaceModel = selectedFaceModel
 
             // 3. find face view type
-            guard let faceViewType = roster[selectedFaceModel.properties.displayURL] else {
+            var faceViewType: FaceView.Type?
+
+            if selectedFaceModel.isWeb {
+                faceViewType = roster["https://*"]
+            } else {
+                faceViewType = roster[selectedFaceModel.properties.displayURL]
+            }
+
+            guard let viewType = faceViewType else {
                 // viewer developer MUST have registered the face view with the face registry
                 assertionFailure(
                     """
@@ -416,10 +422,10 @@ open class VatomView: UIView {
 
             //printBV(info: "Face view for face model: \(faceViewType)")
 
-            //let selectedFaceView: FaceView = ImageFaceView(vatom: vatom, faceModel: selectedFace)
-            let selectedFaceView: FaceView = faceViewType.init(vatom: vatom,
-                                                               faceModel: selectedFaceModel,
-                                                               host: self)
+            //let selectedFaceView: FaceView = ImageFaceView(vatom: vatom, faceModel: selectedFace, host: self)
+            let selectedFaceView: FaceView = viewType.init(vatom: vatom,
+                                                           faceModel: selectedFaceModel,
+                                                           host: self)
 
             // replace currently selected face view with newly selected
             self.replaceFaceView(with: selectedFaceView)

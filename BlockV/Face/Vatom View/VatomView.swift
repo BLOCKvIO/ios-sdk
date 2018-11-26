@@ -160,6 +160,11 @@ open class VatomView: UIView {
             errorView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         }
     }
+    
+    /// Face message delegate.
+    ///
+    /// Delegates will receive custom messages from face views.
+    public weak var messageDelegate: FaceMessageDelegate?
 
     // MARK: - Initializer
 

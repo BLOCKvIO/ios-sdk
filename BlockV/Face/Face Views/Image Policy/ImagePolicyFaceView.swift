@@ -55,7 +55,7 @@ class ImagePolicyFaceView: FaceView {
 
     // MARK: - Initialization
 
-    required init(vatom: VatomModel, faceModel: FaceModel) {
+    required init(vatom: VatomModel, faceModel: FaceModel, host: VatomView) {
 
         // init face config (or legacy private section) fallback on default values
         if let config = faceModel.properties.config {
@@ -68,7 +68,7 @@ class ImagePolicyFaceView: FaceView {
 
         // create an observer for the backing vatom
         self.vatomObserver = VatomObserver(vatomID: vatom.id)
-        super.init(vatom: vatom, faceModel: faceModel)
+        super.init(vatom: vatom, faceModel: faceModel, host: host)
 
         self.vatomObserver.delegate = self
         // add image view
@@ -203,7 +203,7 @@ class ImagePolicyFaceView: FaceView {
         do {
             // encode url
             let encodeURL = try BLOCKv.encodeURL(resourceModel.url)
-            
+
             var request = ImageRequest(url: encodeURL)
             // use unencoded url as cache key
             request.cacheKey = resourceModel.url

@@ -93,14 +93,14 @@ class ImageLayeredFaceView: FaceView {
 	private var vatomObserverStore: VatomObserverStore
 
     // MARK: - Init
-    required init(vatom: VatomModel, faceModel: FaceModel) {
+    required init(vatom: VatomModel, faceModel: FaceModel, host: VatomView) {
         // init face config
         self.config = Config(faceModel)
 
         // create an observer for the backing vatom
         self.vatomObserverStore = VatomObserverStore(vatomID: vatom.id)
 
-        super.init(vatom: vatom, faceModel: faceModel)
+        super.init(vatom: vatom, faceModel: faceModel, host: host)
         self.vatomObserverStore.delegate = self
 
         self.addSubview(baseLayer)
@@ -280,7 +280,7 @@ class ImageLayeredFaceView: FaceView {
         do {
             // encode url
             let encodeURL = try BLOCKv.encodeURL(resourceModel.url)
-            
+
             var request = ImageRequest(url: encodeURL)
             // use unencoded url as cache key
             request.cacheKey = resourceModel.url

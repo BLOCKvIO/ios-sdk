@@ -26,14 +26,14 @@ public struct FaceMessageError: Error {
 /// important that you state which messages you support (by implementing `determinedSupport(forFaceMessages:[Srting])`).
 /// This gives the face an opportunity to adapt it's behaviour.
 public protocol FaceMessageDelegate: class {
-    
+
     /// Completion handler for face messages.
     ///
     /// - Parameters:
     ///   - payload: The JSON payload to be sent back to the Web Face SDK.
     ///   - error: Error with description if one was encountered.
     typealias Completion = (_ payload: JSON?, _ error: FaceMessageError?) -> Void
-    
+
     /// Called when the vatom view receives a message from the face.
     ///
     /// - Parameters:
@@ -45,7 +45,7 @@ public protocol FaceMessageDelegate: class {
                    didRecevieFaceMessage message: String,
                    withObject object: [String: JSON],
                    completion: FaceMessageDelegate.Completion?)
-    
+
     /// Returns a dictionary that indicates which face messages the view supports.
     ///
     /// As a viewer, you should respond with `true` for each message you support. This will allow face interact with
@@ -54,11 +54,11 @@ public protocol FaceMessageDelegate: class {
     /// - Parameter messageIdentifiers: Array of unique identifiers of the face messages.
     /// - Returns: Dictionary mapping face messages to viewer support status. `true` if supported, `false` otherwise.
     func determineSupport(forFaceMessages messageIdentifiers: [String]) -> [String: Bool]
-    
+
 }
 
 extension FaceMessageDelegate {
-    
+
     /// This default implementation returns `false` for each message.
     func determineSupport(forFaceMessages messageIdentifiers: [String]) -> [String: Bool] {
         var dict: [String: Bool] = [:]
@@ -67,5 +67,5 @@ extension FaceMessageDelegate {
         }
         return dict
     }
-    
+
 }

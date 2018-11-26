@@ -79,12 +79,12 @@ class ImageFaceView: FaceView {
 
     // MARK: - Initialization
 
-    required init(vatom: VatomModel, faceModel: FaceModel) {
+    required init(vatom: VatomModel, faceModel: FaceModel, host: VatomView) {
 
         // init face config
         self.config = Config(faceModel)
 
-        super.init(vatom: vatom, faceModel: faceModel)
+        super.init(vatom: vatom, faceModel: faceModel, host: host)
 
         // add image view
         self.addSubview(animatedImageView)
@@ -170,7 +170,7 @@ class ImageFaceView: FaceView {
         ImagePipeline.Configuration.isAnimatedImageDataEnabled = true
 
         //TODO: Should the size of the VatomView be factoring in and the image be resized?
-        
+
         var request = ImageRequest(url: encodeURL)
         // use unencoded url as cache key
         request.cacheKey = resourceModel.url

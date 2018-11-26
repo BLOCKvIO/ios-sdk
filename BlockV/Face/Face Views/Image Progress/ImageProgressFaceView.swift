@@ -107,7 +107,7 @@ class ImageProgressFaceView: FaceView {
 
     // MARK: - Initialization
 
-    required init(vatom: VatomModel, faceModel: FaceModel) {
+    required init(vatom: VatomModel, faceModel: FaceModel, host: VatomView) {
 
         // init face config (or legacy private section) fallback on default values
 
@@ -119,7 +119,7 @@ class ImageProgressFaceView: FaceView {
             self.config = Config() // default values
         }
 
-        super.init(vatom: vatom, faceModel: faceModel)
+        super.init(vatom: vatom, faceModel: faceModel, host: host)
 
         self.addSubview(emptyImageView)
         self.addSubview(fullImageView)

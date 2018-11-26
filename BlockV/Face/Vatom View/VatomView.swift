@@ -160,7 +160,7 @@ open class VatomView: UIView {
             errorView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         }
     }
-    
+
     /// Face message delegate.
     ///
     /// Delegates will receive custom messages from face views.
@@ -418,7 +418,8 @@ open class VatomView: UIView {
 
             //let selectedFaceView: FaceView = ImageFaceView(vatom: vatom, faceModel: selectedFace)
             let selectedFaceView: FaceView = faceViewType.init(vatom: vatom,
-                                                               faceModel: selectedFaceModel)
+                                                               faceModel: selectedFaceModel,
+                                                               host: self)
 
             // replace currently selected face view with newly selected
             self.replaceFaceView(with: selectedFaceView)

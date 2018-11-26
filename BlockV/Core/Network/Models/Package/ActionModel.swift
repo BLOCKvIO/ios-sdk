@@ -51,7 +51,7 @@ public struct ActionModel: Equatable {
 
 // MARK: - Decodable
 
-extension ActionModel: Decodable {
+extension ActionModel: Codable {
 
     /// Initialise from a decoder, e.g. JSONDecoder
     public init(from decoder: Decoder) throws {
@@ -68,6 +68,13 @@ extension ActionModel: Decodable {
                   templateID: templateID,
                   meta: meta,
                   properties: properties)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(compoundName, forKey: .name)
+        try container.encode(properties, forKey: .properties)
+        try container.encode(meta, forKey: .meta)
     }
 
 }

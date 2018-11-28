@@ -177,11 +177,10 @@ extension WebFaceView {
     private func routeMessageToViewer(_ message: FaceScriptMessage) {
 
         // notify the host's message delegate of the custom message from the web page
-        self.host?.messageDelegate?.vatomView(
-            self.host!,
-            didRecevieFaceMessage: message.name,
-            withObject: message.object,
-            completion: { (json, error) in
+        self.delegate?.faceView(self,
+                                didSendMessage: message.name,
+                                withObject: message.object,
+                                compleiton: { (json, error) in
 
                 // handle error from viewer
                 guard error == nil else {

@@ -25,7 +25,7 @@ public struct FaceMessageError: Error {
 /// Faces may send messages to their underlying viewer to request additional functionality. As a viewer it is
 /// important that you state which messages you support (by implementing `determinedSupport(forFaceMessages:[Srting])`).
 /// This gives the face an opportunity to adapt it's behaviour.
-public protocol FaceMessageDelegate: class {
+public protocol VatomViewDelegate: class {
 
     /// Completion handler for face messages.
     ///
@@ -44,6 +44,51 @@ public protocol FaceMessageDelegate: class {
     func vatomView(_ vatomView: VatomView,
                    didRecevieFaceMessage message: String,
                    withObject object: [String: JSON],
-                   completion: FaceMessageDelegate.Completion?)
+                   completion: VatomViewDelegate.Completion?)
 
+}
+
+// MARK: - Face View Delegate
+
+/// The protocol face views must conform to in order to communicate
+protocol FaceViewDelegate: class {
+
+    /// Completion handler for face messages.
+    ///
+    /// - Parameters:
+    ///   - payload: The JSON payload to be sent back to the Web Face View.
+    ///   - error: Error with description if one was encountered.
+    typealias Completion = (_ payload: JSON?, _ error: FaceMessageError?) -> Void
+
+    /// Called when the vatom view receives a message from the face.
+    ///
+    /// - Parameters:
+    ///   - vatomView: The `VatomView` instance which the face message was received from.
+    ///   - message: The unique identifier of the message.
+    ///   - object: Companion object which addtional information relevant to the request.
+    ///   - completion: The completion handler to call once the request has been processed.
+    func faceView(_ faceView: FaceView,
+                  didSendMessage message: String,
+                  withObject object: [String: JSON],
+                  compleiton: FaceViewDelegate.Completion?)
+
+}
+
+/// Extend VatomView to conform to `FaceViewDelegate`.
+///
+/// This is the conduit of communication between the VatomView and it's Face View.
+extension VatomView: FaceViewDelegate {
+    
+    func faceView(_ faceView: FaceView,
+                  didSendMessage message: String,
+                  withObject object: [String: JSON],
+                  compleiton: ((JSON?, FaceMessageError?) -> Void)?) {
+        
+        // forward the message to the vatom view delegate
+        self.vatomViewDelegate?.vatomView(self,
+                                          didRecevieFaceMessage: message,
+                                          withObject: object,
+                                          completion: compleiton)
+    }
+    
 }

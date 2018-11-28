@@ -116,7 +116,7 @@ open class VatomView: UIView {
     public private(set) var selectedFaceView: FaceView?
 
     /// Delegate intended to respond to face messages.
-    public weak var messageDelegate: FaceMessageDelegate?
+    public weak var vatomViewDelegate: VatomViewDelegate?
 
     // MARK: Customization
 
@@ -424,8 +424,8 @@ open class VatomView: UIView {
 
             //let selectedFaceView: FaceView = ImageFaceView(vatom: vatom, faceModel: selectedFace, host: self)
             let selectedFaceView: FaceView = viewType.init(vatom: vatom,
-                                                           faceModel: selectedFaceModel,
-                                                           host: self)
+                                                           faceModel: selectedFaceModel)
+            selectedFaceView.delegate = self
 
             // replace currently selected face view with newly selected
             self.replaceFaceView(with: selectedFaceView)
@@ -474,3 +474,5 @@ open class VatomView: UIView {
     }
 
 }
+
+

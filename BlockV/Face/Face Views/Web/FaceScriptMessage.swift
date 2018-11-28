@@ -32,7 +32,7 @@ struct FaceScriptMessage {
         self.source = source
         self.name = name
         self.responseID = responseID ?? ""
-        self.version = version ?? "1.0.0" // default specifies the version used by the original Face SDK.
+        self.version = version ?? "1.0.0" // default for original Face SDK.
         self.object = object ?? [:]
     }
 
@@ -48,8 +48,9 @@ struct FaceScriptMessage {
         }
         // extract info
         let version = descriptor["version"]?.stringValue
+        // note: 1.0.0 uses slightly different naming
         let responseID = descriptor["response_id"]?.stringValue ?? descriptor["responseID"]?.stringValue ?? ""
-        let object = descriptor["data"]?.objectValue
+        let object = descriptor["payload"]?.objectValue ?? descriptor["data"]?.objectValue
 
         self.init(source: source, name: name, responseID: responseID, version: version, object: object)
     }

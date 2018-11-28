@@ -79,12 +79,12 @@ class ImageFaceView: FaceView {
 
     // MARK: - Initialization
 
-    required init(vatom: VatomModel, faceModel: FaceModel, host: VatomView) {
+    required init(vatom: VatomModel, faceModel: FaceModel) {
 
         // init face config
         self.config = Config(faceModel)
 
-        super.init(vatom: vatom, faceModel: faceModel, host: host)
+        super.init(vatom: vatom, faceModel: faceModel)
 
         // add image view
         self.addSubview(animatedImageView)

@@ -82,14 +82,13 @@ open class BaseFaceView: UIView {
     /// Face model to render.
     public internal(set) var faceModel: FaceModel
 
-    /// The view hosting this face view.
-    public internal(set) weak var host: VatomView?
+    /// Face view delegate.
+    weak var delegate: FaceViewDelegate?
 
     /// Initializes a BaseFaceView using a vAtom and a face model.
-    public required init(vatom: VatomModel, faceModel: FaceModel, host: VatomView) {
+    public required init(vatom: VatomModel, faceModel: FaceModel) {
         self.vatom = vatom
         self.faceModel = faceModel
-        self.host = host
         super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
     }
 

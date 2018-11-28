@@ -55,7 +55,7 @@ class ImagePolicyFaceView: FaceView {
 
     // MARK: - Initialization
 
-    required init(vatom: VatomModel, faceModel: FaceModel, host: VatomView) {
+    required init(vatom: VatomModel, faceModel: FaceModel) {
 
         // init face config (or legacy private section) fallback on default values
         if let config = faceModel.properties.config {
@@ -68,7 +68,7 @@ class ImagePolicyFaceView: FaceView {
 
         // create an observer for the backing vatom
         self.vatomObserver = VatomObserver(vatomID: vatom.id)
-        super.init(vatom: vatom, faceModel: faceModel, host: host)
+        super.init(vatom: vatom, faceModel: faceModel)
 
         self.vatomObserver.delegate = self
         // add image view

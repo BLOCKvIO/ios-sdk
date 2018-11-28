@@ -72,6 +72,10 @@ class TappedVatomViewController: UIViewController {
 
         // A - VatomView (via storyboard)
         
+        vatomViewA.vatomViewDelegate = self
+        vatomViewB.vatomViewDelegate = self
+        vatomViewC.vatomViewDelegate = self
+        
         /*
          Here we call `update` in order to pass the vatom and the procedure to the Vatom View.
          This will trigger the Vatom View Life Cycle (VVLC).
@@ -140,4 +144,17 @@ class TappedVatomViewController: UIViewController {
         }
     }
 
+}
+
+// MARK: - Vatom View Delegate
+
+extension TappedVatomViewController: VatomViewDelegate {
+    
+    func vatomView(_ vatomView: VatomView,
+                   didRecevieFaceMessage message: String,
+                   withObject object: [String : JSON],
+                   completion: ((JSON?, FaceMessageError?) -> Void)?) {
+        print("Message: \(message)")
+    }
+    
 }

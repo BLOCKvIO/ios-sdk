@@ -20,7 +20,7 @@ public struct FaceMessageError: Error {
     }
 }
 
-/// The protocol types must conform to in order to handle face messages.
+/// The protocol types must conform to in order to comuninicate with vatom view.
 ///
 /// Faces may send messages to their underlying viewer to request additional functionality. As a viewer it is
 /// important that you state which messages you support (by implementing `determinedSupport(forFaceMessages:[Srting])`).
@@ -78,17 +78,17 @@ protocol FaceViewDelegate: class {
 ///
 /// This is the conduit of communication between the VatomView and it's Face View.
 extension VatomView: FaceViewDelegate {
-    
+
     func faceView(_ faceView: FaceView,
                   didSendMessage message: String,
                   withObject object: [String: JSON],
                   compleiton: ((JSON?, FaceMessageError?) -> Void)?) {
-        
+
         // forward the message to the vatom view delegate
         self.vatomViewDelegate?.vatomView(self,
                                           didRecevieFaceMessage: message,
                                           withObject: object,
                                           completion: compleiton)
     }
-    
+
 }

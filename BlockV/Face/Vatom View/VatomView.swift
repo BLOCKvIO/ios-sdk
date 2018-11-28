@@ -474,5 +474,3 @@ open class VatomView: UIView {
     }
 
 }
-
-

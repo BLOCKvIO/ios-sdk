@@ -171,8 +171,11 @@ class ImageFaceView: FaceView {
 
         //TODO: Should the size of the VatomView be factoring in and the image be resized?
 
+        var request = ImageRequest(url: encodeURL)
+        // use unencoded url as cache key
+        request.cacheKey = resourceModel.url
         // load image (automatically handles reuse)
-        Nuke.loadImage(with: encodeURL, into: self.animatedImageView) { (_, error) in
+        Nuke.loadImage(with: request, into: self.animatedImageView) { (_, error) in
             self.isLoaded = true
             completion?(error)
         }

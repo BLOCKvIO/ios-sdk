@@ -8,7 +8,7 @@ This is the official BLOCKv SDK. It allows you to easily build your own vAtom Vi
 
 ## Requirements
 
-- iOS 10.0+
+- iOS 10.0+pod 
 - Xcode 10+
 - Swift 4.1+
 

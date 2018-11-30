@@ -62,7 +62,7 @@ public struct VatomModel: Equatable {
 }
 
 // MARK: Codable
-extension VatomModel: Decodable {
+extension VatomModel: Codable {
 
     public init(from decoder: Decoder) throws {
         let items = try decoder.container(keyedBy: CodingKeys.self)
@@ -78,6 +78,21 @@ extension VatomModel: Decodable {
         eth               = try items.decodeIfPresent(JSON.self, forKey: .eth)
         faceModels        = try items.decodeIfPresent([FaceModel].self, forKey: .faceModels) ?? []
         actionModels      = try items.decodeIfPresent([ActionModel].self, forKey: .actionModels) ?? []
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(version, forKey: .version)
+        try container.encode(isUnpublished, forKey: .isUnpublished)
+        try container.encode(whenCreated, forKey: .whenCreated)
+        try container.encode(whenModified, forKey: .whenModified)
+        try container.encode(props, forKey: .props)
+        try container.encode(`private`, forKey: .`private`)
+        try container.encode(eos, forKey: .eos)
+        try container.encode(eth, forKey: .eth)
+        try container.encode(faceModels, forKey: .faceModels)
+        try container.encode(actionModels, forKey: .actionModels)
     }
 
 }
@@ -146,7 +161,7 @@ public struct RootProperties: Equatable {
         case numberDirectClones  = "num_direct_clones"
         case owner
         case parentID            = "parent_id"
-        case publisherFqdn       = "publisher_fqdn"
+        case publisherFQDN       = "publisher_fqdn"
         case resources
         case rootType            = "root_type"
         case tags
@@ -191,10 +206,9 @@ public struct RootProperties: Equatable {
 }
 
 //TODO: Add Encodable conformance too.
-extension RootProperties: Decodable {
+extension RootProperties: Codable {
 
     public init(from decoder: Decoder) throws {
-
         let items = try decoder.container(keyedBy: CodingKeys.self)
         isAcquirable        = try items.decode(Bool.self, forKey: .isAcquirable)
         author              = try items.decode(String.self, forKey: .author)
@@ -212,7 +226,7 @@ extension RootProperties: Decodable {
         numberDirectClones  = try items.decode(Int.self, forKey: .numberDirectClones)
         owner               = try items.decode(String.self, forKey: .owner)
         parentID            = try items.decode(String.self, forKey: .parentID)
-        publisherFQDN       = try items.decode(String.self, forKey: .publisherFqdn)
+        publisherFQDN       = try items.decode(String.self, forKey: .publisherFQDN)
         isRedeemable        = try items.decode(Bool.self, forKey: .isRedeemable)
         resources           = try items.decode([Safe<VatomResourceModel>].self,
                                                              forKey: .resources).compactMap { $0.value }
@@ -228,14 +242,42 @@ extension RootProperties: Decodable {
         // keys are potentially absent from container
         tags                = try items.decodeIfPresent([String].self, forKey: .tags) ?? []
         childPolicy         = try items.decodeIfPresent([VatomChildPolicy].self, forKey: .childPolicy) ?? []
-
     }
 
-//    public func encode(to encoder: Encoder) throws {
-//        var container = encoder.container(keyedBy: CodingKeys.self)
-//        try container.encode(pricingType, forKey: .pricingType)
-//
-//    }
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(isAcquirable, forKey: .isAcquirable)
+        try container.encode(author, forKey: .author)
+        try container.encode(category, forKey: .category)
+        try container.encode(clonedFrom, forKey: .clonedFrom)
+        try container.encode(cloningScore, forKey: .cloningScore)
+        try container.encode(commerce, forKey: .commerce)
+        try container.encode(description, forKey: .description)
+        try container.encode(isDisabled, forKey: .isDisabled)
+        try container.encode(isDropped, forKey: .isDropped)
+        try container.encode(geoPosition, forKey: .geoPosition)
+        try container.encode(isInContract, forKey: .isInContract)
+        try container.encode(inContractWith, forKey: .inContractWith)
+        try container.encode(notifyMessage, forKey: .notifyMessage)
+        try container.encode(numberDirectClones, forKey: .numberDirectClones)
+        try container.encode(owner, forKey: .owner)
+        try container.encode(parentID, forKey: .parentID)
+        try container.encode(publisherFQDN, forKey: .publisherFQDN)
+        try container.encode(isRedeemable, forKey: .isRedeemable)
+        try container.encode(resources, forKey: .resources)
+
+        try container.encode(rootType, forKey: .rootType)
+        try container.encode(templateID, forKey: .templateID)
+        try container.encode(templateVariationID, forKey: .templateVariationID)
+        try container.encode(title, forKey: .title)
+        try container.encode(isTradeable, forKey: .isTradeable)
+        try container.encode(isTransferable, forKey: .isTransferable)
+        try container.encode(transferredBy, forKey: .transferredBy)
+        try container.encode(visibility, forKey: .visibility)
+
+        try container.encode(tags, forKey: .tags)
+        try container.encode(childPolicy, forKey: .childPolicy)
+    }
 
 }
 

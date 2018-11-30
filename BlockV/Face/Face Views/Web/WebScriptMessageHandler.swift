@@ -78,8 +78,15 @@ extension WebFaceView: WKScriptMessageHandler {
 
     /// Sends an error message to the Web Face SDK.
     func postError(responseID: String = "error", _ error: BridgeError) {
-        self.postMessage(responseID, withJSONData: error.bridgeData)
-        printBV(error: "Posting error to bridge:\n \(error.localizedDescription)")
+
+        if coreBridge is CoreBridgeV1 {
+            self.postMessage(responseID, withJSONData: error.bridgeDataV1)
+            printBV(error: "Posting error to bridge:\n \(error.localizedDescription)")
+        } else {
+            self.postMessage(responseID, withJSONData: error.bridgeDataV2)
+            printBV(error: "Posting error to bridge:\n \(error.localizedDescription)")
+        }
+
     }
 
 }
@@ -170,11 +177,10 @@ extension WebFaceView {
     private func routeMessageToViewer(_ message: FaceScriptMessage) {
 
         // notify the host's message delegate of the custom message from the web page
-        self.host?.messageDelegate?.vatomView(
-            self.host!,
-            didRecevieFaceMessage: message.name,
-            withObject: message.object,
-            completion: { (json, error) in
+        self.delegate?.faceView(self,
+                                didSendMessage: message.name,
+                                withObject: message.object,
+                                compleiton: { (json, error) in
 
                 // handle error from viewer
                 guard error == nil else {

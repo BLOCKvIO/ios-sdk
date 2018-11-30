@@ -82,6 +82,9 @@ open class BaseFaceView: UIView {
     /// Face model to render.
     public internal(set) var faceModel: FaceModel
 
+    /// Face view delegate.
+    weak var delegate: FaceViewDelegate?
+
     /// Initializes a BaseFaceView using a vAtom and a face model.
     public required init(vatom: VatomModel, faceModel: FaceModel) {
         self.vatom = vatom
@@ -98,4 +101,5 @@ open class BaseFaceView: UIView {
 /// Models the errors that may be thrown by face views.
 enum FaceError: Error {
     case missingVatomResource
+    case invalidURL
 }

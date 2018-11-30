@@ -12,7 +12,7 @@
 import Foundation
 
 extension JSONDecoder {
-    
+
     /// Singleton 
     static let blockv: JSONDecoder = {
         let decoder = JSONDecoder()
@@ -22,7 +22,7 @@ extension JSONDecoder {
 }
 
 extension JSONEncoder {
-    
+
     /// Singleton
     static let blockv: JSONEncoder = {
         let encoder = JSONEncoder()

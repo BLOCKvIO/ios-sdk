@@ -47,17 +47,37 @@ enum BridgeError: Error, LocalizedError {
     /// An error caused by an issue on the caller (web face) side.
     case caller(_ message: String)
 
+    // Version 1
+
     /// Returns the error formatted as a dictionary. This dictionary may be serialized into JSON data to be posted
     /// over the web bridge.
-    var bridgeFormat: [String: String] {
+    var bridgeFormatV1: [String: String] {
         switch self {
         case let .viewer(message): return ["errorCode": "viewer_error", "errorMessage": message]
         case let .caller(message): return ["errorCode": "caller_error", "errorMessage": message]
         }
     }
+
     /// Data encoded version of the error.
-    var bridgeData: Data {
-        let data = try! JSONEncoder.blockv.encode(self.bridgeFormat)
+    var bridgeDataV1: Data {
+        let data = try! JSONEncoder.blockv.encode(self.bridgeFormatV1)
+        return data
+    }
+
+    // Verion 2
+
+    /// Returns the error formatted as a dictionary. This dictionary may be serialized into JSON data to be posted
+    /// over the web bridge.
+    var bridgeFormatV2: [String: String] {
+        switch self {
+        case let .viewer(message): return ["error_code": "viewer_error", "error_message": message]
+        case let .caller(message): return ["error_code": "caller_error", "error_message": message]
+        }
+    }
+
+    /// Data encoded version of the error.
+    var bridgeDataV2: Data {
+        let data = try! JSONEncoder.blockv.encode(self.bridgeFormatV2)
         return data
     }
 

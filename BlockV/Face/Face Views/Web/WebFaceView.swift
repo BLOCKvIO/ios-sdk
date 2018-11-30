@@ -46,8 +46,8 @@ class WebFaceView: FaceView {
 
     // MARK: - Initialization
 
-    required init(vatom: VatomModel, faceModel: FaceModel, host: VatomView) {
-        super.init(vatom: vatom, faceModel: faceModel, host: host)
+    required init(vatom: VatomModel, faceModel: FaceModel) {
+        super.init(vatom: vatom, faceModel: faceModel)
 
         self.addSubview(webView)
         self.webView.backgroundColor = UIColor.red.withAlphaComponent(0.3)

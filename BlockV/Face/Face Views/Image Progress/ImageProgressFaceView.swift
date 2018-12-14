@@ -251,8 +251,8 @@ class ImageProgressFaceView: FaceView {
 
         // ensure encoding passes
         guard
-            let emptyURL = try? BLOCKv.encodeURL(emptyImageResource.url),
-            let fullURL = try? BLOCKv.encodeURL(fullImageResource.url)
+            let encodedEmptyURL = try? BLOCKv.encodeURL(emptyImageResource.url),
+            let encodedFullURL = try? BLOCKv.encodeURL(fullImageResource.url)
             else {
                 printBV(error: "\(#file) - failed to encode resources.")
                 return
@@ -261,13 +261,19 @@ class ImageProgressFaceView: FaceView {
         dispatchGroup.enter()
         dispatchGroup.enter()
 
+        var requestEmpty = ImageRequest(url: encodedEmptyURL)
+        // use unencoded url as cache key
+        requestEmpty.cacheKey = emptyImageResource.url
         // load image (automatically handles reuse)
-        Nuke.loadImage(with: emptyURL, into: self.emptyImageView) { (_, _) in
+        Nuke.loadImage(with: requestEmpty, into: self.emptyImageView) { (_, _) in
             self.dispatchGroup.leave()
         }
 
+        var requestFull = ImageRequest(url: encodedFullURL)
+        // use unencoded url as cache key
+        requestFull.cacheKey = fullImageResource.url
         // load image (automatically handles reuse)
-        Nuke.loadImage(with: fullURL, into: self.fullImageView) { (_, _) in
+        Nuke.loadImage(with: requestFull, into: self.fullImageView) { (_, _) in
             self.dispatchGroup.leave()
         }
 

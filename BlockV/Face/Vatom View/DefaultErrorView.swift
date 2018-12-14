@@ -113,8 +113,11 @@ internal final class DefaultErrorView: UIView & VatomViewError {
             return
         }
 
+        var request = ImageRequest(url: encodeURL)
+        // use unencoded url as cache key
+        request.cacheKey = resourceModel.url
         // load the image (reuse pool is automatically handled)
-        Nuke.loadImage(with: encodeURL, into: activatedImageView) { [weak self] (_, _) in
+        Nuke.loadImage(with: request, into: activatedImageView) { [weak self] (_, _) in
             self?.activityIndicator.stopAnimating()
         }
 

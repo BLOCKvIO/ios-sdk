@@ -11,6 +11,8 @@
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
+		654146E421C3EFF6006FB9C1 /* UIImage+Resize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654146E321C3EFF6006FB9C1 /* UIImage+Resize.swift */; };
+		654146E721C3EFFF006FB9C1 /* MapAtomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654146E621C3EFFF006FB9C1 /* MapAtomViewController.swift */; };
 		AD0BCC8E217769D7001836DE /* GenericJsonMerge_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD0BCC8D217769D7001836DE /* GenericJsonMerge_Tests.swift */; };
 		AD0BCC922178828A001836DE /* VatomModelUpdate_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD0BCC912178828A001836DE /* VatomModelUpdate_Tests.swift */; };
 		AD0BCC98217A0106001836DE /* LiveVatomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD0BCC97217A0106001836DE /* LiveVatomView.swift */; };
@@ -73,6 +75,8 @@
 		607FACDA1AFB9204008FA782 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		607FACDC1AFB9204008FA782 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		607FACDF1AFB9204008FA782 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
+		654146E321C3EFF6006FB9C1 /* UIImage+Resize.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Resize.swift"; sourceTree = "<group>"; };
+		654146E621C3EFFF006FB9C1 /* MapAtomViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapAtomViewController.swift; sourceTree = "<group>"; };
 		6F6694DB9BF713D3EF69B6B5 /* Pods-BlockV_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Tests/Pods-BlockV_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		7956FE101E9335CDDC8248F3 /* Pods_BLOCKv_Unit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BLOCKv_Unit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		86A0806A35212DD33474BDB7 /* BLOCKv.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = BLOCKv.podspec; path = ../BLOCKv.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
@@ -219,6 +223,15 @@
 			name = "Podspec Metadata";
 			sourceTree = "<group>";
 		};
+		654146E521C3EFFF006FB9C1 /* Map */ = {
+			isa = PBXGroup;
+			children = (
+				654146E621C3EFFF006FB9C1 /* MapAtomViewController.swift */,
+			);
+			name = Map;
+			path = ../../../../Upwork/GS_Baseline_Master/BlockV/Controllers/Map;
+			sourceTree = "<group>";
+		};
 		8C7B4899EFB41257035A54F2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -331,6 +344,7 @@
 		D58E31B5205E962D0024BA0E /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				654146E521C3EFFF006FB9C1 /* Map */,
 				AD920A51215FB3EA00CEFC1D /* User Profile */,
 				AD36A5A0215D382D009EFD55 /* Onboarding */,
 				D519A849205E8360006B0D19 /* Inventory */,
@@ -351,6 +365,7 @@
 		D597FF2520512FF3009B2910 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				654146E321C3EFF6006FB9C1 /* UIImage+Resize.swift */,
 				D597FF262051305A009B2910 /* UIAlertController+Etx.swift */,
 				D55B21F42056745700B6D5C2 /* UIViewController+Ext.swift */,
 				D55B21F82056DE6D00B6D5C2 /* UIColor+Ext.swift */,
@@ -515,6 +530,7 @@
 				"${BUILT_PRODUCTS_DIR}/JWTDecode/JWTDecode.framework",
 				"${BUILT_PRODUCTS_DIR}/NVActivityIndicatorView/NVActivityIndicatorView.framework",
 				"${BUILT_PRODUCTS_DIR}/Nuke/Nuke.framework",
+				"${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework",
 				"${BUILT_PRODUCTS_DIR}/Signals/Signals.framework",
 				"${BUILT_PRODUCTS_DIR}/Starscream/Starscream.framework",
 				"${BUILT_PRODUCTS_DIR}/VatomFace3D/VatomFace3D.framework",
@@ -527,6 +543,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/JWTDecode.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/NVActivityIndicatorView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Nuke.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SDWebImage.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Signals.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Starscream.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VatomFace3D.framework",
@@ -561,6 +578,7 @@
 				AD920A5C215FB47200CEFC1D /* PasswordTableViewController.swift in Sources */,
 				D547576B205E67AD00E6FE90 /* VatomCell.swift in Sources */,
 				D519A84B205E83AB006B0D19 /* VatomDetailTableViewController.swift in Sources */,
+				654146E421C3EFF6006FB9C1 /* UIImage+Resize.swift in Sources */,
 				AD3DB5302157FD7200E00B67 /* TappedVatomViewController.swift in Sources */,
 				AD920A5D215FB47200CEFC1D /* ProfileViewController.swift in Sources */,
 				D55B21FB2056E04B00B6D5C2 /* InventoryCollectionViewController.swift in Sources */,
@@ -570,6 +588,7 @@
 				D55B21E520527EB400B6D5C2 /* TokenCell.swift in Sources */,
 				D55B21F020540AC200B6D5C2 /* RegisterTableViewController.swift in Sources */,
 				D5E3AC9F2049883900CFFEEA /* LoginViewController.swift in Sources */,
+				654146E721C3EFFF006FB9C1 /* MapAtomViewController.swift in Sources */,
 				AD920A5B215FB47200CEFC1D /* UserInfoTableViewController.swift in Sources */,
 				D55B21E02052772400B6D5C2 /* VerifyTableViewController.swift in Sources */,
 				D55B21F92056DE6D00B6D5C2 /* UIColor+Ext.swift in Sources */,

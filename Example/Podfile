@@ -5,6 +5,7 @@ target 'BlockV_Example' do
     
   pod 'BLOCKv', :path => '../'
   pod 'VatomFace3D'
+  pod 'SDWebImage', '~> 4.0'
 
   target 'BLOCKv_Unit_Tests' do
     inherit! :search_paths

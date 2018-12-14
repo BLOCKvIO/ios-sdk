@@ -41,7 +41,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         //: ## Setup
                 
-        BLOCKv.configure(appID: MyAppID)
+        BLOCKv.configure(appID: "b26d7b33-6b4e-42df-8abc-42eda7b8ed98")
         FaceViewRoster.shared.register(Face3D.self)
         
         //: ## Control Flow

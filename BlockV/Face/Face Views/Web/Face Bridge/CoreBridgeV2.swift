@@ -25,7 +25,7 @@ class CoreBridgeV2: CoreBridge {
         case getVatomChildren   = "core.vatom.children.get"
         case getVatom           = "core.vatom.get"
         case performAction      = "core.action.perform"
-//        case resourceEncode     = "core.resource.encode"
+        case encoreResource     = "core.resource.encode"
     }
 
     var faceView: FaceView?
@@ -53,6 +53,7 @@ class CoreBridgeV2: CoreBridge {
         switch message {
         case .initialize:
             self.setupBridge(completion)
+
         case .getVatom:
             // ensure caller supplied params
             guard let identifiers = (scriptMessage.object["ids"]?.arrayValue?.compactMap { $0.stringValue }) else {
@@ -61,6 +62,7 @@ class CoreBridgeV2: CoreBridge {
                 return
             }
             self.getVatoms(withIDs: identifiers, completion: completion)
+
         case .getVatomChildren:
             // ensure caller supplied params
             guard let vatomID = scriptMessage.object["id"]?.stringValue else {
@@ -69,6 +71,7 @@ class CoreBridgeV2: CoreBridge {
                 return
             }
             self.listChildren(forVatomID: vatomID, completion: completion)
+
         case .getUser:
             // ensure caller supplied params
             guard let userID = scriptMessage.object["id"]?.stringValue else {
@@ -77,18 +80,42 @@ class CoreBridgeV2: CoreBridge {
                 return
             }
             self.getPublicUser(userID: userID, completion: completion)
+
         case .performAction:
             // ensure caller supplied params
             guard
-                let vatomID = scriptMessage.object["vatom_id"]?.stringValue, //FIXME: Remove - I don't think this is needed.
+                let vatomID = scriptMessage.object["vatom_id"]?.stringValue, //FIXME: Is this needed?
                 let actionName = scriptMessage.object["action_name"]?.stringValue,
                 let payload = scriptMessage.object["payload"]?.objectValue
                 else {
-                    let error = BridgeError.caller("Missing 'vatom_id', 'action_name' or 'action_data'.")
+                    let error = BridgeError.caller("Missing 'vatom_id', 'action_name' or 'action_data' keys.")
                     completion(nil, error)
                     return
             }
             self.performAction(name: actionName, payload: payload, completion: completion)
+
+        case .encoreResource:
+
+            /*
+             Order of the array must be maintained.
+             */
+
+            // extract urls
+            guard let urlStrings = scriptMessage.object["urls"]?.arrayValue?.map({ $0.stringValue }) else {
+                let error = BridgeError.caller("Missing 'urls' key.")
+                completion(nil, error)
+                return
+            }
+            // ensure all urls are strings
+            let flatURLStrings = urlStrings.compactMap { $0 }
+            guard urlStrings.count == flatURLStrings.count else {
+                let error = BridgeError.caller("Invalid url data type.")
+                completion(nil, error)
+                return
+            }
+
+            self.encodeResources(flatURLStrings, completion: completion)
+
         }
 
     }
@@ -151,7 +178,15 @@ class CoreBridgeV2: CoreBridge {
     }
 
     /// Fetches the vAtom specified by the id.
+    ///
+    /// Only the backing vAtom, or one of its children may be queried.
+    ///
+    /// - Parameters:
+    ///   - ids: Unique identifier of the vAtom.
+    ///   - completion: Completion handler to call with JSON data to be passed to the webpage.
     private func getVatoms(withIDs ids: [String], completion: @escaping Completion) {
+        
+        //FIXME: Add security checks
 
         BLOCKv.getVatoms(withIDs: ids) { (vatoms, error) in
 
@@ -179,7 +214,13 @@ class CoreBridgeV2: CoreBridge {
     /// Fetches the children for the specifed vAtom.
     ///
     /// This method uses the inventory endpoint. Therefore, only *owned* vAtoms are returned.
+    ///
+    /// - Parameters:
+    ///   - id: Unique identifier of the vAtom.
+    ///   - completion: Completion handler to call with JSON data to be passed to the webpage.
     private func listChildren(forVatomID id: String, completion: @escaping Completion) {
+        
+        //FIXME: Add security checks
 
         BLOCKv.getInventory(id: id) { (vatoms, error) in
 
@@ -205,6 +246,10 @@ class CoreBridgeV2: CoreBridge {
     }
 
     /// Fetches the publically available properties of the user specified by the id.
+    ///
+    /// - Parameters:
+    ///   - id: Unique identifier of the user.
+    ///   - completion: Completion handler to call with JSON data to be passed to the webpage.
     private func getPublicUser(userID id: String, completion: @escaping Completion) {
 
         BLOCKv.getPublicUser(withID: id) { (user, error) in
@@ -235,9 +280,14 @@ class CoreBridgeV2: CoreBridge {
     }
 
     /// Performs the action.
+    ///
+    /// - Parameters:
+    ///   - name: Name of the action.
+    ///   - payload: Payload to send to the server.
+    ///   - completion: Completion handler to call with JSON data to be passed to the webpage.
     private func performAction(name: String, payload: [String: JSON], completion: @escaping Completion) {
 
-        //FIXME: Add `userConsentRequired` check.
+        //FIXME: Add security checks
 
         //NOTE: The Client networking layer uses JSONSerialisation which does not play well with JSON.
         // Options:
@@ -263,6 +313,42 @@ class CoreBridgeV2: CoreBridge {
             let error = BridgeError.viewer("Unable to encode data.")
             completion(nil, error)
         }
+    }
+
+    /// Performs an encode on the resources.
+    ///
+    /// If a URL cannot be encoded it is returned unmodified.
+    ///
+    /// Method:
+    /// Asset provider credentials. This method is used over the JWT method, otherwise the JWT would be 'leaked' to the
+    /// Web Face.
+    ///
+    /// - Parameters:
+    ///   - urlStrings: Array of URL strings to be encoded (if possible).
+    ///   - completion: Completion handler to call with JSON data to be passed to the webpage.
+    private func encodeResources(_ urlStrings: [String], completion: @escaping Completion) {
+
+        // convert to URL type
+        let urls = urlStrings.map { URL(string: $0) }
+        // map into response url array
+        let responseURLs: [String] = urls.enumerated().map {
+            if let url = $1 {
+                // attempt encoding, otherwise fallback on origional url
+                return (try? BLOCKv.encodeURL(url).absoluteString) ?? urlStrings[$0]
+            } else {
+                // fallback, URL convertion failed
+                return urlStrings[$0]
+            }
+        }
+
+        // json-data encode the model
+        guard let data = try? JSONEncoder.blockv.encode(responseURLs) else {
+            let bridgeError = BridgeError.viewer("Unable to encode response.")
+            completion(nil, bridgeError)
+            return
+        }
+
+        completion(data, nil)
     }
 
 }

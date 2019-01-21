@@ -11,6 +11,10 @@
 
 import Foundation
 
+/*
+ Face Views should work for both owned and unowned vAtoms.
+ */
+
 /// FIXME: This operator is useful, but has a drawback in that it always makes an assignment.
 infix operator ?=
 internal func ?=<T> (lhs: inout T, rhs: T?) {

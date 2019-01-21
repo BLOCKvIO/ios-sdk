@@ -56,55 +56,89 @@ class CoreBridgeV2: CoreBridge {
 
         case .getVatom:
             // ensure caller supplied params
-            guard let identifiers = (scriptMessage.object["ids"]?.arrayValue?.compactMap { $0.stringValue }) else {
-                let error = BridgeError.caller("Missing 'ids' key.")
-                completion(nil, error)
-                return
+            guard let payload = scriptMessage.object["payload"]?.objectValue,
+                let identifiers = (payload["ids"]?.arrayValue?.compactMap { $0.stringValue }) else {
+                    let error = BridgeError.caller("Missing 'ids' key.")
+                    completion(nil, error)
+                    return
             }
-            self.getVatoms(withIDs: identifiers, completion: completion)
+            // security check - backing vatom or first-level children
+            self.permittedVatomIDs { (permittedIDs, error) in
+
+                // ensure no error
+                guard error == nil, let permittedIDs = permittedIDs else {
+                    let bridgeError = BridgeError.viewer("Unable to fetch vAtoms.")
+                    completion(nil, bridgeError)
+                    return
+                }
+
+                // find the common elements
+                let validIDs = Array(Set(identifiers).union(Set(permittedIDs)))
+
+                self.getVatoms(withIDs: validIDs, completion: completion)
+
+            }
 
         case .getVatomChildren:
             // ensure caller supplied params
-            guard let vatomID = scriptMessage.object["id"]?.stringValue else {
-                let error = BridgeError.caller("Missing 'id' key.")
+            guard let payload = scriptMessage.object["payload"]?.objectValue,
+                let vatomID = payload["id"]?.stringValue else {
+                    let error = BridgeError.caller("Missing 'id' key.")
+                    completion(nil, error)
+                    return
+            }
+            // security check - backing vatom
+            guard vatomID == self.faceView?.vatom.id else {
+                let error = BridgeError.caller("This call is only permitted on the backing vatom: \(vatomID).")
                 completion(nil, error)
                 return
             }
-            self.listChildren(forVatomID: vatomID, completion: completion)
+            self.discoverChildren(forVatomID: vatomID, completion: completion)
 
         case .getUser:
             // ensure caller supplied params
-            guard let userID = scriptMessage.object["id"]?.stringValue else {
-                let error = BridgeError.caller("Missing 'id' key.")
-                completion(nil, error)
-                return
+            guard let payload = scriptMessage.object["payload"]?.objectValue,
+                let userID = payload["id"]?.stringValue else {
+                    let error = BridgeError.caller("Missing 'id' key.")
+                    completion(nil, error)
+                    return
             }
             self.getPublicUser(userID: userID, completion: completion)
 
         case .performAction:
             // ensure caller supplied params
             guard
-                let vatomID = scriptMessage.object["vatom_id"]?.stringValue, //FIXME: Is this needed?
-                let actionName = scriptMessage.object["action_name"]?.stringValue,
-                let payload = scriptMessage.object["payload"]?.objectValue
+                let payload = scriptMessage.object["payload"]?.objectValue,
+                let vatomID = payload["vatom_id"]?.stringValue,
+                let actionName = payload["action_name"]?.stringValue,
+                let actionPayload = payload["payload"]?.objectValue,
+                let thisID = actionPayload["this.id"]?.stringValue
                 else {
                     let error = BridgeError.caller("Missing 'vatom_id', 'action_name' or 'action_data' keys.")
                     completion(nil, error)
                     return
             }
-            self.performAction(name: actionName, payload: payload, completion: completion)
+            // security check - backing vatom
+            guard vatomID == thisID, thisID == self.faceView?.vatom.id else {
+                let error = BridgeError.caller("This call is only permitted on the backing vatom: \(vatomID).")
+                completion(nil, error)
+                return
+            }
+            // perform action
+            self.performAction(name: actionName, payload: actionPayload, completion: completion)
 
         case .encoreResource:
 
             /*
-             Order of the array must be maintained.
+             Note: Order of the array must be maintained.
              */
 
             // extract urls
-            guard let urlStrings = scriptMessage.object["urls"]?.arrayValue?.map({ $0.stringValue }) else {
-                let error = BridgeError.caller("Missing 'urls' key.")
-                completion(nil, error)
-                return
+            guard let payload = scriptMessage.object["payload"]?.objectValue,
+                let urlStrings = payload["urls"]?.arrayValue?.map({ $0.stringValue }) else {
+                    let error = BridgeError.caller("Missing 'urls' key.")
+                    completion(nil, error)
+                    return
             }
             // ensure all urls are strings
             let flatURLStrings = urlStrings.compactMap { $0 }
@@ -179,16 +213,52 @@ class CoreBridgeV2: CoreBridge {
 
     /// Fetches the vAtom specified by the id.
     ///
-    /// Only the backing vAtom, or one of its children may be queried.
+    /// The method uses the vatom endpoint. Therefore, only public vAtoms are returned (irrespecitve of ownership).
     ///
     /// - Parameters:
     ///   - ids: Unique identifier of the vAtom.
     ///   - completion: Completion handler to call with JSON data to be passed to the webpage.
     private func getVatoms(withIDs ids: [String], completion: @escaping Completion) {
-        
-        //FIXME: Add security checks
 
-        BLOCKv.getVatoms(withIDs: ids) { (vatoms, error) in
+            BLOCKv.getVatoms(withIDs: ids) { (vatoms, error) in
+
+                // ensure no error
+                guard error == nil else {
+                    let bridgeError = BridgeError.viewer("Unable to fetch vAtoms.")
+                    completion(nil, bridgeError)
+                    return
+                }
+
+                let response = ["vatoms": vatoms]
+
+                // json-data encode the model
+                guard let data = try? JSONEncoder.blockv.encode(response) else {
+                    let bridgeError = BridgeError.viewer("Unable to encode response.")
+                    completion(nil, bridgeError)
+                    return
+                }
+                completion(data, nil)
+
+            }
+
+    }
+
+    /// Returns an array of vAtom IDs which are permitted to be queried.
+    ///
+    /// Business Rule: Only the backing vAtom or one of it's children may be queried.
+    private func permittedVatomIDs(completion: @escaping ([String]?, Error?) -> Void) {
+
+        guard let backingID = self.faceView?.vatom.id else {
+            assertionFailure("The backing vatom must be non-nil.")
+            let bridgeError = BridgeError.viewer("Unable to fetch vAtoms.")
+            completion(nil, bridgeError)
+            return
+        }
+
+        let builder = DiscoverQueryBuilder()
+        builder.setScope(scope: .parentID, value: backingID)
+
+        BLOCKv.discover(builder) { (vatoms, error) in
 
             // ensure no error
             guard error == nil else {
@@ -196,33 +266,28 @@ class CoreBridgeV2: CoreBridge {
                 completion(nil, bridgeError)
                 return
             }
+            // create a list of the child vatoms and add the backing (parent vatom)
+            var permittedIDs = vatoms.map { $0.id }
+            permittedIDs.append(backingID)
 
-            let response = ["vatoms": vatoms]
-
-            // json-data encode the model
-            guard let data = try? JSONEncoder.blockv.encode(response) else {
-                let bridgeError = BridgeError.viewer("Unable to encode response.")
-                completion(nil, bridgeError)
-                return
-            }
-            completion(data, nil)
-
+            completion(permittedIDs, nil)
         }
 
     }
 
-    /// Fetches the children for the specifed vAtom.
+    /// Searches for the children of the specifed vAtom.
     ///
-    /// This method uses the inventory endpoint. Therefore, only *owned* vAtoms are returned.
+    /// This method uses the discover endpoint. Therefore, *owned* and *unowned* vAtoms may be queried.
     ///
     /// - Parameters:
     ///   - id: Unique identifier of the vAtom.
     ///   - completion: Completion handler to call with JSON data to be passed to the webpage.
-    private func listChildren(forVatomID id: String, completion: @escaping Completion) {
-        
-        //FIXME: Add security checks
+    private func discoverChildren(forVatomID id: String, completion: @escaping Completion) {
 
-        BLOCKv.getInventory(id: id) { (vatoms, error) in
+        let builder = DiscoverQueryBuilder()
+        builder.setScope(scope: .parentID, value: id)
+
+        BLOCKv.discover(builder) { (vatoms, error) in
 
             // ensure no error
             guard error == nil else {
@@ -287,7 +352,7 @@ class CoreBridgeV2: CoreBridge {
     ///   - completion: Completion handler to call with JSON data to be passed to the webpage.
     private func performAction(name: String, payload: [String: JSON], completion: @escaping Completion) {
 
-        //FIXME: Add security checks
+        //FIXME: Should the bridge construct the payload or the native side?
 
         //NOTE: The Client networking layer uses JSONSerialisation which does not play well with JSON.
         // Options:

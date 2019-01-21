@@ -134,7 +134,7 @@ class CoreBridgeV1: CoreBridge {
             }
             // security check - backing vatom
             guard thisID == self.faceView?.vatom.id else {
-                let error = BridgeError.caller("This method is only permitted for the backing vatom: \(thisID).")
+                let error = BridgeError.caller("This method is only permitted for the backing vatom.")
                 completion(nil, error)
                 return
             }

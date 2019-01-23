@@ -75,16 +75,17 @@ class CoreBridgeV1: CoreBridge {
             self.permittedVatomIDs { (permittedIDs, error) in
 
                 // ensure no error
-                guard error == nil, let permittedIDs = permittedIDs else {
-                    let bridgeError = BridgeError.viewer("Unable to fetch vAtoms.")
-                    completion(nil, bridgeError)
-                    return
+                guard error == nil,
+                    let permittedIDs = permittedIDs,
+                    // check if the id is permitted to be queried
+                    permittedIDs.contains(vatomID)
+                    else {
+                        let bridgeError = BridgeError.viewer("Unable to fetch vAtoms.")
+                        completion(nil, bridgeError)
+                        return
                 }
 
-                // check if the id is permitted to be queried
-                if permittedIDs.contains(vatomID) {
-                    self.getVatom(withID: vatomID, completion: completion)
-                }
+                self.getVatom(withID: vatomID, completion: completion)
 
             }
 

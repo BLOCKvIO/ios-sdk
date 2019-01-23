@@ -109,17 +109,16 @@ class CoreBridgeV2: CoreBridge {
             // ensure caller supplied params
             guard
                 let payload = scriptMessage.object["payload"]?.objectValue,
-                let vatomID = payload["vatom_id"]?.stringValue,
                 let actionName = payload["action_name"]?.stringValue,
                 let actionPayload = payload["payload"]?.objectValue,
                 let thisID = actionPayload["this.id"]?.stringValue
                 else {
-                    let error = BridgeError.caller("Missing 'vatom_id', 'action_name' or 'action_data' keys.")
+                    let error = BridgeError.caller("Missing 'action_name' or 'payload' keys.")
                     completion(nil, error)
                     return
             }
             // security check - backing vatom
-            guard vatomID == thisID, thisID == self.faceView?.vatom.id else {
+            guard thisID == self.faceView?.vatom.id else {
                 let error = BridgeError.caller("This method is only permitted on the backing vatom.")
                 completion(nil, error)
                 return

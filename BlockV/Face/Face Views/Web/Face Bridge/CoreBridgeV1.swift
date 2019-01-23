@@ -70,7 +70,24 @@ class CoreBridgeV1: CoreBridge {
                 completion(nil, error)
                 return
             }
-            self.getVatom(withID: vatomID, completion: completion)
+
+            // security check - backing vatom or first-level children
+            self.permittedVatomIDs { (permittedIDs, error) in
+
+                // ensure no error
+                guard error == nil,
+                    let permittedIDs = permittedIDs,
+                    // check if the id is permitted to be queried
+                    permittedIDs.contains(vatomID)
+                    else {
+                        let bridgeError = BridgeError.viewer("Unable to fetch vAtoms.")
+                        completion(nil, bridgeError)
+                        return
+                }
+
+                self.getVatom(withID: vatomID, completion: completion)
+
+            }
 
         case .getVatomChildren:
             // ensure caller supplied params
@@ -79,7 +96,13 @@ class CoreBridgeV1: CoreBridge {
                 completion(nil, error)
                 return
             }
-            self.listChildren(forVatomID: vatomID, completion: completion)
+            // security check
+            guard vatomID == self.faceView?.vatom.id else {
+                let error = BridgeError.caller("This method is only permitted on the backing vatom: \(vatomID).")
+                completion(nil, error)
+                return
+            }
+            self.discoverChildren(forVatomID: vatomID, completion: completion)
 
         case .getUserProfile:
             // ensure caller supplied params
@@ -103,11 +126,18 @@ class CoreBridgeV1: CoreBridge {
             // ensure caller supplied params
             guard
                 let actionName = scriptMessage.object["actionName"]?.stringValue,
-                let actionData = scriptMessage.object["actionData"]?.objectValue
+                let actionData = scriptMessage.object["actionData"]?.objectValue,
+                let thisID = actionData["this.id"]?.stringValue
                 else {
-                    let error = BridgeError.caller("Missing 'actionName' or 'actionData'.")
+                    let error = BridgeError.caller("Invalid payload.")
                     completion(nil, error)
                     return
+            }
+            // security check - backing vatom
+            guard thisID == self.faceView?.vatom.id else {
+                let error = BridgeError.caller("This method is only permitted for the backing vatom.")
+                completion(nil, error)
+                return
             }
             self.performAction(name: actionName, payload: actionData, completion: completion)
         }
@@ -239,12 +269,12 @@ class CoreBridgeV1: CoreBridge {
 
     }
 
-    /// Fetches the children for the specifed vAtom.
+    /// Searched for the children of the specifed vAtom.
     ///
-    /// This method uses the inventory endpoint. Therefore, only *owned* vAtoms are returned.
-    private func listChildren(forVatomID id: String, completion: @escaping Completion) {
+    /// This method uses the discover endpoint. Therefore, *owned* and *unowned* vAtoms may be returned.
+    private func discoverChildren(forVatomID id: String, completion: @escaping Completion) {
 
-        self.listChildrenFormatted(forVatomID: id) { (formattedVatoms, error) in
+        self.discoverChildrenFormatted(forVatomID: id) { (formattedVatoms, error) in
 
             // ensure no error
             guard error == nil else {
@@ -374,12 +404,44 @@ class CoreBridgeV1: CoreBridge {
  */
 private extension CoreBridgeV1 {
 
+    /// Returns an array of vAtom IDs which are permitted to be queried.
+    ///
+    /// Business Rule: Only the backing vAtom or one of it's children may be queried.
+    private func permittedVatomIDs(completion: @escaping ([String]?, Error?) -> Void) {
+
+        guard let backingID = self.faceView?.vatom.id else {
+            assertionFailure("The backing vatom must be non-nil.")
+            let bridgeError = BridgeError.viewer("Unable to fetch vAtoms.")
+            completion(nil, bridgeError)
+            return
+        }
+
+        let builder = DiscoverQueryBuilder()
+        builder.setScope(scope: .parentID, value: backingID)
+
+        BLOCKv.discover(builder) { (vatoms, error) in
+
+            // ensure no error
+            guard error == nil else {
+                let bridgeError = BridgeError.viewer("Unable to fetch vAtoms.")
+                completion(nil, bridgeError)
+                return
+            }
+            // create a list of the child vatoms and add the backing (parent vatom)
+            var permittedIDs = vatoms.map { $0.id }
+            permittedIDs.append(backingID)
+
+            completion(permittedIDs, nil)
+        }
+
+    }
+
     /// Completes with the vAtom in bridge format.
     private typealias BFVatomCompletion = (_ formattedVatoms: [BRVatom], _ error: BridgeError?) -> Void
 
     /// Fetches the vAtom and completes with the *bridge format* representation.
     ///
-    /// The method uses the vatom endpoint. Therefore, only *owned* vAtoms are returned.
+    /// The method uses the vatom endpoint. Therefore, only public vAtoms are returned (irrespecitve of ownership).
     private func getVatomsFormatted(withIDs ids: [String], completion: @escaping BFVatomCompletion) {
 
         BLOCKv.getVatoms(withIDs: ids) { (vatoms, error) in
@@ -407,10 +469,13 @@ private extension CoreBridgeV1 {
 
     /// Fetches the children for the specifed vAtom.
     ///
-    /// This method uses the inventory endpoint. Therefore, only *owned* vAtoms are returned.
-    private func listChildrenFormatted(forVatomID id: String, completion: @escaping BFVatomCompletion) {
+    /// Uses the discover endpoint, so *un-owned* vAtoms may be queried.
+    private func discoverChildrenFormatted(forVatomID id: String, completion: @escaping BFVatomCompletion) {
 
-        BLOCKv.getInventory(id: id) { (vatoms, error) in
+        let builder = DiscoverQueryBuilder()
+        builder.setScope(scope: .parentID, value: id)
+
+        BLOCKv.discover(builder) { (vatoms, error) in
 
             // ensure no error
             guard error == nil else {

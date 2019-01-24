@@ -57,8 +57,8 @@ class CoreBridgeV2: CoreBridge {
         case .getVatom:
             // ensure caller supplied params
             guard let payload = scriptMessage.object["payload"]?.objectValue,
-                let identifiers = (payload["ids"]?.arrayValue?.compactMap { $0.stringValue }) else {
-                    let error = BridgeError.caller("Missing 'ids' key.")
+                let vatomID = payload["id"]?.stringValue else {
+                    let error = BridgeError.caller("Missing 'id' key.")
                     completion(nil, error)
                     return
             }
@@ -66,16 +66,17 @@ class CoreBridgeV2: CoreBridge {
             self.permittedVatomIDs { (permittedIDs, error) in
 
                 // ensure no error
-                guard error == nil, let permittedIDs = permittedIDs else {
-                    let bridgeError = BridgeError.viewer("Unable to fetch vAtoms.")
-                    completion(nil, bridgeError)
-                    return
+                guard error == nil,
+                    let permittedIDs = permittedIDs,
+                    // check if the id is permitted to be queried
+                    permittedIDs.contains(vatomID)
+                    else {
+                        let bridgeError = BridgeError.viewer("Unable to fetch vAtoms.")
+                        completion(nil, bridgeError)
+                        return
                 }
 
-                // find the common elements
-                let validIDs = Array(Set(identifiers).union(Set(permittedIDs)))
-
-                self.getVatoms(withIDs: validIDs, completion: completion)
+                self.getVatom(withID: vatomID, completion: completion)
 
             }
 
@@ -217,18 +218,18 @@ class CoreBridgeV2: CoreBridge {
     /// - Parameters:
     ///   - ids: Unique identifier of the vAtom.
     ///   - completion: Completion handler to call with JSON data to be passed to the webpage.
-    private func getVatoms(withIDs ids: [String], completion: @escaping Completion) {
+    private func getVatom(withID id: String, completion: @escaping Completion) {
 
-            BLOCKv.getVatoms(withIDs: ids) { (vatoms, error) in
+            BLOCKv.getVatoms(withIDs: [id]) { (vatoms, error) in
 
-                // ensure no error
-                guard error == nil else {
+                // ensure no error, extract first vatom
+                guard error == nil, let vatom = vatoms.first else {
                     let bridgeError = BridgeError.viewer("Unable to fetch vAtoms.")
                     completion(nil, bridgeError)
                     return
                 }
 
-                let response = ["vatoms": vatoms]
+                let response = ["vatom": vatom]
 
                 // json-data encode the model
                 guard let data = try? JSONEncoder.blockv.encode(response) else {

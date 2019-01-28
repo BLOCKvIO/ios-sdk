@@ -14,7 +14,7 @@ import Foundation
 /// Struct representing the script message sent by the Web Face SDK.
 struct FaceScriptMessage {
     /// Unique identifier of the incomming message.
-    let name: String
+    var name: String
     /// Unique indentifier for the outgoing response.
     var responseID: String
     /// Origin of the message.

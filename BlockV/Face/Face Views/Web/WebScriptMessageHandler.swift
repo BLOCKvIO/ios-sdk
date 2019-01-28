@@ -127,6 +127,24 @@ extension WebFaceView {
                 }
             }
 
+            /*
+             Note:
+             Version 1.0.0 uses a set of legacy messages. Here, these legacy viewer messages are transformed into the
+             BLOCKv standardized viewer messages.
+             By doing this, viewers will be unaware (a good thing) of the version of the web face sending the custom
+             messages.
+             */
+            switch message.name {
+            case "ui.map.show": message.name = "viewer.map.show"
+            case "ui.qr.scan": message.name = "viewer.qr.scan"
+            case "ui.vatom.show": message.name = "viewer.vatom.show"
+            case "ui.scanner.show": message.name = "viewer.scanner.show"
+            case "ui.browser.open": message.name = "viewer.url.open"
+            case "vatom.view.close": message.name = "viewer.view.close"
+            case "vatom.view.presentCard": message.name = "viewer.card.show"
+            default: break
+            }
+
         case "2.0.0":
             self.coreBridge = CoreBridgeV2(faceView: self)
         default:
@@ -180,7 +198,7 @@ extension WebFaceView {
         self.delegate?.faceView(self,
                                 didSendMessage: message.name,
                                 withObject: message.object,
-                                compleiton: { (json, error) in
+                                completion: { (json, error) in
 
                 // handle error from viewer
                 guard error == nil else {

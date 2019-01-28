@@ -56,9 +56,8 @@ class CoreBridgeV2: CoreBridge {
 
         case .getVatom:
             // ensure caller supplied params
-            guard let payload = scriptMessage.object["payload"]?.objectValue,
-                let identifiers = (payload["ids"]?.arrayValue?.compactMap { $0.stringValue }) else {
-                    let error = BridgeError.caller("Missing 'ids' key.")
+            guard let vatomID = scriptMessage.object["id"]?.stringValue else {
+                    let error = BridgeError.caller("Missing 'id' key.")
                     completion(nil, error)
                     return
             }
@@ -66,23 +65,23 @@ class CoreBridgeV2: CoreBridge {
             self.permittedVatomIDs { (permittedIDs, error) in
 
                 // ensure no error
-                guard error == nil, let permittedIDs = permittedIDs else {
-                    let bridgeError = BridgeError.viewer("Unable to fetch vAtoms.")
-                    completion(nil, bridgeError)
-                    return
+                guard error == nil,
+                    let permittedIDs = permittedIDs,
+                    // check if the id is permitted to be queried
+                    permittedIDs.contains(vatomID)
+                    else {
+                        let bridgeError = BridgeError.viewer("Unable to fetch vAtoms.")
+                        completion(nil, bridgeError)
+                        return
                 }
 
-                // find the common elements
-                let validIDs = Array(Set(identifiers).union(Set(permittedIDs)))
-
-                self.getVatoms(withIDs: validIDs, completion: completion)
+                self.getVatoms(withIDs: [vatomID], completion: completion)
 
             }
 
         case .getVatomChildren:
             // ensure caller supplied params
-            guard let payload = scriptMessage.object["payload"]?.objectValue,
-                let vatomID = payload["id"]?.stringValue else {
+            guard let vatomID = scriptMessage.object["id"]?.stringValue else {
                     let error = BridgeError.caller("Missing 'id' key.")
                     completion(nil, error)
                     return
@@ -97,8 +96,7 @@ class CoreBridgeV2: CoreBridge {
 
         case .getUser:
             // ensure caller supplied params
-            guard let payload = scriptMessage.object["payload"]?.objectValue,
-                let userID = payload["id"]?.stringValue else {
+            guard let userID = scriptMessage.object["id"]?.stringValue else {
                     let error = BridgeError.caller("Missing 'id' key.")
                     completion(nil, error)
                     return
@@ -108,9 +106,8 @@ class CoreBridgeV2: CoreBridge {
         case .performAction:
             // ensure caller supplied params
             guard
-                let payload = scriptMessage.object["payload"]?.objectValue,
-                let actionName = payload["action_name"]?.stringValue,
-                let actionPayload = payload["payload"]?.objectValue,
+                let actionName = scriptMessage.object["action_name"]?.stringValue,
+                let actionPayload = scriptMessage.object["payload"]?.objectValue,
                 let thisID = actionPayload["this.id"]?.stringValue
                 else {
                     let error = BridgeError.caller("Missing 'action_name' or 'payload' keys.")
@@ -133,8 +130,7 @@ class CoreBridgeV2: CoreBridge {
              */
 
             // extract urls
-            guard let payload = scriptMessage.object["payload"]?.objectValue,
-                let urlStrings = payload["urls"]?.arrayValue?.map({ $0.stringValue }) else {
+            guard let urlStrings = scriptMessage.object["urls"]?.arrayValue?.map({ $0.stringValue }) else {
                     let error = BridgeError.caller("Missing 'urls' key.")
                     completion(nil, error)
                     return

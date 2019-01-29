@@ -31,7 +31,6 @@ public class DiscoverQueryBuilder {
     /// Models the options for the structure and contents of the query's response.
     public enum ResultType: String {
         case payload = "*"
-        case count   = "count"
     }
 
     // MARK: - Properties

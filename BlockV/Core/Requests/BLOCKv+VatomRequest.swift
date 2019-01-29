@@ -149,25 +149,6 @@ extension BLOCKv {
         }
     }
 
-    /// Searches for the count (tally) of vAtoms on the BLOCKv platform.
-    ///
-    /// - Parameters:
-    ///   - builder: A discover query builder object. Use the builder to simplify constructing
-    ///              discover queries.
-    ///   - completion: The completion handler to call when the request is completed.
-    ///                 This handler is executed on the main queue.
-    ///   - count: Number of discovered vAtoms.
-    ///   - error: BLOCKv error.
-    public static func discoverCount(_ builder: DiscoverQueryBuilder,
-                                     completion: @escaping(_ count: Int?, _ error: BVError?) -> Void) {
-
-        // explicitlt set return type to payload
-        builder.setReturn(type: .count)
-        self.discover(payload: builder.toDictionary()) { (result, error) in
-            completion(result?.count, error)
-        }
-    }
-
     public typealias DiscoverResult = (vatoms: [VatomModel], count: Int)
 
     /// Performs a search for vAtoms on the BLOCKv platform.

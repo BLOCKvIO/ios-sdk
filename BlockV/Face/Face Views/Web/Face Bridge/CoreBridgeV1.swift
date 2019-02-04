@@ -70,7 +70,7 @@ class CoreBridgeV1: CoreBridge {
         switch message {
         case .initialize:
             self.setupBridge(completion)
-            
+
         case .getVatom:
             // ensure caller supplied params
             guard let vatomID = scriptMessage.object["id"]?.stringValue else {
@@ -130,25 +130,26 @@ class CoreBridgeV1: CoreBridge {
             }
             self.getPublicAvatarURL(forUserID: userID, completion: completion)
 
-//        case .performAction:
-//            // ensure caller supplied params
-//            guard
-//                let actionName = scriptMessage.object["actionName"]?.stringValue,
-//                let actionData = scriptMessage.object["actionData"]?.objectValue,
-//                let thisID = actionData["this.id"]?.stringValue
-//                else {
-//                    let error = BridgeError.caller("Invalid payload.")
-//                    completion(nil, error)
-//                    return
-//            }
-//            // security check - backing vatom
-//            guard thisID == self.faceView?.vatom.id else {
-//                let error = BridgeError.caller("This method is only permitted for the backing vatom.")
-//                completion(nil, error)
-//                return
-//            }
-//            self.performAction(name: actionName, payload: actionData, completion: completion)
-            
+        case .performAction:
+            // ensure caller supplied params
+            guard
+                let actionName = scriptMessage.object["actionName"]?.stringValue,
+                let actionData = scriptMessage.object["actionData"]?.objectValue,
+                let thisID = actionData["this.id"]?.stringValue
+                else {
+                    let error = BridgeError.caller("Invalid payload.")
+                    completion(nil, error)
+                    return
+            }
+            // security check - backing vatom
+            guard thisID == self.faceView?.vatom.id else {
+                let error = BridgeError.caller("This method is only permitted for the backing vatom.")
+                completion(nil, error)
+                return
+            }
+
+            self.performAction(name: actionName, payload: actionData, completion: completion)
+
         default:
             return
         }
@@ -330,7 +331,7 @@ class CoreBridgeV1: CoreBridge {
                                   firstName: user.properties.firstName,
                                   lastName: user.properties.lastName,
                                   avatarURL: encodedURL?.absoluteString ?? "")
-            
+
             do {
                 // json encode the model
                 let json = try JSON.init(encodable: response)
@@ -367,7 +368,7 @@ class CoreBridgeV1: CoreBridge {
             }
             // create avatar response
             let response = PublicAvatarFormat(id: user.id, avatarURL: encodedURL?.absoluteString ?? "")
-            
+
             do {
                 // json encode the model
                 let json = try JSON.init(encodable: response)
@@ -381,36 +382,38 @@ class CoreBridgeV1: CoreBridge {
 
     }
 
-//    /// Performs the action.
-//    private func performAction(name: String, payload: [String: JSON], completion: @escaping Completion) {
-//
-//        //FIXME: Add `userConsentRequired` check.
-//
-//        //NOTE: The Client networking layer uses JSONSerialisation which does not play well with JSON.
-//        // Options:
-//        // a) Client must be updated to use JSON
-//        // b) Right here, JSON must be converted to [String: Any] (an inefficient conversion)
-//
-//        do {
-//            // HACK: Convert JSON to Data to [String: Any]
-//            let data = try JSONEncoder.blockv.encode(payload)
-//            guard let dict = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-//                throw BridgeError.viewer("Unable to encode data.")
-//            }
-//            BLOCKv.performAction(name: name, payload: dict) { (data, error) in
-//                // ensure no error
-//                guard let data = data, error == nil else {
-//                    let bridgeError = BridgeError.viewer("Unable to perform action: \(name).")
-//                    completion(nil, bridgeError)
-//                    return
-//                }
-//                completion(data, nil)
-//            }
-//        } catch {
-//            let error = BridgeError.viewer("Unable to encode data.")
-//            completion(nil, error)
-//        }
-//    }
+    /// Performs the action.
+    private func performAction(name: String, payload: [String: JSON], completion: @escaping Completion) {
+
+        do {
+            /*
+             HACK: Convert JSON > Data > [String: Any] (limitation of Alamofire request encoding).
+             TODO: Add 'Dictionaryable' conformance to 'JSON'. This is inefficient, but will allow simpler conversion.
+             */
+
+            let data = try JSONEncoder.blockv.encode(payload)
+            guard let dict = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+                throw BridgeError.viewer("Unable to encode data.")
+            }
+
+            BLOCKv.performAction(name: name, payload: dict) { (payload, error) in
+                // ensure no error
+                guard let payload = payload, error == nil else {
+                    let bridgeError = BridgeError.viewer("Unable to perform action: \(name).")
+                    completion(nil, bridgeError)
+                    return
+                }
+                // convert to json
+                let json = try? JSON(payload)
+                completion(json, nil)
+            }
+
+        } catch {
+            let error = BridgeError.viewer("Unable to encode data.")
+            completion(nil, error)
+        }
+
+    }
 
 }
 

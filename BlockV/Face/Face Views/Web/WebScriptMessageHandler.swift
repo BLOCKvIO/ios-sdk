@@ -76,7 +76,7 @@ extension WebFaceView: WKScriptMessageHandler {
     /// Ideally, this function should only allow [String: Any] payloads. However, allows primative types, e.g. Bool,
     /// to be passed across as Javascript strings.
     func sendResponse(forRequestMessage message: RequestScriptMessage, payload: JSON?, error: BridgeError?) {
-        
+
         /*
          Note: Accepted Viewer Payloads
          
@@ -85,7 +85,7 @@ extension WebFaceView: WKScriptMessageHandler {
          - V1: Objects and primatives.
          - V2: Only objects.
          */
-        
+
         if let payload = payload {
             
             if message.version == "1.0.0" {
@@ -93,7 +93,7 @@ extension WebFaceView: WKScriptMessageHandler {
                 let jsonString = String.init(data: data, encoding: .utf8)!
                 self.postMessage(message.requestID, withJSONString: jsonString)
             } else { // 2.0.0
-                
+
                 // wrap in response object
                 let response: JSON = [
                     "name": try! JSON(message.name), //FIXME: This is not right
@@ -104,9 +104,9 @@ extension WebFaceView: WKScriptMessageHandler {
                 let jsonString = String.init(data: data, encoding: .utf8)!
                 self.postMessage(message.requestID, withJSONString: jsonString)
             }
-            
+
         } else if let error = error {
-            
+
             if message.version == "1.0.0" {
                 let response = try! JSON(error.bridgeFormatV1)
                 let data = try! JSONEncoder.blockv.encode(response)
@@ -125,19 +125,19 @@ extension WebFaceView: WKScriptMessageHandler {
         } else {
             assertionFailure("Either 'payload' or 'error' must be non nil.")
         }
-        
+
     }
-    
+
     /// Send a request message to the Bridge SDK.
     ///
     /// The proper working of this function is dependent on the Bridge SDK being initialized.
     ///gon
     func sendRequestMessage<T: Encodable>(_ scriptMessage: RequestScriptMessage, completion: ((ResponseScriptMessage<T>) -> Void)?) {
-        
+
         let data = try! JSONEncoder.blockv.encode(scriptMessage)
         let jsonString = String.init(data: data, encoding: .utf8)!
         self.postMessage(scriptMessage.requestID, withJSONString: jsonString)
-        
+
     }
 
 }
@@ -195,11 +195,7 @@ extension WebFaceView {
             if coreBridge.canProcessMessage(message.name) {
                 // forward to core bridge
                 coreBridge.processMessage(message) { (payload, error) in
-                    
-                    if let payload = payload {
-                        let json = try! JSON(encodable: payload)
-                    }
-                    
+
                     // post response
                     self.sendResponse(forRequestMessage: message, payload: payload, error: error)
 

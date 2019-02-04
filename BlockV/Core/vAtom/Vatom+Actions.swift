@@ -24,7 +24,7 @@ extension VatomModel {
     ///   - completion: The completion handler to call when the action is completed.
     ///                 This handler is executed on the main queue.
     public func transfer(toToken token: UserToken,
-                         completion: @escaping (Data?, BVError?) -> Void) {
+                         completion: @escaping ([String: Any]?, BVError?) -> Void) {
 
         let body = [
             "this.id": self.id,
@@ -32,9 +32,9 @@ extension VatomModel {
         ]
 
         // perform the action
-        BLOCKv.performAction(name: "Transfer", payload: body) { (data, error) in
+        BLOCKv.performAction(name: "Transfer", payload: body) { (json, error) in
             //TODO: should it be weak self?
-            completion(data, error)
+            completion(json, error)
         }
 
     }
@@ -50,7 +50,7 @@ extension VatomModel {
     ///   - completion: The completion handler to call when the action is completed.
     ///                 This handler is executed on the main queue.
     public func drop(latitude: Double, longitude: Double,
-                     completion: @escaping (Data?, BVError?) -> Void) {
+                     completion: @escaping ([String: Any]?, BVError?) -> Void) {
 
         let body: [String: Any] = [
             "this.id": self.id,
@@ -61,9 +61,9 @@ extension VatomModel {
         ]
 
         // perform the action
-        BLOCKv.performAction(name: "Drop", payload: body) { (data, error) in
+        BLOCKv.performAction(name: "Drop", payload: body) { (json, error) in
             //TODO: should it be weak self?
-            completion(data, error)
+            completion(json, error)
         }
 
     }
@@ -75,16 +75,16 @@ extension VatomModel {
     ///
     ///   - completion: The completion handler to call when the action is completed.
     ///                 This handler is executed on the main queue.
-    public func pickUp(completion: @escaping (Data?, BVError?) -> Void) {
+    public func pickUp(completion: @escaping ([String: Any]?, BVError?) -> Void) {
 
         let body = [
             "this.id": self.id
         ]
 
         // perform the action
-        BLOCKv.performAction(name: "Pickup", payload: body) { (data, error) in
+        BLOCKv.performAction(name: "Pickup", payload: body) { (json, error) in
             //TODO: should it be weak self?
-            completion(data, error)
+            completion(json, error)
         }
 
     }

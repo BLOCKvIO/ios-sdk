@@ -26,15 +26,15 @@ struct RequestScriptMessage: Codable {
     /// used by first Face SDK only – all newer version MUST supply a version key-pair.
     let version: String
     /// Object containg data from the FaceSDK.
-    let object: [String: JSON]
+    let payload: [String: JSON]
 
     /// Initializes using parameters.
-    init(source: String, name: String, requestID: String?, version: String?, object: [String: JSON]?) {
+    init(source: String, name: String, requestID: String?, version: String?, payload: [String: JSON]?) {
         self.source = source
         self.name = name
         self.requestID = requestID ?? ""
         self.version = version ?? "1.0.0" // default for original Face SDK.
-        self.object = object ?? [:]
+        self.payload = payload ?? [:]
     }
 
     /// Initializes using a JSON object.
@@ -51,9 +51,9 @@ struct RequestScriptMessage: Codable {
         let version = descriptor["version"]?.stringValue
         // note: 1.0.0 uses slightly different naming (responseID)
         let requestID = descriptor["request_id"]?.stringValue ?? descriptor["responseID"]?.stringValue ?? ""
-        let object = descriptor["payload"]?.objectValue ?? descriptor["data"]?.objectValue
+        let payload = descriptor["payload"]?.objectValue ?? descriptor["data"]?.objectValue
 
-        self.init(source: source, name: name, requestID: requestID, version: version, object: object)
+        self.init(source: source, name: name, requestID: requestID, version: version, payload: payload)
     }
 
     enum FaceScriptError: Error {

@@ -156,7 +156,7 @@ extension WebFaceView {
 
         print(#function)
         print("Message name: \(message.name)")
-        print("Object: \(message.object)")
+        print("Payload: \(message.payload)")
 
         var message = message
 
@@ -215,7 +215,7 @@ extension WebFaceView {
         // notify the host's message delegate of the custom message from the web page
         self.delegate?.faceView(self,
                                 didSendMessage: message.name,
-                                withObject: message.object,
+                                withObject: message.payload,
                                 completion: { (payload, error) in
 
                                     // transform the bridge error

@@ -26,12 +26,13 @@ class CoreBridgeV1: CoreBridge {
         }
         // send the vatom accross
         let uuid = UUID().uuidString
-        let object: [String: JSON] = ["vatom": jsonVatom]
+        let payload: [String: JSON] = ["vatom": jsonVatom]
 
         let message = RequestScriptMessage(source: "ios-vatoms",
                                            name: "vatom.updated",
                                            requestID: "req_\(uuid)",
-                                           version: "1.0.0", object: object)
+                                           version: "1.0.0",
+                                           payload: payload)
 
         // fire and forget
         self.faceView?.sendRequestMessage(message, completion: nil)
@@ -90,7 +91,7 @@ class CoreBridgeV1: CoreBridge {
 
         case .getVatom:
             // ensure caller supplied params
-            guard let vatomID = scriptMessage.object["id"]?.stringValue else {
+            guard let vatomID = scriptMessage.payload["id"]?.stringValue else {
                 let error = BridgeError.caller("Missing vAtom ID.")
                 completion(nil, error)
                 return
@@ -116,7 +117,7 @@ class CoreBridgeV1: CoreBridge {
 
         case .getVatomChildren:
             // ensure caller supplied params
-            guard let vatomID = scriptMessage.object["id"]?.stringValue else {
+            guard let vatomID = scriptMessage.payload["id"]?.stringValue else {
                 let error = BridgeError.caller("Missing vAtom ID.")
                 completion(nil, error)
                 return
@@ -131,7 +132,7 @@ class CoreBridgeV1: CoreBridge {
 
         case .getUserProfile:
             // ensure caller supplied params
-            guard let userID = scriptMessage.object["userID"]?.stringValue else {
+            guard let userID = scriptMessage.payload["userID"]?.stringValue else {
                 let error = BridgeError.caller("Missing user ID.")
                 completion(nil, error)
                 return
@@ -140,7 +141,7 @@ class CoreBridgeV1: CoreBridge {
 
         case .getUserAvatar:
             // ensure caller supplied params
-            guard let userID = scriptMessage.object["userID"]?.stringValue else {
+            guard let userID = scriptMessage.payload["userID"]?.stringValue else {
                 let error = BridgeError.caller("Missing user ID.")
                 completion(nil, error)
                 return
@@ -150,8 +151,8 @@ class CoreBridgeV1: CoreBridge {
         case .performAction:
             // ensure caller supplied params
             guard
-                let actionName = scriptMessage.object["actionName"]?.stringValue,
-                let actionData = scriptMessage.object["actionData"]?.objectValue,
+                let actionName = scriptMessage.payload["actionName"]?.stringValue,
+                let actionData = scriptMessage.payload["actionData"]?.objectValue,
                 let thisID = actionData["this.id"]?.stringValue
                 else {
                     let error = BridgeError.caller("Invalid payload.")

@@ -22,12 +22,13 @@ class CoreBridgeV2: CoreBridge {
             printBV(error: "Unable to pass vatom update over bridge.")
             return
         }
-        let object: [String: JSON] = ["vatom": jsonVatom]
+        let payload: [String: JSON] = ["vatom": jsonVatom]
 
         let message = RequestScriptMessage(source: "ios-vatoms",
                                            name: "core.vatom.update",
                                            requestID: "req_1",
-                                           version: "1.0.0", object: object)
+                                           version: "1.0.0",
+                                           payload: payload)
 
         // fire and forget
         self.faceView?.sendRequestMessage(message, completion: nil)
@@ -87,7 +88,7 @@ class CoreBridgeV2: CoreBridge {
 
         case .getVatom:
             // ensure caller supplied params
-            guard let vatomID = scriptMessage.object["id"]?.stringValue else {
+            guard let vatomID = scriptMessage.payload["id"]?.stringValue else {
                     let error = BridgeError.caller("Missing 'id' key.")
                     completion(nil, error)
                     return
@@ -120,7 +121,7 @@ class CoreBridgeV2: CoreBridge {
 
         case .getVatomChildren:
             // ensure caller supplied params
-            guard let vatomID = scriptMessage.object["id"]?.stringValue else {
+            guard let vatomID = scriptMessage.payload["id"]?.stringValue else {
                     let error = BridgeError.caller("Missing 'id' key.")
                     completion(nil, error)
                     return
@@ -136,7 +137,7 @@ class CoreBridgeV2: CoreBridge {
 
         case .getUser:
             // ensure caller supplied params
-            guard let userID = scriptMessage.object["id"]?.stringValue else {
+            guard let userID = scriptMessage.payload["id"]?.stringValue else {
                     let error = BridgeError.caller("Missing 'id' key.")
                     completion(nil, error)
                     return
@@ -154,8 +155,8 @@ class CoreBridgeV2: CoreBridge {
         case .performAction:
             // ensure caller supplied params
             guard
-                let actionName = scriptMessage.object["action_name"]?.stringValue,
-                let actionPayload = scriptMessage.object["payload"]?.objectValue,
+                let actionName = scriptMessage.payload["action_name"]?.stringValue,
+                let actionPayload = scriptMessage.payload["payload"]?.objectValue,
                 let thisID = actionPayload["this.id"]?.stringValue
                 else {
                     let error = BridgeError.caller("Missing 'action_name' or 'payload' keys.")
@@ -186,7 +187,7 @@ class CoreBridgeV2: CoreBridge {
              */
 
             // extract urls
-            guard let urlStrings = scriptMessage.object["urls"]?.arrayValue?.map({ $0.stringValue }) else {
+            guard let urlStrings = scriptMessage.payload["urls"]?.arrayValue?.map({ $0.stringValue }) else {
                     let error = BridgeError.caller("Missing 'urls' key.")
                     completion(nil, error)
                     return

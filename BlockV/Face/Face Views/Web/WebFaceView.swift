@@ -20,8 +20,8 @@ import WebKit
 /// https://stackoverflow.com/a/26383032/3589408
 class LeakAvoider: NSObject, WKScriptMessageHandler {
     /// Hold a weak reference to the `WKScriptMessageHandler`.
-    weak var delegate : WKScriptMessageHandler?
-    init(delegate:WKScriptMessageHandler) {
+    weak var delegate: WKScriptMessageHandler?
+    init(delegate: WKScriptMessageHandler) {
         self.delegate = delegate
         super.init()
     }
@@ -96,7 +96,9 @@ class WebFaceView: FaceView {
         // if the vatom has changed, load the face url again
         if vatom.id != self.vatom.id {
             self.loadFace()
+            return
         }
+        self.coreBridge?.sendVatom(vatom)
     }
 
     func unload() {

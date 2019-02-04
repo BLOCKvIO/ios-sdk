@@ -16,6 +16,13 @@ import Foundation
 /// Bridges into the Core module.
 class CoreBridgeV1: CoreBridge {
 
+    func sendVatom(_ vatom: VatomModel) {
+        // send the vatom accross
+        self.formatVatoms([vatom]) { vatoms in
+            assertionFailure()
+        }
+    }
+
     // MARK: - Enums
 
     /// Represents the contract for the Web bridge (version 1).
@@ -50,7 +57,7 @@ class CoreBridgeV1: CoreBridge {
     }
 
     /// Processes the face script message and calls the completion handler with the result for encoding.
-    func processMessage(_ scriptMessage: FaceScriptMessage, completion: @escaping Completion) {
+    func processMessage(_ scriptMessage: RequestScriptMessage, completion: @escaping Completion) {
 
         /*
          Sanity Check
@@ -63,6 +70,7 @@ class CoreBridgeV1: CoreBridge {
         switch message {
         case .initialize:
             self.setupBridge(completion)
+            
         case .getVatom:
             // ensure caller supplied params
             guard let vatomID = scriptMessage.object["id"]?.stringValue else {
@@ -89,20 +97,20 @@ class CoreBridgeV1: CoreBridge {
 
             }
 
-        case .getVatomChildren:
-            // ensure caller supplied params
-            guard let vatomID = scriptMessage.object["id"]?.stringValue else {
-                let error = BridgeError.caller("Missing vAtom ID.")
-                completion(nil, error)
-                return
-            }
-            // security check
-            guard vatomID == self.faceView?.vatom.id else {
-                let error = BridgeError.caller("This method is only permitted on the backing vatom: \(vatomID).")
-                completion(nil, error)
-                return
-            }
-            self.discoverChildren(forVatomID: vatomID, completion: completion)
+//        case .getVatomChildren:
+//            // ensure caller supplied params
+//            guard let vatomID = scriptMessage.object["id"]?.stringValue else {
+//                let error = BridgeError.caller("Missing vAtom ID.")
+//                completion(nil, error)
+//                return
+//            }
+//            // security check
+//            guard vatomID == self.faceView?.vatom.id else {
+//                let error = BridgeError.caller("This method is only permitted on the backing vatom: \(vatomID).")
+//                completion(nil, error)
+//                return
+//            }
+//            self.discoverChildren(forVatomID: vatomID, completion: completion)
 
         case .getUserProfile:
             // ensure caller supplied params
@@ -122,24 +130,27 @@ class CoreBridgeV1: CoreBridge {
             }
             self.getPublicAvatarURL(forUserID: userID, completion: completion)
 
-        case .performAction:
-            // ensure caller supplied params
-            guard
-                let actionName = scriptMessage.object["actionName"]?.stringValue,
-                let actionData = scriptMessage.object["actionData"]?.objectValue,
-                let thisID = actionData["this.id"]?.stringValue
-                else {
-                    let error = BridgeError.caller("Invalid payload.")
-                    completion(nil, error)
-                    return
-            }
-            // security check - backing vatom
-            guard thisID == self.faceView?.vatom.id else {
-                let error = BridgeError.caller("This method is only permitted for the backing vatom.")
-                completion(nil, error)
-                return
-            }
-            self.performAction(name: actionName, payload: actionData, completion: completion)
+//        case .performAction:
+//            // ensure caller supplied params
+//            guard
+//                let actionName = scriptMessage.object["actionName"]?.stringValue,
+//                let actionData = scriptMessage.object["actionData"]?.objectValue,
+//                let thisID = actionData["this.id"]?.stringValue
+//                else {
+//                    let error = BridgeError.caller("Invalid payload.")
+//                    completion(nil, error)
+//                    return
+//            }
+//            // security check - backing vatom
+//            guard thisID == self.faceView?.vatom.id else {
+//                let error = BridgeError.caller("This method is only permitted for the backing vatom.")
+//                completion(nil, error)
+//                return
+//            }
+//            self.performAction(name: actionName, payload: actionData, completion: completion)
+            
+        default:
+            return
         }
 
     }
@@ -173,7 +184,7 @@ class CoreBridgeV1: CoreBridge {
     /// Creates the bridge initializtion JSON data.
     ///
     /// - Parameter completion: Completion handler to call with JSON data to be passed to the webpage.
-    private func setupBridge(_ completion: @escaping Completion) {
+    private func setupBridge(_ completion: @escaping CoreBridge.Completion) {
 
         // santiy check
         guard let faceView = self.faceView else {
@@ -227,13 +238,16 @@ class CoreBridgeV1: CoreBridge {
                 let response = BRSetup(viewMode: viewMode,
                                        user: userInfo,
                                        vatomInfo: vatomInfo)
-                // json-data encode the model
-                guard let data = try? JSONEncoder.blockv.encode(response) else {
+
+                do {
+                    // json encode the model
+                    let json = try JSON.init(encodable: response)
+                    completion(json, nil)
+                } catch {
                     let bridgeError = BridgeError.viewer("Unable to encode response.")
                     completion(nil, bridgeError)
-                    return
                 }
-                completion(data, nil)
+
             })
 
         }
@@ -257,42 +271,43 @@ class CoreBridgeV1: CoreBridge {
             }
             let response = ["vatomInfo": formattedVatom]
 
-            // json-data encode the model
-            guard let data = try? JSONEncoder.blockv.encode(response) else {
+            do {
+                // json encode the model
+                let json = try JSON.init(encodable: response)
+                completion(json, nil)
+            } catch {
                 let bridgeError = BridgeError.viewer("Unable to encode response.")
                 completion(nil, bridgeError)
-                return
             }
-            completion(data, nil)
 
         }
 
     }
 
-    /// Searched for the children of the specifed vAtom.
-    ///
-    /// This method uses the discover endpoint. Therefore, *owned* and *unowned* vAtoms may be returned.
-    private func discoverChildren(forVatomID id: String, completion: @escaping Completion) {
-
-        self.discoverChildrenFormatted(forVatomID: id) { (formattedVatoms, error) in
-
-            // ensure no error
-            guard error == nil else {
-                completion(nil, error!)
-                return
-            }
-            let vatomItems = formattedVatoms.map { ["vatomInfo": $0] }
-            let response = ["items": vatomItems]
-            // json-data encode the model
-            guard let data = try? JSONEncoder.blockv.encode(response) else {
-                let bridgeError = BridgeError.viewer("Unable to encode response.")
-                completion(nil, bridgeError)
-                return
-            }
-            completion(data, nil)
-        }
-
-    }
+//    /// Searched for the children of the specifed vAtom.
+//    ///
+//    /// This method uses the discover endpoint. Therefore, *owned* and *unowned* vAtoms may be returned.
+//    private func discoverChildren(forVatomID id: String, completion: @escaping Completion) {
+//
+//        self.discoverChildrenFormatted(forVatomID: id) { (formattedVatoms, error) in
+//
+//            // ensure no error
+//            guard error == nil else {
+//                completion(nil, error!)
+//                return
+//            }
+//            let vatomItems = formattedVatoms.map { ["vatomInfo": $0] }
+//            let response = ["items": vatomItems]
+//            // json-data encode the model
+//            guard let data = try? JSONEncoder.blockv.encode(response) else {
+//                let bridgeError = BridgeError.viewer("Unable to encode response.")
+//                completion(nil, bridgeError)
+//                return
+//            }
+//            completion(data, nil)
+//        }
+//
+//    }
 
     /// Fetches the publically available properties of the user specified by the id.
     private func getPublicUser(forUserID id: String, completion: @escaping Completion) {
@@ -315,14 +330,15 @@ class CoreBridgeV1: CoreBridge {
                                   firstName: user.properties.firstName,
                                   lastName: user.properties.lastName,
                                   avatarURL: encodedURL?.absoluteString ?? "")
-
-            // json-data encode the model
-            guard let data = try? JSONEncoder.blockv.encode(response) else {
+            
+            do {
+                // json encode the model
+                let json = try JSON.init(encodable: response)
+                completion(json, nil)
+            } catch {
                 let bridgeError = BridgeError.viewer("Unable to encode response.")
                 completion(nil, bridgeError)
-                return
             }
-            completion(data, nil)
 
         }
 
@@ -351,48 +367,50 @@ class CoreBridgeV1: CoreBridge {
             }
             // create avatar response
             let response = PublicAvatarFormat(id: user.id, avatarURL: encodedURL?.absoluteString ?? "")
-            // json-data encode the model
-            guard let data = try? JSONEncoder.blockv.encode(response) else {
+            
+            do {
+                // json encode the model
+                let json = try JSON.init(encodable: response)
+                completion(json, nil)
+            } catch {
                 let bridgeError = BridgeError.viewer("Unable to encode response.")
                 completion(nil, bridgeError)
-                return
             }
-            completion(data, nil)
 
         }
 
     }
 
-    /// Performs the action.
-    private func performAction(name: String, payload: [String: JSON], completion: @escaping Completion) {
-
-        //FIXME: Add `userConsentRequired` check.
-
-        //NOTE: The Client networking layer uses JSONSerialisation which does not play well with JSON.
-        // Options:
-        // a) Client must be updated to use JSON
-        // b) Right here, JSON must be converted to [String: Any] (an inefficient conversion)
-
-        do {
-            // HACK: Convert JSON to Data to [String: Any]
-            let data = try JSONEncoder.blockv.encode(payload)
-            guard let dict = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-                throw BridgeError.viewer("Unable to encode data.")
-            }
-            BLOCKv.performAction(name: name, payload: dict) { (data, error) in
-                // ensure no error
-                guard let data = data, error == nil else {
-                    let bridgeError = BridgeError.viewer("Unable to perform action: \(name).")
-                    completion(nil, bridgeError)
-                    return
-                }
-                completion(data, nil)
-            }
-        } catch {
-            let error = BridgeError.viewer("Unable to encode data.")
-            completion(nil, error)
-        }
-    }
+//    /// Performs the action.
+//    private func performAction(name: String, payload: [String: JSON], completion: @escaping Completion) {
+//
+//        //FIXME: Add `userConsentRequired` check.
+//
+//        //NOTE: The Client networking layer uses JSONSerialisation which does not play well with JSON.
+//        // Options:
+//        // a) Client must be updated to use JSON
+//        // b) Right here, JSON must be converted to [String: Any] (an inefficient conversion)
+//
+//        do {
+//            // HACK: Convert JSON to Data to [String: Any]
+//            let data = try JSONEncoder.blockv.encode(payload)
+//            guard let dict = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+//                throw BridgeError.viewer("Unable to encode data.")
+//            }
+//            BLOCKv.performAction(name: name, payload: dict) { (data, error) in
+//                // ensure no error
+//                guard let data = data, error == nil else {
+//                    let bridgeError = BridgeError.viewer("Unable to perform action: \(name).")
+//                    completion(nil, bridgeError)
+//                    return
+//                }
+//                completion(data, nil)
+//            }
+//        } catch {
+//            let error = BridgeError.viewer("Unable to encode data.")
+//            completion(nil, error)
+//        }
+//    }
 
 }
 
@@ -503,7 +521,7 @@ private extension CoreBridgeV1 {
         var formattedVatoms = [BRVatom]()
         for vatom in vatoms {
             // combine root and private props
-            if let properties = try? JSON(codable: vatom.props) {
+            if let properties = try? JSON(encodable: vatom.props) {
                 if let privateProps = vatom.private {
                     // merge private properties into root properties
                     let combinedProperties = properties.updated(applying: privateProps)

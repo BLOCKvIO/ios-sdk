@@ -29,7 +29,7 @@ import Foundation
 */
 
 extension TimeInterval {
-    
+
     /**
      Checks if the current time has passed the reference date `since` plus some delay `self`.
      
@@ -48,7 +48,7 @@ extension TimeInterval {
     func hasPassed(since: TimeInterval) -> Bool {
         return Date().timeIntervalSinceReferenceDate - self > since
     }
-    
+
 }
 
 /**

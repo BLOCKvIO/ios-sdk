@@ -56,6 +56,14 @@ struct RequestScriptMessage: Codable {
         self.init(source: source, name: name, requestID: requestID, version: version, payload: payload)
     }
 
+    enum CodingKeys: String, CodingKey {
+        case source
+        case name
+        case requestID = "request_id"
+        case version
+        case payload
+    }
+
     enum FaceScriptError: Error {
         case invalidName
         case invalidSource
@@ -74,9 +82,9 @@ struct ResponseScriptMessage: Encodable {
     let payload: JSON
 
     enum CodingKeys: String, CodingKey {
-        case name = "name"
+        case name
         case responseID  = "response_id"
-        case payload = "payload"
+        case payload
     }
 
 }

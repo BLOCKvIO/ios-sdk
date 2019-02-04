@@ -27,7 +27,7 @@ class CoreBridgeV2: CoreBridge {
         let message = RequestScriptMessage(source: "ios-vatoms",
                                            name: "core.vatom.update",
                                            requestID: "req_1",
-                                           version: "1.0.0",
+                                           version: "2.0.0",
                                            payload: payload)
 
         // fire and forget
@@ -132,8 +132,15 @@ class CoreBridgeV2: CoreBridge {
                 completion(nil, error)
                 return
             }
-            assertionFailure()
-//            self.discoverChildren(forVatomID: vatomID, completion: completion)
+            self.discoverChildren(forVatomID: vatomID, completion: { (payload, error) in
+                // json dance
+                if let payload = payload?["vatoms"]?.first {
+                    let payload = try? JSON.init(encodable: ["vatom": payload])
+                    completion(payload, error)
+                    return
+                }
+                completion(nil, error)
+            })
 
         case .getUser:
             // ensure caller supplied params

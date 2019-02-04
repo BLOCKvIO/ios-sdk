@@ -24,15 +24,14 @@ class CoreBridgeV1: CoreBridge {
                 printBV(error: "Unable to pass vatom update over bridge.")
                 return
         }
-        // send the vatom accross
-        let uuid = UUID().uuidString
-        let payload: [String: JSON] = ["vatom": jsonVatom]
+        let response = ["vatomInfo": jsonVatom]
 
+        // send the vatom accross
         let message = RequestScriptMessage(source: "ios-vatoms",
                                            name: "vatom.updated",
-                                           requestID: "req_\(uuid)",
+                                           requestID: "vatom.updated",
                                            version: "1.0.0",
-                                           payload: payload)
+                                           payload: response)
 
         // fire and forget
         self.faceView?.sendRequestMessage(message, completion: nil)

@@ -134,9 +134,19 @@ extension WebFaceView: WKScriptMessageHandler {
     func sendRequestMessage(_ scriptMessage: RequestScriptMessage,
                             completion: ((ResponseScriptMessage) -> Void)?) {
 
-        let data = try! JSONEncoder.blockv.encode(scriptMessage)
-        let jsonString = String.init(data: data, encoding: .utf8)!
-        self.postMessage(scriptMessage.requestID, withJSONString: jsonString)
+        if scriptMessage.version == "1.0.0" {
+            // only payload
+            let payload = scriptMessage.payload
+            let data = try! JSONEncoder.blockv.encode(payload)
+            let jsonString = String.init(data: data, encoding: .utf8)!
+            self.postMessage(scriptMessage.requestID, withJSONString: jsonString)
+        } else { // 2.0.0
+            let data = try! JSONEncoder.blockv.encode(scriptMessage)
+            let jsonString = String.init(data: data, encoding: .utf8)!
+            self.postMessage(scriptMessage.requestID, withJSONString: jsonString)
+        }
+        
+        // Completion will never be called in this version.
 
     }
 

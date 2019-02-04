@@ -53,8 +53,8 @@ public struct VatomModel: Equatable {
         case whenModified      = "when_modified"
         case props             = "vAtom::vAtomType"
         case `private`         = "private"
-        case faceModels        = "faceModels"
-        case actionModels      = "actionModels"
+        case faceModels        = "faces"
+        case actionModels      = "actions"
         case eos               = "eos"
         case eth               = "eth"
     }

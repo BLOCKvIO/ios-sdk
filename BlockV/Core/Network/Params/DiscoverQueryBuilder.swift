@@ -31,7 +31,6 @@ public class DiscoverQueryBuilder {
     /// Models the options for the structure and contents of the query's response.
     public enum ResultType: String {
         case payload = "*"
-        case count   = "count"
     }
 
     // MARK: - Properties
@@ -170,7 +169,9 @@ extension DiscoverQueryBuilder: DictionaryCodable {
 
         payload["scope"] = self.scope
         let filterElems = self.filters.map { $0.toDictionary() } // map the filters to dictionaries
-        payload["filters"] = [["filter_elems": filterElems]] // filters is an array, the first element is 
+        if !filterElems.isEmpty {
+            payload["filters"] = [["filter_elems": filterElems]] // filters is an array, the first element is
+        }
         payload["return"] = self.resultStructure
 
         return payload

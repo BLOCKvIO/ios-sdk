@@ -63,15 +63,15 @@ struct RequestScriptMessage: Codable {
     }
 }
 
-/// Struct representing a response script message. The Bridge SDK is bi-directional. This means a `ResponseScriptMessage`
-/// can be sent and received.
+/// Struct representing a response script message. The Bridge SDK is bi-directional.
+/// This means a `ResponseScriptMessage` can be sent and received.
 ///
 /// V2 defines a wrapping payload structure.
-struct ResponseScriptMessage<T: Encodable>: Encodable {
+struct ResponseScriptMessage: Encodable {
 
     let name: String
     let responseID: String
-    let payload: T
+    let payload: JSON
 
     enum CodingKeys: String, CodingKey {
         case name = "name"

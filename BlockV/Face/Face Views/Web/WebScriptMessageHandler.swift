@@ -70,7 +70,7 @@ extension WebFaceView: WKScriptMessageHandler {
         }
 
     }
-    
+
     /// Convenience method to allow an object to be posted.
     ///
     /// Ideally, this function should only allow [String: Any] payloads. However, allows primative types, e.g. Bool,
@@ -87,7 +87,7 @@ extension WebFaceView: WKScriptMessageHandler {
          */
 
         if let payload = payload {
-            
+
             if message.version == "1.0.0" {
                 let data = try! JSONEncoder.blockv.encode(payload)
                 let jsonString = String.init(data: data, encoding: .utf8)!
@@ -131,8 +131,8 @@ extension WebFaceView: WKScriptMessageHandler {
     /// Send a request message to the Bridge SDK.
     ///
     /// The proper working of this function is dependent on the Bridge SDK being initialized.
-    ///gon
-    func sendRequestMessage<T: Encodable>(_ scriptMessage: RequestScriptMessage, completion: ((ResponseScriptMessage<T>) -> Void)?) {
+    func sendRequestMessage(_ scriptMessage: RequestScriptMessage,
+                            completion: ((ResponseScriptMessage) -> Void)?) {
 
         let data = try! JSONEncoder.blockv.encode(scriptMessage)
         let jsonString = String.init(data: data, encoding: .utf8)!
@@ -152,7 +152,7 @@ extension WebFaceView {
     ///   - name: Unique identifier of the message.
     ///   - data: Data payload from webpage.
     ///   - completion: Completion handler to call pasing the data to be forwarded to the webpage.
-    private func routeMessage(_ message: RequestScriptMessage) throws { // swiftlint:disable:this cyclomatic_complexity function_body_length
+    private func routeMessage(_ message: RequestScriptMessage) throws {
 
         print(#function)
         print("Message name: \(message.name)")
@@ -220,15 +220,17 @@ extension WebFaceView {
 
                                     // transform the bridge error
                                     let bridgeError = BridgeError.viewer(error?.message ?? "Unknown error occured.")
-                                    
-                                    // V1 Support. Transform the `viewer.qr.scan` reponse paylaod from [String: String] to String.
+
+                                    // V1 Support. Transform the `viewer.qr.scan` reponse paylaod from [String: String]
+                                    // to String.
                                     if message.version == "1.0.0" && message.name == "viewer.qr.scan" {
                                         if let newPayload = payload?["data"] {
-                                            self.sendResponse(forRequestMessage: message, payload: newPayload, error: bridgeError)
+                                            self.sendResponse(forRequestMessage: message, payload: newPayload,
+                                                              error: bridgeError)
                                             return
                                         }
                                     }
-                                    
+
                                     self.sendResponse(forRequestMessage: message,
                                                       payload: payload,
                                                       error: bridgeError)
@@ -236,13 +238,13 @@ extension WebFaceView {
         })
 
     }
-    
+
     /// Transforms viewer message from protocol V1 to V2.
     ///
     /// - Parameter message: Script message to transform.
     /// - Returns: Transformed script message.
     private func transformScriptMessage(_ message: RequestScriptMessage) -> RequestScriptMessage {
-        
+
         var message = message
         /*
          Note:
@@ -256,7 +258,7 @@ extension WebFaceView {
                 message.requestID = "vatom.children.get-response"
             }
         }
-        
+
         /*
          Note:
          Version 1.0.0 uses a set of legacy messages. Here, these legacy viewer messages are transformed into the
@@ -276,9 +278,9 @@ extension WebFaceView {
         case "ui.vatom.clone": message.name = "viewer.action.share"
         default: break
         }
-        
+
         return message
-        
+
     }
 
 }

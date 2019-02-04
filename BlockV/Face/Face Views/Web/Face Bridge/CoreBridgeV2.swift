@@ -17,7 +17,20 @@ import Foundation
 class CoreBridgeV2: CoreBridge {
 
     func sendVatom(_ vatom: VatomModel) {
-        // send vatom across
+
+        guard let jsonVatom = try? JSON(encodable: vatom) else {
+            printBV(error: "Unable to pass vatom update over bridge.")
+            return
+        }
+        let object: [String: JSON] = ["vatom": jsonVatom]
+
+        let message = RequestScriptMessage(source: "ios-vatoms",
+                                           name: "core.vatom.update",
+                                           requestID: "req_1",
+                                           version: "1.0.0", object: object)
+
+        // fire and forget
+        self.faceView?.sendRequestMessage(message, completion: nil)
 
     }
 
@@ -33,11 +46,11 @@ class CoreBridgeV2: CoreBridge {
         case encodeResource     = "core.resource.encode"
     }
 
-    var faceView: FaceView?
+    var faceView: WebFaceView?
 
     // MARK: - Initializer
 
-    required init(faceView: FaceView) {
+    required init(faceView: WebFaceView) {
         self.faceView = faceView
     }
 
@@ -47,6 +60,8 @@ class CoreBridgeV2: CoreBridge {
     func canProcessMessage(_ message: String) -> Bool {
         return !(MessageName(rawValue: message) == nil)
     }
+
+    // swiftlint:disable cyclomatic_complexity
 
     /// Processes the face script message and calls the completion handler with the result for encoding.
     func processMessage(_ scriptMessage: RequestScriptMessage, completion: @escaping (JSON?, BridgeError?) -> Void) {
@@ -103,19 +118,20 @@ class CoreBridgeV2: CoreBridge {
 
             }
 
-//        case .getVatomChildren:
-//            // ensure caller supplied params
-//            guard let vatomID = scriptMessage.object["id"]?.stringValue else {
-//                    let error = BridgeError.caller("Missing 'id' key.")
-//                    completion(nil, error)
-//                    return
-//            }
-//            // security check - backing vatom
-//            guard vatomID == self.faceView?.vatom.id else {
-//                let error = BridgeError.caller("This method is only permitted on the backing vatom.")
-//                completion(nil, error)
-//                return
-//            }
+        case .getVatomChildren:
+            // ensure caller supplied params
+            guard let vatomID = scriptMessage.object["id"]?.stringValue else {
+                    let error = BridgeError.caller("Missing 'id' key.")
+                    completion(nil, error)
+                    return
+            }
+            // security check - backing vatom
+            guard vatomID == self.faceView?.vatom.id else {
+                let error = BridgeError.caller("This method is only permitted on the backing vatom.")
+                completion(nil, error)
+                return
+            }
+            assertionFailure()
 //            self.discoverChildren(forVatomID: vatomID, completion: completion)
 
         case .getUser:
@@ -154,9 +170,13 @@ class CoreBridgeV2: CoreBridge {
             }
             // perform action
             self.performAction(name: actionName, payload: actionPayload) { (payload, error) in
-                
-                print(payload)
-                
+                // json dance
+                if let payload = payload {
+                    let payload = try? JSON.init(encodable: ["user": payload])
+                    completion(payload, error)
+                    return
+                }
+                completion(nil, error)
             }
 
         case .encodeResource:
@@ -188,9 +208,6 @@ class CoreBridgeV2: CoreBridge {
                 }
                 completion(nil, error)
             }
-
-        default:
-            return
 
         }
 
@@ -365,55 +382,37 @@ class CoreBridgeV2: CoreBridge {
     ///   - name: Name of the action.
     ///   - payload: Payload to send to the server.
     ///   - completion: Completion handler to call with JSON data to be passed to the webpage.
-    private func performAction(name: String, payload: [String: JSON], completion: @escaping (JSON?, BridgeError?) -> Void) {
+    private func performAction(name: String, payload: [String: JSON],
+                               completion: @escaping (JSON?, BridgeError?) -> Void) {
 
-        //NOTE: The Client networking layer uses JSONSerialisation which does not play well with JSON.
-        // Options:
-        // a) Client must be updated to use JSON
-        // b) Right here, JSON must be converted to [String: Any] (an inefficient conversion)
+        do {
+            /*
+             HACK: Convert JSON > Data > [String: Any] (limitation of Alamofire request encoding).
+             TODO: Add 'Dictionaryable' conformance to 'JSON'. This is inefficient, but will allow simpler conversion.
+             */
 
-//        do {
-//
-//            // HACK: Convert JSON to Data to [String: Any]
-//            let data = try JSONEncoder.blockv.encode(payload)
-//            guard let dict = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-//                throw BridgeError.viewer("Unable to encode data.")
-//            }
-//            BLOCKv.performAction(name: name, payload: dict) { (response, error) in
-//
-//                // ensure no error
-//                guard let response = response, error == nil else {
-//                    let bridgeError = BridgeError.viewer("Unable to perform action: \(name).")
-//                    completion(nil, bridgeError)
-//                    return
-//                }
-//
-//                /*
-//                 Note:
-//                 performAction completes with data (this must be changed to [String: Any] or JSON
-//                 In the meantime, we must manually deserialize the data into a heterogenous dictionary.
-//                 */
-//                do {
-//                    guard
-//                        let object = try JSONSerialization.jsonObject(with: response) as? [String: Any],
-//                        let p1 = object["payload"] as? [String: Any] else {
-//                            assertionFailure()
-//                            throw BridgeError.viewer("Wrong")
-//                    }
-//
-//                    let jsonPayload = try JSON(p1)
-//                    completion(jsonPayload, nil)
-//
-//                } catch {
-//                    let error = BridgeError.viewer("Unable to encode data.")
-//                    completion(nil, error)
-//                }
-//
-//            }
-//        } catch {
-//            let error = BridgeError.viewer("Unable to encode data.")
-//            completion(nil, error)
-//        }
+            let data = try JSONEncoder.blockv.encode(payload)
+            guard let dict = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+                throw BridgeError.viewer("Unable to encode data.")
+            }
+
+            BLOCKv.performAction(name: name, payload: dict) { (payload, error) in
+                // ensure no error
+                guard let payload = payload, error == nil else {
+                    let bridgeError = BridgeError.viewer("Unable to perform action: \(name).")
+                    completion(nil, bridgeError)
+                    return
+                }
+                // convert to json
+                let json = try? JSON(payload)
+                completion(json, nil)
+            }
+
+        } catch {
+            let error = BridgeError.viewer("Unable to encode data.")
+            completion(nil, error)
+        }
+
     }
 
     /// Performs an encode on the resources.

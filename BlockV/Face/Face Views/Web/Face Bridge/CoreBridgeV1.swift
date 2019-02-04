@@ -17,10 +17,25 @@ import Foundation
 class CoreBridgeV1: CoreBridge {
 
     func sendVatom(_ vatom: VatomModel) {
-        // send the vatom accross
-        self.formatVatoms([vatom]) { vatoms in
-            assertionFailure()
+
+        guard
+            let vatom = self.formatVatoms([vatom]).first,
+            let jsonVatom = try? JSON(encodable: vatom) else {
+                printBV(error: "Unable to pass vatom update over bridge.")
+                return
         }
+        // send the vatom accross
+        let uuid = UUID().uuidString
+        let object: [String: JSON] = ["vatom": jsonVatom]
+
+        let message = RequestScriptMessage(source: "ios-vatoms",
+                                           name: "vatom.updated",
+                                           requestID: "req_\(uuid)",
+                                           version: "1.0.0", object: object)
+
+        // fire and forget
+        self.faceView?.sendRequestMessage(message, completion: nil)
+
     }
 
     // MARK: - Enums
@@ -38,11 +53,11 @@ class CoreBridgeV1: CoreBridge {
     // MARK: - Properties
 
     /// Reference to the face view which this bridge is interacting with.
-    weak var faceView: FaceView?
+    weak var faceView: WebFaceView?
 
     // MARK: - Initializer
 
-    required init(faceView: FaceView) {
+    required init(faceView: WebFaceView) {
         self.faceView = faceView
     }
 
@@ -55,6 +70,8 @@ class CoreBridgeV1: CoreBridge {
         }
         return true
     }
+
+    // swiftlint:disable cyclomatic_complexity
 
     /// Processes the face script message and calls the completion handler with the result for encoding.
     func processMessage(_ scriptMessage: RequestScriptMessage, completion: @escaping Completion) {
@@ -97,20 +114,20 @@ class CoreBridgeV1: CoreBridge {
 
             }
 
-//        case .getVatomChildren:
-//            // ensure caller supplied params
-//            guard let vatomID = scriptMessage.object["id"]?.stringValue else {
-//                let error = BridgeError.caller("Missing vAtom ID.")
-//                completion(nil, error)
-//                return
-//            }
-//            // security check
-//            guard vatomID == self.faceView?.vatom.id else {
-//                let error = BridgeError.caller("This method is only permitted on the backing vatom: \(vatomID).")
-//                completion(nil, error)
-//                return
-//            }
-//            self.discoverChildren(forVatomID: vatomID, completion: completion)
+        case .getVatomChildren:
+            // ensure caller supplied params
+            guard let vatomID = scriptMessage.object["id"]?.stringValue else {
+                let error = BridgeError.caller("Missing vAtom ID.")
+                completion(nil, error)
+                return
+            }
+            // security check
+            guard vatomID == self.faceView?.vatom.id else {
+                let error = BridgeError.caller("This method is only permitted on the backing vatom: \(vatomID).")
+                completion(nil, error)
+                return
+            }
+            self.discoverChildren(forVatomID: vatomID, completion: completion)
 
         case .getUserProfile:
             // ensure caller supplied params
@@ -149,9 +166,6 @@ class CoreBridgeV1: CoreBridge {
             }
 
             self.performAction(name: actionName, payload: actionData, completion: completion)
-
-        default:
-            return
         }
 
     }
@@ -285,30 +299,31 @@ class CoreBridgeV1: CoreBridge {
 
     }
 
-//    /// Searched for the children of the specifed vAtom.
-//    ///
-//    /// This method uses the discover endpoint. Therefore, *owned* and *unowned* vAtoms may be returned.
-//    private func discoverChildren(forVatomID id: String, completion: @escaping Completion) {
-//
-//        self.discoverChildrenFormatted(forVatomID: id) { (formattedVatoms, error) in
-//
-//            // ensure no error
-//            guard error == nil else {
-//                completion(nil, error!)
-//                return
-//            }
-//            let vatomItems = formattedVatoms.map { ["vatomInfo": $0] }
-//            let response = ["items": vatomItems]
-//            // json-data encode the model
-//            guard let data = try? JSONEncoder.blockv.encode(response) else {
-//                let bridgeError = BridgeError.viewer("Unable to encode response.")
-//                completion(nil, bridgeError)
-//                return
-//            }
-//            completion(data, nil)
-//        }
-//
-//    }
+    /// Searched for the children of the specifed vAtom.
+    ///
+    /// This method uses the discover endpoint. Therefore, *owned* and *unowned* vAtoms may be returned.
+    private func discoverChildren(forVatomID id: String, completion: @escaping Completion) {
+
+        self.discoverChildrenFormatted(forVatomID: id) { (formattedVatoms, error) in
+
+            // ensure no error
+            guard error == nil else {
+                completion(nil, error!)
+                return
+            }
+            let vatomItems = formattedVatoms.map { ["vatomInfo": $0] }
+            let response = ["items": vatomItems]
+            do {
+                // json encode the model
+                let json = try JSON.init(encodable: response)
+                completion(json, nil)
+            } catch {
+                let bridgeError = BridgeError.viewer("Unable to encode response.")
+                completion(nil, bridgeError)
+            }
+        }
+
+    }
 
     /// Fetches the publically available properties of the user specified by the id.
     private func getPublicUser(forUserID id: String, completion: @escaping Completion) {
@@ -473,16 +488,9 @@ private extension CoreBridgeV1 {
                 completion([], bridgeError)
                 return
             }
-            // ensure there is at least one vatom
-            guard let vatom = vatoms.first else {
-                completion([], BridgeError.viewer("vAtom not found."))
-                return
-            }
+
             // convert vAtom into bridge format
-            self.formatVatoms([vatom], completion: { (formattedVatoms) in
-                let fvs = formattedVatoms
-                completion(fvs, nil)
-            })
+            completion(self.formatVatoms(vatoms), nil)
 
         }
 
@@ -505,21 +513,16 @@ private extension CoreBridgeV1 {
                 return
             }
             // format vatoms
-            self.formatVatoms(vatoms, completion: { (formattedVatoms) in
-                let fvs = formattedVatoms
-                completion(fvs, nil)
-            })
+            completion(self.formatVatoms(vatoms), nil)
 
         }
 
     }
 
-    private typealias FormatCompletion = (_ formattedVatoms: [BRVatom]) -> Void
-
     /// Returns the vatom transformed into the bridge format.
     ///
     /// Resources are encoded.
-    private func formatVatoms(_ vatoms: [VatomModel], completion: @escaping FormatCompletion) {
+    private func formatVatoms(_ vatoms: [VatomModel]) -> [BRVatom] {
 
         var formattedVatoms = [BRVatom]()
         for vatom in vatoms {
@@ -541,7 +544,7 @@ private extension CoreBridgeV1 {
             }
 
         }
-        completion(formattedVatoms)
+        return formattedVatoms
     }
 
 }

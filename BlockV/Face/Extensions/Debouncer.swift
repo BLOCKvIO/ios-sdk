@@ -23,13 +23,27 @@
 
 import Foundation
 
+/*
+- https://stackoverflow.com/questions/25991367/difference-between-throttling-and-debouncing-a-function
+- http://demo.nimius.net/debounce_throttle/
+*/
+
 extension TimeInterval {
 
     /**
-     Checks if `since` has passed since `self`.
+     Checks if the current time has passed the reference date `since` plus some delay `self`.
      
-     - Parameter since: The duration of time that needs to have passed for this function to return `true`.
-     - Returns: `true` if `since` has passed since now.
+     ```
+     let lastRunDate = Date().timeIntervalSinceReferenceDate()
+     let delay: TimeInterval = 3
+     
+     if delay.hasPassed(since: lastRunDate) {
+     // at least 3 seconds has passed
+     }
+     
+     ```
+     
+     - Parameter since: The reference date from which
      */
     func hasPassed(since: TimeInterval) -> Bool {
         return Date().timeIntervalSinceReferenceDate - self > since

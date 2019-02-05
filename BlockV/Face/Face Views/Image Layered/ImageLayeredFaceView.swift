@@ -280,7 +280,7 @@ class ImageLayeredFaceView: FaceView {
         do {
             // encode url
             let encodeURL = try BLOCKv.encodeURL(resourceModel.url)
-            
+
             var request = ImageRequest(url: encodeURL)
             // use unencoded url as cache key
             request.cacheKey = resourceModel.url

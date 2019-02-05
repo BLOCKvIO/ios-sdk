@@ -170,7 +170,7 @@ class ImageFaceView: FaceView {
         ImagePipeline.Configuration.isAnimatedImageDataEnabled = true
 
         //TODO: Should the size of the VatomView be factoring in and the image be resized?
-        
+
         var request = ImageRequest(url: encodeURL)
         // use unencoded url as cache key
         request.cacheKey = resourceModel.url

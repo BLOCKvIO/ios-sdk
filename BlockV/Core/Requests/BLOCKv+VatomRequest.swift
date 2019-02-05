@@ -149,25 +149,6 @@ extension BLOCKv {
         }
     }
 
-    /// Searches for the count (tally) of vAtoms on the BLOCKv platform.
-    ///
-    /// - Parameters:
-    ///   - builder: A discover query builder object. Use the builder to simplify constructing
-    ///              discover queries.
-    ///   - completion: The completion handler to call when the request is completed.
-    ///                 This handler is executed on the main queue.
-    ///   - count: Number of discovered vAtoms.
-    ///   - error: BLOCKv error.
-    public static func discoverCount(_ builder: DiscoverQueryBuilder,
-                                     completion: @escaping(_ count: Int?, _ error: BVError?) -> Void) {
-
-        // explicitlt set return type to payload
-        builder.setReturn(type: .count)
-        self.discover(payload: builder.toDictionary()) { (result, error) in
-            completion(result?.count, error)
-        }
-    }
-
     public typealias DiscoverResult = (vatoms: [VatomModel], count: Int)
 
     /// Performs a search for vAtoms on the BLOCKv platform.
@@ -355,7 +336,7 @@ extension BLOCKv {
     ///                 This handler is executed on the main queue.
     public static func performAction(name: String,
                                      payload: [String: Any],
-                                     completion: @escaping (Data?, BVError?) -> Void) {
+                                     completion: @escaping ([String: Any]?, BVError?) -> Void) {
 
         let endpoint = API.VatomAction.custom(name: name, payload: payload)
 
@@ -368,11 +349,23 @@ extension BLOCKv {
                 }
                 return
             }
+            //
+            do {
+                guard
+                    let object = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                    let payload = object["payload"] as? [String: Any] else {
+                        throw BVError.modelDecoding(reason: "Unable to extract payload.")
+                }
+                // json is available
+                DispatchQueue.main.async {
+                    completion(payload, nil)
+                }
 
-            // data is available
-            DispatchQueue.main.async {
-                completion(data, nil)
+            } catch {
+                let error = BVError.modelDecoding(reason: error.localizedDescription)
+                completion(nil, error)
             }
+
         }
 
     }
@@ -387,7 +380,7 @@ extension BLOCKv {
     ///   - completion: The completion handler to call when the action is completed.
     ///                 This handler is executed on the main queue.
     public static func acquireVatom(withID id: String,
-                                    completion: @escaping (Data?, BVError?) -> Void) {
+                                    completion: @escaping ([String: Any]?, BVError?) -> Void) {
 
         let body = ["this.id": id]
 

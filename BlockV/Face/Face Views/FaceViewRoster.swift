@@ -51,7 +51,7 @@ public class FaceViewRoster {
         roster.register(ImagePolicyFaceView.self)
         roster.register(ImageProgressFaceView.self)
         roster.register(ImageLayeredFaceView.self)
-
+        roster.register(WebFaceView.self)
         return roster
     }()
 

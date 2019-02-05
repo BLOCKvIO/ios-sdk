@@ -20,11 +20,13 @@ public struct BaseModel<T: Decodable>: Decodable {
 ///
 /// This structure forms part of a subset of responses.
 public struct MetaModel: Codable, Equatable {
+    let createdBy: String
     let dataType: String
     public let whenCreated: Date
     public let whenModified: Date
 
     enum CodingKeys: String, CodingKey {
+        case createdBy = "created_by"
         case dataType = "data_type"
         case whenCreated = "when_created"
         case whenModified = "when_modified"

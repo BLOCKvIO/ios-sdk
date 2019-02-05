@@ -30,6 +30,8 @@ extension JSON {
     /// of those types.
     public init(_ value: Any) throws {
         switch value {
+        case _ as NSNull:
+            self = .null
         case let num as Float:
             self = .number(num)
         case let num as Int:
@@ -50,11 +52,10 @@ extension JSON {
 
 extension JSON {
 
-    /// Create a JSON value from a `Codable`. This will give you access to the “raw”
-    /// encoded JSON value the `Codable` is serialized into. And hopefully, you could
-    /// encode the resulting JSON value and decode the original `Codable` back.
-    public init<T: Codable>(codable: T) throws {
-        let encoded = try JSONEncoder().encode(codable)
+    /// Create a JSON value from an `Encodable`. This will give you access to the “raw”
+    /// encoded JSON value the `Encodable` is serialized into.
+    public init<T: Encodable>(encodable: T) throws {
+        let encoded = try JSONEncoder().encode(encodable)
         self = try JSONDecoder().decode(JSON.self, from: encoded)
     }
 }

@@ -11,12 +11,13 @@
 
 import Foundation
 
-/// Struct representing the script message sent by the Web Face SDK.
-struct FaceScriptMessage {
+/// Struct representing a request script message. The Bridge SDK is bi-directional. This means a `RequestScriptMessage`
+/// can be sent and received.
+struct RequestScriptMessage: Codable {
     /// Unique identifier of the incomming message.
-    let name: String
+    var name: String
     /// Unique indentifier for the outgoing response.
-    var responseID: String
+    var requestID: String
     /// Origin of the message.
     let source: String
     /// Interface version being requested from the FaceSDK.
@@ -25,15 +26,15 @@ struct FaceScriptMessage {
     /// used by first Face SDK only – all newer version MUST supply a version key-pair.
     let version: String
     /// Object containg data from the FaceSDK.
-    let object: [String: JSON]
+    let payload: [String: JSON]
 
     /// Initializes using parameters.
-    init(source: String, name: String, responseID: String?, version: String?, object: [String: JSON]?) {
+    init(source: String, name: String, requestID: String?, version: String?, payload: [String: JSON]?) {
         self.source = source
         self.name = name
-        self.responseID = responseID ?? ""
+        self.requestID = requestID ?? ""
         self.version = version ?? "1.0.0" // default for original Face SDK.
-        self.object = object ?? [:]
+        self.payload = payload ?? [:]
     }
 
     /// Initializes using a JSON object.
@@ -48,11 +49,19 @@ struct FaceScriptMessage {
         }
         // extract info
         let version = descriptor["version"]?.stringValue
-        // note: 1.0.0 uses slightly different naming
-        let responseID = descriptor["response_id"]?.stringValue ?? descriptor["responseID"]?.stringValue ?? ""
-        let object = descriptor["payload"]?.objectValue ?? descriptor["data"]?.objectValue
+        // note: 1.0.0 uses slightly different naming (responseID)
+        let requestID = descriptor["request_id"]?.stringValue ?? descriptor["responseID"]?.stringValue ?? ""
+        let payload = descriptor["payload"]?.objectValue ?? descriptor["data"]?.objectValue
 
-        self.init(source: source, name: name, responseID: responseID, version: version, object: object)
+        self.init(source: source, name: name, requestID: requestID, version: version, payload: payload)
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case source
+        case name
+        case requestID = "request_id"
+        case version
+        case payload
     }
 
     enum FaceScriptError: Error {
@@ -60,4 +69,22 @@ struct FaceScriptMessage {
         case invalidSource
         case invalidVersion
     }
+}
+
+/// Struct representing a response script message. The Bridge SDK is bi-directional.
+/// This means a `ResponseScriptMessage` can be sent and received.
+///
+/// V2 defines a wrapping payload structure.
+struct ResponseScriptMessage: Encodable {
+
+    let name: String
+    let responseID: String
+    let payload: JSON
+
+    enum CodingKeys: String, CodingKey {
+        case name
+        case responseID  = "response_id"
+        case payload
+    }
+
 }

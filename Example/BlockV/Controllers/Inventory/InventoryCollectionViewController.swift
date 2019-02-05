@@ -114,7 +114,7 @@ class InventoryCollectionViewController: UICollectionViewController {
         // MARK: - State Update
         
         // subscribe to vatom state update events
-        BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { [weak self] vatomStateEvent in
+        BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { vatomStateEvent in
             
             print("\nViewer > State Update Event: \n\(vatomStateEvent)")
             

@@ -20,9 +20,9 @@ protocol CoreBridge {
     /// Completion type used by message handlers.
     ///
     /// - parameters:
-    ///   - data: JSON encoded data.
+    ///   - payload: Payload portion of the response.
     ///   - error: Any error encountered during message processing.
-    typealias Completion = (_ data: Data?, _ error: BridgeError?) -> Void
+    typealias Completion = (_ payload: JSON?, _ error: BridgeError?) -> Void
 
     /// Processes the message and calls the completion handler once the output is known.
     ///
@@ -30,10 +30,15 @@ protocol CoreBridge {
     ///   - scriptMessage: The face script message from the webpage.
     ///   - completion: The completion handler that is called once the message has been processed.
     /// - Returns: `true` is the bridge is capable of processing the message. `false` otherwise.
-    func processMessage(_ scriptMessage: FaceScriptMessage, completion: @escaping Completion)
+    func processMessage(_ scriptMessage: RequestScriptMessage, completion: @escaping Completion)
 
     /// Returns `true` if the bridge is capable of processing the message and `false` otherwise.
     func canProcessMessage(_ message: String) -> Bool
+
+    /// Send a formatted vAtom to the Bridge SDK.
+    ///
+    /// This is to specialized for a protocol. Surely something more generic exists.
+    func sendVatom(_ vatom: VatomModel)
 
 }
 

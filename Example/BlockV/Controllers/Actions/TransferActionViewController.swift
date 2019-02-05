@@ -89,16 +89,16 @@ class TransferActionViewController: UIViewController {
     /// a another user via a phone, email, or user id token.
     func performTransferConvenience(token: UserToken) {
         
-        self.vatom.transfer(toToken: token) { [weak self] (data, error) in
+        self.vatom.transfer(toToken: token) { [weak self] (json, error) in
             
             // unwrap data, handle error
-            guard let data = data, error == nil else {
+            guard let json = json, error == nil else {
                 print(error!.localizedDescription)
                 return
             }
             
             // success
-            print("Action response: \(String.init(data: data, encoding: .utf8) ?? "<parsing error>")")
+            print("Action response: \(json.debugDescription)")
             self?.hide()
         }
         
@@ -116,16 +116,16 @@ class TransferActionViewController: UIViewController {
             "new.owner.\(token.type.rawValue)": token.value
         ]
         
-        BLOCKv.performAction(name: "Transfer", payload: body) { [weak self] (data, error) in
+        BLOCKv.performAction(name: "Transfer", payload: body) { [weak self] (json, error) in
             
             // unwrap data, handle error
-            guard let data = data, error == nil else {
+            guard let json = json, error == nil else {
                 print(error!.localizedDescription)
                 return
             }
             
             // success
-            print("Action response: \(String.init(data: data, encoding: .utf8) ?? "<parsing error>")")
+            print("Action response: \(json.debugDescription)")
             self?.hide()
             
         }

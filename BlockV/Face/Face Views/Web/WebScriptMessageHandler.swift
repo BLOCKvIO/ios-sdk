@@ -34,11 +34,11 @@ extension WebFaceView: WKScriptMessageHandler {
             guard let payload = message.objectValue else {
                 throw BridgeError.caller("Top-level must be an object.")
             }
-            let scriptMessage = try FaceScriptMessage(descriptor: payload)
+            let scriptMessage = try RequestScriptMessage(descriptor: payload)
             try self.routeMessage(scriptMessage)
         } catch {
             let error = BridgeError.caller("Invalid script message.")
-            self.postError(error)
+            printBV(error: error.localizedDescription)
         }
 
     }
@@ -46,19 +46,14 @@ extension WebFaceView: WKScriptMessageHandler {
     /// Sends a script message to the Web Face SDK.
     ///
     /// - important: The data must be json encoded.
-    func postMessage(_ responseID: String, withJSONData data: Data? = nil) {
+    func postMessage(_ responseID: String, withJSONString jsonString: String? = nil) {
 
         // create script
         var script = "(window.vatomicEventReceiver || window.blockvEventReceiver).trigger('message', "
         script += "\"" + responseID + "\""
-        if let data = data {
-            // string-fy the json data
-            if let jsonString = String(data: data, encoding: .utf8) {
-                script += ", "
-                script += jsonString
-            } else {
-                printBV(error: "Unable to convert json data into string.")
-            }
+        if let jsonString = jsonString {
+            script += ", "
+            script += jsonString
         }
         script += ");"
         printBV(info: "Posting script for evaluation:\n\(script)")
@@ -76,16 +71,82 @@ extension WebFaceView: WKScriptMessageHandler {
 
     }
 
-    /// Sends an error message to the Web Face SDK.
-    func postError(responseID: String = "error", _ error: BridgeError) {
+    /// Convenience method to allow an object to be posted.
+    ///
+    /// Ideally, this function should only allow [String: Any] payloads. However, allows primative types, e.g. Bool,
+    /// to be passed across as Javascript strings.
+    func sendResponse(forRequestMessage message: RequestScriptMessage, payload: JSON?, error: BridgeError?) {
 
-        if coreBridge is CoreBridgeV1 {
-            self.postMessage(responseID, withJSONData: error.bridgeDataV1)
-            printBV(error: "Posting error to bridge:\n \(error.localizedDescription)")
+        /*
+         Note: Accepted Viewer Payloads
+         
+         Each Bridge SDK version imposes different requirements on the structure of the JSON payload it
+         accepts:
+         - V1: Objects and primatives.
+         - V2: Only objects.
+         */
+
+        if let payload = payload {
+
+            if message.version == "1.0.0" {
+                let data = try! JSONEncoder.blockv.encode(payload)
+                let jsonString = String.init(data: data, encoding: .utf8)!
+                self.postMessage(message.requestID, withJSONString: jsonString)
+            } else { // 2.0.0
+
+                // wrap in response object
+                let response: JSON = [
+                    "name": try! JSON(message.name), //FIXME: This is not right
+                    "response_id": try! JSON(message.requestID),
+                    "payload": payload
+                ]
+                let data = try! JSONEncoder.blockv.encode(response)
+                let jsonString = String.init(data: data, encoding: .utf8)!
+                self.postMessage(message.requestID, withJSONString: jsonString)
+            }
+
+        } else if let error = error {
+
+            if message.version == "1.0.0" {
+                let response = try! JSON(error.bridgeFormatV1)
+                let data = try! JSONEncoder.blockv.encode(response)
+                let jsonString = String.init(data: data, encoding: .utf8)!
+                self.postMessage(message.requestID, withJSONString: jsonString)
+            } else { // 2.0.0
+                let response: JSON = [
+                    "name": try! JSON(message.name),
+                    "response_id": try! JSON(message.requestID),
+                    "payload": try! JSON(error.bridgeFormatV2)
+                ]
+                let data = try! JSONEncoder.blockv.encode(response)
+                let jsonString = String.init(data: data, encoding: .utf8)!
+                self.postMessage(message.requestID, withJSONString: jsonString)
+            }
         } else {
-            self.postMessage(responseID, withJSONData: error.bridgeDataV2)
-            printBV(error: "Posting error to bridge:\n \(error.localizedDescription)")
+            assertionFailure("Either 'payload' or 'error' must be non nil.")
         }
+
+    }
+
+    /// Send a request message to the Bridge SDK.
+    ///
+    /// The proper working of this function is dependent on the Bridge SDK being initialized.
+    func sendRequestMessage(_ scriptMessage: RequestScriptMessage,
+                            completion: ((ResponseScriptMessage) -> Void)?) {
+
+        if scriptMessage.version == "1.0.0" {
+            // only payload
+            let payload = scriptMessage.payload
+            let data = try! JSONEncoder.blockv.encode(payload)
+            let jsonString = String.init(data: data, encoding: .utf8)!
+            self.postMessage(scriptMessage.requestID, withJSONString: jsonString)
+        } else { // 2.0.0
+            let data = try! JSONEncoder.blockv.encode(scriptMessage)
+            let jsonString = String.init(data: data, encoding: .utf8)!
+            self.postMessage(scriptMessage.requestID, withJSONString: jsonString)
+        }
+        
+        // Completion will never be called in this version.
 
     }
 
@@ -101,11 +162,11 @@ extension WebFaceView {
     ///   - name: Unique identifier of the message.
     ///   - data: Data payload from webpage.
     ///   - completion: Completion handler to call pasing the data to be forwarded to the webpage.
-    private func routeMessage(_ message: FaceScriptMessage) throws {
+    private func routeMessage(_ message: RequestScriptMessage) throws {
 
         print(#function)
         print("Message name: \(message.name)")
-        print("Object: \(message.object)")
+        print("Payload: \(message.payload)")
 
         var message = message
 
@@ -113,19 +174,8 @@ extension WebFaceView {
         switch message.version {
         case "1.0.0": // original Face SDK
             self.coreBridge = CoreBridgeV1(faceView: self)
-
-            /*
-             Note:
-             By default, Version 1.0.0 (original Face SDK) expects the native SDK to respond with the appropriate
-             response ID. Some messages expect a *named* response. In the code below, the named responses are inserted.
-             */
-            if message.responseID.isEmpty {
-                if message.name == "vatom.init" {
-                    message.responseID = "vatom.init-complete"
-                } else if message.name == "vatom.children.get" {
-                    message.responseID = "vatom.children.get-response"
-                }
-            }
+            // transform V1 to V2
+            message = self.transformScriptMessage(message)
 
         case "2.0.0":
             self.coreBridge = CoreBridgeV2(faceView: self)
@@ -154,15 +204,11 @@ extension WebFaceView {
             // determine appropriate responder (core or viewer)
             if coreBridge.canProcessMessage(message.name) {
                 // forward to core bridge
-                coreBridge.processMessage(message) { (data, error) in
-                    // convert completion into a bridge message
-                    if let error = error {
-                        self.postError(responseID: message.responseID, error)
-                    } else if let data = data {
-                        self.postMessage(message.responseID, withJSONData: data)
-                    } else {
-                        fatalError("An error or data must be returned.")
-                    }
+                coreBridge.processMessage(message) { (payload, error) in
+
+                    // post response
+                    self.sendResponse(forRequestMessage: message, payload: payload, error: error)
+
                 }
             } else {
                 // forward to viewer
@@ -174,57 +220,76 @@ extension WebFaceView {
     }
 
     /// Routes the script message to the viewer and handles the response.
-    private func routeMessageToViewer(_ message: FaceScriptMessage) {
+    private func routeMessageToViewer(_ message: RequestScriptMessage) {
 
         // notify the host's message delegate of the custom message from the web page
         self.delegate?.faceView(self,
                                 didSendMessage: message.name,
-                                withObject: message.object,
-                                compleiton: { (json, error) in
+                                withObject: message.payload,
+                                completion: { (payload, error) in
 
-                // handle error from viewer
-                guard error == nil else {
-                    // convert error into bridge error
-                    self.postError(BridgeError.viewer(error!.message))
-                    return
-                }
-                // handle no data
-                guard let json = json else {
-                    self.postMessage(message.responseID, withJSONData: nil)
-                    return
-                }
-                // attempt encoding
-                do {
+                                    // transform the bridge error
+                                    let bridgeError = BridgeError.viewer(error?.message ?? "Unknown error occured.")
 
-                    /*
-                     Note:
-                     Accepted Viewer Payloads
-                     
-                     Each Web Face SDK version imposes different requirements on the structure of the JSON payload it
-                     accepts:
-                     - V2: Only objects.
-                     - V1: Only objects and strings.
-                     */
+                                    // V1 Support. Transform the `viewer.qr.scan` reponse paylaod from [String: String]
+                                    // to String.
+                                    if message.version == "1.0.0" && message.name == "viewer.qr.scan" {
+                                        if let newPayload = payload?["data"] {
+                                            self.sendResponse(forRequestMessage: message, payload: newPayload,
+                                                              error: bridgeError)
+                                            return
+                                        }
+                                    }
 
-                    switch json {
-                    case let .object(object):
-                        let data = try JSONEncoder.blockv.encode(object)
-                        self.postMessage(message.responseID, withJSONData: data)
-                    case let .string(string): // backwards compatibility V1
-                        guard let data = string.data(using: .utf8) else {
-                            throw BridgeError.viewer("Unable to encode.")
-                        }
-                        self.postMessage(message.responseID, withJSONData: data)
-                    default:
-                        assertionFailure("Unsupported payload type.")
-                        throw BridgeError.viewer("Unsupported payload type.")
-                    }
-                } catch {
-                    let error = BridgeError.viewer("Unable to encode viewer payload.")
-                    self.postError(error)
-                }
+                                    self.sendResponse(forRequestMessage: message,
+                                                      payload: payload,
+                                                      error: bridgeError)
 
         })
+
+    }
+
+    /// Transforms viewer message from protocol V1 to V2.
+    ///
+    /// - Parameter message: Script message to transform.
+    /// - Returns: Transformed script message.
+    private func transformScriptMessage(_ message: RequestScriptMessage) -> RequestScriptMessage {
+
+        var message = message
+        /*
+         Note:
+         By default, Version 1.0.0 (original Face SDK) expects the native SDK to respond with the appropriate
+         response ID. Some messages expect a *named* response. In the code below, the named responses are inserted.
+         */
+        if message.requestID.isEmpty {
+            if message.name == "vatom.init" {
+                message.requestID = "vatom.init-complete"
+            } else if message.name == "vatom.children.get" {
+                message.requestID = "vatom.children.get-response"
+            }
+        }
+
+        /*
+         Note:
+         Version 1.0.0 uses a set of legacy messages. Here, these legacy viewer messages are transformed into the
+         BLOCKv standardized viewer messages.
+         By doing this, viewers will be unaware (a good thing) of the version of the web face sending the custom
+         messages.
+         */
+        switch message.name {
+        case "ui.map.show": message.name = "viewer.map.show"
+        case "ui.qr.scan": message.name = "viewer.qr.scan"
+        case "ui.vatom.show": message.name = "viewer.vatom.show"
+        case "ui.scanner.show": message.name = "viewer.scanner.show"
+        case "ui.browser.open": message.name = "viewer.url.open"
+        case "vatom.view.close": message.name = "viewer.view.close"
+        case "vatom.view.presentCard": message.name = "viewer.card.show"
+        case "ui.vatom.transfer": message.name = "viewer.action.send"
+        case "ui.vatom.clone": message.name = "viewer.action.share"
+        default: break
+        }
+
+        return message
 
     }
 

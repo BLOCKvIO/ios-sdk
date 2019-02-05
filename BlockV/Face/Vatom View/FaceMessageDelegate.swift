@@ -70,7 +70,7 @@ protocol FaceViewDelegate: class {
     func faceView(_ faceView: FaceView,
                   didSendMessage message: String,
                   withObject object: [String: JSON],
-                  compleiton: FaceViewDelegate.Completion?)
+                  completion: FaceViewDelegate.Completion?)
 
 }
 
@@ -82,13 +82,13 @@ extension VatomView: FaceViewDelegate {
     func faceView(_ faceView: FaceView,
                   didSendMessage message: String,
                   withObject object: [String: JSON],
-                  compleiton: ((JSON?, FaceMessageError?) -> Void)?) {
+                  completion: ((JSON?, FaceMessageError?) -> Void)?) {
 
         // forward the message to the vatom view delegate
         self.vatomViewDelegate?.vatomView(self,
                                           didRecevieFaceMessage: message,
                                           withObject: object,
-                                          completion: compleiton)
+                                          completion: completion)
     }
 
 }

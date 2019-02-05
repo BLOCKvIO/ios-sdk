@@ -12,6 +12,26 @@
 import Foundation
 import WebKit
 
+/// Wraps WKScriptMessageHandler as a weak delegate.
+///
+/// Context: `WKUserContentController` holds a strong reference to its delegate. This may cause memory leaks.
+///
+/// - see:
+/// https://stackoverflow.com/a/26383032/3589408
+class LeakAvoider: NSObject, WKScriptMessageHandler {
+    /// Hold a weak reference to the `WKScriptMessageHandler`.
+    weak var delegate: WKScriptMessageHandler?
+    init(delegate: WKScriptMessageHandler) {
+        self.delegate = delegate
+        super.init()
+    }
+    func userContentController(_ userContentController: WKUserContentController,
+                               didReceive message: WKScriptMessage) {
+        self.delegate?.userContentController(
+            userContentController, didReceive: message)
+    }
+}
+
 /// Web face view.
 ///
 /// Displays webage where the url is specified by the display URL of the face model.
@@ -30,8 +50,8 @@ class WebFaceView: FaceView {
         webConfiguration.allowsInlineMediaPlayback = true
         webConfiguration.allowsAirPlayForMediaPlayback = true
         webConfiguration.mediaTypesRequiringUserActionForPlayback = []
-        webConfiguration.userContentController.add(self, name: "vatomicBridge")
-        webConfiguration.userContentController.add(self, name: "blockvBridge")
+        webConfiguration.userContentController.add(LeakAvoider(delegate: self), name: "vatomicBridge")
+        webConfiguration.userContentController.add(LeakAvoider(delegate: self), name: "blockvBridge")
 
         // content controller
         let webView = WKWebView(frame: self.bounds, configuration: webConfiguration)
@@ -76,7 +96,9 @@ class WebFaceView: FaceView {
         // if the vatom has changed, load the face url again
         if vatom.id != self.vatom.id {
             self.loadFace()
+            return
         }
+        self.coreBridge?.sendVatom(vatom)
     }
 
     func unload() {

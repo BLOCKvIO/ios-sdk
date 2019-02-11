@@ -134,8 +134,8 @@ class CoreBridgeV2: CoreBridge {
             }
             self.discoverChildren(forVatomID: vatomID, completion: { (payload, error) in
                 // json dance
-                if let payload = payload?["vatoms"]?.first {
-                    let payload = try? JSON.init(encodable: ["vatom": payload])
+                if let payload = payload?["vatoms"] {
+                    let payload = try? JSON.init(encodable: ["vatoms": payload])
                     completion(payload, error)
                     return
                 }

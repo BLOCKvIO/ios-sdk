@@ -88,40 +88,52 @@ extension WebFaceView: WKScriptMessageHandler {
 
         if let payload = payload {
 
+            // create response
+            var response: JSON?
             if message.version == "1.0.0" {
-                let data = try! JSONEncoder.blockv.encode(payload)
-                let jsonString = String.init(data: data, encoding: .utf8)!
-                self.postMessage(message.requestID, withJSONString: jsonString)
-            } else { // 2.0.0
-
-                // wrap in response object
-                let response: JSON = [
-                    "name": try! JSON(message.name), //FIXME: This is not right
-                    "response_id": try! JSON(message.requestID),
-                    "payload": payload
+                response = payload
+            } else {
+                response = [
+                "name": try! JSON(message.name),
+                "response_id": try! JSON(message.requestID),
+                "payload": payload
                 ]
-                let data = try! JSONEncoder.blockv.encode(response)
-                let jsonString = String.init(data: data, encoding: .utf8)!
-                self.postMessage(message.requestID, withJSONString: jsonString)
             }
+
+            // encode response
+            guard let data = try? JSONEncoder.blockv.encode(response),
+                let jsonString = String.init(data: data, encoding: .utf8) else {
+                    // handle error
+                    let error = BridgeError.viewer("Unable to encode response.")
+                    self.sendResponse(forRequestMessage: message, payload: nil, error: error)
+                    return
+            }
+            self.postMessage(message.requestID, withJSONString: jsonString)
 
         } else if let error = error {
 
+            // create response
+            var response: JSON?
             if message.version == "1.0.0" {
-                let response = try! JSON(error.bridgeFormatV1)
-                let data = try! JSONEncoder.blockv.encode(response)
-                let jsonString = String.init(data: data, encoding: .utf8)!
-                self.postMessage(message.requestID, withJSONString: jsonString)
-            } else { // 2.0.0
-                let response: JSON = [
+                response = try! JSON(error.bridgeFormatV1)
+            } else {
+                response = [
                     "name": try! JSON(message.name),
                     "response_id": try! JSON(message.requestID),
                     "payload": try! JSON(error.bridgeFormatV2)
                 ]
-                let data = try! JSONEncoder.blockv.encode(response)
-                let jsonString = String.init(data: data, encoding: .utf8)!
-                self.postMessage(message.requestID, withJSONString: jsonString)
             }
+
+            // encode response
+            guard let data = try? JSONEncoder.blockv.encode(response),
+                let jsonString = String.init(data: data, encoding: .utf8) else {
+                    // handle error
+                    let error = BridgeError.viewer("Unable to encode response.")
+                    self.sendResponse(forRequestMessage: message, payload: nil, error: error)
+                    return
+            }
+            self.postMessage(message.requestID, withJSONString: jsonString)
+
         } else {
             assertionFailure("Either 'payload' or 'error' must be non nil.")
         }
@@ -145,7 +157,7 @@ extension WebFaceView: WKScriptMessageHandler {
             let jsonString = String.init(data: data, encoding: .utf8)!
             self.postMessage(scriptMessage.requestID, withJSONString: jsonString)
         }
-        
+
         // Completion will never be called in this version.
 
     }

@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+#### 3.x Release (API v1)
+- `3.0.x` Releases - [3.0.0](#300)
+
 #### 2.x Releases (API v1)
 - `2.3.x` Releases -  [2.3.0](#230)
 - `2.2.x` Releases -  [2.2.0](#220)
@@ -16,35 +19,66 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [3.0.0](https://github.com/BLOCKvIO/ios-sdk/releases/tag/3.0.0)
+
+### Added
+
+- Web Face View
+    - Pull Request [#161](https://github.com/BLOCKvIO/ios-sdk/pull/161)
+    - Pull Request [#159](https://github.com/BLOCKvIO/ios-sdk/pull/159)
+    - Pull Request [#155](https://github.com/BLOCKvIO/ios-sdk/pull/155)
+    - Pull Request [#153](https://github.com/BLOCKvIO/ios-sdk/pull/153)
+    - Pull Request [#152](https://github.com/BLOCKvIO/ios-sdk/pull/152)
+    - Pull Request [#148](https://github.com/BLOCKvIO/ios-sdk/pull/148)
+    - Pull Request [#147](https://github.com/BLOCKvIO/ios-sdk/pull/147)
+    - Pull Request [#146](https://github.com/BLOCKvIO/ios-sdk/pull/146)
+- BLOCKv encoder and decoder convenience structs
+    - Pull Request [#151](https://github.com/BLOCKvIO/ios-sdk/pull/151)
+- `NSNull` initialisation to GenericJSON
+    - Pull Request [#151](https://github.com/BLOCKvIO/ios-sdk/pull/151)
+- `Codable` conformance to `VatomModel` and`ActionModel`
+    - Pull Request [#150](https://github.com/BLOCKvIO/ios-sdk/pull/150)
+    
+### Updated
+
+- Remove discover count (due to server inconsistency)
+    - Pull Request [#158](https://github.com/BLOCKvIO/ios-sdk/pull/158)
+- Correct `VatomModel` codable keys to match server
+    - Pull Request [#157](https://github.com/BLOCKvIO/ios-sdk/pull/157)
+- Use unencoded resource url as cache key
+    - Pull Request [#145](https://github.com/BLOCKvIO/ios-sdk/pull/145)
+
+---
+
 ## [2.3.0](https://github.com/BLOCKvIO/ios-sdk/releases/tag/2.3.0)
 
 ### Added
 
 - Image Layered Face View
-  - Pull Rrequest [#143](https://github.com/BLOCKvIO/ios-sdk/pull/143)
+  - Pull Request [#143](https://github.com/BLOCKvIO/ios-sdk/pull/143)
   
 - 3D Face View
-  - Pull Rrequest [#143](https://github.com/BLOCKvIO/ios-sdk/pull/143)
+  - Pull Request [#143](https://github.com/BLOCKvIO/ios-sdk/pull/143)
 
 ## [2.2.0](https://github.com/BLOCKvIO/ios-sdk/releases/tag/2.2.0)
 
 ### Added
 
 - Image Policy Face View
-  - Pull Rrequest [#134](https://github.com/BLOCKvIO/ios-sdk/pull/134)
+  - Pull Request [#134](https://github.com/BLOCKvIO/ios-sdk/pull/134)
   
   ### Updated
   
   - Prevent `InventoryViewController` from refreshing the inventory after a state update event. This is bad pratice. Rather, an object should
 be created which performs localized updates using the state events.
-  - Pull Rrequest [#133](https://github.com/BLOCKvIO/ios-sdk/pull/133)
+  - Pull Request [#133](https://github.com/BLOCKvIO/ios-sdk/pull/133)
 
 ## [2.1.0](https://github.com/BLOCKvIO/ios-sdk/releases/tag/2.1.0)
 
 ### Added
 
 - Image Progress Face View
-  - Pull Rrequest [#119](https://github.com/BLOCKvIO/ios-sdk/pull/119)
+  - Pull Request [#119](https://github.com/BLOCKvIO/ios-sdk/pull/119)
 - `LiveVatomView` demonstrating responding to Web socket state updates. 
   - Pull Request [#116](https://github.com/BLOCKvIO/ios-sdk/pull/116)
 - `updated(applying:)` method to `VatomModel`. This method allows the partial update data in a state update to be applied to a vatom.

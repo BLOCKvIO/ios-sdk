@@ -132,7 +132,7 @@ public class WebSocketManager {
 
         // Listen for notifications for when the app becomes active
         NotificationCenter.default.addObserver(self, selector: #selector(handleApplicationDidBecomeActive),
-                                               name: .UIApplicationDidBecomeActive, object: nil)
+                                               name: UIApplication.didBecomeActiveNotification, object: nil)
 
     }
 

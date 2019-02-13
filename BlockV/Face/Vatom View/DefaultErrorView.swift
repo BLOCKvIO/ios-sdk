@@ -36,13 +36,13 @@ internal final class DefaultErrorView: UIView & VatomViewError {
     // MARK: - Properties
 
     private let activityIndicator: UIActivityIndicatorView = {
-        let indicator = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+        let indicator = UIActivityIndicatorView(style: .gray)
         indicator.translatesAutoresizingMaskIntoConstraints = false
         return indicator
     }()
 
     private let infoButton: UIButton = {
-        let button = UIButton(type: UIButtonType.infoLight)
+        let button = UIButton(type: UIButton.ButtonType.infoLight)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.tintColor = UIColor.orange
         return button

@@ -37,10 +37,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     internal var webSocketManager: WebSocketManager?
     
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         //: ## Setup
-                
+        
         BLOCKv.configure(appID: MyAppID)
         FaceViewRoster.shared.register(Face3D.self)
         

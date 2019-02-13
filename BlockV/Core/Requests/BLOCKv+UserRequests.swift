@@ -89,7 +89,7 @@ extension BLOCKv {
         //TODO: Perhaps this method should require Data instead of UIImage?
 
         // create image data
-        guard let imageData = UIImagePNGRepresentation(image) else {
+        guard let imageData = image.pngData() else {
             let error = BVError.custom(reason: "\nBV SDK >>> Error: Conversion to png respresetation returned nil.")
             completion(error)
             return

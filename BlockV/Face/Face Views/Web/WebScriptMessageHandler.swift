@@ -11,6 +11,7 @@
 
 import Foundation
 import WebKit
+import GenericJSON
 
 /// This extension handles the bidirectional communication between the Web Face SDK and the Native App.
 ///

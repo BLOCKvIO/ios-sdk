@@ -10,6 +10,7 @@
 //
 
 import Foundation
+import GenericJSON
 
 public struct VatomModel: Equatable {
 

@@ -10,6 +10,7 @@
 //
 
 import Foundation
+import GenericJSON
 
 /// Struct representing a request script message. The Bridge SDK is bi-directional. This means a `RequestScriptMessage`
 /// can be sent and received.

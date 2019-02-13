@@ -10,6 +10,7 @@
 //
 
 import Foundation
+import GenericJSON
 
 /// Protocol to which face bridges should conform.
 ///

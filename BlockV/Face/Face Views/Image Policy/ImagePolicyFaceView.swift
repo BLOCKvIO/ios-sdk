@@ -12,6 +12,7 @@
 import UIKit
 import FLAnimatedImage
 import Nuke
+import GenericJSON
 
 /// Native Image face view
 ///
@@ -155,13 +156,13 @@ class ImagePolicyFaceView: FaceView {
                 }
 
             } else if let policy = policy as? Config.FieldLookup {
-
+                
                 // create key path and split into head and tail
                 guard let component = KeyPath(policy.field).headAndTail(),
                     // only private section lookups are allowed
                     component.head == "private",
                     // current value on the vatom
-                    let vatomValue = self.vatom.private?[keyPath: component.tail] else {
+                    let vatomValue = self.vatom.private?[keyPath: component.tail.path] else {
                         continue
                 }
 

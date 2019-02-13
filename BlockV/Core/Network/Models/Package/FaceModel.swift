@@ -10,6 +10,7 @@
 //
 
 import Foundation
+import GenericJSON
 
 /// A simple struct that models a template face.
 ///

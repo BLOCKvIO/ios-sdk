@@ -10,6 +10,7 @@
 //
 
 import Foundation
+import GenericJSON
 
 /// Core Bridge (Version 2.0.0)
 ///

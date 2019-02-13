@@ -88,19 +88,19 @@ extension VatomModel {
 
         // update EOS
         if let eosPropsPartial = stateUpdate.vatomProperties["eos"] {
-            if let updatedEOS = vatom.eos?.updated(applying: eosPropsPartial) {
+            if let updatedEOS = vatom.eos?.merging(with: eosPropsPartial) {
                 vatom.eos = updatedEOS
             }
         }
         // update ETH
         if let ethPropsPartial = stateUpdate.vatomProperties["eth"] {
-            if let updatedETH = vatom.eth?.updated(applying: ethPropsPartial) {
+            if let updatedETH = vatom.eth?.merging(with: ethPropsPartial) {
                 vatom.eth = updatedETH
             }
         }
         // update private
         if let privatePropsPartial = stateUpdate.vatomProperties["private"] {
-            if let updatedPrivate = vatom.private?.updated(applying: privatePropsPartial) {
+            if let updatedPrivate = vatom.private?.merging(with: privatePropsPartial) {
                 vatom.private = updatedPrivate
             }
         }

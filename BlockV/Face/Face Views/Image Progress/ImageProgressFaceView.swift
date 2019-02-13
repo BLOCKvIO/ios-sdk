@@ -11,6 +11,7 @@
 
 import UIKit
 import Nuke
+import GenericJSON
 
 /// Native progress image face view
 ///

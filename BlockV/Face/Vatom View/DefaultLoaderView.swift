@@ -20,7 +20,7 @@ internal final class DefaultLoaderView: UIView, VatomViewLoader {
     // MARK: - Properties
 
     private let activityIndicator: UIActivityIndicatorView = {
-        let indicator = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+        let indicator = UIActivityIndicatorView(style: .gray)
         indicator.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         return indicator
     }()

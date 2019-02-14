@@ -27,7 +27,7 @@ extension UIViewController {
     
     /// Shows activity indicator on the right.
     func showNavBarActivityRight() {
-        let indicator = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+        let indicator = UIActivityIndicatorView(style: .gray)
         indicator.startAnimating()
         let item = UIBarButtonItem(customView: indicator)
         
@@ -41,7 +41,7 @@ extension UIViewController {
     
     /// Shows activty indicator on the left.
     func showNavBarActivityLeft() {
-        let indicator = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+        let indicator = UIActivityIndicatorView(style: .gray)
         indicator.startAnimating()
         let item = UIBarButtonItem(customView: indicator)
         

@@ -10,6 +10,7 @@
 //
 
 import Foundation
+import GenericJSON
 
 /// Core Bridge (Version 1.0.0)
 ///
@@ -530,7 +531,7 @@ private extension CoreBridgeV1 {
             if let properties = try? JSON(encodable: vatom.props) {
                 if let privateProps = vatom.private {
                     // merge private properties into root properties
-                    let combinedProperties = properties.updated(applying: privateProps)
+                    let combinedProperties = properties.merging(with: privateProps)
                     // encode resource urls
                     var encodedResources: [String: URL] = [:]
                     vatom.props.resources.forEach { encodedResources[$0.name] = $0.encodedURL()}

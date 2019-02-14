@@ -23,6 +23,7 @@
 
 import UIKit
 import BLOCKv
+import GenericJSON
 
 /*
  Goals

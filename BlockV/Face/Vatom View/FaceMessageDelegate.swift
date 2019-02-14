@@ -10,6 +10,7 @@
 //
 
 import Foundation
+import GenericJSON
 
 /// Face message error (view bridge).
 public struct FaceMessageError: Error {

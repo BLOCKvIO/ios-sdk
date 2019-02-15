@@ -23,7 +23,7 @@
 
 import Foundation
 import BLOCKv
-//import VatomFace3D
+import VatomFace3D
 
 /// Struct holding the set of custom face selection procedures (FSP)s.
 struct CustomProcedure {
@@ -35,9 +35,9 @@ struct CustomProcedure {
         let result = EmbeddedProcedure.icon.procedure(vatom, urls)
 
         // check if it's one of our heavy faces
-//        if result?.properties.displayURL.lowercased() == Face3D.displayURL {
-//            return nil
-//        }
+        if result?.properties.displayURL.lowercased() == Face3D.displayURL {
+            return nil
+        }
 
         // not heavy, allow it
         return result

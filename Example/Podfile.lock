@@ -17,21 +17,12 @@ PODS:
   - GenericJSON (1.2.0)
   - JWTDecode (2.2.0)
   - Nuke (7.5.2)
-  - NVActivityIndicatorView (4.6.1):
-    - NVActivityIndicatorView/Presenter (= 4.6.1)
-  - NVActivityIndicatorView/Presenter (4.6.1)
   - Signals (6.0.0)
   - Starscream (3.0.6)
   - SwiftLint (0.30.1)
-  - VatomFace3D (1.0.4):
-    - BLOCKv/Face
-    - FLAnimatedImage
-    - Nuke
-    - NVActivityIndicatorView
 
 DEPENDENCIES:
   - BLOCKv (from `../`)
-  - VatomFace3D
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -40,11 +31,9 @@ SPEC REPOS:
     - GenericJSON
     - JWTDecode
     - Nuke
-    - NVActivityIndicatorView
     - Signals
     - Starscream
     - SwiftLint
-    - VatomFace3D
 
 EXTERNAL SOURCES:
   BLOCKv:
@@ -57,12 +46,10 @@ SPEC CHECKSUMS:
   GenericJSON: 05eb212cd12bf0562b816075090bea3eda2ab2ed
   JWTDecode: 85a405ab16d5473e99bd89ded1d535090ebd6a0e
   Nuke: 0350d346a688426e8f2331253ef28dc2fc4f6178
-  NVActivityIndicatorView: 4ca19fccc84595a78957336a086d00a49be6ce61
   Signals: eca6a9098b40ed5f8d8b60498d0e91168fa7c0cc
   Starscream: ef3ece99d765eeccb67de105bfa143f929026cf5
   SwiftLint: a54bf1fe12b55c68560eb2a7689dfc81458508f7
-  VatomFace3D: 6a77f5f2b0cb99664a8e0237ce171276956df384
 
-PODFILE CHECKSUM: 572540b34367caffea356b90ca04601e730b047d
+PODFILE CHECKSUM: 87baefe3de21b1785b390c8052c50b536716bdad
 
 COCOAPODS: 1.6.0

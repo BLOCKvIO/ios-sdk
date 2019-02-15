@@ -23,25 +23,25 @@
 
 import Foundation
 import BLOCKv
-import VatomFace3D
+//import VatomFace3D
 
 /// Struct holding the set of custom face selection procedures (FSP)s.
 struct CustomProcedure {
-    
+
     /// This face selection procedure filters out "heavy" faces (e.g. 3D)
     static let noHeavyIcons : FaceSelectionProcedure = { vatom, urls -> FaceModel? in
-        
+
         // run standard Icon face selection
         let result = EmbeddedProcedure.icon.procedure(vatom, urls)
-        
+
         // check if it's one of our heavy faces
-        if result?.properties.displayURL.lowercased() == Face3D.displayURL {
-            return nil
-        }
-        
+//        if result?.properties.displayURL.lowercased() == Face3D.displayURL {
+//            return nil
+//        }
+
         // not heavy, allow it
         return result
-        
+
     }
-    
+
 }

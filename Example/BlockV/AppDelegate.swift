@@ -28,7 +28,7 @@
 
 import UIKit
 import BLOCKv
-import VatomFace3D
+//import VatomFace3D
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -42,7 +42,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         //: ## Setup
         
         BLOCKv.configure(appID: MyAppID)
-        FaceViewRoster.shared.register(Face3D.self)
+        //FaceViewRoster.shared.register(Face3D.self)
         
         //: ## Control Flow
 

@@ -181,6 +181,28 @@ extension API {
             return Endpoint(method: .put,
                             path: currentUserPath + "/tokens/\(id)/default")
         }
+        
+        // MARK: Username
+        
+        /// Builds the endpoint to edit a username token.
+        ///
+        /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
+        static func updateUsernameToken(id: String, username: String) -> Endpoint<BaseModel<FullTokenModel>> {
+            return Endpoint(method: .patch,
+                            path: currentUserPath + "/tokens/\(id)",
+                            parameters: [
+                                "token": username,
+                                "token_type": "username"
+            ])
+        }
+        
+        /// Builds the endpoint to disable a username token.
+        ///
+        /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
+        static func disableUsername(tokenId: String) -> Endpoint<BaseModel<GeneralModel>> { //FIXME: General model is wrong
+            return Endpoint(method: .put,
+                            path: currentUserPath + "/tokens/\(tokenId)/disabled")
+        }
 
         // MARK: Avatar
 

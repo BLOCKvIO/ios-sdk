@@ -291,6 +291,10 @@ extension BLOCKv {
     ///
     /// Note: Primary tokens may not be deleted.
     ///
+    /// - important: Deleting a *username* token will allow the username to be reclaimed immediately by another
+    /// user. A safer approach is to call `TODO` which will prevent the username from being
+    /// reclaimed for a defined period of time.
+    ///
     /// - Parameters:
     ///   - tokenId: Unique identifier of the token to be deleted.
     ///   - completion: The completion handler to call when the request is completed.
@@ -382,6 +386,67 @@ extension BLOCKv {
             // model is available
             DispatchQueue.main.async {
                 completion(userModel, nil)
+            }
+
+        }
+
+    }
+
+    /// Updates the current user's username.
+    ///
+    /// Updating a username token will automatically disable the current username token.
+    ///
+    /// - Parameters:
+    ///   - tokenID: Unique identifier of the current username token.
+    ///   - newUsername: New username.
+    ///   - completion: The completion handler to call when the request is completed.
+    ///                 This handler is executed on the main queue.
+    public static func updateUsernameToken(tokenID: String, newUsername: String,
+                                           completion: @escaping (FullTokenModel?, BVError?) -> Void) {
+
+        let endpoint = API.CurrentUser.updateUsernameToken(id: tokenID, username: newUsername)
+
+        self.client.request(endpoint) { (baseModel, error) in
+
+            // extract model, ensure no error
+            guard let tokenModel = baseModel?.payload, error == nil else {
+                DispatchQueue.main.async {
+                    completion(nil, error)
+                }
+                return
+            }
+
+            // model is available
+            DispatchQueue.main.async {
+                completion(tokenModel, nil)
+            }
+
+        }
+
+    }
+
+    /// Disables a username token.
+    ///
+    /// Once disabled, the username token is frozen for a period of time. After this period has elapsed, the username
+    /// is recycled, at which time the username becomes available for other users in the system to claim.
+    public static func disableUsernameToken(tokenID: String,
+                                            completion: @escaping (BVError?) -> Void) {
+
+        let endpoint = API.CurrentUser.disableUsername(tokenId: tokenID)
+
+        self.client.request(endpoint) { (baseModel, error) in
+
+            // extract model, ensure no error
+            guard baseModel?.payload != nil, error == nil else {
+                DispatchQueue.main.async {
+                    completion(error)
+                }
+                return
+            }
+
+            // model is available
+            DispatchQueue.main.async {
+                completion(nil)
             }
 
         }

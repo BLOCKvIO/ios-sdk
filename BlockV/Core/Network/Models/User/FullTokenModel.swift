@@ -22,6 +22,7 @@ public struct FullTokenModel: Codable, Equatable {
         public let appID: String
         public let isConfirmed: Bool
         public let isDefault: Bool
+        public let isDisabled: Bool
         public let token: String
         public let tokenType: String
         public let userID: String
@@ -31,6 +32,7 @@ public struct FullTokenModel: Codable, Equatable {
             case appID             = "app_id"
             case isConfirmed       = "confirmed"
             case isDefault         = "is_default"
+            case isDisabled        = "disabled"
             case token             = "token"
             case tokenType         = "token_type"
             case userID            = "user_id"

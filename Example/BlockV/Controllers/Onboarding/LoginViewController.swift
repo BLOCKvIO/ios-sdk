@@ -152,7 +152,6 @@ class LoginViewController: UIViewController {
         default:
             assertionFailure("Unhandled Type.")
         }
-        
     }
     
     // MARK: - Navigation

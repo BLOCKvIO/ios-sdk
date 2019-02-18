@@ -24,9 +24,10 @@ import Foundation
 
 /// Models types of user tokens supported on the BLOCKv platform.
 public enum UserTokenType: String, Codable {
-    case phone = "phone_number"
-    case email = "email"
-    case id    = "id"
+    case phone      = "phone_number"
+    case email      = "email"
+    case id         = "id"
+    case username   = "username"
 }
 
 /// User token model.

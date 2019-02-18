@@ -59,6 +59,7 @@ class LoginViewController: UIViewController {
         default: fatalError("Unhandled index.")
         }
         self.userTokenTextField.becomeFirstResponder()
+        self.userTokenTextField.reloadInputViews()
     }
     
     /// This function performs the login operation.

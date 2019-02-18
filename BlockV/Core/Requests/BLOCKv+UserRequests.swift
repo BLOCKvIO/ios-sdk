@@ -287,6 +287,50 @@ extension BLOCKv {
 
     }
 
+    /// Updates one of the current user's tokens on the BLOCKv platform.
+    ///
+    /// Under the hood, the the new token is added and the old token is deleted from the user account. Primary token
+    /// status will be transfered from the old token to the new token *if* the old token was flagged as primary.
+    ///
+    ///   - completion: The completion handler to call when the request is completed.
+    ///                 This handler is executed on the main queue.
+    public static func updateCurrentUserToken(_ oldToken: FullTokenModel,
+                                              newToken: UserToken,
+                                              completion: @escaping (FullTokenModel?, BVError?) -> Void) {
+
+        // add new token (set as primary if old token was primary)
+        self.addCurrentUserToken(token: newToken,
+                                 isPrimary: oldToken.properties.isDefault,
+                                 completion: { (token, error) in
+
+                                    // reference to outer completion
+                                    let outerCompletion = completion
+                                    // extract model, handle error
+                                    guard let token = token, error == nil else {
+                                        DispatchQueue.main.async {
+                                            completion(nil, error)
+                                        }
+                                        return
+                                    }
+                                    // delete the old token
+                                    self.deleteCurrentUserToken(oldToken.id, completion: { (error) in
+
+                                        // handle error - unable to delete old token
+                                        guard error == nil else {
+                                            DispatchQueue.main.async {
+                                                outerCompletion(nil, error)
+                                            }
+                                            return
+                                        }
+                                        // callback with
+                                        outerCompletion(token, nil)
+
+                                    })
+
+        })
+
+    }
+
     /// Removes the token from the current user's token list on the BLOCKv platform.
     ///
     /// Note: Primary tokens may not be deleted.

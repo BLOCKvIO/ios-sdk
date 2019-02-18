@@ -147,6 +147,9 @@ class TransferActionViewController: UIViewController {
         case .id:
             userTokenTextField.keyboardType = .asciiCapable
             userTokenTextField.placeholder = "User ID"
+        case .username:
+            userTokenTextField.keyboardType = .default
+            userTokenTextField.placeholder = "Username"
         }
     }
     

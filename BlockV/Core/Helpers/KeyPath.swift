@@ -12,7 +12,7 @@
 import Foundation
 
 /// Simple struct that models a key path.
-public struct KeyPath: Equatable {
+struct KeyPath: Equatable {
     private(set) var segments: [String]
 
     var isEmpty: Bool { return segments.isEmpty }
@@ -32,7 +32,7 @@ public struct KeyPath: Equatable {
 }
 
 /// Initializes a KeyPath with a string of the form "this.is.a.keypath"
-public extension KeyPath {
+extension KeyPath {
 
     /// This init is only required for testing - file access is limited to internal to allow for testing export
     init() {
@@ -46,13 +46,67 @@ public extension KeyPath {
 
 /// Initializ a KeyPath using a string literal.
 extension KeyPath: ExpressibleByStringLiteral {
-    public init(stringLiteral value: String) {
+    init(stringLiteral value: String) {
         self.init(value)
     }
-    public init(unicodeScalarLiteral value: String) {
+    init(unicodeScalarLiteral value: String) {
         self.init(value)
     }
-    public init(extendedGraphemeClusterLiteral value: String) {
+    init(extendedGraphemeClusterLiteral value: String) {
         self.init(value)
+    }
+}
+
+// MARK: - Dictionary Keypath
+
+extension Dictionary where Key == String {
+    subscript(keyPath keyPath: KeyPath) -> Any? {
+        get {
+            switch keyPath.headAndTail() {
+            case nil:
+                // key path is empty.
+                return nil
+            case let (head, remainingKeyPath)? where remainingKeyPath.isEmpty:
+                // Reached the end of the key path.
+                let key = Key(stringLiteral: head)
+                return self[key]
+            case let (head, remainingKeyPath)?:
+                // Key path has a tail we need to traverse.
+                let key = Key(stringLiteral: head)
+                switch self[key] {
+                case let nestedDict as [Key: Any]:
+                    // Next nest level is a dictionary.
+                    // Start over with remaining key path.
+                    return nestedDict[keyPath: remainingKeyPath]
+                default:
+                    // Next nest level isn't a dictionary.
+                    // Invalid key path, abort.
+                    return nil
+                }
+            }
+        }
+        set {
+            switch keyPath.headAndTail() {
+            case nil:
+                // key path is empty.
+                return
+            case let (head, remainingKeyPath)? where remainingKeyPath.isEmpty:
+                // Reached the end of the key path.
+                let key = Key(stringLiteral: head)
+                self[key] = newValue as? Value
+            case let (head, remainingKeyPath)?:
+                let key = Key(stringLiteral: head)
+                let value = self[key]
+                switch value {
+                case var nestedDict as [Key: Any]:
+                    // Key path has a tail we need to traverse
+                    nestedDict[keyPath: remainingKeyPath] = newValue
+                    self[key] = nestedDict as? Value
+                default:
+                    // Invalid keyPath
+                    return
+                }
+            }
+        }
     }
 }

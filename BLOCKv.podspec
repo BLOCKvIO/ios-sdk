@@ -24,6 +24,7 @@ Pod::Spec.new do |s|
         s.dependency 'Signals',    '~> 6.0'  # Elegant eventing
         s.dependency 'SwiftLint',  '~> 0.26' # Linter
         s.dependency 'GenericJSON', '~> 1.2' # JSON
+        s.dependency 'PromiseKit', '~> 6.8"' # Promises
         #s.exclude_files = '**/Info*.plist'
     end
     

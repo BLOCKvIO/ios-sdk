@@ -1,15 +1,16 @@
 PODS:
   - Alamofire (4.8.1)
-  - BLOCKv (3.0.0):
-    - BLOCKv/Face (= 3.0.0)
-  - BLOCKv/Core (3.0.0):
+  - BLOCKv (3.0.1):
+    - BLOCKv/Face (= 3.0.1)
+  - BLOCKv/Core (3.0.1):
     - Alamofire (~> 4.7)
     - GenericJSON (~> 1.2)
     - JWTDecode (~> 2.1)
+    - PromiseKit
     - Signals (~> 6.0)
     - Starscream (~> 3.0)
     - SwiftLint (~> 0.26)
-  - BLOCKv/Face (3.0.0):
+  - BLOCKv/Face (3.0.1):
     - BLOCKv/Core
     - FLAnimatedImage (~> 1.0)
     - Nuke (~> 7.0)
@@ -20,6 +21,15 @@ PODS:
   - NVActivityIndicatorView (4.6.1):
     - NVActivityIndicatorView/Presenter (= 4.6.1)
   - NVActivityIndicatorView/Presenter (4.6.1)
+  - PromiseKit (6.8.3):
+    - PromiseKit/CorePromise (= 6.8.3)
+    - PromiseKit/Foundation (= 6.8.3)
+    - PromiseKit/UIKit (= 6.8.3)
+  - PromiseKit/CorePromise (6.8.3)
+  - PromiseKit/Foundation (6.8.3):
+    - PromiseKit/CorePromise
+  - PromiseKit/UIKit (6.8.3):
+    - PromiseKit/CorePromise
   - Signals (6.0.0)
   - Starscream (3.0.6)
   - SwiftLint (0.30.1)
@@ -42,6 +52,7 @@ SPEC REPOS:
     - JWTDecode
     - Nuke
     - NVActivityIndicatorView
+    - PromiseKit
     - Signals
     - Starscream
     - SwiftLint
@@ -53,17 +64,18 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Alamofire: 16ce2c353fb72865124ddae8a57c5942388f4f11
-  BLOCKv: 60d3a98639188c430c00d126669e452c4aac1d73
+  BLOCKv: f24edb1e91a81de96134b7437f3463fac9987283
   FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
   GenericJSON: 05eb212cd12bf0562b816075090bea3eda2ab2ed
   JWTDecode: 85a405ab16d5473e99bd89ded1d535090ebd6a0e
   Nuke: 0350d346a688426e8f2331253ef28dc2fc4f6178
   NVActivityIndicatorView: 4ca19fccc84595a78957336a086d00a49be6ce61
+  PromiseKit: 94c6e781838c5bf4717677d0d882b0e7250c80fc
   Signals: eca6a9098b40ed5f8d8b60498d0e91168fa7c0cc
   Starscream: ef3ece99d765eeccb67de105bfa143f929026cf5
   SwiftLint: a54bf1fe12b55c68560eb2a7689dfc81458508f7
   VatomFace3D: 78d08c503819d5e2d8e1978d953885d596e379cf
 
-PODFILE CHECKSUM: d63113581b30008d083f82a8a354c17db0a9e801
+PODFILE CHECKSUM: 572540b34367caffea356b90ca04601e730b047d
 
 COCOAPODS: 1.6.0

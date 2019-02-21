@@ -10,6 +10,7 @@
 //
 
 import Foundation
+import PromiseKit
 
 /// Base class for a Region plugin.
 public class Region {
@@ -45,17 +46,17 @@ public class Region {
     public fileprivate(set) var closed = false
     
     /// Re-synchronizes the region by manually fetching everything from the server again.
-    public func forceSynchronize() -> Promise<Void> {
+    public func forceSynchronize() -> Guarantee<Void> {
         self.synchronized = false
         return self.synchronize()
     }
     
-    var _syncPromise : Promise<Void>?
+    var _syncPromise: Guarantee<Void>?
     
     /// This will try to make the region stable by querying the backend for all data.
     ///
     /// - Returns: Promise which resolves when complete.
-    public func synchronize() -> Promise<Void> {
+    public func synchronize() -> Guarantee<Void> {
         
         // Stop if already running
         if let promise = _syncPromise {
@@ -68,12 +69,13 @@ public class Region {
         
         // Stop if already in sync
         if synchronized {
-            return Promise()
+            return Guarantee()
         }
         
         // Ask the subclass to load it's data
         printBV(info: "[DataPool > Region] Starting synchronization for region \(self.stateKey)")
-        _syncPromise = self.load().then { ids -> Void in
+        
+        _syncPromise = self.load().map { ids -> Void in
             
             // Check if subclass returned an array of IDs
             if let ids = ids {
@@ -97,18 +99,26 @@ public class Region {
             // All data is up to date!
             self.synchronized = true
             self._syncPromise = nil
-            log.debug("[DataPool > Region] Region '\(self.stateKey)' is now in sync!")
+            printBV(error: "[DataPool > Region] Region '\(self.stateKey)' is now in sync!")
             
-            }.catch { err in
-                
-                // Error handling, notify listeners of an error
-                self._syncPromise = nil
-                self.error = err
-                log.warning("[DataPool > Region] Unable to load: " + err.localizedDescription)
-                self.emit(.error, userInfo: ["error": err])
-                
+        }.recover { err in
+            // Error handling, notify listeners of an error
+            self._syncPromise = nil
+            self.error = err
+            printBV(error: "[DataPool > Region] Unable to load: " + err.localizedDescription)
+            self.emit(.error, userInfo: ["error": err])
         }
         
+//        }.catch { err -> Void in
+//
+//            // Error handling, notify listeners of an error
+//            self._syncPromise = nil
+//            self.error = err
+//            printBV(error: "[DataPool > Region] Unable to load: " + err.localizedDescription)
+//            self.emit(.error, userInfo: ["error": err])
+//
+//        }
+    
         // Return promise
         return _syncPromise!
         
@@ -290,13 +300,13 @@ public class Region {
     /// Returns all the objects within this region. Waits until the region is stable first.
     ///
     /// - Returns: Array of objects. Check the region-specific map() function to see what types are returned.
-    public func getAllStable() -> Promise<[Any]> {
-        
+    public func getAllStable() -> Guarantee<[Any]> {
+
         // Synchronize now
-        return self.synchronize().then { Void -> [Any] in
+        return self.synchronize().map({
             return self.getAll()
-        }
-        
+        })
+ 
     }
     
     /// Returns all the objects within this region. Does NOT wait until the region is stable first.
@@ -331,14 +341,12 @@ public class Region {
     }
     
     /// Returns an object within this region by it's ID. Waits until the region is stable first.
-    public func getStable(id: String) -> Promise<Any?> {
+    public func getStable(id: String) -> Guarantee<Any?> {
         
         // Synchronize now
-        return self.synchronize().then { Void -> Any? in
-            
+        return self.synchronize().map {
             // Get item
             return self.get(id: id)
-            
         }
         
     }

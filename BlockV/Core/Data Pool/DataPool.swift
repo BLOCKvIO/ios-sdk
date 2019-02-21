@@ -10,14 +10,15 @@
 //
 
 import Foundation
+import PromiseKit
 
 public final class DataPool {
     
     /// List of available plugins, i.e. region classes.
     static let plugins : [Region.Type] = [
-        InventoryRegion.self,
-        VatomIDRegion.self,
-        VatomChildrenRegion.self
+//        InventoryRegion.self,
+//        VatomIDRegion.self,
+//        VatomChildrenRegion.self
     ]
     
     /// List of active regions
@@ -64,18 +65,18 @@ public final class DataPool {
         region.loadFromCache().recover { err -> Void in
             
             // Unable to load from disk
-            log.warning("[DataPool] Unable to load region state from disk. " + err.localizedDescription)
+            printBV(error: "[DataPool] Unable to load region state from disk. " + err.localizedDescription)
             
-            }.then { _ -> Promise<Void> in
-                
-                // Start sync'ing region data with the server
-                return region.synchronize()
-                
-            }.catch { err in
-                
-                // Unable to load from network either!
-                log.warning("[DataPool] Unable to load region state from network. " + err.localizedDescription)
-                
+        }.then { _ -> Guarantee<Void> in
+            
+            // Start sync'ing region data with the server
+            return region.synchronize()
+            
+        }.catch { err in
+            
+            // Unable to load from network either!
+            printBV(error: "[DataPool] Unable to load region state from network. " + err.localizedDescription)
+            
         }
         
         // Return new region

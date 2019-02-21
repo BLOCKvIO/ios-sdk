@@ -51,7 +51,7 @@ public class Region {
         return self.synchronize()
     }
     
-    var _syncPromise: Guarantee<Void>?
+    private var _syncPromise: Guarantee<Void>?
     
     /// This will try to make the region stable by querying the backend for all data.
     ///

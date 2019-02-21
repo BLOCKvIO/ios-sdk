@@ -29,8 +29,8 @@ public final class DataPool {
         didSet {
             
             // Notify regions
-            for r in regions {
-                r.onSessionInfoChanged(info: sessionInfo)
+            for reg in regions {
+                reg.onSessionInfoChanged(info: sessionInfo)
             }
             
         }
@@ -50,7 +50,7 @@ public final class DataPool {
         }
         
         // We need to create a new region. Find region plugin
-        guard let Region = plugins.first(where: { $0.ID == id }) else {
+        guard let regionPlugin = plugins.first(where: { $0.ID == id }) else {
             fatalError("[DataPool] No region plugin matches ID: \(id)")
         }
         

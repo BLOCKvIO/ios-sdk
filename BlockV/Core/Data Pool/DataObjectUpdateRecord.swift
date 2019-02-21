@@ -13,11 +13,11 @@ import Foundation
 
 /// This contains a *sparse* data object, which represents fields which will be changed on a Data Object.
 struct DataObjectUpdateRecord {
-    
+
     /// The data object ID to modify.
-    var id : String
-    
+    var id: String
+
     /// The sparse object containing the changed fields.
-    var changes : [String:Any]
-    
+    var changes: [String: Any]
+
 }

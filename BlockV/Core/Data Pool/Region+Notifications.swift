@@ -12,59 +12,59 @@
 import Foundation
 
 /// Possible events
-public enum RegionEvent : String {
-    
+public enum RegionEvent: String {
+
     /// Triggered when any data in the region changes. This also indicates that there is no longer an error.
     case updated = "region.updated"
-    
+
     /// When a data object changes. userInfo["id"] is the ID of the changed object.
     case objectUpdated = "region.object.updated"
-    
+
     /// When an error occurs. userInfo["error"] is the error. You can also access `region.error` to get the error.
     case error = "region.error"
-    
+
 }
 
 extension RegionEvent {
-    
+
     /// Convert the notification to a Notification.Name
-    public var asNotification : Notification.Name {
+    public var asNotification: Notification.Name {
         return Notification.Name(rawValue: self.rawValue)
     }
-    
+
 }
 
 /// Helpers to deal with events
 extension Region {
-    
+
     /// Add a listener
     public func addObserver(_ observer: Any, selector: Selector, name: RegionEvent) {
         NotificationCenter.default.addObserver(observer, selector: selector, name: Notification.Name(name.rawValue), object: self)
     }
-    
+
     /// Removes a set listener
     /// TODO: Find a way to auto remove block listeners when their container object is dealloc'd?
     public typealias RemoveObserverFunction = () -> Void
-    
+
     /// Add a listener
     public func listen(for name: RegionEvent, handler : @escaping (Notification) -> Void) -> RemoveObserverFunction {
-        
+
         // Register observer
         let observer = NotificationCenter.default.addObserver(forName: Notification.Name(name.rawValue), object: self, queue: OperationQueue.main, using: handler)
-        
+
         // Return a function which can be called to remove the observer
         return {
             NotificationCenter.default.removeObserver(observer)
         }
-        
+
     }
-    
+
     /// Emits an event. This is used by Region and it's subclasses only
-    func emit(_ name : RegionEvent, userInfo : [String:Any] = [:]) {
-        
+    func emit(_ name: RegionEvent, userInfo: [String: Any] = [:]) {
+
         // Send notification
         NotificationCenter.default.post(name: Notification.Name(name.rawValue), object: self, userInfo: userInfo)
-        
+
     }
-    
+
 }

@@ -13,16 +13,14 @@ import Foundation
 
 // For reference: https://stackoverflow.com/a/45221496
 extension Dictionary {
-     
+
     /// Merges one dictionary with another.
-    public func deepMerged(with other: [Key: Value]) -> [Key: Value]
-    {
+    public func deepMerged(with other: [Key: Value]) -> [Key: Value] {
         var result: [Key: Value] = self
         for (key, value) in other {
             if let value = value as? [Key: Value],
                 let existing = result[key] as? [Key: Value],
-                let merged = existing.deepMerged(with: value) as? Value
-            {
+                let merged = existing.deepMerged(with: value) as? Value {
                 result[key] = merged
             } else {
                 result[key] = value

@@ -13,18 +13,18 @@ import Foundation
 
 /// Represents a raw data object, potentially without any data, which is monitored by a region.
 class DataObject {
-    
+
     /// Type ID.
-    var type : String = ""
-    
+    var type: String = ""
+
     /// Identifier.
-    var id : String = ""
-    
+    var id: String = ""
+
     /// Object payload, if any.
-    var data : [String:Any]?
-    
+    var data: [String: Any]?
+
     /// Cached object. Plugins map this raw data object to their own types, this is used to cache
     /// those types if there have been no changes.
-    var cached : Any?
-    
+    var cached: Any?
+
 }

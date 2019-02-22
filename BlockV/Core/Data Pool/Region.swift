@@ -56,6 +56,7 @@ public class Region {
     /// This will try to make the region stable by querying the backend for all data.
     ///
     /// - Returns: Promise which resolves when complete.
+    @discardableResult
     public func synchronize() -> Guarantee<Void> {
 
         // Stop if already running

@@ -10,211 +10,209 @@
 //
 
 import Foundation
+import MoreCodable
 
 /// Intermediate class which handles updates via the BLOCKv websocket and returning Vatom objects. Regions can subclass
 /// this to automatically get updates via WebSocket.
-class BLOCKvRegion : Region {
-    
+class BLOCKvRegion: Region {
+
     /// Constructor
     required init(descriptor: Any) throws {
         try super.init(descriptor: descriptor)
-        
+
         // subscribe to socket connections
         BLOCKv.socket.onConnected.subscribe(with: self) { _ in
             self.onWebSocketConnect()
         }
-        
+
         // subscribe to raw socket messages
         BLOCKv.socket.onMessageReceivedRaw.subscribe(with: self) { descriptor in
             self.onWebSocketMessage(descriptor)
         }
-        
+
         // Monitor for timed updates
         // TODO: DataObjectAnimator.addRegion(this)
-        
+
     }
-    
+
     deinit {
-        
+
         // Remove listeners
         NotificationCenter.default.removeObserver(self)
-        
+
     }
-    
+
     /// Queue of pending WebSocket messages
-    var queuedMessages : [[String:Any]] = []
-    
+    var queuedMessages: [[String: Any]] = []
+
     /// True if WebSocket processing is paused
     var socketPaused = false
     var socketProcessing = false
-    
+
     /// Called when this region is going to be shut down
     override func close() {
         super.close()
-        
+
         // Remove listeners
         // TODO: DataObjectAnimator.removeRegion(this)
-        
+
     }
-    
+
     /// Called to pause processing of websocket messages
     func pauseMessages() {
         self.socketPaused = true
     }
-    
+
     /// Called to resume processing of websocket messages
     func resumeMessages() {
-        
+
         // Unpause
         self.socketPaused = false
-        
+
         // Process next message if needed
         if !self.socketProcessing {
             self.processNextMessage()
         }
-        
+
     }
-    
+
     /// Called when the websocket reconnects
     @objc func onWebSocketConnect() {
-        
+
         // Mark as unstable
         self.synchronized = false
-        
+
         // Re-sync the entire thing. Don't worry about synchronize() getting called while it's running already, it handles that case.
         self.synchronize()
-        
+
     }
-    
+
     /// Called when there's a new event message via the WebSocket.
     @objc func onWebSocketMessage(_ descriptor: [String: Any]) {
-        
+
         // Add to queue
         self.queuedMessages.append(descriptor)
-        
+
         // Process it if necessary
         if !self.socketPaused && !self.socketProcessing {
             self.processNextMessage()
         }
-        
+
     }
-    
+
     /// Called to process the next WebSocket message.
     func processNextMessage() {
-        
+
         // Stop if socket is paused
         if socketPaused {
             return
         }
-        
+
         // Stop if already processing
         if socketProcessing { return }
         socketProcessing = true
-        
+
         // Get next msg to process
         if queuedMessages.count == 0 {
-            
+
             // No more messages!
             self.socketProcessing = false
             return
-            
+
         }
-        
+
         // Process message
         let msg = queuedMessages.removeFirst()
         self.processMessage(msg)
-        
+
         // Done, process next message
         self.socketProcessing = false
         self.processNextMessage()
-        
+
     }
-    
+
     /// Processes a raw WebSocket message.
-    func processMessage(_ msg : [String:Any]) {
-        
+    func processMessage(_ msg: [String: Any]) {
+
         // Get info
-        guard let msg_type = msg["msg_type"] as? String else { return }
-        guard let payload = msg["payload"] as? [String:Any] else { return }
-        guard let new_data = payload["new_object"] as? [String:Any] else { return }
+        guard let msgType = msg["msg_type"] as? String else { return }
+        guard let payload = msg["payload"] as? [String: Any] else { return }
+        guard let newData = payload["new_object"] as? [String: Any] else { return }
         guard let vatomID = payload["id"] as? String else { return }
-        if msg_type != "state_update" {
+        if msgType != "state_update" {
             return
         }
-        
+
         // Update existing objects
-        let changes = DataObjectUpdateRecord(id: vatomID, changes: new_data)
+        let changes = DataObjectUpdateRecord(id: vatomID, changes: newData)
         self.update(objects: [changes])
-        
+
     }
-    
+
     /** Map our data objects to Vatom objects */
-    override func map(_ object : DataObject) -> Any? {
-        
+    override func map(_ object: DataObject) -> Any? {
+
         // Only handle vatoms
         guard object.type == "vatom" else {
             return nil
         }
-        
+
         // Stop if no data available
-        if object.data == nil {
+        guard var objectData = object.data else {
             return nil
         }
-        
+
+        let decoder = DictionaryDecoder()
+
         // Get vatom info
         guard let template = object.data![keyPath: "vAtom::vAtomType.template"] as? String else { return nil }
-        
+
         // Fetch all faces linked to this vatom
         let faces = objects.values.filter { $0.type == "face" && $0.data?["template"] as? String == template }
-            .map { try? VatomFace(from: $0.data!) }
-            .filter { $0 != nil }
-            .map { $0! }
-        
+        objectData["faces"] = faces
+
         // Fetch all actions linked to this vatom
         let actionNamePrefix = template + "::Action::"
         let actions = objects.values.filter { $0.type == "action" && ($0.data?["name"] as? String)?.starts(with: actionNamePrefix) == true }
-            .map { try? VatomAction(from: $0.data!) }
-            .filter { $0 != nil }
-            .map { $0! }
-        
-        // Create new Vatom instance
-        return VatomModel(
-        return Vatom(descriptor: object.data!, faces: faces, actions: actions)
-        
+        objectData["actions"] = actions
+
+        // create and return a new instance
+        return try? decoder.decode(VatomModel.self, from: objectData)
+
     }
-    
+
     /// Called when an object is about to be added.
     override func will(add object: DataObject) {
-        
+
         // Notify parent as well
-        guard let parentID = (object.data?["vAtom::vAtomType"] as? [String:Any])?["parent_id"] as? String else { return }
+        guard let parentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else { return }
         DispatchQueue.main.async {
             self.emit(.objectUpdated, userInfo: ["id": parentID])
         }
-        
+
     }
-    
+
     /// Called when an object is about to be updated.
-    override func will(update object: DataObject, withFields: [String : Any]) {
-        
+    override func will(update object: DataObject, withFields: [String: Any]) {
+
         // Notify parent as well
-        guard let oldParentID = (object.data?["vAtom::vAtomType"] as? [String:Any])?["parent_id"] as? String else { return }
-        guard let newParentID = (withFields["vAtom::vAtomType"] as? [String:Any])?["parent_id"] as? String else { return }
+        guard let oldParentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else { return }
+        guard let newParentID = (withFields["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else { return }
         DispatchQueue.main.async {
             self.emit(.objectUpdated, userInfo: ["id": oldParentID])
             self.emit(.objectUpdated, userInfo: ["id": newParentID])
         }
-        
+
     }
-    
+
     /// Called when an object is about to be updated.
     override func will(update: DataObject, keyPath: String, oldValue: Any?, newValue: Any?) {
-        
+
         // Check if parent ID is changing
         if keyPath != "vAtom::vAtomType.parent_id" {
             return
         }
-        
+
         // Notify parent as well
         guard let oldParentID = oldValue as? String else { return }
         guard let newParentID = newValue as? String else { return }
@@ -222,18 +220,18 @@ class BLOCKvRegion : Region {
             self.emit(.objectUpdated, userInfo: ["id": oldParentID])
             self.emit(.objectUpdated, userInfo: ["id": newParentID])
         }
-        
+
     }
-    
+
     /// Called when an object is about to be removed.
     override func will(remove object: DataObject) {
-        
+
         // Notify parent as well
-        guard let parentID = (object.data?["vAtom::vAtomType"] as? [String:Any])?["parent_id"] as? String else { return }
+        guard let parentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else { return }
         DispatchQueue.main.async {
             self.emit(.objectUpdated, userInfo: ["id": parentID])
         }
-        
+
     }
-    
+
 }

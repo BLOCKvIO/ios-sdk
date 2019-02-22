@@ -82,7 +82,8 @@ class BLOCKvRegion: Region {
         // Mark as unstable
         self.synchronized = false
 
-        // Re-sync the entire thing. Don't worry about synchronize() getting called while it's running already, it handles that case.
+        // Re-sync the entire thing. Don't worry about synchronize() getting called while it's running already,
+        // it handles that case.
         self.synchronize()
 
     }
@@ -173,7 +174,8 @@ class BLOCKvRegion: Region {
 
         // Fetch all actions linked to this vatom
         let actionNamePrefix = template + "::Action::"
-        let actions = objects.values.filter { $0.type == "action" && ($0.data?["name"] as? String)?.starts(with: actionNamePrefix) == true }
+        let actions = objects.values.filter { $0.type == "action" && ($0.data?["name"] as? String)?
+            .starts(with: actionNamePrefix) == true }
         objectData["actions"] = actions
 
         // create and return a new instance

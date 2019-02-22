@@ -61,39 +61,3 @@ class KeyPath_Tests: XCTestCase {
    
     
 }
-
-
-class GenericJSONKeyPath_Tests: XCTestCase {
-    
-    private let someJSON: JSON = [
-        "a": "x",
-        "b": "y",
-        "c": [
-            "foo": "bar",
-            "tar": [1, 2, 3]
-        ]
-    ]
-    
-    func testDictionaryKeyPathLookup() {
-        let a = someJSON[keyPath: "a"]
-        let b = someJSON[keyPath: "b"]
-        let c = someJSON[keyPath: "c.foo"]
-        let d = someJSON[keyPath: "c.tar"]
-        
-        do {
-            let a = try self.require(a?.stringValue)
-            XCTAssertEqual(a, "x")
-            let b = try self.require(b?.stringValue)
-            XCTAssertEqual(b, "y")
-            let c = try self.require(c?.stringValue)
-            XCTAssertEqual(c, "bar")
-            let tar = try self.require(d?.arrayValue)
-            XCTAssertEqual(tar, [1, 2, 3])
-        } catch {
-            XCTFail(error.localizedDescription)
-        }
-        
-    }
-    
-}
-

@@ -12,8 +12,13 @@
 import Foundation
 import MoreCodable
 
-/// Intermediate class which handles updates via the BLOCKv websocket and returning Vatom objects. Regions can subclass
-/// this to automatically get updates via WebSocket.
+/// Abstract subclass of `Region`. This intermediate class handles updates from the BLOCKv Web socket. Regions should
+/// subclass to automatically handle Web socket updates.
+///
+/// Roles:
+/// - Handles Web socket events (including queuing, pausing, and processing).
+/// - Messages are transformed into DataObjectUpdateRecord (Sparse Object) and use to update the region.
+/// - Data transformations (map) to VatomModel
 class BLOCKvRegion: Region {
 
     /// Constructor
@@ -31,39 +36,43 @@ class BLOCKvRegion: Region {
         }
 
         // Monitor for timed updates
-        // TODO: DataObjectAnimator.addRegion(this)
+        DataObjectAnimator.shared.add(region: self)
 
     }
 
     deinit {
 
-        // Remove listeners
-        NotificationCenter.default.removeObserver(self)
+        //FIXME: As I understand it, the signals will not need to be unsubscribed from.
+
+        // Stop listening for animation updates
+        DataObjectAnimator.shared.remove(region: self)
 
     }
 
-    /// Queue of pending WebSocket messages
-    var queuedMessages: [[String: Any]] = []
+    /// Queue of pending Web socket messages
+    private var queuedMessages: [[String: Any]] = []
 
-    /// True if WebSocket processing is paused
-    var socketPaused = false
-    var socketProcessing = false
+    /// True if Web socket processing is paused
+    private var socketPaused = false
+    private var socketProcessing = false
 
     /// Called when this region is going to be shut down
     override func close() {
         super.close()
 
+        //FIXME: Double check that signals do not need to be unsubscribed from.
+
         // Remove listeners
-        // TODO: DataObjectAnimator.removeRegion(this)
+        DataObjectAnimator.shared.remove(region: self)
 
     }
 
-    /// Called to pause processing of websocket messages
+    /// Called to pause processing of web socket messages
     func pauseMessages() {
         self.socketPaused = true
     }
 
-    /// Called to resume processing of websocket messages
+    /// Called to resume processing of web socket messages
     func resumeMessages() {
 
         // Unpause
@@ -76,7 +85,7 @@ class BLOCKvRegion: Region {
 
     }
 
-    /// Called when the websocket reconnects
+    /// Called when the web socket reconnects
     @objc func onWebSocketConnect() {
 
         // Mark as unstable
@@ -88,7 +97,7 @@ class BLOCKvRegion: Region {
 
     }
 
-    /// Called when there's a new event message via the WebSocket.
+    /// Called when there's a new event message via the Web socket.
     @objc func onWebSocketMessage(_ descriptor: [String: Any]) {
 
         // Add to queue
@@ -132,7 +141,7 @@ class BLOCKvRegion: Region {
 
     }
 
-    /// Processes a raw WebSocket message.
+    /// Processes a raw Web socket message.
     func processMessage(_ msg: [String: Any]) {
 
         // Get info
@@ -150,7 +159,7 @@ class BLOCKvRegion: Region {
 
     }
 
-    /** Map our data objects to Vatom objects */
+    /// Map data objects to Vatom objects.
     override func map(_ object: DataObject) -> Any? {
 
         // Only handle vatoms
@@ -187,7 +196,9 @@ class BLOCKvRegion: Region {
     override func will(add object: DataObject) {
 
         // Notify parent as well
-        guard let parentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else { return }
+        guard let parentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
+            return
+        }
         DispatchQueue.main.async {
             self.emit(.objectUpdated, userInfo: ["id": parentID])
         }
@@ -198,8 +209,12 @@ class BLOCKvRegion: Region {
     override func will(update object: DataObject, withFields: [String: Any]) {
 
         // Notify parent as well
-        guard let oldParentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else { return }
-        guard let newParentID = (withFields["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else { return }
+        guard let oldParentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
+            return
+        }
+        guard let newParentID = (withFields["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
+            return
+        }
         DispatchQueue.main.async {
             self.emit(.objectUpdated, userInfo: ["id": oldParentID])
             self.emit(.objectUpdated, userInfo: ["id": newParentID])

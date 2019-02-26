@@ -12,6 +12,29 @@
 import Foundation
 import PromiseKit
 
+/*
+ IDEAS
+ 
+ -
+ 
+ /// Start an additive load. This should resolve once a partial region is fetched.
+ func loadAdditive() -> Promise<[String]?> {
+    //
+ }
+ */
+
+/// An abstract class that manages a complete collection of objects (a.k.a Region).
+///
+/// Regions are generally "id-complete". That is, the local region should have a complete copy of all remote objects.
+///
+/// Roles:
+/// - In memory store of objects.
+/// - Keep track of synchornization state.
+/// - Loads new objects.
+/// - CRUD (including update with spare objects).
+/// - Change Notifications
+/// - Persistance (debounced)
+///
 /// Base class for a Region plugin.
 public class Region {
 
@@ -20,21 +43,21 @@ public class Region {
 
     }
 
-    /// This region plugin's ID
+    /// This region plugin's ID.
     class var ID: String {
         return "subclass-should-override"
     }
 
-    /// True if this region contains temporary objects which should not be cached to disk
+    /// True if this region contains temporary objects which should not be cached to disk.
     let noCache = false
 
-    /// All objects currently in our cache
+    /// All objects currently in our cache.
     var objects: [String: DataObject] = [:]
 
-    /// True if data in this region is in sync with the backend
+    /// True if data in this region is in sync with the backend.
     public internal(set) var synchronized = false
 
-    /// If there's an error, this contains the current error
+    /// If there's an error, this contains the current error.
     public internal(set) var error: Error?
 
     /// An ID which uniquely identifies this region. Used for caching purposes.
@@ -42,7 +65,7 @@ public class Region {
         return "subclass-should-override"
     }
 
-    /// True if this region has been closed
+    /// True if this region has been closed.
     public fileprivate(set) var closed = false
 
     /// Re-synchronizes the region by manually fetching everything from the server again.
@@ -51,6 +74,7 @@ public class Region {
         return self.synchronize()
     }
 
+    /// Currently executing synchronization promise. If `nil` there is no synchronization underway.
     private var _syncPromise: Guarantee<Void>?
 
     /// This will try to make the region stable by querying the backend for all data.
@@ -76,6 +100,7 @@ public class Region {
         // Ask the subclass to load it's data
         printBV(info: "[DataPool > Region] Starting synchronization for region \(self.stateKey)")
 
+        // load objects
         _syncPromise = self.load().map { ids -> Void in
 
             // Check if subclass returned an array of IDs
@@ -125,9 +150,12 @@ public class Region {
 
     }
 
-    /// Start initial load. This should resolve once the region is up to date.
+    /// Start initial load. The promise sohuld resolve once the region is up to date and provide the set of object ids.
     ///
-    /// - Returns: An array of object IDs, or null. If an array of object IDs is returned, any IDs not in this list will be removed from the region.
+    /// This function should fetch the _entire_ region.
+    ///
+    /// - Returns: A promise which will fullsil with an array of object IDs, or `nil`. If an array of object IDs is
+    ///   returned, any IDs not in this list should be removed from the region.
     func load() -> Promise<[String]?> {
         return Promise(error: NSError("Subclasses must override Region.load()"))
     }
@@ -162,8 +190,8 @@ public class Region {
         // Go through each object
         for obj in objects {
 
-            // Stop if no data
-            if obj.data == nil {
+            // Skip if no data
+            guard let data = obj.data else {
                 continue
             }
 
@@ -171,10 +199,10 @@ public class Region {
             if let existingObject = self.objects[obj.id] {
 
                 // Notify
-                self.will(update: existingObject, withFields: obj.data!)
+                self.will(update: existingObject, withFields: data)
 
-                // It exists already, update the object
-                existingObject.data = obj.data
+                // It exists already, update the object (replace data)
+                existingObject.data = data
                 existingObject.cached = nil
 
             } else {
@@ -195,10 +223,6 @@ public class Region {
         // Notify updated
         if objects.count > 0 {
             self.emit(.updated)
-        }
-
-        // Save soon
-        if objects.count > 0 {
             self.save()
         }
 
@@ -209,18 +233,25 @@ public class Region {
     /// - Parameter objects: The list of changes to perform to our data objects.
     func update(objects: [DataObjectUpdateRecord]) {
 
-        // Go through each object
-        var didUpdate = false
+        // Batch emit events, so if a object is updated multiple times, only one event is sent
+        var changedIDs = Set<String>()
+
         for obj in objects {
 
             // Fetch existing object
             guard let existingObject = self.objects[obj.id] else {
                 continue
+
+                // This is an odd case. A spare update is being skipped because the object was not found.
+                // This indicates that something is wrong with the synchronization.
+                //TODO: Re-synchronize here?
             }
 
             // Stop if existing object doesn't have the full data
             guard let existingData = existingObject.data else {
                 continue
+
+                // This is also an odd case. What would cause the existing object to not have data?
             }
 
             // Notify
@@ -233,18 +264,18 @@ public class Region {
             existingObject.cached = nil
 
             // Emit event
-            self.emit(.objectUpdated, userInfo: ["id": obj.id])
-            didUpdate = true
+            changedIDs.insert(obj.id)
 
         }
 
-        // Notify updated
-        if didUpdate {
+        // Notify each item that was updated
+        for id in changedIDs {
+            self.emit(.objectUpdated, userInfo: ["id": id])
+        }
+
+        // Notify overall update
+        if changedIDs.count > 0 {
             self.emit(.updated)
-        }
-
-        // Save soon
-        if didUpdate {
             self.save()
         }
 
@@ -273,10 +304,6 @@ public class Region {
         // Notify updated
         if didUpdate {
             self.emit(.updated)
-        }
-
-        // Save soon
-        if didUpdate {
             self.save()
         }
 
@@ -288,7 +315,7 @@ public class Region {
     func onSessionInfoChanged(info: Any?) {}
 
     /// If the plugin wants, it can map DataObjects to another type. This takes in a DataObject and returns a new type.
-    /// If the plugin returns null, the specified data object will not be returned and will be skipped.
+    /// If the plugin returns `nil`, the specified data object will not be returned and will be skipped.
     ///
     /// The default implementation simply returns the DataObject.
     ///
@@ -317,7 +344,7 @@ public class Region {
         var items: [Any] = []
         for object in objects.values {
 
-            // Check for cached object
+            // Check for cached concrete type
             if let cached = object.cached {
                 items.append(cached)
                 continue
@@ -360,7 +387,7 @@ public class Region {
             return nil
         }
 
-        // Check for cached object
+        // Check for cached concrete type
         if let cached = object.cached {
             return cached
         }
@@ -386,7 +413,8 @@ public class Region {
         let filename = self.stateKey.replacingOccurrences(of: ":", with: "_")
 
         // Get temporary file location
-        let file = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(filename).appendingPathExtension("json")
+        let file = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(filename)
+            .appendingPathExtension("json")
 
         // Read data
         guard let data = try? Data(contentsOf: file) else {
@@ -404,7 +432,8 @@ public class Region {
         let objects = json.map { fields -> DataObject? in
 
             // Get fields
-            guard let id = fields[0] as? String, let type = fields[1] as? String, let data = fields[2] as? [String: Any] else {
+            guard let id = fields[0] as? String, let type = fields[1] as? String,
+                let data = fields[2] as? [String: Any] else {
                 return nil
             }
 
@@ -417,8 +446,8 @@ public class Region {
 
         }
 
-        // Strip out nulls
-        let cleanObjects = objects.filter { $0 != nil }.map { $0! }
+        // Strip out nils
+        let cleanObjects = objects.compactMap { $0 }
 
         // Add objects
         self.add(objects: cleanObjects)
@@ -437,7 +466,7 @@ public class Region {
 
         // TODO: Implement better caching via Realm or something
 
-        // Stop if another save task is pending
+        // Cancel the pending save task
         if saveTask != nil {
             saveTask?.cancel()
         }
@@ -463,10 +492,12 @@ public class Region {
             let filename = self.stateKey.replacingOccurrences(of: ":", with: "_")
 
             // Get temporary file location
-            let file = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(filename).appendingPathExtension("json")
+            let file = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(filename)
+                .appendingPathExtension("json")
 
             // Make sure folder exists
-            try? FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true, attributes: nil)
+            try? FileManager.default.createDirectory(at: file.deletingLastPathComponent(),
+                                                     withIntermediateDirectories: true, attributes: nil)
 
             // Write file
             do {
@@ -482,7 +513,7 @@ public class Region {
 
         }
 
-        // Start save task soon
+        // Debounce save task
         DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: saveTask!)
 
     }
@@ -542,10 +573,8 @@ public class Region {
 
         // Remove object
         guard let removedObject = objects.removeValue(forKey: id) else {
-
             // No object, do nothing
             return {}
-
         }
 
         // Notify
@@ -563,9 +592,8 @@ public class Region {
 
             // Notify
             self.will(add: removedObject)
-
-            // Revert
             self.add(objects: [removedObject])
+            self.save()
 
         }
 

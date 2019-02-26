@@ -12,13 +12,19 @@
 import Foundation
 import PromiseKit
 
+///
+///
+/// Data Pool plugin (region classes) must be pre-registered.
+/// Region instances are created on-demand.
+/// Regions are loaded from disk cache.
 public final class DataPool {
 
     /// List of available plugins, i.e. region classes.
     static let plugins: [Region.Type] = [
-//        InventoryRegion.self,
+//        InventoryRegion.self
 //        VatomIDRegion.self,
-//        VatomChildrenRegion.self
+//        VatomChildrenRegion.self,
+//        GeoPosRegion.self
     ]
 
     /// List of active regions
@@ -54,7 +60,7 @@ public final class DataPool {
             fatalError("[DataPool] No region plugin matches ID: \(id)")
         }
 
-        // Create and store region
+        // Create and store region instance.
         guard let region = try? Region.init(descriptor: descriptor) else {
             fatalError("[DataPool] Region can't be created in this context")
             // TODO: Better error handling? This shouldn't normally happen though.
@@ -90,7 +96,7 @@ public final class DataPool {
     static func removeRegion(region: Region) {
 
         // Remove region
-        regions = regions.filter { $0 !== region }
+        regions = regions.filter { $0 !== region } // array no longer keeps a strong ref to the region
 
     }
 

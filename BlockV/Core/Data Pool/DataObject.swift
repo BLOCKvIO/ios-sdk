@@ -23,8 +23,27 @@ class DataObject {
     /// Object payload, if any.
     var data: [String: Any]?
 
-    /// Cached object. Plugins map this raw data object to their own types, this is used to cache
-    /// those types if there have been no changes.
+    /// Cached concrete type. Plugins use the `map` function to transform raw `data` into a concrete type.
+    /// This property is used to cache the transformed type. This avoids the overhead of performing the transformation.
     var cached: Any?
 
+}
+
+/// Represents a raw data object, potentially without any data, which is monitored by a region.
+class DataObject2<T> {
+
+    /// Type ID.
+    var type: String = ""
+
+    /// Identifier.
+    var id: String = ""
+
+    /// Object payload, if any.
+    var data: [String: Any]?
+
+    /// Cached concrete type.
+    ///
+    /// Plugins use the `map` function to transform raw `data` into a concrete type. This property is used to cache
+    /// the transformed type. This avoids the overhead of performing the transformation.
+    var cached: T?
 }

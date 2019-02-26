@@ -39,7 +39,8 @@ extension Region {
 
     /// Add a listener
     public func addObserver(_ observer: Any, selector: Selector, name: RegionEvent) {
-        NotificationCenter.default.addObserver(observer, selector: selector, name: Notification.Name(name.rawValue), object: self)
+        NotificationCenter.default.addObserver(observer, selector: selector,
+                                               name: Notification.Name(name.rawValue), object: self)
     }
 
     /// Removes a set listener
@@ -47,10 +48,11 @@ extension Region {
     public typealias RemoveObserverFunction = () -> Void
 
     /// Add a listener
-    public func listen(for name: RegionEvent, handler : @escaping (Notification) -> Void) -> RemoveObserverFunction {
+    public func listen(for name: RegionEvent, handler: @escaping (Notification) -> Void) -> RemoveObserverFunction {
 
         // Register observer
-        let observer = NotificationCenter.default.addObserver(forName: Notification.Name(name.rawValue), object: self, queue: OperationQueue.main, using: handler)
+        let observer = NotificationCenter.default.addObserver(forName: Notification.Name(name.rawValue),
+                                                              object: self, queue: OperationQueue.main, using: handler)
 
         // Return a function which can be called to remove the observer
         return {

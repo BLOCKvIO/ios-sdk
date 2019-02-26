@@ -44,6 +44,8 @@ internal extension Client {
 
 internal extension API {
 
+    /// Raw endpoints are generic over `Void`. This informs the networking client to return then raw data (instead of
+    /// parsing out a model).
     enum Raw {
 
         /// Builds the endpoint to search for vAtoms.
@@ -55,6 +57,16 @@ internal extension API {
             return Endpoint(method: .post,
                             path: "/v1/vatom/discover",
                             parameters: payload)
+        }
+
+        /// Builds the endpoint to get a vAtom by its unique identifier.
+        ///
+        /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
+        static func getVatoms(withIDs ids: [String]) -> Endpoint<Void> {
+            return Endpoint(method: .post,
+                            path: "/v1/user/vatom/get",
+                            parameters: ["ids": ids]
+            )
         }
 
     }

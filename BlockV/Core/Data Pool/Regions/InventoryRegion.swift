@@ -13,12 +13,12 @@ import Foundation
 import PromiseKit
 
 /// This region plugin provides access to the current user's inventory.
-class InventoryRegion : BLOCKvRegion {
+class InventoryRegion: BLOCKvRegion {
 
-    /// Plugin ID
-    override class var ID : String { return "inventory" }
+    /// Plugin identifier
+    override class var ID: String { return "inventory" }
 
-    /** Constructor */
+    /// Constructor
     required init(descriptor: Any) throws {
         try super.init(descriptor: descriptor)
 
@@ -29,25 +29,25 @@ class InventoryRegion : BLOCKvRegion {
 
     }
 
-    /// Current user ID
+    /// Current user ID.
     let currentUserID = DataPool.sessionInfo["userID"] as? String ?? ""
 
-    /// Our state key is the current user's ID
-    override var stateKey : String {
+    /// Our state key is the current user's Id.
+    override var stateKey: String {
         return "inventory:" + currentUserID
     }
 
-    /// There should only be one inventory region
-    override func matches(id : String, descriptor : Any) -> Bool {
+    /// There should only be one inventory region.
+    override func matches(id: String, descriptor: Any) -> Bool {
         return id == "inventory"
     }
 
-    /// Shut down this region if the current user changes
-    override func onSessionInfoChanged(info : Any?) {
+    /// Shut down this region if the current user changes.
+    override func onSessionInfoChanged(info: Any?) {
         self.close()
     }
 
-    /** Load current state from the server */
+    /// Load current state from the server.
     override func load() -> Promise<[String]?> {
 
         // Pause websocket events
@@ -64,11 +64,11 @@ class InventoryRegion : BLOCKvRegion {
     }
 
     /// Recursively fetch all pages of data from the server
-    fileprivate func fetch(page : Int = 1, previousItems : [String] = []) -> Promise<[String]?> {
+    fileprivate func fetch(page: Int = 1, previousItems: [String] = []) -> Promise<[String]?> {
 
         // Stop if closed
         if closed {
-            return Promise(value: previousItems)
+            return Promise.value(previousItems)
         }
 
 //        // Create discover query
@@ -80,31 +80,30 @@ class InventoryRegion : BLOCKvRegion {
         // create discover query
         let builder = DiscoverQueryBuilder()
         builder.setScopeToOwner()
-        //TODO: set page & limit
+        //FIXME: set page & limit
 
         // Execute it
         printBV(info: "[DataPool > InventoryRegion] Loading page \(page), got \(previousItems.count) items so far...")
 
         // build raw request
-        let endpoint = API.raw.discover(builder.toDictionary())
-        BLOCKv.client.request(endpoint).then { data -> Promise<[String]?> in
+        let endpoint = API.Raw.discover(builder.toDictionary())
+        return BLOCKv.client.request(endpoint).then { data -> Promise<[String]?> in
 
-        }
+            //TODO: Use a json returning request instead of a raw data request.
 
-        BLOCKv.client.request(endpoint) { (data, error) in
+            // convert
+            guard let object = try? JSONSerialization.jsonObject(with: data), let json = object as? [String: Any] else {
+                throw NSError.init("Unable to load") //FIXME: Create a better error
+            }
 
-
-
-        }
-
-        return Request2.post(endpoint: "/vatom/discover", payload: builder.toDictionary()).then { data -> Promise<[String]?> in
+            //TODO: This should be factored out.
 
             // Create list of items
-            var items : [DataObject] = []
+            var items: [DataObject] = []
             var ids = previousItems
 
             // Add vatoms to the list
-            guard let vatomInfos = data["results"] as? [[String:Any]] else { return Promise(value: ids) }
+            guard let vatomInfos = json["results"] as? [[String: Any]] else { return Promise.value(ids) }
             for vatomInfo in vatomInfos {
 
                 // Add data object
@@ -118,7 +117,7 @@ class InventoryRegion : BLOCKvRegion {
             }
 
             // Add faces to the list
-            guard let faces = data["faces"] as? [[String:Any]] else { return Promise(value: ids) }
+            guard let faces = json["faces"] as? [[String: Any]] else { return Promise.value(ids) }
             for face in faces {
 
                 // Add data object
@@ -132,7 +131,7 @@ class InventoryRegion : BLOCKvRegion {
             }
 
             // Add actions to the list
-            guard let actions = data["actions"] as? [[String:Any]] else { return Promise(value: ids) }
+            guard let actions = json["actions"] as? [[String: Any]] else { return Promise.value(ids) }
             for action in actions {
 
                 // Add data object
@@ -150,7 +149,7 @@ class InventoryRegion : BLOCKvRegion {
 
             // If no more data, stop
             if vatomInfos.count == 0 {
-                return Promise(value: ids)
+                return Promise.value(ids)
             }
 
             // Done, get next page
@@ -161,36 +160,44 @@ class InventoryRegion : BLOCKvRegion {
     }
 
     /// Called on WebSocket message.
-    override func processMessage(_ msg: [String:Any]) {
+    override func processMessage(_ msg: [String: Any]) {
         super.processMessage(msg)
 
         // Get info
-        guard let msg_type = msg["msg_type"] as? String else { return }
-        guard let payload = msg["payload"] as? [String:Any] else { return }
-        guard let old_owner = payload["old_owner"] as? String else { return }
-        guard let new_owner = payload["new_owner"] as? String else { return }
+        guard let msgType = msg["msg_type"] as? String else { return }
+        guard let payload = msg["payload"] as? [String: Any] else { return }
+        guard let oldOwner = payload["old_owner"] as? String else { return }
+        guard let newOwner = payload["new_owner"] as? String else { return }
         guard let vatomID = payload["id"] as? String else { return }
-        if msg_type != "inventory" {
+        if msgType != "inventory" {
             return
         }
 
         // Check if this is an incoming or outgoing vatom
-        if (old_owner == self.currentUserID && new_owner != self.currentUserID) {
+        if oldOwner == self.currentUserID && newOwner != self.currentUserID {
 
             // Vatom is no longer owned by us
             self.remove(ids: [vatomID])
 
-        } else if (old_owner != self.currentUserID && new_owner == self.currentUserID) {
+        } else if oldOwner != self.currentUserID && newOwner == self.currentUserID {
 
             // Vatom is now our inventory! Pause WebSocket and fetch vatom payload
             self.pauseMessages()
-            Request2.post(endpoint: "/user/vatom/get", payload: [ "ids": [vatomID] ]).then { data -> Void in
+
+            let endpoint = API.Raw.getVatoms(withIDs: [vatomID])
+            BLOCKv.client.request(endpoint).done { data in
+
+                // convert
+                guard let object = try? JSONSerialization.jsonObject(with: data),
+                    let json = object as? [String: Any] else {
+                    throw NSError.init("Unable to load") //FIXME: Create a better error
+                }
 
                 // Add vatom to new objects list
-                var items : [DataObject] = []
+                var items: [DataObject] = []
 
                 // Add vatoms to the list
-                guard let vatomInfos = data["vatoms"] as? [[String:Any]] else { return }
+                guard let vatomInfos = json["vatoms"] as? [[String: Any]] else { return }
                 for vatomInfo in vatomInfos {
 
                     // Add data object
@@ -203,7 +210,7 @@ class InventoryRegion : BLOCKvRegion {
                 }
 
                 // Add faces to the list
-                guard let faces = data["faces"] as? [[String:Any]] else { return }
+                guard let faces = json["faces"] as? [[String: Any]] else { return }
                 for face in faces {
 
                     // Add data object
@@ -216,7 +223,7 @@ class InventoryRegion : BLOCKvRegion {
                 }
 
                 // Add actions to the list
-                guard let actions = data["actions"] as? [[String:Any]] else { return }
+                guard let actions = json["actions"] as? [[String: Any]] else { return }
                 for action in actions {
 
                     // Add data object
@@ -232,25 +239,29 @@ class InventoryRegion : BLOCKvRegion {
                 self.add(objects: items)
 
                 // Notify vatom received
-                guard let vatom = self.get(id: vatomInfos[0]["id"] as? String ?? "") as? Vatom else {
+                guard let vatom = self.get(id: vatomInfos[0]["id"] as? String ?? "") as? VatomModel else {
                     printBV(error: "[DataPool > InventoryRegion] Couldn't process incoming vatom")
                     return
                 }
 
+                //FIXME: Figure out how to deal with incoming overlay.
+
                 // Notify incoming
-                vatom.onReceived(from: VatomUser.withID(old_owner), presentationInfo: [:], triggeringAction: payload["action_name"] as? String)
+//                vatom.onReceived(from: VatomUser.withID(old_owner),
+//                                 presentationInfo: [:],
+//                                 triggeringAction: payload["action_name"] as? String)
 
-                }.always { () -> Void in
-
-                    // Resume WebSocket processing
-                    self.resumeMessages()
-
+            }.catch { error in
+                printBV(error: "[InventoryRegion] Unable to fetch inventory. \(error.localizedDescription)")
+            }.finally {
+                // Resume WebSocket processing
+                self.resumeMessages()
             }
 
         } else {
 
             // Logic error, old owner and new owner cannot be the same
-            printBV(error: "[DataPool > BVWebSocketRegion] Logic error in WebSocket message, old_owner and new_owner shouldn't be the same: \(vatomID)")
+            printBV(error: "[InventoryRegion] Logic error in WebSocket message, old_owner and new_owner shouldn't be the same: \(vatomID)")
 
         }
 

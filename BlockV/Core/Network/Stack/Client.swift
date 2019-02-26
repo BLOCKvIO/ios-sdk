@@ -14,12 +14,13 @@ import Alamofire
 
 protocol ClientProtocol {
 
+    typealias RawCompletion = (_ data: Data?, _ error: BVError?) -> Void
+
     /// Request that returns raw data.
-    func request(_ endpoint: Endpoint<Void>, completion: @escaping (Data?, BVError?) -> Void )
+    func request(_ endpoint: Endpoint<Void>, completion: @escaping RawCompletion)
 
     /// Request that returns native object (must conform to decodable).
-    func request<Response>(_ endpoint: Endpoint<Response>,
-                           completion: @escaping (Response?, BVError?) -> Void ) where Response: Decodable
+    func request<T>(_ endpoint: Endpoint<T>, completion: @escaping (T?, BVError?) -> Void ) where T: Decodable
 
 }
 
@@ -107,15 +108,17 @@ final class Client: ClientProtocol {
 
     /// Endpoints generic over `void` complete by passing in the raw data response.
     ///
-    /// This is usefull for actions whose reponse payloads are not know since reactors may change at
-    /// any time.
+    /// This is usefull for actions whose reponse payloads are not defined. For example, reactors may define their own
+    /// inner payload structure.
     ///
-    /// NOTE: Raw requests do not partake in OAuth and general lifecycle handling.
+    /// - important:
+    /// Raw requests do *not* flow through the credential refresh mechanism. Do not perform auth related calls, e.g.
+    /// login using this request method.
     ///
     /// - Parameters:
     ///   - endpoint: Endpoint for the request
     ///   - completion: The completion handler to call when the request is completed.
-    func request(_ endpoint: Endpoint<Void>, completion: @escaping (Data?, BVError?) -> Void) {
+    func request(_ endpoint: Endpoint<Void>, completion: @escaping RawCompletion) {
 
         // create request
         let request = self.sessionManager.request(
@@ -143,6 +146,34 @@ final class Client: ClientProtocol {
                     let error = BVError.networking(error: err)
                     completion(nil, error)
                 }
+            }
+        }
+
+    }
+
+    /// JSON Completion handler.
+    typealias JSONCompletion = (_ json: Any?, _ error: BVError?) -> Void
+
+    func requestJSON(_ endpoint: Endpoint<Void>, completion: @escaping JSONCompletion) {
+
+        // create request
+        let request = self.sessionManager.request(
+            url(path: endpoint.path),
+            method: endpoint.method,
+            parameters: endpoint.parameters,
+            encoding: endpoint.encoding
+        )
+
+        // configure validation
+        request.validate()
+
+        request.responseJSON { dataResponse in
+            switch dataResponse.result {
+            case let .success(json):
+                print("success", json)
+                completion(json, nil)
+            case let .failure(err):
+                print("failure", err)
             }
         }
 
@@ -181,6 +212,9 @@ final class Client: ClientProtocol {
                 /*
                  Not all responses (even in the 200 range) are wrapped in the `BaseModel`. Endpoints must be treated
                  on a per-endpoint basis.
+                 
+                 The AuthModel is only returned on a limited set of endpoints. It seems wasteful to try and
+                 inspect every response for the access and refesh tokens.
                  */
 
                 // extract auth tokens if available

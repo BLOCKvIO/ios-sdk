@@ -11,6 +11,7 @@
 
 import XCTest
 @testable import BLOCKv
+import GenericJSON
 
 class VatomModelUpdate_Tests: XCTestCase {
     

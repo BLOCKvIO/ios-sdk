@@ -21,7 +21,7 @@ public final class DataPool {
 
     /// List of available plugins, i.e. region classes.
     static let plugins: [Region.Type] = [
-//        InventoryRegion.self
+        InventoryRegion.self
 //        VatomIDRegion.self,
 //        VatomChildrenRegion.self,
 //        GeoPosRegion.self
@@ -61,7 +61,7 @@ public final class DataPool {
         }
 
         // Create and store region instance.
-        guard let region = try? Region.init(descriptor: descriptor) else {
+        guard let region = try? regionPlugin.init(descriptor: descriptor) else {
             fatalError("[DataPool] Region can't be created in this context")
             // TODO: Better error handling? This shouldn't normally happen though.
         }

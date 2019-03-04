@@ -40,9 +40,9 @@ public struct MessageListModel: Equatable {
     }
 
     /// Filters out all threads more recent than the cursor (useful for paging).
-    public let cursor: String
+    public var cursor: String
     /// Array of messages for the specifed thread.
-    public let messages: [MessageModel]
+    public var messages: [MessageModel]
 
     enum CodingKeys: String, CodingKey {
         case cursor

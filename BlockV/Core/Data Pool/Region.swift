@@ -150,9 +150,10 @@ public class Region {
 
     }
 
-    /// Start initial load. The promise sohuld resolve once the region is up to date and provide the set of object ids.
+    /// Start load of remote objects. The promise should resolve once the region is up to date and provides the
+    /// set of object ids.
     ///
-    /// This function should fetch the _entire_ region.
+    /// This function should fetch the _entire_ region. Each object should be added to the region using `
     ///
     /// - Returns: A promise which will fullsil with an array of object IDs, or `nil`. If an array of object IDs is
     ///   returned, any IDs not in this list should be removed from the region.
@@ -182,7 +183,7 @@ public class Region {
         fatalError("Subclasses muct override Region.matches()")
     }
 
-    /// Add DataObjects to our pool
+    /// Add DataObjects to our pool.
     ///
     /// - Parameter objects: The objects to add
     func add(objects: [DataObject]) {
@@ -328,7 +329,7 @@ public class Region {
     /// Returns all the objects within this region. Waits until the region is stable first.
     ///
     /// - Returns: Array of objects. Check the region-specific map() function to see what types are returned.
-    public func getAllStable() -> Guarantee<[Any]> {
+    public func getAllStable() -> Guarantee<[Any]> { // Make generic over T
 
         // Synchronize now
         return self.synchronize().map({
@@ -338,7 +339,7 @@ public class Region {
     }
 
     /// Returns all the objects within this region. Does NOT wait until the region is stable first.
-    public func getAll() -> [Any] {
+    public func getAll() -> [Any] { // Make generic over T
 
         // Create array of all items
         var items: [Any] = []
@@ -369,7 +370,7 @@ public class Region {
     }
 
     /// Returns an object within this region by it's ID. Waits until the region is stable first.
-    public func getStable(id: String) -> Guarantee<Any?> {
+    public func getStable(id: String) -> Guarantee<Any?> { // Make generic over T
 
         // Synchronize now
         return self.synchronize().map {
@@ -380,7 +381,7 @@ public class Region {
     }
 
     /// Returns an object within this region by it's ID.
-    public func get(id: String) -> Any? {
+    public func get(id: String) -> Any? { // Make generic over T
 
         // Get object
         guard let object = objects[id] else {

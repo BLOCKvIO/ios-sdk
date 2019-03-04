@@ -10,7 +10,8 @@
 //
 
 import Foundation
-import MoreCodable
+//import MoreCodable
+import DictionaryCoding
 
 /// Abstract subclass of `Region`. This intermediate class handles updates from the BLOCKv Web socket. Regions should
 /// subclass to automatically handle Web socket updates.
@@ -160,7 +161,30 @@ class BLOCKvRegion: Region {
     }
 
     /// Map data objects to Vatom objects.
+    ///
+    /// This is the primary transformation function which converts freeform data pool objects into concrete types.
     override func map(_ object: DataObject) -> Any? {
+        
+        //FIXME: This method is synchronous - this is no good.
+
+        /*
+         How to transfrom data objects into types?
+         
+         Data > Decoder > Type (decode from external representation)
+         Type > Encoder > Data (encode for extrernal representation)
+         
+         Facts:
+         - Data pool store heterogeneous object of type [String: Any] - it is type independent.
+         - `map(:DataObject)` needs to transformt this into a concrete type.
+         - The codable machinary is good for data <> native type transformations.
+         
+         
+         Options:
+         1. Convert [String: Any] into Data, then Data into Type (very inefficient).
+         2. Write an init(descriptor: [String: Any])` - this allows VatomModel to be initialized with a dictionary.
+         > This sucks because a) it's a lot of work, b) does not leverage the CodingKeys of Codable conformance.
+         3. Write a Decoder with transforms [String: Any] into Type AND leverages the CodingKeys
+         */
 
         // Only handle vatoms
         guard object.type == "vatom" else {
@@ -172,23 +196,44 @@ class BLOCKvRegion: Region {
             return nil
         }
 
-        let decoder = DictionaryDecoder()
-
         // Get vatom info
         guard let template = object.data![keyPath: "vAtom::vAtomType.template"] as? String else { return nil }
 
         // Fetch all faces linked to this vatom
         let faces = objects.values.filter { $0.type == "face" && $0.data?["template"] as? String == template }
-        objectData["faces"] = faces
+        objectData["faces"] = faces.map { $0.data }
 
         // Fetch all actions linked to this vatom
         let actionNamePrefix = template + "::Action::"
         let actions = objects.values.filter { $0.type == "action" && ($0.data?["name"] as? String)?
             .starts(with: actionNamePrefix) == true }
-        objectData["actions"] = actions
+        objectData["actions"] = actions.map { $0.data }
 
-        // create and return a new instance
-        return try? decoder.decode(VatomModel.self, from: objectData)
+        print("\(self)")
+
+        /*
+         Option 1
+         Convert dictionary to data so it can be passed through codable machinary
+         */
+
+        do {
+            let rawData = try JSONSerialization.data(withJSONObject: objectData)
+            let vatoms = try JSONDecoder.blockv.decode(VatomModel.self, from: rawData)
+            return vatoms
+        } catch {
+            printBV(error: error.localizedDescription)
+            return nil
+        }
+
+        /*
+         Option 2
+         Dictionary Encoder
+         */
+
+//        let decoder = DictionaryDecoder()
+//
+//        // create and return a new instance
+//        return try? decoder.decode(VatomModel.self, from: objectData)
 
     }
 

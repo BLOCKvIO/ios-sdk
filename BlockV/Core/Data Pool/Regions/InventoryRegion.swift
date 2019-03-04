@@ -21,6 +21,8 @@ class InventoryRegion: BLOCKvRegion {
     /// Constructor
     required init(descriptor: Any) throws {
         try super.init(descriptor: descriptor)
+        
+        print(DataPool.sessionInfo["userID"])
 
         // Make sure we have a valid current user
         guard let userID = DataPool.sessionInfo["userID"] as? String, !userID.isEmpty else {
@@ -37,7 +39,7 @@ class InventoryRegion: BLOCKvRegion {
         return "inventory:" + currentUserID
     }
 
-    /// There should only be one inventory region.
+    // There should only be one inventory region.
     override func matches(id: String, descriptor: Any) -> Bool {
         return id == "inventory"
     }
@@ -71,16 +73,11 @@ class InventoryRegion: BLOCKvRegion {
             return Promise.value(previousItems)
         }
 
-//        // Create discover query
-//        let filter = VatomDiscoverFilter()
-//        filter.ownedVatomsOnly = true
-//        filter.page = page
-//        filter.limit = 1000
-
         // create discover query
         let builder = DiscoverQueryBuilder()
         builder.setScopeToOwner()
-        //FIXME: set page & limit
+        builder.page = page
+        builder.limit = 1000
 
         // Execute it
         printBV(info: "[DataPool > InventoryRegion] Loading page \(page), got \(previousItems.count) items so far...")
@@ -96,6 +93,10 @@ class InventoryRegion: BLOCKvRegion {
                 throw NSError.init("Unable to load") //FIXME: Create a better error
             }
 
+            guard let payload = json["payload"] as? [String: Any] else {
+                throw NSError.init("Unable to load") //FIXME: Create a better error
+            }
+
             //TODO: This should be factored out.
 
             // Create list of items
@@ -103,7 +104,7 @@ class InventoryRegion: BLOCKvRegion {
             var ids = previousItems
 
             // Add vatoms to the list
-            guard let vatomInfos = json["results"] as? [[String: Any]] else { return Promise.value(ids) }
+            guard let vatomInfos = payload["results"] as? [[String: Any]] else { return Promise.value(ids) }
             for vatomInfo in vatomInfos {
 
                 // Add data object
@@ -117,7 +118,7 @@ class InventoryRegion: BLOCKvRegion {
             }
 
             // Add faces to the list
-            guard let faces = json["faces"] as? [[String: Any]] else { return Promise.value(ids) }
+            guard let faces = payload["faces"] as? [[String: Any]] else { return Promise.value(ids) }
             for face in faces {
 
                 // Add data object
@@ -131,7 +132,7 @@ class InventoryRegion: BLOCKvRegion {
             }
 
             // Add actions to the list
-            guard let actions = json["actions"] as? [[String: Any]] else { return Promise.value(ids) }
+            guard let actions = payload["actions"] as? [[String: Any]] else { return Promise.value(ids) }
             for action in actions {
 
                 // Add data object
@@ -149,6 +150,7 @@ class InventoryRegion: BLOCKvRegion {
 
             // If no more data, stop
             if vatomInfos.count == 0 {
+//            if page > 1 { //FIXME: Testing
                 return Promise.value(ids)
             }
 
@@ -193,11 +195,15 @@ class InventoryRegion: BLOCKvRegion {
                     throw NSError.init("Unable to load") //FIXME: Create a better error
                 }
 
+                guard let payload = json["payload"] as? [String: Any] else {
+                    throw NSError.init("Unable to load") //FIXME: Create a better error
+                }
+
                 // Add vatom to new objects list
                 var items: [DataObject] = []
 
                 // Add vatoms to the list
-                guard let vatomInfos = json["vatoms"] as? [[String: Any]] else { return }
+                guard let vatomInfos = payload["vatoms"] as? [[String: Any]] else { return }
                 for vatomInfo in vatomInfos {
 
                     // Add data object
@@ -210,7 +216,7 @@ class InventoryRegion: BLOCKvRegion {
                 }
 
                 // Add faces to the list
-                guard let faces = json["faces"] as? [[String: Any]] else { return }
+                guard let faces = payload["faces"] as? [[String: Any]] else { return }
                 for face in faces {
 
                     // Add data object
@@ -223,7 +229,7 @@ class InventoryRegion: BLOCKvRegion {
                 }
 
                 // Add actions to the list
-                guard let actions = json["actions"] as? [[String: Any]] else { return }
+                guard let actions = payload["actions"] as? [[String: Any]] else { return }
                 for action in actions {
 
                     // Add data object

@@ -10,24 +10,24 @@ import XCTest
 @testable import BLOCKv
 
 class FaceModel_Tests: XCTestCase {
-    
+
     // MARK: - Lifecycle
-    
+
     override func setUp() {
         super.setUp()
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
-    
+
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
     }
-    
+
     // MARK: - Test Methods
-    
+
     /// Test the decoding where face type is native.
     func testNativeFaceDecoding() {
-        
+
         do {
             // decode server json into face model
             let model = try TestUtility.jsonDecoder.decode(FaceModel.self, from: MockModel.FaceModel.nativeGenericIcon)
@@ -40,12 +40,12 @@ class FaceModel_Tests: XCTestCase {
         } catch {
             XCTFail(error.localizedDescription)
         }
-        
+
     }
-    
+
     /// Test decoding where face type is Web.
     func testWebFaceDecoding() {
-        
+
         do {
             // decode server json into face model
             let model = try TestUtility.jsonDecoder.decode(FaceModel.self, from: MockModel.FaceModel.webGenericFullscreen)
@@ -58,15 +58,15 @@ class FaceModel_Tests: XCTestCase {
         } catch {
             XCTFail(error.localizedDescription)
         }
-        
+
     }
-    
+
     /// Test codable (i.e. encode and decode).
     ///
     /// This test checks that encoding the model to data and then decoding back to the original model procduces models
     /// that pass the equality test. This is important for persistance of the models.
     func testCodable() {
-        
+
         do {
             // decode server json into face model
             let model = try TestUtility.jsonDecoder.decode(FaceModel.self, from: MockModel.FaceModel.nativeGenericIcon)
@@ -75,15 +75,15 @@ class FaceModel_Tests: XCTestCase {
             let data = try TestUtility.jsonEncoder.encode(modelFromJSONData)
             // decode into face model
             let modelFromEncodedData = try TestUtility.jsonDecoder.decode(FaceModel.self, from: data)
-            
+
             print(modelFromJSONData)
             print(modelFromEncodedData)
-            
+
             XCTAssertEqual(modelFromJSONData, modelFromEncodedData)
 
         } catch {
             XCTFail(error.localizedDescription)
         }
     }
-    
+
 }

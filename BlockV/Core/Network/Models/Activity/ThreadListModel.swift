@@ -15,9 +15,9 @@ import Foundation
 public struct ThreadListModel: Equatable {
 
     /// Filters out all threads more recent than the cursor (useful for paging).
-    public let cursor: String
+    public var cursor: String
     /// Array of threads
-    public let threads: [ThreadModel]
+    public var threads: [ThreadModel]
 
     enum CodingKeys: String, CodingKey {
         case cursor

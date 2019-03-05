@@ -11,6 +11,7 @@
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
+		AD09ECAF222D5667003F46C0 /* ActivityModelCodable_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD09ECAE222D5667003F46C0 /* ActivityModelCodable_Tests.swift */; };
 		AD0BCC922178828A001836DE /* VatomModelUpdate_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD0BCC912178828A001836DE /* VatomModelUpdate_Tests.swift */; };
 		AD0BCC98217A0106001836DE /* LiveVatomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD0BCC97217A0106001836DE /* LiveVatomView.swift */; };
 		AD36A59F215D1CE4009EFD55 /* CustomLoaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD36A59E215D1CE4009EFD55 /* CustomLoaderView.swift */; };
@@ -84,6 +85,7 @@
 		A11EBD956A70C6C7890F053F /* Pods-BLOCKv_Unit_Tests.prod.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BLOCKv_Unit_Tests.prod.xcconfig"; path = "Pods/Target Support Files/Pods-BLOCKv_Unit_Tests/Pods-BLOCKv_Unit_Tests.prod.xcconfig"; sourceTree = "<group>"; };
 		A8F8F6BF41E2864BD8FA3FB7 /* Pods-BlockV_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Tests/Pods-BlockV_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		AC9D73DE9B5506A2FFBB74EE /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
+		AD09ECAE222D5667003F46C0 /* ActivityModelCodable_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityModelCodable_Tests.swift; sourceTree = "<group>"; };
 		AD0BCC912178828A001836DE /* VatomModelUpdate_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VatomModelUpdate_Tests.swift; sourceTree = "<group>"; };
 		AD0BCC97217A0106001836DE /* LiveVatomView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LiveVatomView.swift; sourceTree = "<group>"; };
 		AD36A59E215D1CE4009EFD55 /* CustomLoaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomLoaderView.swift; sourceTree = "<group>"; };
@@ -280,6 +282,7 @@
 				ADA07DF021A94025007A6322 /* FaceModelCodable_Tests.swift */,
 				ADA07DF121A94025007A6322 /* VatomModelCodable_Tests.swift */,
 				ADA07DF221A94025007A6322 /* ActionModelCodable_Tests.swift */,
+				AD09ECAE222D5667003F46C0 /* ActivityModelCodable_Tests.swift */,
 			);
 			path = Codable;
 			sourceTree = "<group>";
@@ -639,6 +642,7 @@
 				ADA07DF721A94061007A6322 /* KeyPath_Tests.swift in Sources */,
 				AD0BCC922178828A001836DE /* VatomModelUpdate_Tests.swift in Sources */,
 				ADA07DFA21A94068007A6322 /* ActionModelCodable_Tests.swift in Sources */,
+				AD09ECAF222D5667003F46C0 /* ActivityModelCodable_Tests.swift in Sources */,
 				D530759C21119E2A00DE7FD0 /* MockModel.swift in Sources */,
 				ADA07DF921A94068007A6322 /* VatomModelCodable_Tests.swift in Sources */,
 			);

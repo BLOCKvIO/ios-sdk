@@ -20,14 +20,20 @@ public struct MessageListModel: Equatable {
      */
 
     // Inner model
-    struct InnerModel: Decodable {
+    struct InnerModel: Codable {
         let message: MessageModel
 //        let whenModified: Date
 
         enum CodingKeys: String, CodingKey {
             case message
-            case whenModified = "when_modified"
+//            case whenModified = "when_modified"
         }
+
+        init(message: MessageModel) {
+            self.message = message
+        }
+
+        // MARK: - Codable
 
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -37,12 +43,17 @@ public struct MessageListModel: Equatable {
 //            whenModified = Date(timeIntervalSince1970: _whenModified / 1000)
         }
 
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(message, forKey: .message)
+        }
+
     }
 
     /// Filters out all threads more recent than the cursor (useful for paging).
-    public let cursor: String
+    public var cursor: String
     /// Array of messages for the specifed thread.
-    public let messages: [MessageModel]
+    public var messages: [MessageModel]
 
     enum CodingKeys: String, CodingKey {
         case cursor
@@ -51,16 +62,21 @@ public struct MessageListModel: Equatable {
 
 }
 
-extension MessageListModel: Decodable {
+extension MessageListModel: Codable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.cursor = try container.decode(String.self, forKey: .cursor)
-        //print(self.cursor)
         let inner = container.decodeSafelyArray(of: InnerModel.self, forKey: .messages)
-        //print(inner)
         self.messages = inner.map { $0.message }
         print(self.messages)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(cursor, forKey: .cursor)
+        let innerWrapper = messages.map { InnerModel(message: $0) }
+        try container.encode(innerWrapper, forKey: .messages)
     }
 
 }

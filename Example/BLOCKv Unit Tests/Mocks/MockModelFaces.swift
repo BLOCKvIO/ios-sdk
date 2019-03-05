@@ -12,8 +12,7 @@
 import Foundation
 
 public struct MockModelFaces {
-    
-    
+
     /// Two native generic faces, one icon and one 3d.
     public static let genericIconAnd3D = """
         [
@@ -80,8 +79,7 @@ public struct MockModelFaces {
           }
         ]
         """.data(using: .utf8)!
-    
-    
+
     /// Same as above but with array ordering reveresed.
     let genericIconAnd3DOrderRevered = """
         [
@@ -148,5 +146,5 @@ public struct MockModelFaces {
           }
         ]
         """.data(using: .utf8)!
-    
+
 }

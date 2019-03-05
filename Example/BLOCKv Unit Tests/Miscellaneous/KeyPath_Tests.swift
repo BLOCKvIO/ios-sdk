@@ -13,7 +13,7 @@ import XCTest
 @testable import BLOCKv
 
 class KeyPath_Tests: XCTestCase {
-    
+
     func testHeadAndTailEmpty() {
         let keyPath = KeyPath("")
         do {
@@ -24,7 +24,7 @@ class KeyPath_Tests: XCTestCase {
             XCTFail(error.localizedDescription)
         }
     }
-    
+
     func testHeadAndTailSingle() {
         let keyPath = KeyPath("a")
         do {
@@ -35,7 +35,7 @@ class KeyPath_Tests: XCTestCase {
             XCTFail(error.localizedDescription)
         }
     }
-    
+
     func testHeadAndTailDouble() {
         let keyPath = KeyPath("a.b")
         do {
@@ -46,7 +46,7 @@ class KeyPath_Tests: XCTestCase {
             XCTFail(error.localizedDescription)
         }
     }
-    
+
     func testHeadAndTailTripple() {
         let keyPath = KeyPath("a.b.c")
         do {
@@ -57,7 +57,5 @@ class KeyPath_Tests: XCTestCase {
             XCTFail(error.localizedDescription)
         }
     }
-    
-   
-    
+
 }

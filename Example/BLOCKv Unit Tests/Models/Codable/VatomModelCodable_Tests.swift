@@ -15,55 +15,54 @@ import XCTest
 class VatomModelCodable_Tests: XCTestCase {
 
     // MARK: vAtom Resource
-    
+
     func testVatomResourceDecoding() {
-        
+
         do {
-            let _ = try TestUtility.jsonDecoder.decode([VatomResourceModel].self, from: MockModel2.vatomResourcesJSON_Simple1)
+            _ = try TestUtility.jsonDecoder.decode([VatomResourceModel].self, from: MockModel2.vatomResourcesJSON_Simple1)
         } catch {
             XCTFail("Decoding failed: \(error.localizedDescription)")
         }
-        
+
     }
-    
+
     // MARK: vAtom
-    
+
     func testVatomDecoding() {
-        
+
         do {
             let vatom = try TestUtility.jsonDecoder.decode(VatomModel.self, from: MockModel2.vatomJSON_Version1)
             print(vatom)
         } catch {
             XCTFail("Decoding failed: \(error.localizedDescription)")
         }
-        
+
         do {
-            let _ = try TestUtility.jsonDecoder.decode(VatomModel.self, from: MockModel2.vatomJSON_Version2)
-            
+            _ = try TestUtility.jsonDecoder.decode(VatomModel.self, from: MockModel2.vatomJSON_Version2)
+
         } catch {
             XCTFail("Decoding failed: \(error.localizedDescription)")
         }
-        
+
         do {
-            let _ = try TestUtility.jsonDecoder.decode(VatomModel.self, from: MockModel2.vatomJSON_Version3)
-            
+            _ = try TestUtility.jsonDecoder.decode(VatomModel.self, from: MockModel2.vatomJSON_Version3)
+
         } catch {
             XCTFail("Decoding failed: \(error.localizedDescription)")
         }
-        
+
         do {
-            let _ = try TestUtility.jsonDecoder.decode(VatomModel.self, from: MockModel2.vatomJSON_ExtendedPrivateSection)
+            _ = try TestUtility.jsonDecoder.decode(VatomModel.self, from: MockModel2.vatomJSON_ExtendedPrivateSection)
         } catch {
             XCTFail("Decoding failed: \(error.localizedDescription)")
         }
-        
-        
+
     }
-    
+
     // MARK: Array of vAtoms
-    
+
     func testVatomArrayDecoding() {
-        
+
         do {
             let blob = MockModel2.vatomArrayJSON_Version1
             let model = try TestUtility.jsonDecoder.decode([Safe<VatomModel>].self, from: blob)
@@ -71,7 +70,7 @@ class VatomModelCodable_Tests: XCTestCase {
         } catch {
             XCTFail("Decoding failed: \(error.localizedDescription)")
         }
-        
+
         do {
             let blob = MockModel2.vatomArrayJSON_Version2
             let model = try TestUtility.jsonDecoder.decode([Safe<VatomModel>].self, from: blob)
@@ -79,7 +78,7 @@ class VatomModelCodable_Tests: XCTestCase {
         } catch {
             XCTFail("Decoding failed: \(error.localizedDescription)")
         }
-        
+
     }
 
 }

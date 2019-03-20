@@ -234,7 +234,7 @@ extension WebFaceView {
 
     /// Routes the script message to the viewer and handles the response.
     private func routeMessageToViewer(_ message: RequestScriptMessage) {
-        
+
         // notify the host's message delegate of the custom message from the web page
         self.delegate?.faceView(self,
                                 didSendMessage: message.name,
@@ -253,7 +253,7 @@ extension WebFaceView {
                                         return
                                     }
         })
-        
+
     }
 
     /// Transforms viewer message from protocol V1 to V2.

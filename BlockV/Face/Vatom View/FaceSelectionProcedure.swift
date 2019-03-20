@@ -18,7 +18,7 @@ import Foundation
 /// face for a specific visual context.
 ///
 /// Closure inputs:
-/// - Packed vAtom to be displayed.
+/// - vAtom to be displayed.
 /// - Installed display URLs. This is the set of native face display URLs (i.e. unique identifiers of the installed
 ///   native faces).
 ///
@@ -214,7 +214,7 @@ private struct EmbeddedProcedureBuilder {
 
             if face.isNative {
 
-                // enusrue the native face is supported (i.e. the face code is installed)
+                // ensure the native face is supported (i.e. the face code is installed)
                 if installedURLs.contains(where: {
                     ($0.caseInsensitiveCompare(face.properties.displayURL) == .orderedSame) }) {
                     // prefer 'native' over 'web'
@@ -228,7 +228,7 @@ private struct EmbeddedProcedureBuilder {
 
             if face.isWeb {
 
-                // enusrue the native face is supported (i.e. the face code is installed)
+                // ensure the native face is supported (i.e. the face code is installed)
                 if installedURLs.contains(where: {
                     ($0.caseInsensitiveCompare("https://*") == .orderedSame) }) {
                 } else {

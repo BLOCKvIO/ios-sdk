@@ -27,12 +27,6 @@ public protocol VatomViewError where Self: UIView {
     var vatom: VatomModel? { get set }
 }
 
-/// Types that manage a `VatomView` should conform to this delegate to know when the face has completed loading.
-protocol VatomViewLifecycleDelegate: class {
-    /// Called when the vatom view's selected face view has loaded successful or with an error.
-    func faceViewDidCompleteLoad(error: Error?)
-}
-
 /*
  Design Goals:
  1. Vatom View will ask for the best face (default routine for each view context).
@@ -42,6 +36,8 @@ protocol VatomViewLifecycleDelegate: class {
  prepareForReuse by calling `unLoad`.
  4. Viewers must be able to use embedded FSPs.
  5. Viewers must be able supply a custom FSP (defaults to the icon).
+ 6. Viewers must be informed of the selected face view (or any errors in selected the face view).
+ 7. Viewers must be informed of the completion of loading the face view (or any error encountered).
  */
 
 /// Visualizes a vAtom by attempting to display one of the vAtom's face views.
@@ -107,7 +103,7 @@ open class VatomView: UIView {
     ///
     /// The roster is a consolidated list of the face views registered by both the SDK and Viewer.
     /// This list represents the face views that are *capable* of being rendered.
-    public private(set) var roster: Roster
+    public internal(set) var roster: Roster
 
     /// Face model selected by the specifed face selection procedure (FSP).
     public private(set) var selectedFaceModel: FaceModel?
@@ -186,13 +182,15 @@ open class VatomView: UIView {
     ///   - procedure: The Face Selection Procedure (FSP) that determines which face view to display.
     ///     Defaults to `.icon`.
     public init(vatom: VatomModel,
-                procedure: @escaping FaceSelectionProcedure = EmbeddedProcedure.icon.procedure) {
+                procedure: @escaping FaceSelectionProcedure = EmbeddedProcedure.icon.procedure,
+                delegate: VatomViewDelegate? = nil) {
 
         self.procedure = procedure
         self.roster = FaceViewRoster.shared.roster
         self.loaderView = VatomView.defaultLoaderView.init()
         self.errorView = VatomView.defaultErrorView.init()
         self.vatom = vatom
+        self.vatomViewDelegate = delegate
         super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
 
         commonSetup()
@@ -221,13 +219,15 @@ open class VatomView: UIView {
                 procedure: @escaping FaceSelectionProcedure = EmbeddedProcedure.icon.procedure,
                 loadingView: VVLoaderView = VatomView.defaultLoaderView.init(),
                 errorView: VVErrorView = VatomView.defaultErrorView.init(),
-                roster: Roster = FaceViewRoster.shared.roster) {
+                roster: Roster = FaceViewRoster.shared.roster,
+                delegate: VatomViewDelegate? = nil) {
 
         self.procedure = procedure
         self.loaderView = loadingView
         self.errorView = errorView
         self.roster = roster
         self.vatom = vatom
+        self.vatomViewDelegate = delegate
         super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
 
         commonSetup()
@@ -315,25 +315,6 @@ open class VatomView: UIView {
         self.selectedFaceView?.unload()
     }
 
-    /// Vatom View Life Cycle error
-    public enum VVLCError: Error, CustomStringConvertible {
-
-        case selectionFailed
-        case unregisteredFaceViewSelected(_ displayURL: String)
-
-        public var description: String {
-            switch self {
-            case .selectionFailed:
-                return "Face Selection Procedure (FSP) did not to select a face view."
-            case .unregisteredFaceViewSelected(let url):
-                return """
-                Face selection procedure (FSP) selected a face view '\(url)' without the face view being registered.
-                """
-            }
-        }
-
-    }
-
     // MARK: - Vatom View Life Cycle
 
     /// Exectues the Vatom View Lifecycle (VVLC) on the current vAtom.
@@ -347,7 +328,16 @@ open class VatomView: UIView {
     /// - Parameter oldVatom: The previous vAtom being visualized by this VatomView.
     internal func runVVLC(oldVatom: VatomModel? = nil) {
 
+        /*
+         Note:
+         VVLC traps with assertion failure in two cases:
+         1. Backing vatom is nil.
+         2. The supplied FSP selected a Face Model and no eligilbe Face View was installed.
+         Both of these cases indicated developer error.
+         */
+
         guard let vatom = vatom else {
+            self.vatomViewDelegate?.vatomView(self, didSelectFaceView: .failure(VVLCError.faceViewSelectionFailed))
             assertionFailure("Developer error: vatom must not be nil.")
             return
         }
@@ -363,6 +353,7 @@ open class VatomView: UIView {
 
             //printBV(error: "Face Selection Procedure (FSP) returned without selecting a face model.")
             self.state = .error
+            self.vatomViewDelegate?.vatomView(self, didSelectFaceView: .failure(VVLCError.faceViewSelectionFailed))
             return
         }
 
@@ -393,6 +384,8 @@ open class VatomView: UIView {
             self.state = .completed
             // update currently selected face view (without replacement)
             self.selectedFaceView?.vatomChanged(vatom)
+            // inform delegate
+            self.vatomViewDelegate?.vatomView(self, didSelectFaceView: .success(self.selectedFaceView!))
 
         } else {
 
@@ -412,10 +405,11 @@ open class VatomView: UIView {
 
             guard let viewType = faceViewType else {
                 // viewer developer MUST have registered the face view with the face registry
+                self.vatomViewDelegate?.vatomView(self, didSelectFaceView: .failure(VVLCError.faceViewSelectionFailed))
                 assertionFailure(
                     """
-                    Developer error: Face selection procedure (FSP) selected a face without the face view being
-                    installed. Your FSP MUST check if the face view has been registered with the FaceRegistry.
+                    Developer error: Face Selection Procedure (FSP) selected a face model without an eligible face view
+                    being registered. Your FSP MUST check if the face view has been registered with the FaceRegistry.
                     """)
                 return
             }
@@ -429,6 +423,8 @@ open class VatomView: UIView {
 
             // replace currently selected face view with newly selected
             self.replaceFaceView(with: selectedFaceView)
+            // inform delegate
+            self.vatomViewDelegate?.vatomView(self, didSelectFaceView: .success(selectedFaceView))
 
         }
 
@@ -456,18 +452,23 @@ open class VatomView: UIView {
 
             ///printBV(info: "Face view load completion called.")
 
+            guard let self = self else { return }
+
             // Error - Case 2 -  Display error view if the face view encounters an error during its load operation.
 
             // ensure no error
             guard error == nil else {
                 // face view encountered an error
-                self?.selectedFaceView?.removeFromSuperview()
-                self?.state = .error
+                self.selectedFaceView?.removeFromSuperview()
+                self.state = .error
+                self.vatomViewDelegate?.vatomView(self, didLoadFaceView: .failure(VVLCError.faceViewLoadFailed) )
                 return
             }
 
             // show face
-            self?.state = .completed
+            self.state = .completed
+            // inform delegate
+            self.vatomViewDelegate?.vatomView(self, didLoadFaceView: .success(self.selectedFaceView!))
 
         }
 

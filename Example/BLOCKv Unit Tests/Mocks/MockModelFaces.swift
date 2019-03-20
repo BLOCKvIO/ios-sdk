@@ -12,8 +12,84 @@
 import Foundation
 
 public struct MockModelFaces {
+    
+    /// Faces for the Image Policy Test vAtom.
+    ///
+    /// Template variation: vatomic.prototyping::ImagePolicyTest::v2
+    ///
+    /// Faces:
+    ///
+    /// 1. native://image | generic | icon |
+    /// 2. native://* | generic | card |
+    public static let testVatom_ImagePolicyTest = """
+    [
+      {
+        "id": "53f4457e-8a1a-4c93-ab92-b4db9f1c1234",
+        "template": "vatomic.prototyping::ImagePolicyTest::v2",
+        "meta": {
+          "created_by": "BLOCKv Backend",
+          "when_created": "2018-10-04T07:39:55Z",
+          "modified_by": "",
+          "when_modified": "2018-10-04T07:39:55Z",
+          "data_type": "v1::FaceType"
+        },
+        "properties": {
+          "display_url": "native://image-policy",
+          "package_url": ".",
+          "constraints": {
+            "bluetooth_le": false,
+            "contact_list": false,
+            "gps": false,
+            "three_d": false,
+            "view_mode": "icon",
+            "platform": "generic",
+            "quality": "high"
+          },
+          "resources": [],
+          "config": {
+            "image_policy": [
+              {
+                "field": "private.my_state",
+                "resource": "Image2",
+                "value": "two"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "170769ea-28cc-4223-94d7-11c5b9ca1234",
+        "template": "vatomic.prototyping::ImagePolicyTest::v2",
+        "meta": {
+          "created_by": "BLOCKv Backend",
+          "when_created": "2018-10-04T07:39:04Z",
+          "modified_by": "",
+          "when_modified": "2018-10-04T07:39:04Z",
+          "data_type": "v1::FaceType"
+        },
+        "properties": {
+          "display_url": "https://demo.blockv.io/faces/image-policy-toggler",
+          "package_url": ".",
+          "constraints": {
+            "bluetooth_le": false,
+            "contact_list": false,
+            "gps": false,
+            "three_d": false,
+            "view_mode": "card",
+            "platform": "generic",
+            "quality": "high"
+          },
+          "resources": []
+        }
+      }
+    ]
+    """.data(using: .utf8)!
 
     /// Two native generic faces, one icon and one 3d.
+    ///
+    /// Two faces: *(URL | Platform | View Mode)*
+    /// 1. native://image | generic | card |
+    /// 2. native://generic-3d | generic | icon |
     public static let genericIconAnd3D = """
         [
           {

@@ -36,8 +36,8 @@ class LiveVatomView: VatomView {
         commonInit()
     }
 
-    override init(vatom: VatomModel, procedure: @escaping FaceSelectionProcedure) {
-        super.init(vatom: vatom, procedure: procedure)
+    override init(vatom: VatomModel, procedure: @escaping FaceSelectionProcedure, delegate: VatomViewDelegate? = nil) {
+        super.init(vatom: vatom, procedure: procedure, delegate: delegate)
         commonInit()
     }
 

@@ -150,12 +150,14 @@ class TappedVatomViewController: UIViewController {
 // MARK: - Vatom View Delegate
 
 extension TappedVatomViewController: VatomViewDelegate {
-    
+
     func vatomView(_ vatomView: VatomView,
                    didRecevieFaceMessage message: String,
-                   withObject object: [String : JSON],
-                   completion: ((JSON?, FaceMessageError?) -> Void)?) {
-        print("Message: \(message)")
+                   withObject object: [String: JSON],
+                   completion: ((Result<JSON, FaceMessageError>) -> Void)?) {
+     
+        print("Handle face message: \(message)")
+
     }
-    
+
 }

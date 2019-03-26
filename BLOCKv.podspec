@@ -18,12 +18,12 @@ Pod::Spec.new do |s|
     
     s.subspec 'Core' do |s|
         s.source_files = 'BlockV/Core/**/*.{swift}'
-        s.dependency 'Alamofire',  '~> 4.7'  # Networking
-        s.dependency 'Starscream', '~> 3.0'  # Web socket
-        s.dependency 'JWTDecode',  '~> 2.1'  # JWT decoding
-        s.dependency 'Signals',    '~> 6.0'  # Elegant eventing
-        s.dependency 'SwiftLint',  '~> 0.26' # Linter
-        s.dependency 'GenericJSON', '~> 1.2' # JSON
+        s.dependency 'Alamofire',  '~> 4.7'    # Networking
+        s.dependency 'Starscream', '~> 3.0.6'  # Web socket
+        s.dependency 'JWTDecode',  '~> 2.1'    # JWT decoding
+        s.dependency 'Signals',    '~> 6.0'    # Elegant eventing
+        s.dependency 'SwiftLint',  '~> 0.26'   # Linter
+        s.dependency 'GenericJSON', '~> 1.2'   # JSON
         #s.exclude_files = '**/Info*.plist'
     end
     

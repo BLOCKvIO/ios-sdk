@@ -136,7 +136,9 @@ extension WebFaceView: WKNavigationDelegate {
         if navigationAction.navigationType == .linkActivated {
             if let url = navigationAction.request.url {
                 // open in Safari.app
-                UIApplication.shared.open(url, options: convertToUIApplicationOpenExternalURLOptionsKeyDictionary([:]), completionHandler: nil)
+                UIApplication.shared.open(url,
+                                          options: convertToUIApplicationOpenExternalURLOptionsKeyDictionary([:]),
+                                          completionHandler: nil)
                 return decisionHandler(.cancel)
             }
         }
@@ -148,6 +150,9 @@ extension WebFaceView: WKNavigationDelegate {
 }
 
 // Helper function inserted by Swift 4.2 migrator.
-fileprivate func convertToUIApplicationOpenExternalURLOptionsKeyDictionary(_ input: [String: Any]) -> [UIApplication.OpenExternalURLOptionsKey: Any] {
-	return Dictionary(uniqueKeysWithValues: input.map { key, value in (UIApplication.OpenExternalURLOptionsKey(rawValue: key), value)})
+private func convertToUIApplicationOpenExternalURLOptionsKeyDictionary(_ input: [String: Any])
+    -> [UIApplication.OpenExternalURLOptionsKey: Any] {
+	return Dictionary(uniqueKeysWithValues: input.map { key, value in
+        (UIApplication.OpenExternalURLOptionsKey(rawValue: key), value)
+    })
 }

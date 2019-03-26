@@ -19,10 +19,10 @@
 public enum Result<Success, Failure: Error> {
     /// A success, storing a `Success` value.
     case success(Success)
-    
+
     /// A failure, storing a `Failure` value.
     case failure(Failure)
-    
+
     /// Returns a new result, mapping any success value using the given
     /// transformation.
     ///
@@ -51,7 +51,7 @@ public enum Result<Success, Failure: Error> {
             return .failure(failure)
         }
     }
-    
+
     /// Returns a new result, mapping any failure value using the given
     /// transformation.
     ///
@@ -88,7 +88,7 @@ public enum Result<Success, Failure: Error> {
             return .failure(transform(failure))
         }
     }
-    
+
     /// Returns a new result, mapping any success value using the given
     /// transformation and unwrapping the produced result.
     ///
@@ -106,7 +106,7 @@ public enum Result<Success, Failure: Error> {
             return .failure(failure)
         }
     }
-    
+
     /// Returns a new result, mapping any failure value using the given
     /// transformation and unwrapping the produced result.
     ///
@@ -124,7 +124,7 @@ public enum Result<Success, Failure: Error> {
             return transform(failure)
         }
     }
-    
+
     /// Returns the success value as a throwing expression.
     ///
     /// Use this method to retrieve the value of this result if it represents a

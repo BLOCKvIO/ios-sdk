@@ -69,11 +69,11 @@ extension VatomModel: Codable {
         let items = try decoder.container(keyedBy: CodingKeys.self)
         id                = try items.decode(String.self, forKey: .id)
         version           = try items.decode(String.self, forKey: .version)
-        isUnpublished     = try items.decode(Bool.self, forKey: .isUnpublished)
         whenCreated       = try items.decode(Date.self, forKey: .whenCreated)
         whenModified      = try items.decode(Date.self, forKey: .whenModified)
         props             = try items.decode(RootProperties.self, forKey: .props)
 
+        isUnpublished     = try items.decodeIfPresent(Bool.self, forKey: .isUnpublished) ?? false
         `private`         = try items.decodeIfPresent(JSON.self, forKey: .private)
         eos               = try items.decodeIfPresent(JSON.self, forKey: .eos)
         eth               = try items.decodeIfPresent(JSON.self, forKey: .eth)
@@ -102,9 +102,10 @@ extension VatomModel: Codable {
 extension VatomModel: Hashable {
 
     /// vAtoms are uniquely identified by their platform identifier.
-    public var hashValue: Int {
-        return id.hashValue
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
+
 }
 
 // MARK: - Vatom Root Properties

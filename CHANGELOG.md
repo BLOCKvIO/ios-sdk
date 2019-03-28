@@ -2,6 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 #### 3.x Release (API v1)
+- `3.1.x` Releases - [3.1.0](#310)
 - `3.0.x` Releases - [3.0.0](#300)
 
 #### 2.x Releases (API v1)
@@ -18,6 +19,24 @@ All notable changes to this project will be documented in this file.
 - `0.9.x` Releases - [0.9.9](#099) | [0.9.10](#0910)
 
 ---
+
+## [3.1.0](https://github.com/BLOCKvIO/ios-sdk/releases/tag/3.1.0)
+
+### Updated
+
+- Add `Codable` conformance to `MessageListModel`.  
+- Convert `cursor` and `messages` properties on `MessageListModel` from `let` to `var` . 
+- Convert `cursor` and `threads` properties on  `MessageListModel`  from `let` to `var`.
+    - Pull Request [#175](https://github.com/BLOCKvIO/ios-sdk/pull/175)
+    
+- Add `page` and `limit` properties to `DiscoverQueryBuilder` to allow for paging.
+    - Pull Request [#173](https://github.com/BLOCKvIO/ios-sdk/pull/173/files)
+
+### Fixed
+
+- Default `isPublished` is `false`. This allows vAtoms with a missing `unpublished` JSON key to be decoded.
+    - Pull Request [#176](https://github.com/BLOCKvIO/ios-sdk/pull/176)
+
 
 ## [3.0.0](https://github.com/BLOCKvIO/ios-sdk/releases/tag/3.0.0)
 

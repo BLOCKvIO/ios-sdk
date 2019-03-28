@@ -100,8 +100,8 @@ extension FaceModel: Codable {
 extension FaceModel: Hashable {
 
     /// Faces are uniquely identified by their platform identifier.
-    public var hashValue: Int {
-        return id.hashValue
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 
 }

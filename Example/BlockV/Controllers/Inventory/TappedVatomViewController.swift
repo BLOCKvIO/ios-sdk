@@ -142,6 +142,11 @@ class TappedVatomViewController: UIViewController {
         if segue.identifier == "seg.vatom.detail" {
             let destination = segue.destination as! VatomDetailTableViewController
             destination.vatom = vatom
+        } else if segue.identifier == "seg.action.storyboard" {
+            let destination = segue.destination as! UINavigationController
+            let vc = destination.viewControllers[0] as! ActionListTableViewController
+            // pass vatom along
+            vc.vatom = self.vatom
         }
     }
 
@@ -150,12 +155,14 @@ class TappedVatomViewController: UIViewController {
 // MARK: - Vatom View Delegate
 
 extension TappedVatomViewController: VatomViewDelegate {
-    
+
     func vatomView(_ vatomView: VatomView,
                    didRecevieFaceMessage message: String,
-                   withObject object: [String : JSON],
-                   completion: ((JSON?, FaceMessageError?) -> Void)?) {
-        print("Message: \(message)")
+                   withObject object: [String: JSON],
+                   completion: ((Result<JSON, FaceMessageError>) -> Void)?) {
+     
+        print("Handle face message: \(message)")
+
     }
-    
+
 }

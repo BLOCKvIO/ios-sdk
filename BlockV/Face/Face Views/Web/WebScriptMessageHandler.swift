@@ -239,25 +239,19 @@ extension WebFaceView {
         self.delegate?.faceView(self,
                                 didSendMessage: message.name,
                                 withObject: message.payload,
-                                completion: { (payload, error) in
-
-                                    // transform the bridge error
-                                    let bridgeError = BridgeError.viewer(error?.message ?? "Unknown error occured.")
-
-                                    // V1 Support. Transform the `viewer.qr.scan` reponse paylaod from [String: String]
-                                    // to String.
-                                    if message.version == "1.0.0" && message.name == "viewer.qr.scan" {
-                                        if let newPayload = payload?["data"] {
-                                            self.sendResponse(forRequestMessage: message, payload: newPayload,
-                                                              error: bridgeError)
-                                            return
-                                        }
+                                completion: { result in
+                                    switch result {
+                                    case .success(let payload):
+                                        self.sendResponse(forRequestMessage: message, payload: payload, error: nil)
+                                        return
+                                    case .failure(let error):
+                                        // transform the bridge error
+                                        let bridgeError = BridgeError.viewer(error.message)
+                                        self.sendResponse(forRequestMessage: message,
+                                                          payload: nil,
+                                                          error: bridgeError)
+                                        return
                                     }
-
-                                    self.sendResponse(forRequestMessage: message,
-                                                      payload: payload,
-                                                      error: bridgeError)
-
         })
 
     }

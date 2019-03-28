@@ -112,8 +112,8 @@ final class Client: ClientProtocol {
     /// inner payload structure.
     ///
     /// - important:
-    /// Raw requests do *not* flow through the credential refresh mechanism. Do not perform auth related calls, e.g.
-    /// login using this request method.
+    /// Do not call this endpoint for auth related calls, e.g login. Raw requests do *not* support through the
+    /// credential refresh mechanism. The access and refresh token will not be extracted and passed to the oauthhandler.
     ///
     /// - Parameters:
     ///   - endpoint: Endpoint for the request
@@ -212,9 +212,6 @@ final class Client: ClientProtocol {
                 /*
                  Not all responses (even in the 200 range) are wrapped in the `BaseModel`. Endpoints must be treated
                  on a per-endpoint basis.
-                 
-                 The AuthModel is only returned on a limited set of endpoints. It seems wasteful to try and
-                 inspect every response for the access and refesh tokens.
                  */
 
                 // extract auth tokens if available

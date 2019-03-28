@@ -85,26 +85,24 @@ class OutboundActionViewController: UIViewController {
         
     }
     
-    /// Option 1 - This show the convenience `transfer` method on VatomModel to transfer the vAtom to
-    /// a another user via a phone, email, or user id token.
+    /// Performs the appropriate action using the
     func performAction(token: UserToken) {
         
-        let resultHandler: ((Result<[String: Any], BVError>) -> Void) = { [weak self] result in
-            switch result {
-            case .success(let json):
-                // success
-                print("Action response: \(json.debugDescription)")
-                self?.hide()
-            case .failure(let error):
-                print(error.localizedDescription)
+        let completionHandler: (([String: Any]?, BVError?) -> Void) = { [weak self] (data, error) in
+            // handle error
+            guard let data = data, error != nil else {
+                print(error!.localizedDescription)
                 return
             }
+            // handle success
+            print("Action response: \(data.debugDescription)")
+            self?.hide()
         }
         
         switch actionName {
-        case "Transfer":    self.vatom.transfer(toToken: token, completion: resultHandler)
-        case "Clone":       self.vatom.clone(toToken: token, completion: resultHandler)
-        case "Redeem":      self.vatom.redeem(toToken: token, completion: resultHandler)
+        case "Transfer":    self.vatom.transfer(toToken: token, completion: completionHandler)
+        case "Clone":       self.vatom.clone(toToken: token, completion: completionHandler)
+        case "Redeem":      self.vatom.redeem(toToken: token, completion: completionHandler)
         default:
             return
         }
@@ -133,6 +131,61 @@ class OutboundActionViewController: UIViewController {
     
     fileprivate func hide() {
         self.presentingViewController?.presentingViewController?.dismiss(animated: true, completion: nil)
+    }
+    
+}
+
+/// Action Extensions
+extension VatomModel {
+    
+    /// Clones this vAtom to the specified token.
+    ///
+    /// Note: Calling this action will trigger the action associated with this vAtom's
+    /// template. If an action has not been configured, an error will be generated.
+    ///
+    /// - Parameters:
+    ///   - token: Standard UserToken (Phone, Email, or User ID)
+    ///   - completion: The completion handler to call when the action is completed.
+    ///                 This handler is executed on the main queue.
+    public func clone(toToken token: UserToken,
+                         completion: @escaping ([String: Any]?, BVError?) -> Void) {
+        
+        let body = [
+            "this.id": self.id,
+            "new.owner.\(token.type.rawValue)": token.value
+        ]
+        
+        // perform the action
+        BLOCKv.performAction(name: "Clone", payload: body) { (json, error) in
+            //TODO: should it be weak self?
+            completion(json, error)
+        }
+        
+    }
+    
+    /// Redeems this vAtom to the specified token.
+    ///
+    /// Note: Calling this action will trigger the action associated with this vAtom's
+    /// template. If an action has not been configured, an error will be generated.
+    ///
+    /// - Parameters:
+    ///   - token: Standard UserToken (Phone, Email, or User ID)
+    ///   - completion: The completion handler to call when the action is completed.
+    ///                 This handler is executed on the main queue.
+    public func redeem(toToken token: UserToken,
+                      completion: @escaping ([String: Any]?, BVError?) -> Void) {
+        
+        let body = [
+            "this.id": self.id,
+            "new.owner.\(token.type.rawValue)": token.value
+        ]
+        
+        // perform the action
+        BLOCKv.performAction(name: "Redeem", payload: body) { (json, error) in
+            //TODO: should it be weak self?
+            completion(json, error)
+        }
+        
     }
     
 }

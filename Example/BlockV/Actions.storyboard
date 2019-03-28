@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="me2-Z5-Uar">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="me2-Z5-Uar">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -36,9 +36,7 @@
                                     </subviews>
                                 </tableViewCellContentView>
                                 <connections>
-                                    <segue destination="Bua-ur-nUH" kind="show" id="tVV-H0-azn">
-                                        <nil key="action"/>
-                                    </segue>
+                                    <segue destination="Bua-ur-nUH" kind="show" identifier="seg.action.selection" id="tVV-H0-azn"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -63,7 +61,7 @@
         <!--Transfer-->
         <scene sceneID="5k1-Tn-79l">
             <objects>
-                <viewController title="Transfer" id="Bua-ur-nUH" customClass="TransferActionViewController" customModule="BlockV_Example" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Transfer" id="Bua-ur-nUH" customClass="OutboundActionViewController" customModule="BlockV_Example" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="Q6P-lR-xPx"/>
                         <viewControllerLayoutGuide type="bottom" id="n6L-ct-GzC"/>

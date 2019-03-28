@@ -1,15 +1,15 @@
 PODS:
   - Alamofire (4.8.1)
-  - BLOCKv (3.0.0):
-    - BLOCKv/Face (= 3.0.0)
-  - BLOCKv/Core (3.0.0):
+  - BLOCKv (3.1.0):
+    - BLOCKv/Face (= 3.1.0)
+  - BLOCKv/Core (3.1.0):
     - Alamofire (~> 4.7)
     - GenericJSON (~> 1.2)
     - JWTDecode (~> 2.1)
     - Signals (~> 6.0)
-    - Starscream (~> 3.0)
+    - Starscream (~> 3.0.6)
     - SwiftLint (~> 0.26)
-  - BLOCKv/Face (3.0.0):
+  - BLOCKv/Face (3.1.0):
     - BLOCKv/Core
     - FLAnimatedImage (~> 1.0)
     - Nuke (~> 7.0)
@@ -53,7 +53,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Alamofire: 16ce2c353fb72865124ddae8a57c5942388f4f11
-  BLOCKv: 60d3a98639188c430c00d126669e452c4aac1d73
+  BLOCKv: 214559aa90809f52e7bd2ffbf733d895b3c5ada1
   FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
   GenericJSON: 05eb212cd12bf0562b816075090bea3eda2ab2ed
   JWTDecode: 85a405ab16d5473e99bd89ded1d535090ebd6a0e
@@ -64,6 +64,6 @@ SPEC CHECKSUMS:
   SwiftLint: a54bf1fe12b55c68560eb2a7689dfc81458508f7
   VatomFace3D: 78d08c503819d5e2d8e1978d953885d596e379cf
 
-PODFILE CHECKSUM: d63113581b30008d083f82a8a354c17db0a9e801
+PODFILE CHECKSUM: 572540b34367caffea356b90ca04601e730b047d
 
-COCOAPODS: 1.6.0
+COCOAPODS: 1.6.1

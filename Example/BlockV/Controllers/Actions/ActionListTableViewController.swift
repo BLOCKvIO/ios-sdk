@@ -39,11 +39,18 @@ class ActionListTableViewController: UITableViewController {
     
     var vatom: VatomModel!
     
-    // For now, we hardcode to display a single action.
-    //
-    // In a future release, the actions configure for the vAtom's template
-    // will be returned.
-    fileprivate var actions: [String] = ["Transfer"]
+    // table view data model
+    struct AvailableAction {
+        let action: ActionModel
+        /// Flag indicating whether this action is supported by this viewer.
+        let isSupported: Bool
+    }
+    
+    /// List of available actions.
+    fileprivate var availableActions: [AvailableAction] = []
+    
+    /// List of actions this viewer supports (i.e. knows how to handle).
+    private var supportedActions = ["Transfer", "Clone", "Redeem"]
     
     // MARK: - Actions
     
@@ -66,9 +73,13 @@ class ActionListTableViewController: UITableViewController {
     /// Fetches all the actions configured / associated with our vAtom's template.
     fileprivate func fetchActions() {
         
+        self.showNavBarActivityRight()
+        
         let templateID = self.vatom.props.templateID
         
         BLOCKv.getActions(forTemplateID: templateID) { (actions, error) in
+            
+            self.hideNavBarActivityRight()
             
             // unwrap actions, handle error
             guard let actions = actions, error == nil else {
@@ -78,18 +89,33 @@ class ActionListTableViewController: UITableViewController {
             
             // success
             print("Actions: \(actions.debugDescription)")
+            // update data source
+            self.availableActions = actions.map { action -> AvailableAction in
+                // record
+                let supported = self.supportedActions.contains(action.name)
+                return AvailableAction(action: action, isSupported: supported)
+            }
+            self.tableView.reloadData()
             
         }
         
     }
 
     // MARK: - Navigation
-
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        let destination = segue.destination as! TransferActionViewController
-        destination.vatom = self.vatom
+    
+    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
+        return false
     }
 
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        // dependecy injection
+        let destination = segue.destination as! OutboundActionViewController
+        destination.vatom = self.vatom
+        destination.actionName = self.selectedAction!.action.name
+    }
+    
+    var selectedAction: AvailableAction?
+    
 }
 
 // MARK: - Table view data source
@@ -101,14 +127,24 @@ extension ActionListTableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
+        return availableActions.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell.action.id", for: indexPath)
-        cell.textLabel?.text = actions[indexPath.row]
+        let availableAction = availableActions[indexPath.row]
+        cell.textLabel?.text = availableAction.action.name
+        cell.textLabel?.alpha = availableAction.isSupported ? 1 : 0.5
+        cell.accessoryView = nil
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        selectedAction = availableActions[indexPath.row]
+        if selectedAction!.isSupported {
+            self.performSegue(withIdentifier: "seg.action.selection", sender: self)
+        }
     }
     
 }

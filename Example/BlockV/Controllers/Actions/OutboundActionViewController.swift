@@ -90,8 +90,8 @@ class OutboundActionViewController: UIViewController {
         
         let completionHandler: (([String: Any]?, BVError?) -> Void) = { [weak self] (data, error) in
             // handle error
-            guard let data = data, error != nil else {
-                print(error!.localizedDescription)
+            guard let data = data, error == nil else {
+                print(error?.localizedDescription)
                 return
             }
             // handle success

@@ -142,6 +142,11 @@ class TappedVatomViewController: UIViewController {
         if segue.identifier == "seg.vatom.detail" {
             let destination = segue.destination as! VatomDetailTableViewController
             destination.vatom = vatom
+        } else if segue.identifier == "seg.action.storyboard" {
+            let destination = segue.destination as! UINavigationController
+            let vc = destination.viewControllers[0] as! ActionListTableViewController
+            // pass vatom along
+            vc.vatom = self.vatom
         }
     }
 

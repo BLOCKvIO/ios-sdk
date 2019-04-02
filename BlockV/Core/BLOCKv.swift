@@ -15,7 +15,7 @@ import JWTDecode
 
 /*
  Goal:
- BLOCKv should be invariant over App ID and Environment. In other words, the properties should
+ BLOCKv should be invariant over App ID and Environment. In other words, the properties should not
  change, once set. Possibly targets for each environemnt?
  */
 
@@ -66,6 +66,12 @@ public final class BLOCKv {
                                                selector: #selector(handleUserAuthorisationRequired),
                                                name: Notification.Name.BVInternal.UserAuthorizationRequried,
                                                object: nil)
+
+        // handle session launch
+        if self.isLoggedIn {
+            self.onSessionLaunch()
+        }
+
     }
 
     // MARK: - Client
@@ -171,7 +177,7 @@ public final class BLOCKv {
     fileprivate static var _socket: WebSocketManager?
 
     //TODO: What if this is accessed before the client is accessed?
-    //TODO: What if the viewer suscribes to an event before auth (login/reg) has occured?
+    //TODO: What if the viewer subscribes to an event before auth (login/reg) has occured?
     public static var socket: WebSocketManager {
         if _socket == nil {
             _socket = WebSocketManager(baseURLString: self.environment!.webSocketURLString,
@@ -194,8 +200,10 @@ public final class BLOCKv {
         // disconnect and nil out socekt
         self._socket?.disconnect()
         self._socket = nil
+        // clear data pool
+        DataPool.clear()
 
-        printBV(info: "Reset")
+        printBV(info: "Reseting SDK")
     }
 
     // - Public Lifecycle
@@ -223,15 +231,15 @@ public final class BLOCKv {
         BLOCKv.client.getAccessToken(completion: completion)
     }
 
-    /// Called when the networking client detects the user is unathorized.
+    /// Called when the networking client detects the user is unauthenticated.
     ///
     /// This method perfroms a clean up operation before notifying the viewer that the SDK requires
-    /// user authorization.
+    /// user authentication.
     ///
     /// - important: This method may be called multiple times. For example, consider the case where
     /// multiple requests fail due to the refresh token being invalid.
     @objc
-    private static func handleUserAuthorisationRequired() {
+    private static func handleUserAuthorisationRequired() { //FIXME: Rename to handleUserAuthenticationRequired()
 
         printBV(info: "Authorization - User is unauthorized.")
 
@@ -242,6 +250,17 @@ public final class BLOCKv {
             // call the closure stored in `onLogout`
             onLogout?()
         }
+
+    }
+
+    /// Called when the user authenticates (logs in).
+    ///
+    /// - important:
+    /// This method is *not* called when for access token refreshes.
+    static internal func onLogin() {
+
+        // stand up the session
+        self.onSessionLaunch()
 
     }
 
@@ -259,6 +278,38 @@ public final class BLOCKv {
         self.environment = environment
 
         //FIXME: *Changing* the environment should nil out the client and access credentials.
+
+    }
+
+    /// This function is called everytime a user session is launched.
+    ///
+    /// A 'session launch' means the user has logged in (received a new refresh token), or the app has been cold
+    /// launched with an existing *valid* refresh token.
+    ///
+    /// - note:
+    /// This is slightly broader than 'log in' since it includes the lifecycle of the app. This function is responsible
+    /// for creating objects which are depenedent on a user session, e.g. data pool.
+    ///
+    /// Its compainion `onSessionTerminated` is `onLogout` since there is no app event signalling app termination.
+    ///
+    /// Triggered by:
+    /// - User authentication
+    /// - App launch & user is authenticated
+    static private func onSessionLaunch() {
+
+        guard let refreshToken = CredentialStore.refreshToken?.token else {
+            fatalError("Invlalid session")
+        }
+
+        guard let claim = try? decode(jwt: refreshToken).claim(name: "user_id"), let userId = claim.string else {
+            fatalError("Invalid cliam")
+        }
+
+        // standup the client
+        _ = client
+
+        // standup data pool
+        DataPool.sessionInfo = ["userID": userId]
 
     }
 

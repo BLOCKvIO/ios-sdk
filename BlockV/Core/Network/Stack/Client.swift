@@ -108,7 +108,7 @@ final class Client: ClientProtocol {
 
     /// Endpoints generic over `void` complete by passing in the raw data response.
     ///
-    /// This is usefull for actions whose reponse payloads are not defined. For example, reactors may define their own
+    /// This is useful for actions whose reponse payloads are not defined. For example, reactors may define their own
     /// inner payload structure.
     ///
     /// - important:

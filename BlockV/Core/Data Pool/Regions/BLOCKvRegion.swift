@@ -10,16 +10,27 @@
 //
 
 import Foundation
-//import MoreCodable
-import DictionaryCoding
+
+/*
+ Issues:
+ 1. Dependecy injection of socket manager.
+ */
 
 /// Abstract subclass of `Region`. This intermediate class handles updates from the BLOCKv Web socket. Regions should
 /// subclass to automatically handle Web socket updates.
 ///
+/// The BLOCKv subclass is hardcoded to treat the 'objects' as vatoms. That is, the freeform object must be a vatom.
+/// This is a product of the design, but it could be generalised in the future if say faces were to become a monitored
+/// region.
+///
 /// Roles:
-/// - Handles Web socket events (including queuing, pausing, and processing).
-/// - Messages are transformed into DataObjectUpdateRecord (Sparse Object) and use to update the region.
+/// - Handles some Web socket events (including queuing, pausing, and processing).
+/// - Only 'state_update' events are intercepted.
+///   > State-update messages are transformed into DataObjectUpdateRecord (Sparse Object) and use to update the region.
 /// - Data transformations (map) to VatomModel
+/// - Notifications
+///   > Add, update, remove notification are broadcast for the changed vatom. An update is always emitted for the parent
+///   of the changed vatom. This is useful since the parent can then update its state, e.g. on child removal.
 class BLOCKvRegion: Region {
 
     /// Constructor
@@ -36,63 +47,83 @@ class BLOCKvRegion: Region {
             self.onWebSocketMessage(descriptor)
         }
 
-        // Monitor for timed updates
+        // monitor for timed updates
         DataObjectAnimator.shared.add(region: self)
 
     }
 
+    /*
+     The initialiser below allows for dependency injection of the socket manager.
+     */
+
+    /// Initialize with a descriptor and a socket.
+//    init(descriptor: Any, socket: WebSocketManager) throws {
+//        try super.init(descriptor: descriptor)
+//
+//        // subscribe to socket connections
+//        socket.onConnected.subscribe(with: self) { _ in
+//            self.onWebSocketConnect()
+//        }
+//
+//        // subscribe to raw socket messages
+//        socket.onMessageReceivedRaw.subscribe(with: self) { descriptor in
+//            self.onWebSocketMessage(descriptor)
+//        }
+//
+//        // Monitor for timed updates
+//        DataObjectAnimator.shared.add(region: self)
+//    }
+
     deinit {
 
-        //FIXME: As I understand it, the signals will not need to be unsubscribed from.
-
-        // Stop listening for animation updates
+        // stop listening for animation updates
         DataObjectAnimator.shared.remove(region: self)
 
     }
 
-    /// Queue of pending Web socket messages
+    /// Queue of pending messages.
     private var queuedMessages: [[String: Any]] = []
-
-    /// True if Web socket processing is paused
+    /// Boolean value that is `true` if message processing is paused.
     private var socketPaused = false
+    /// Boolean valie that is `true` if a message is currently being processed.
     private var socketProcessing = false
 
-    /// Called when this region is going to be shut down
+    /// Called when this region is going to be shut down.
     override func close() {
         super.close()
 
         //FIXME: Double check that signals do not need to be unsubscribed from.
 
-        // Remove listeners
+        // remove listeners
         DataObjectAnimator.shared.remove(region: self)
 
     }
 
-    /// Called to pause processing of web socket messages
+    /// Called to pause processing of socket messages.
     func pauseMessages() {
         self.socketPaused = true
     }
 
-    /// Called to resume processing of web socket messages
+    /// Called to resume processing of socket messages.
     func resumeMessages() {
 
-        // Unpause
+        // unpause
         self.socketPaused = false
 
-        // Process next message if needed
+        // process next message if needed
         if !self.socketProcessing {
             self.processNextMessage()
         }
 
     }
 
-    /// Called when the web socket reconnects
+    /// Called when the Web socket re-connects.
     @objc func onWebSocketConnect() {
 
-        // Mark as unstable
+        // mark as unstable
         self.synchronized = false
 
-        // Re-sync the entire thing. Don't worry about synchronize() getting called while it's running already,
+        // re-sync the entire thing. Don't worry about synchronize() getting called while it's running already,
         // it handles that case.
         self.synchronize()
 
@@ -101,10 +132,10 @@ class BLOCKvRegion: Region {
     /// Called when there's a new event message via the Web socket.
     @objc func onWebSocketMessage(_ descriptor: [String: Any]) {
 
-        // Add to queue
+        // add to queue
         self.queuedMessages.append(descriptor)
 
-        // Process it if necessary
+        // process it if necessary
         if !self.socketPaused && !self.socketProcessing {
             self.processNextMessage()
         }
@@ -114,38 +145,41 @@ class BLOCKvRegion: Region {
     /// Called to process the next WebSocket message.
     func processNextMessage() {
 
-        // Stop if socket is paused
+        // stop if socket is paused
         if socketPaused {
             return
         }
 
-        // Stop if already processing
+        // stop if already processing
         if socketProcessing { return }
         socketProcessing = true
 
-        // Get next msg to process
+        // get next msg to process
         if queuedMessages.count == 0 {
 
-            // No more messages!
+            // no more messages
             self.socketProcessing = false
             return
 
         }
 
-        // Process message
+        // process message
         let msg = queuedMessages.removeFirst()
         self.processMessage(msg)
 
-        // Done, process next message
+        // done, process next message
         self.socketProcessing = false
         self.processNextMessage()
 
     }
 
     /// Processes a raw Web socket message.
+    ///
+    /// Only 'state_update' events intercepted and used to perform parital updates on the region's objects.
+    /// Message processing is not paused for 'state_update' events.
     func processMessage(_ msg: [String: Any]) {
 
-        // Get info
+        // get info
         guard let msgType = msg["msg_type"] as? String else { return }
         guard let payload = msg["payload"] as? [String: Any] else { return }
         guard let newData = payload["new_object"] as? [String: Any] else { return }
@@ -154,18 +188,20 @@ class BLOCKvRegion: Region {
             return
         }
 
-        // Update existing objects
+        // update existing objects
         let changes = DataObjectUpdateRecord(id: vatomID, changes: newData)
         self.update(objects: [changes])
 
     }
 
+    // MARK: - Transformations
+
     /// Map data objects to Vatom objects.
     ///
     /// This is the primary transformation function which converts freeform data pool objects into concrete types.
     override func map(_ object: DataObject) -> Any? {
-        
-        //FIXME: This method is synchronous - this is no good.
+
+        //FIXME: This method is synchronous which may affect performance.
 
         /*
          How to transfrom data objects into types?
@@ -186,74 +222,100 @@ class BLOCKvRegion: Region {
          3. Write a Decoder with transforms [String: Any] into Type AND leverages the CodingKeys
          */
 
-        // Only handle vatoms
+        // only handle vatoms
         guard object.type == "vatom" else {
             return nil
         }
 
-        // Stop if no data available
+        // stop if no data available
         guard var objectData = object.data else {
             return nil
         }
 
-        // Get vatom info
+        // get vatom info
         guard let template = object.data![keyPath: "vAtom::vAtomType.template"] as? String else { return nil }
 
-        // Fetch all faces linked to this vatom
+        // fetch all faces linked to this vatom
         let faces = objects.values.filter { $0.type == "face" && $0.data?["template"] as? String == template }
         objectData["faces"] = faces.map { $0.data }
 
-        // Fetch all actions linked to this vatom
+        // fetch all actions linked to this vatom
         let actionNamePrefix = template + "::Action::"
         let actions = objects.values.filter { $0.type == "action" && ($0.data?["name"] as? String)?
             .starts(with: actionNamePrefix) == true }
         objectData["actions"] = actions.map { $0.data }
 
-        print("\(self)")
-
-        /*
-         Option 1
-         Convert dictionary to data so it can be passed through codable machinary
-         */
-
         do {
-            let rawData = try JSONSerialization.data(withJSONObject: objectData)
-            let vatoms = try JSONDecoder.blockv.decode(VatomModel.self, from: rawData)
-            return vatoms
+            if JSONSerialization.isValidJSONObject(objectData) {
+                let rawData = try JSONSerialization.data(withJSONObject: objectData)
+                let vatoms = try JSONDecoder.blockv.decode(VatomModel.self, from: rawData)
+                return vatoms
+            } else {
+                throw NSError.init("Invalid JSON for Vatom: \(object.id)")
+            }
         } catch {
             printBV(error: error.localizedDescription)
             return nil
         }
 
-        /*
-         Option 2
-         Dictionary Encoder
-         */
-
-//        let decoder = DictionaryDecoder()
-//
-//        // create and return a new instance
-//        return try? decoder.decode(VatomModel.self, from: objectData)
-
     }
 
-    /// Called when an object is about to be added.
-    override func will(add object: DataObject) {
+    // MARK: - Notifications
 
+    // - Add
+
+    /// Called when an object is about to be added.
+//    override func will(add object: DataObject) {
+//
+//        // Notify parent as well
+//        guard let parentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
+//            return
+//        }
+//        DispatchQueue.main.async {
+//            // broadcast update the vatom's parent
+//            self.emit(.objectUpdated, userInfo: ["id": parentID]) //FIXME: Does this make sense? If the parent calls list children at this point it will not have updated yet
+////            // broadbast the add
+//            self.emit(.objectAdded, userInfo: ["id": object.id])
+//        }
+//
+//    }
+
+    override func did(add object: DataObject) {
         // Notify parent as well
         guard let parentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
             return
         }
         DispatchQueue.main.async {
+            // broadcast update the vatom's parent
             self.emit(.objectUpdated, userInfo: ["id": parentID])
+            // broadbast the add
+            self.emit(.objectAdded, userInfo: ["id": object.id])
+        }
+    }
+
+    // - Update
+
+    /// Called when an object is about to be updated.
+    override func will(update object: DataObject, withFields: [String: Any]) {
+
+        // notify parent as well
+        guard let oldParentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
+            return
+        }
+        guard let newParentID = (withFields["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
+            return
+        }
+        DispatchQueue.main.async {
+            self.emit(.objectUpdated, userInfo: ["id": oldParentID])
+            self.emit(.objectUpdated, userInfo: ["id": newParentID])
         }
 
     }
 
     /// Called when an object is about to be updated.
-    override func will(update object: DataObject, withFields: [String: Any]) {
+    override func did(update object: DataObject, withFields: [String: Any]) {
 
-        // Notify parent as well
+        // notify parent as well
         guard let oldParentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
             return
         }
@@ -270,12 +332,12 @@ class BLOCKvRegion: Region {
     /// Called when an object is about to be updated.
     override func will(update: DataObject, keyPath: String, oldValue: Any?, newValue: Any?) {
 
-        // Check if parent ID is changing
+        // check if parent ID is changing
         if keyPath != "vAtom::vAtomType.parent_id" {
             return
         }
 
-        // Notify parent as well
+        // notify parent as well
         guard let oldParentID = oldValue as? String else { return }
         guard let newParentID = newValue as? String else { return }
         DispatchQueue.main.async {
@@ -285,13 +347,20 @@ class BLOCKvRegion: Region {
 
     }
 
+    // - Remove
+
     /// Called when an object is about to be removed.
     override func will(remove object: DataObject) {
 
-        // Notify parent as well
-        guard let parentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else { return }
+        // notify parent as well
+        guard let parentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
+            return
+        }
         DispatchQueue.main.async {
-            self.emit(.objectUpdated, userInfo: ["id": parentID])
+            if parentID != "." {
+                self.emit(.objectUpdated, userInfo: ["id": parentID])
+            }
+            self.emit(.objectRemoved, userInfo: ["id": object.id])
         }
 
     }

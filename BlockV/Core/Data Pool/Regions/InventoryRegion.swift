@@ -12,19 +12,32 @@
 import Foundation
 import PromiseKit
 
+/*
+ Issues
+ 2. Dependecy inject session info (don't rely on static DataPool.sessionInfo)
+ 3. Convert discover to inventory call (server dependent).
+ 4. Convert request to auth-lifecylce participating requests.
+ */
+
 /// This region plugin provides access to the current user's inventory.
+///
+/// Two primary functions:
+/// 1. Overrides load (to fetch all object from the server).
+/// 2. Processing 'inventory' messages.
+///    > Importanly, for vatom additions, this pauses the message processing, fetches the vatom, and only resumes the
+///    message processing.
 class InventoryRegion: BLOCKvRegion {
 
-    /// Plugin identifier
-    override class var ID: String { return "inventory" }
+    /// Plugin identifier.
+    override class var id: String { return "inventory" }
 
-    /// Constructor
+    /// Constructor.
     required init(descriptor: Any) throws {
         try super.init(descriptor: descriptor)
-        
+
         print(DataPool.sessionInfo["userID"])
 
-        // Make sure we have a valid current user
+        // make sure we have a valid current user
         guard let userID = DataPool.sessionInfo["userID"] as? String, !userID.isEmpty else {
             throw NSError("You cannot query the inventory region without being logged in.")
         }
@@ -39,51 +52,52 @@ class InventoryRegion: BLOCKvRegion {
         return "inventory:" + currentUserID
     }
 
-    // There should only be one inventory region.
+    /// Returns `true` if this region matches the `id` and `descriptor`.
+    ///
+    /// There should only be one inventory region.
     override func matches(id: String, descriptor: Any) -> Bool {
         return id == "inventory"
     }
 
-    /// Shut down this region if the current user changes.
+    /// Called when session info changes. This should trigger a clean up process since the region may no longer be
+    /// valid.
     override func onSessionInfoChanged(info: Any?) {
+        // shut down this region if the current user changes.
         self.close()
     }
 
     /// Load current state from the server.
     override func load() -> Promise<[String]?> {
 
-        // Pause websocket events
+        // pause websocket events
         self.pauseMessages()
 
-        // Fetch all pages recursively
+        // fetch all pages recursively
         return self.fetch().ensure {
 
-            // Resume websocket events
+            // resume websocket events
             self.resumeMessages()
 
         }
 
     }
 
-    /// Recursively fetch all pages of data from the server
+    /// Fetches all objects from the server.
+    ///
+    /// Recursivly pages through the server's pool until all object have been found.
     fileprivate func fetch(page: Int = 1, previousItems: [String] = []) -> Promise<[String]?> {
 
-        // Stop if closed
+        // stop if closed
         if closed {
             return Promise.value(previousItems)
         }
 
-        // create discover query
-        let builder = DiscoverQueryBuilder()
-        builder.setScopeToOwner()
-        builder.page = page
-        builder.limit = 1000
-
-        // Execute it
+        // execute it
         printBV(info: "[DataPool > InventoryRegion] Loading page \(page), got \(previousItems.count) items so far...")
 
         // build raw request
-        let endpoint = API.Raw.discover(builder.toDictionary())
+        let endpoint = API.Raw.getInventory(parentID: "*", page: page, limit: 100)
+
         return BLOCKv.client.request(endpoint).then { data -> Promise<[String]?> in
 
             //TODO: Use a json returning request instead of a raw data request.
@@ -99,29 +113,15 @@ class InventoryRegion: BLOCKvRegion {
 
             //TODO: This should be factored out.
 
-            // Create list of items
+            // create list of items
             var items: [DataObject] = []
             var ids = previousItems
 
-            // Add vatoms to the list
-            guard let vatomInfos = payload["results"] as? [[String: Any]] else { return Promise.value(ids) }
-            for vatomInfo in vatomInfos {
-
-                // Add data object
-                let obj = DataObject()
-                obj.type = "vatom"
-                obj.id = vatomInfo["id"] as? String ?? ""
-                obj.data = vatomInfo
-                items.append(obj)
-                ids.append(obj.id)
-
-            }
-
-            // Add faces to the list
+            // add faces to the list
             guard let faces = payload["faces"] as? [[String: Any]] else { return Promise.value(ids) }
             for face in faces {
 
-                // Add data object
+                // add data object
                 let obj = DataObject()
                 obj.type = "face"
                 obj.id = face["id"] as? String ?? ""
@@ -131,11 +131,11 @@ class InventoryRegion: BLOCKvRegion {
 
             }
 
-            // Add actions to the list
+            // add actions to the list
             guard let actions = payload["actions"] as? [[String: Any]] else { return Promise.value(ids) }
             for action in actions {
 
-                // Add data object
+                // add data object
                 let obj = DataObject()
                 obj.type = "action"
                 obj.id = action["name"] as? String ?? ""
@@ -145,27 +145,44 @@ class InventoryRegion: BLOCKvRegion {
 
             }
 
-            // Add data objects
+            // add vatoms to the list
+            guard let vatomInfos = payload["vatoms"] as? [[String: Any]] else { return Promise.value(ids) }
+            for vatomInfo in vatomInfos {
+
+                // add data object
+                let obj = DataObject()
+                obj.type = "vatom"
+                obj.id = vatomInfo["id"] as? String ?? ""
+                obj.data = vatomInfo
+                items.append(obj)
+                ids.append(obj.id)
+
+            }
+
+            // add data objects
             self.add(objects: items)
 
-            // If no more data, stop
+            // if no more data, stop
             if vatomInfos.count == 0 {
-//            if page > 1 { //FIXME: Testing
                 return Promise.value(ids)
             }
 
-            // Done, get next page
+            // done, get next page
             return self.fetch(page: page + 1, previousItems: ids)
 
         }
 
     }
 
-    /// Called on WebSocket message.
+    /// Called on Web socket message.
+    ///
+    /// Allows super to handle 'state_update', then goes on to process 'inventory' events.
+    /// Message process is paused for 'inventory' events which indicate a vatom was added. Since the vatom must
+    /// be fetched from the server.
     override func processMessage(_ msg: [String: Any]) {
         super.processMessage(msg)
 
-        // Get info
+        // get info
         guard let msgType = msg["msg_type"] as? String else { return }
         guard let payload = msg["payload"] as? [String: Any] else { return }
         guard let oldOwner = payload["old_owner"] as? String else { return }
@@ -175,15 +192,16 @@ class InventoryRegion: BLOCKvRegion {
             return
         }
 
-        // Check if this is an incoming or outgoing vatom
+        // check if this is an incoming or outgoing vatom
         if oldOwner == self.currentUserID && newOwner != self.currentUserID {
 
-            // Vatom is no longer owned by us
+            // vatom is no longer owned by us
             self.remove(ids: [vatomID])
 
         } else if oldOwner != self.currentUserID && newOwner == self.currentUserID {
 
-            // Vatom is now our inventory! Pause WebSocket and fetch vatom payload
+            // vatom is now our inventory
+            // pause this instance's message processing and fetch vatom payload
             self.pauseMessages()
 
             let endpoint = API.Raw.getVatoms(withIDs: [vatomID])
@@ -199,27 +217,14 @@ class InventoryRegion: BLOCKvRegion {
                     throw NSError.init("Unable to load") //FIXME: Create a better error
                 }
 
-                // Add vatom to new objects list
+                // add vatom to new objects list
                 var items: [DataObject] = []
 
-                // Add vatoms to the list
-                guard let vatomInfos = payload["vatoms"] as? [[String: Any]] else { return }
-                for vatomInfo in vatomInfos {
-
-                    // Add data object
-                    let obj = DataObject()
-                    obj.type = "vatom"
-                    obj.id = vatomInfo["id"] as? String ?? ""
-                    obj.data = vatomInfo
-                    items.append(obj)
-
-                }
-
-                // Add faces to the list
+                // add faces to the list
                 guard let faces = payload["faces"] as? [[String: Any]] else { return }
                 for face in faces {
 
-                    // Add data object
+                    // add data object
                     let obj = DataObject()
                     obj.type = "face"
                     obj.id = face["id"] as? String ?? ""
@@ -228,11 +233,11 @@ class InventoryRegion: BLOCKvRegion {
 
                 }
 
-                // Add actions to the list
+                // add actions to the list
                 guard let actions = payload["actions"] as? [[String: Any]] else { return }
                 for action in actions {
 
-                    // Add data object
+                    // add data object
                     let obj = DataObject()
                     obj.type = "action"
                     obj.id = action["name"] as? String ?? ""
@@ -241,32 +246,40 @@ class InventoryRegion: BLOCKvRegion {
 
                 }
 
-                // Add new objects
+                // add vatoms to the list
+                guard let vatomInfos = payload["vatoms"] as? [[String: Any]] else { return }
+                for vatomInfo in vatomInfos {
+
+                    // add data object
+                    let obj = DataObject()
+                    obj.type = "vatom"
+                    obj.id = vatomInfo["id"] as? String ?? ""
+                    obj.data = vatomInfo
+                    items.append(obj)
+
+                }
+
+                // add new objects
                 self.add(objects: items)
 
-                // Notify vatom received
+                // notify vatom received
                 guard let vatom = self.get(id: vatomInfos[0]["id"] as? String ?? "") as? VatomModel else {
                     printBV(error: "[DataPool > InventoryRegion] Couldn't process incoming vatom")
                     return
                 }
-
-                //FIXME: Figure out how to deal with incoming overlay.
-
-                // Notify incoming
-//                vatom.onReceived(from: VatomUser.withID(old_owner),
-//                                 presentationInfo: [:],
-//                                 triggeringAction: payload["action_name"] as? String)
+                
+                //FIXME: Consider where to add onReceived
 
             }.catch { error in
                 printBV(error: "[InventoryRegion] Unable to fetch inventory. \(error.localizedDescription)")
             }.finally {
-                // Resume WebSocket processing
+                // resume WebSocket processing
                 self.resumeMessages()
             }
 
         } else {
 
-            // Logic error, old owner and new owner cannot be the same
+            // logic error, old owner and new owner cannot be the same
             printBV(error: "[InventoryRegion] Logic error in WebSocket message, old_owner and new_owner shouldn't be the same: \(vatomID)")
 
         }

@@ -13,17 +13,23 @@ import Foundation
 import PromiseKit
 
 /*
- IDEAS
+ # Notes:
  
- -
+ ## Filter & Sort
  
- /// Start an additive load. This should resolve once a partial region is fetched.
- func loadAdditive() -> Promise<[String]?> {
-    //
- }
+ Both of these should become classes (which do not inherit from Region). They provide a 'view into' a region.
+ 
+ Caller:
+ 
+ DataPool.region(id: "inventory", descriptor: [:]).filter { $0.dateModified > a }
+ DataPool.region(id: "inventory", descriptor: [:]).sort { $0.title }
+ 
+ Adding sort directly to Region is hard beacuse multiple callers may use use the same regions - all with different
+ sorting predicates. So sorting must be cofigurable (isolated) per caller.
+ 
  */
 
-/// An abstract class that manages a complete collection of objects (a.k.a Region).
+/// An abstract class that manages a complete collection of objects (a.k.a Regions).
 ///
 /// Regions are generally "id-complete". That is, the local region should have a complete copy of all remote objects.
 ///
@@ -32,120 +38,124 @@ import PromiseKit
 /// - Keep track of synchornization state.
 /// - Loads new objects.
 /// - CRUD (including update with spare objects).
-/// - Change Notifications
-/// - Persistance (debounced)
-///
-/// Base class for a Region plugin.
+/// - Change Notifications.
+/// - Persistance.
 public class Region {
 
     /// Constructor
-    required init(descriptor: Any) throws {
-
-    }
+    required init(descriptor: Any) throws { }
 
     /// This region plugin's ID.
-    class var ID: String {
-        return "subclass-should-override"
+    class var id: String {
+        assertionFailure("subclass-should-override")
+        return ""
     }
 
-    /// True if this region contains temporary objects which should not be cached to disk.
+    /// `true` if this region contains temporary objects which should not be cached to disk, `false` otherwise.
     let noCache = false
 
     /// All objects currently in our cache.
     var objects: [String: DataObject] = [:]
 
-    /// True if data in this region is in sync with the backend.
-    public internal(set) var synchronized = false
+    /// `true` if data in this region is in sync with the backend.
+    public internal(set) var synchronized = false {
+        didSet {
+            if synchronized {
+                self.emit(.stabalized, userInfo: [:])
+            } else {
+                self.emit(.destabalized, userInfo: [:])
+            }
+        }
+    }
 
-    /// If there's an error, this contains the current error.
+    /// Contains the current error.
     public internal(set) var error: Error?
 
     /// An ID which uniquely identifies this region. Used for caching purposes.
     var stateKey: String {
-        return "subclass-should-override"
+        assertionFailure("subclass-should-override")
+        return ""
     }
 
-    /// True if this region has been closed.
+    /// `true` if this region has been closed.
     public fileprivate(set) var closed = false
 
-    /// Re-synchronizes the region by manually fetching everything from the server again.
+    /// Re-synchronizes the region by manually fetching objects from the server again.
     public func forceSynchronize() -> Guarantee<Void> {
         self.synchronized = false
         return self.synchronize()
     }
 
-    /// Currently executing synchronization promise. If `nil` there is no synchronization underway.
+    /// Currently executing synchronization promise. `nil` if there is no synchronization underway.
     private var _syncPromise: Guarantee<Void>?
 
-    /// This will try to make the region stable by querying the backend for all data.
+    /// Attempts to stablaize the region by querying the backend for all data.
     ///
     /// - Returns: Promise which resolves when complete.
     @discardableResult
     public func synchronize() -> Guarantee<Void> {
 
-        // Stop if already running
+        self.emit(.synchronizing, userInfo: [:])
+
+        // stop if already running
         if let promise = _syncPromise {
             return promise
         }
 
-        // Remove pending error
+        // remove pending error
         self.error = nil
         self.emit(.updated)
 
-        // Stop if already in sync
+        // stop if already in sync
         if synchronized {
             return Guarantee()
         }
 
-        // Ask the subclass to load it's data
+        // ask the subclass to load it's data
         printBV(info: "[DataPool > Region] Starting synchronization for region \(self.stateKey)")
 
         // load objects
         _syncPromise = self.load().map { ids -> Void in
 
-            // Check if subclass returned an array of IDs
+            /*
+             The subclass is expected to call the add method as it finds object, and then, once
+             all ids are known, return all the newly added ids.
+             Super (this) then calls the remove method on all ids that are no longer present.
+             */
+
+            // check if subclass returned an array of IDs
             if let ids = ids {
 
-                // Create a list of keys to remove
+                // create a list of keys to remove
                 var keysToRemove: [String] = []
                 for id in self.objects.keys {
 
-                    // Check if it's in our list
+                    // check if it's in our list
                     if !ids.contains(id) {
                         keysToRemove.append(id)
                     }
 
                 }
 
-                // Remove objects
+                // Rrmove objects
                 self.remove(ids: keysToRemove)
 
             }
 
-            // All data is up to date!
+            // data is up to date
             self.synchronized = true
             self._syncPromise = nil
-            printBV(error: "[DataPool > Region] Region '\(self.stateKey)' is now in sync!")
+            printBV(info: "[DataPool > Region] Region '\(self.stateKey)' is now in sync!")
 
         }.recover { err in
-            // Error handling, notify listeners of an error
+            // error handling, notify listeners of an error
             self._syncPromise = nil
             self.error = err
             printBV(error: "[DataPool > Region] Unable to load: " + err.localizedDescription)
             self.emit(.error, userInfo: ["error": err])
         }
 
-//        }.catch { err -> Void in
-//
-//            // Error handling, notify listeners of an error
-//            self._syncPromise = nil
-//            self.error = err
-//            printBV(error: "[DataPool > Region] Unable to load: " + err.localizedDescription)
-//            self.emit(.error, userInfo: ["error": err])
-//
-//        }
-
-        // Return promise
+        // return promise
         return _syncPromise!
 
     }
@@ -153,7 +163,7 @@ public class Region {
     /// Start load of remote objects. The promise should resolve once the region is up to date and provides the
     /// set of object ids.
     ///
-    /// This function should fetch the _entire_ region. Each object should be added to the region using `
+    /// This function should fetch the _entire_ region.
     ///
     /// - Returns: A promise which will fullsil with an array of object IDs, or `nil`. If an array of object IDs is
     ///   returned, any IDs not in this list should be removed from the region.
@@ -164,10 +174,9 @@ public class Region {
     /// Stop and destroy this region. Subclasses can override this to do stuff on close.
     public func close() {
 
-        // Notify data pool we have closed
+        // notify data pool we have closed
         DataPool.removeRegion(region: self)
-
-        // We're closed
+        // we're closed
         self.closed = true
 
     }
@@ -188,36 +197,39 @@ public class Region {
     /// - Parameter objects: The objects to add
     func add(objects: [DataObject]) {
 
-        // Go through each object
+        // go through each object
         for obj in objects {
 
-            // Skip if no data
+            // skip if no data
             guard let data = obj.data else {
                 continue
             }
 
-            // Check if exists already
+            // check if exists already
             if let existingObject = self.objects[obj.id] {
 
-                // Notify
+                // notify
                 self.will(update: existingObject, withFields: data)
 
-                // It exists already, update the object (replace data)
+                // it exists already, update the object (replace data)
                 existingObject.data = data
                 existingObject.cached = nil
 
+                self.did(update: existingObject, withFields: data)
+
             } else {
 
-                // Notify
-                self.will(add: obj)
-
-                // It does not exist, add it
+                // it does not exist, add it
                 self.objects[obj.id] = obj
+
+                // notify
+                self.did(add: obj)
 
             }
 
-            // Emit event
-            self.emit(.objectUpdated, userInfo: ["id": obj.id])
+            // emit event
+            //FIXME: Why was this being broadcast?
+//            self.emit(.objectUpdated, userInfo: ["id": obj.id])
 
         }
 
@@ -234,47 +246,44 @@ public class Region {
     /// - Parameter objects: The list of changes to perform to our data objects.
     func update(objects: [DataObjectUpdateRecord]) {
 
-        // Batch emit events, so if a object is updated multiple times, only one event is sent
+        // batch emit events, so if a object is updated multiple times, only one event is sent
         var changedIDs = Set<String>()
 
         for obj in objects {
 
-            // Fetch existing object
+            // fetch existing object
             guard let existingObject = self.objects[obj.id] else {
                 continue
-
-                // This is an odd case. A spare update is being skipped because the object was not found.
-                // This indicates that something is wrong with the synchronization.
-                //TODO: Re-synchronize here?
             }
 
-            // Stop if existing object doesn't have the full data
+            // stop if existing object doesn't have the full data
             guard let existingData = existingObject.data else {
                 continue
-
-                // This is also an odd case. What would cause the existing object to not have data?
             }
 
-            // Notify
+            // notify
             self.will(update: existingObject, withFields: obj.changes)
 
-            // Update fields
+            // update fields
             existingObject.data = existingData.deepMerged(with: obj.changes)
 
-            // Clear cached values
+            // clear cached values
             existingObject.cached = nil
 
-            // Emit event
+            // notify
+            self.did(update: existingObject, withFields: obj.changes)
+
+            // emit event
             changedIDs.insert(obj.id)
 
         }
 
-        // Notify each item that was updated
+        // notify each item that was updated
         for id in changedIDs {
             self.emit(.objectUpdated, userInfo: ["id": id])
         }
 
-        // Notify overall update
+        // notify overall update
         if changedIDs.count > 0 {
             self.emit(.updated)
             self.save()
@@ -287,22 +296,22 @@ public class Region {
     /// - Parameter ids: The IDs of objects to remove
     func remove(ids: [String]) {
 
-        // Remove all data objects with the specified IDs
+        // remove all data objects with the specified IDs
         var didUpdate = false
         for id in ids {
 
-            // Remove it
-            guard let object = self.objects.removeValue(forKey: id)else {
+            // remove it
+            guard let object = self.objects.removeValue(forKey: id) else {
                 continue
             }
 
-            // Notify
+            // notify
             didUpdate = true
-            self.will(remove: object)
+            self.will(remove: object) //FIXME: Should be didRemove?
 
         }
 
-        // Notify updated
+        // notify region updated
         if didUpdate {
             self.emit(.updated)
             self.save()
@@ -329,9 +338,9 @@ public class Region {
     /// Returns all the objects within this region. Waits until the region is stable first.
     ///
     /// - Returns: Array of objects. Check the region-specific map() function to see what types are returned.
-    public func getAllStable() -> Guarantee<[Any]> { // Make generic over T
+    public func getAllStable() -> Guarantee<[Any]> {
 
-        // Synchronize now
+        // synchronize now
         return self.synchronize().map({
             return self.getAll()
         })
@@ -339,106 +348,106 @@ public class Region {
     }
 
     /// Returns all the objects within this region. Does NOT wait until the region is stable first.
-    public func getAll() -> [Any] { // Make generic over T
+    public func getAll() -> [Any] {
 
-        // Create array of all items
+        // create array of all items
         var items: [Any] = []
         for object in objects.values {
 
-            // Check for cached concrete type
+            // check for cached concrete type
             if let cached = object.cached {
                 items.append(cached)
                 continue
             }
 
-            // Map to the plugin's intended type
+            // map to the plugin's intended type
             guard let mapped = self.map(object) else {
                 continue
             }
 
-            // Cache it
+            // cache it
             object.cached = mapped
 
-            // Add to list
+            // add to list
             items.append(mapped)
 
         }
 
-        // Done
+        // done
         return items
 
     }
 
     /// Returns an object within this region by it's ID. Waits until the region is stable first.
-    public func getStable(id: String) -> Guarantee<Any?> { // Make generic over T
+    public func getStable(id: String) -> Guarantee<Any?> {
 
-        // Synchronize now
+        // synchronize now
         return self.synchronize().map {
-            // Get item
+            // get item
             return self.get(id: id)
         }
 
     }
 
     /// Returns an object within this region by it's ID.
-    public func get(id: String) -> Any? { // Make generic over T
+    public func get(id: String) -> Any? {
 
-        // Get object
+        // get object
         guard let object = objects[id] else {
             return nil
         }
 
-        // Check for cached concrete type
+        // check for cached concrete type
         if let cached = object.cached {
             return cached
         }
 
-        // Map to the plugin's intended type
+        // map to the plugin's intended type
         guard let mapped = self.map(object) else {
             return nil
         }
 
-        // Cache it
+        // cache it
         object.cached = mapped
 
-        // Done
+        // done
         return mapped
 
     }
 
-    /// Load objects from local storage
+    /// Load objects from local storage.
     func loadFromCache() -> Promise<Void> {
 
-        // Get filename
+        // get filename
         let startTime = Date.timeIntervalSinceReferenceDate
         let filename = self.stateKey.replacingOccurrences(of: ":", with: "_")
 
-        // Get temporary file location
+        // get temporary file location
         let file = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(filename)
             .appendingPathExtension("json")
 
-        // Read data
+        // read data
         guard let data = try? Data(contentsOf: file) else {
             printBV(error: ("[DataPool > Region] Unable to read cached data"))
             return Promise()
         }
 
-        // Parse JSON
+        // parse JSON
         guard let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [[Any]] else {
             printBV(error: "[DataPool > Region] Unable to parse cached JSON")
             return Promise()
         }
 
-        // Create objects
+        // create objects
         let objects = json.map { fields -> DataObject? in
 
-            // Get fields
+            // get fields
             guard let id = fields[0] as? String, let type = fields[1] as? String,
                 let data = fields[2] as? [String: Any] else {
                 return nil
             }
 
-            // Create DataObject
+            // create DataObject
             let obj = DataObject()
             obj.id = id
             obj.type = type
@@ -450,10 +459,10 @@ public class Region {
         // Strip out nils
         let cleanObjects = objects.compactMap { $0 }
 
-        // Add objects
+        // add objects
         self.add(objects: cleanObjects)
 
-        // Done
+        // done
         let delay = (Date.timeIntervalSinceReferenceDate - startTime) * 1000
         printBV(info: ("[DataPool > Region] Loaded \(cleanObjects.count) from cache in \(Int(delay))ms"))
         return Promise()
@@ -465,17 +474,15 @@ public class Region {
     /// Saves the region to local storage.
     func save() {
 
-        // TODO: Implement better caching via Realm or something
-
-        // Cancel the pending save task
+        // cancel the pending save task
         if saveTask != nil {
             saveTask?.cancel()
         }
 
-        // Create save task
+        // create save task
         saveTask = DispatchWorkItem { () -> Void in
 
-            // Create data to save
+            // create data to save
             let startTime = Date.timeIntervalSinceReferenceDate
             let json = self.objects.values.map { return [
                 $0.id,
@@ -483,24 +490,24 @@ public class Region {
                 $0.data ?? [:]
                 ]}
 
-            // Convert to JSON
+            // convert to JSON
             guard let data = try? JSONSerialization.data(withJSONObject: json, options: []) else {
                 printBV(error: ("[DataPool > Region] Unable to convert data objects to JSON"))
                 return
             }
 
-            // Get filename
+            // get filename
             let filename = self.stateKey.replacingOccurrences(of: ":", with: "_")
 
-            // Get temporary file location
+            // get temporary file location
             let file = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(filename)
                 .appendingPathExtension("json")
 
-            // Make sure folder exists
+            // make sure folder exists
             try? FileManager.default.createDirectory(at: file.deletingLastPathComponent(),
                                                      withIntermediateDirectories: true, attributes: nil)
 
-            // Write file
+            // write file
             do {
                 try data.write(to: file)
             } catch let err {
@@ -508,7 +515,7 @@ public class Region {
                 return
             }
 
-            // Done
+            // done
             let delay = (Date.timeIntervalSinceReferenceDate - startTime) * 1000
             printBV(info: ("[DataPool > Region] Saved \(self.objects.count) items to disk in \(Int(delay))ms"))
 
@@ -531,31 +538,31 @@ public class Region {
     /// - Returns: An undo function
     func preemptiveChange(id: String, keyPath: String, value: Any) -> UndoFunction {
 
-        // Get object. If it doesn't exist, do nothing and return an undo function which does nothing.
+        // get object. If it doesn't exist, do nothing and return an undo function which does nothing.
         guard let object = objects[id], object.data != nil else {
             return {}
         }
 
-        // Get current value
+        // get current value
         let oldValue = object.data![keyPath: KeyPath(keyPath)]
 
-        // Notify
+        // notify
         self.will(update: object, keyPath: keyPath, oldValue: oldValue, newValue: value)
 
-        // Update to new value
+        // update to new value
         object.data![keyPath: KeyPath(keyPath)] = value
         object.cached = nil
         self.emit(.objectUpdated, userInfo: ["id": id])
         self.emit(.updated)
         self.save()
 
-        // Return undo function
+        // return undo function
         return {
 
-            // Notify
+            // notify
             self.will(update: object, keyPath: keyPath, oldValue: value, newValue: oldValue)
 
-            // Update to new value
+            // update to new value
             object.data![keyPath: KeyPath(keyPath)] = oldValue
             object.cached = nil
             self.emit(.objectUpdated, userInfo: ["id": id])
@@ -572,26 +579,26 @@ public class Region {
     /// - Returns: An undo function
     func preemptiveRemove(id: String) -> UndoFunction {
 
-        // Remove object
+        // remove object
         guard let removedObject = objects.removeValue(forKey: id) else {
-            // No object, do nothing
+            // no object, do nothing
             return {}
         }
 
-        // Notify
-        self.will(remove: removedObject)
+        // notify
+        self.will(remove: removedObject) //FIXME: should be didRemove
         self.emit(.updated)
         self.save()
 
-        // Return undo function
+        // return undo function
         return {
 
-            // Check that a new object wasn't added in the mean time
+            // check that a new object wasn't added in the mean time
             guard self.objects[id] == nil else {
                 return
             }
 
-            // Notify
+            // notify
             self.will(add: removedObject)
             self.add(objects: [removedObject])
             self.save()
@@ -600,10 +607,16 @@ public class Region {
 
     }
 
-    /// Listener functions, can be overridden by subclasses
+    // MARK: - Listener functions, can be overridden by subclasses
+
     func will(add: DataObject) {}
     func will(update: DataObject, withFields: [String: Any]) {}
     func will(update: DataObject, keyPath: String, oldValue: Any?, newValue: Any?) {}
     func will(remove object: DataObject) {}
+
+    func did(add: DataObject) {}
+    func did(update: DataObject, withFields: [String: Any]) {}
+//    func did(update: DataObject, keyPath: String, oldValue: Any?, newValue: Any?) {}
+//    func did(remove object: DataObject) {}
 
 }

@@ -17,11 +17,26 @@ public enum RegionEvent: String {
     /// Triggered when any data in the region changes. This also indicates that there is no longer an error.
     case updated = "region.updated"
 
+    /// Triggered when an object is added.
+    case objectAdded = "region.object.addded"
+
+    /// Triggered when an object is removed.
+    case objectRemoved = "region.object.removed"
+
     /// When a data object changes. userInfo["id"] is the ID of the changed object.
     case objectUpdated = "region.object.updated"
 
     /// When an error occurs. userInfo["error"] is the error. You can also access `region.error` to get the error.
     case error = "region.error"
+
+    /// Lifecycle events
+
+    /// Triggered when the region stabalizes.
+    case stabalized = "region.stabalized"
+    /// Triggered when the region destabalizes.
+    case destabalized = "region.destablaized"
+    /// Triggered when the region begins synchronization.
+    case synchronizing = "region.synchronizing"
 
 }
 
@@ -37,34 +52,43 @@ extension RegionEvent {
 /// Helpers to deal with events
 extension Region {
 
-    /// Add a listener
+    /// Add a listener.
     public func addObserver(_ observer: Any, selector: Selector, name: RegionEvent) {
-        NotificationCenter.default.addObserver(observer, selector: selector,
-                                               name: Notification.Name(name.rawValue), object: self)
+        NotificationCenter.default.addObserver(observer,
+                                               selector: selector,
+                                               name: Notification.Name(name.rawValue),
+                                               object: self)
     }
 
-    /// Removes a set listener
+    /// Remove a listener.
+    public func removeObserver(_ observer: Any, name: RegionEvent) {
+        NotificationCenter.default.removeObserver(observer,
+                                                  name: Notification.Name(name.rawValue),
+                                                  object: self)
+    }
+
+    /// Removes a set listener.
     /// TODO: Find a way to auto remove block listeners when their container object is dealloc'd?
     public typealias RemoveObserverFunction = () -> Void
 
     /// Add a listener
     public func listen(for name: RegionEvent, handler: @escaping (Notification) -> Void) -> RemoveObserverFunction {
 
-        // Register observer
+        // register observer
         let observer = NotificationCenter.default.addObserver(forName: Notification.Name(name.rawValue),
                                                               object: self, queue: OperationQueue.main, using: handler)
 
-        // Return a function which can be called to remove the observer
+        // return a function which can be called to remove the observer
         return {
             NotificationCenter.default.removeObserver(observer)
         }
 
     }
 
-    /// Emits an event. This is used by Region and it's subclasses only
+    /// Emits an event. This is used by Region and it's subclasses only.
     func emit(_ name: RegionEvent, userInfo: [String: Any] = [:]) {
 
-        // Send notification
+        // send notification
         NotificationCenter.default.post(name: Notification.Name(name.rawValue), object: self, userInfo: userInfo)
 
     }

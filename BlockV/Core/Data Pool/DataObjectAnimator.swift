@@ -36,12 +36,12 @@ internal class DataObjectAnimator {
 
     }
 
-    /// Add a region to receive updates
+    /// Add a region to receive updates.
     func add(region: Region) {
         self.regions.append(Weak(value: region))
     }
 
-    // Stop receiving updates for the specified region
+    /// Stop receiving updates for the specified region.
     func remove(region: Region) {
         self.regions = self.regions.filter { !($0.value == nil || $0.value === region) }
     }
@@ -49,18 +49,18 @@ internal class DataObjectAnimator {
     /// Called when there's a new event message via the WebSocket.
     @objc private func onWebSocketMessage(_ descriptor: [String: Any]) {
 
-        // We only handle state update messages here.
+        // we only handle state update messages here.
         guard descriptor["msg_type"] as? String == "state_update" else {
             return
         }
 
-        // Only handle brain updates
+        // only handle brain updates
         guard let payload = descriptor["payload"] as? [String: Any],
             payload["action_name"] as? String == "brain-update" else {
             return
         }
 
-        // Get list of next positions from the brain
+        // get list of next positions from the brain
         guard
             let vatomID = payload["id"] as? String,
             let newObject = payload["new_object"] as? [String: Any],
@@ -70,7 +70,7 @@ internal class DataObjectAnimator {
 
         // TODO: Ensure we care about this vatom. Check if any of our regions have this vatomID
 
-        // Map coordinates to sparse object updates
+        // map coordinates to sparse object updates
         let updates = nextPositions.map { PendingUpdate(
             time: ($0["time"] as? Double ?? 0) / 1000,
             update: DataObjectUpdateRecord(
@@ -85,12 +85,12 @@ internal class DataObjectAnimator {
             )
             ) }
 
-        // Ensure we have any updates
+        // ensure we have any updates
         guard updates.count > 0 else {
             return
         }
 
-        // Fetch earliest time
+        // fetch earliest time
         var earliestTime = updates[0].time
         for update in updates {
             if earliestTime > update.time {
@@ -98,27 +98,27 @@ internal class DataObjectAnimator {
             }
         }
 
-        // Remove all pending changes for this object that are before our earliest time
+        // remove all pending changes for this object that are before our earliest time
         self.changes = self.changes.filter { !($0.update.id == vatomID && $0.time <= earliestTime) }
 
-        // Add each item to the array
+        // add each item to the array
         let now = Date.timeIntervalSinceReferenceDate + Date.timeIntervalBetween1970AndReferenceDate
         for update in updates {
 
-            // Stop if time has passed already
+            // stop if time has passed already
             if update.time < now {
                 continue
             }
 
-            // Add it
+            // add it
             self.changes.append(update)
 
         }
 
-        // Sort changes oldest to newest
+        // sort changes oldest to newest
         self.changes.sort { $0.time - $1.time < 0 }
 
-        // Start update timer if needed
+        // start update timer if needed
         if self.timer == nil {
             self.timer = Timer.scheduledTimer(timeInterval: 0.5, target: self,
                                               selector: #selector(doNextUpdate), userInfo: nil, repeats: true)
@@ -126,35 +126,35 @@ internal class DataObjectAnimator {
 
     }
 
-    /// Called when the timer is executed, to do the next scheduled update
+    /// Called when the timer is executed, to do the next scheduled update.
     @objc fileprivate func doNextUpdate() {
 
-        // If there's no more updates, remove the timer and stop
+        // if there's no more updates, remove the timer and stop
         if self.changes.count == 0 {
             self.timer?.invalidate()
             self.timer = nil
             return
         }
 
-        // Check if the first entry has passed yet
+        // check if the first entry has passed yet
         let now = Date.timeIntervalSinceReferenceDate + Date.timeIntervalBetween1970AndReferenceDate
         if self.changes[0].time > now {
             return
         }
 
-        // Make list of all changes
+        // make list of all changes
         var changes: [DataObjectUpdateRecord] = []
         while self.changes.count > 0 && self.changes[0].time <= now {
 
-            // Get the next change to execute
+            // get the next change to execute
             let change = self.changes.removeFirst()
 
-            // Add to change list
+            // add to change list
             changes.append(change.update)
 
         }
 
-        // Execute the changes on all regions
+        // execute the changes on all regions
         for region in self.regions {
             region.value?.update(objects: changes)
         }

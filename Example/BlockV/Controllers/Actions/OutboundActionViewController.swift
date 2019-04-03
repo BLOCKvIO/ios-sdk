@@ -88,21 +88,23 @@ class OutboundActionViewController: UIViewController {
     /// Performs the appropriate action using the
     func performAction(token: UserToken) {
         
-        let completionHandler: (([String: Any]?, BVError?) -> Void) = { [weak self] (data, error) in
-            // handle error
-            guard let data = data, error == nil else {
-                print(error?.localizedDescription)
+        let resultHandler: ((Result<[String: Any], BVError>) -> Void) = { [weak self] result in
+            switch result {
+            case .success(let json):
+                // success
+                print("Action response: \(json.debugDescription)")
+                self?.hide()
+            case .failure(let error):
+                print(error.localizedDescription)
+
                 return
             }
-            // handle success
-            print("Action response: \(data.debugDescription)")
-            self?.hide()
         }
         
         switch actionName {
-        case "Transfer":    self.vatom.transfer(toToken: token, completion: completionHandler)
-        case "Clone":       self.vatom.clone(toToken: token, completion: completionHandler)
-        case "Redeem":      self.vatom.redeem(toToken: token, completion: completionHandler)
+        case "Transfer":    self.vatom.transfer(toToken: token, completion: resultHandler)
+        case "Clone":       self.vatom.clone(toToken: token, completion: resultHandler)
+        case "Redeem":      self.vatom.redeem(toToken: token, completion: resultHandler)
         default:
             return
         }

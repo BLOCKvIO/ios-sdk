@@ -73,4 +73,22 @@ extension UIAlertController {
         return alertController
     }
     
+    static func confirmAlert(title: String,
+                             message: String,
+                             confirmed: @escaping (Bool) -> Void) -> UIAlertController {
+        let alertController = UIAlertController.init(title: title,
+                                                     message: message,
+                                                     preferredStyle: .alert)
+        
+        let okAction = UIAlertAction.init(title: "OK", style: .default) { action in
+            confirmed(true)
+        }
+        let cancelAction = UIAlertAction.init(title: "Cancel", style: .destructive) { action in
+            confirmed(false)
+        }
+        alertController.addAction(okAction)
+        alertController.addAction(cancelAction)
+        return alertController
+    }
+    
 }

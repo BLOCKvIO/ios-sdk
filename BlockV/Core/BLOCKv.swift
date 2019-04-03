@@ -239,7 +239,7 @@ public final class BLOCKv {
     /// - important: This method may be called multiple times. For example, consider the case where
     /// multiple requests fail due to the refresh token being invalid.
     @objc
-    private static func handleUserAuthorisationRequired() { //FIXME: Rename to handleUserAuthenticationRequired()
+    private static func handleUserAuthorisationRequired() {
 
         printBV(info: "Authorization - User is unauthorized.")
 
@@ -256,7 +256,7 @@ public final class BLOCKv {
     /// Called when the user authenticates (logs in).
     ///
     /// - important:
-    /// This method is *not* called when for access token refreshes.
+    /// This method is *not* called when the access token refreshes.
     static internal func onLogin() {
 
         // stand up the session

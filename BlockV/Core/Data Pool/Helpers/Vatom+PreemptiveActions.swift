@@ -10,7 +10,6 @@
 //
 
 import Foundation
-import PromiseKit
 
 /// Extends VatomModel with common vatom actions available on owned vatoms.
 ///

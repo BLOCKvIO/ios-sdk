@@ -75,7 +75,8 @@ extension BLOCKv {
                 // persist credentials
                 CredentialStore.saveRefreshToken(authModel.refreshToken)
                 CredentialStore.saveAssetProviders(authModel.assetProviders)
-
+                // noifty
+                self.onLogin()
                 completion(authModel.user, nil)
             }
 
@@ -149,7 +150,8 @@ extension BLOCKv {
                 // persist credentials
                 CredentialStore.saveRefreshToken(authModel.refreshToken)
                 CredentialStore.saveAssetProviders(authModel.assetProviders)
-
+                // notify
+                self.onLogin()
                 // completion
                 completion(authModel.user, nil)
             }

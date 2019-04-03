@@ -39,6 +39,9 @@ class ActionListTableViewController: UITableViewController {
     
     var vatom: VatomModel!
     
+    /// Currently selected action.
+    var selectedAction: AvailableAction?
+    
     // table view data model
     struct AvailableAction {
         let action: ActionModel
@@ -100,6 +103,26 @@ class ActionListTableViewController: UITableViewController {
         }
         
     }
+    
+    /// Prompts the user to optionally delete the vatom.
+    fileprivate func deleteVatom() {
+        
+        let message = "This vAtom will be deleted from all your devices."
+        let alert = UIAlertController.confirmAlert(title: "Delete vAtom", message: message) { confirmed in
+            if confirmed {
+                BLOCKv.trashVatom(self.vatom.id) { [weak self] _ in
+                    self?.hide()
+                }
+            }
+        }
+        
+        self.present(alert, animated: true, completion: nil)
+        
+    }
+    
+    fileprivate func hide() {
+        self.presentingViewController?.presentingViewController?.dismiss(animated: true, completion: nil)
+    }
 
     // MARK: - Navigation
     
@@ -114,8 +137,6 @@ class ActionListTableViewController: UITableViewController {
         destination.actionName = self.selectedAction!.action.name
     }
     
-    var selectedAction: AvailableAction?
-    
 }
 
 // MARK: - Table view data source
@@ -123,27 +144,43 @@ class ActionListTableViewController: UITableViewController {
 extension ActionListTableViewController {
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        return 2
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return availableActions.count
+        if section == 0 {
+            return availableActions.count
+        }
+        return 1
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell.action.id", for: indexPath)
-        let availableAction = availableActions[indexPath.row]
-        cell.textLabel?.text = availableAction.action.name
-        cell.textLabel?.alpha = availableAction.isSupported ? 1 : 0.5
-        cell.accessoryView = nil
+        if indexPath.section == 0 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "cell.action.id", for: indexPath)
+            let availableAction = availableActions[indexPath.row]
+            cell.textLabel?.text = availableAction.action.name
+            cell.textLabel?.alpha = availableAction.isSupported ? 1 : 0.5
+            cell.accessoryView = nil
+            return cell
+        }
+        
+        let cell = UITableViewCell.init(style: .default, reuseIdentifier: "id.cell.delete")
+        cell.textLabel?.textColor = UIColor.destruciveOrange
+        cell.textLabel?.text = "Delete"
         return cell
+        
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        selectedAction = availableActions[indexPath.row]
-        if selectedAction!.isSupported {
-            self.performSegue(withIdentifier: "seg.action.selection", sender: self)
+        
+        if indexPath.section == 0 {
+            selectedAction = availableActions[indexPath.row]
+            if selectedAction!.isSupported {
+                self.performSegue(withIdentifier: "seg.action.selection", sender: self)
+            }
+        } else {
+            self.deleteVatom()
         }
     }
     

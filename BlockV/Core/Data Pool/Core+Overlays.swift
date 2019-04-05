@@ -60,6 +60,13 @@ internal extension API {
                             parameters: ["ids": ids]
             )
         }
+        
+        /// Builds the endpoint to update a vatom.
+        static func updateVatom(payload: [String: Any]) -> Endpoint<Void> {
+            return Endpoint(method: .post,
+                            path: "/v1/vatoms",
+                            parameters: payload)
+        }
 
     }
 

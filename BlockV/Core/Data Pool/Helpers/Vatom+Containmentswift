@@ -1,0 +1,132 @@
+//
+//  BlockV AG. Copyright (c) 2018, all rights reserved.
+//
+//  Licensed under the BlockV SDK License (the "License"); you may not use this file or
+//  the BlockV SDK except in compliance with the License accompanying it. Unless
+//  required by applicable law or agreed to in writing, the BlockV SDK distributed under
+//  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+//  ANY KIND, either express or implied. See the License for the specific language
+//  governing permissions and limitations under the License.
+//
+
+import Foundation
+import PromiseKit
+
+extension VatomModel {
+    
+    /// Adds the specified child vatoms.
+    public func addChildren(_ vatoms: [VatomModel], completion: @escaping (Result<[VatomModel], BVError>) -> Void) {
+        
+        let endpoint = API.raw.
+
+    }
+    
+    /// Removes the specified child vatoms.
+    public func removeChildren(_ vatoms: [VatomModel], completion: @escaping (Result<[VatomModel], BVError>) -> Void) {
+        
+        // set the chidren's parent id to self's parent id (on level up)
+        
+    }
+    
+    /// Removes all child vatoms.
+    public func removeAllChildren(completion: @escaping (BVError?) -> Void) {
+        
+        // set all children's parent id to self's parent id
+        
+    }
+    
+    /// Sets the parent of this vatom to the specifed vatom.
+    public func setParentVatom(_ vatom: VatomModel, completion: @escaping (Result<VatomModel, BVError>) -> Void) {
+        
+        // set self's parent id to the id of the specifed vatom
+        
+    }
+    
+    public func getChildren(completion: @escaping (Result<[VatomModel], BVError>) -> Void) {
+        
+        // get children from data pool - ensure data pool is stable
+        
+    }
+    
+    public func getChildrenCached(completion: @escaping (Result<[VatomModel], BVError>) -> Void) {
+        
+        // get children from data pool - don't go out to network
+        
+    }
+    
+    
+    // MARK: - Implementation
+    
+    /// Sets the parent of this vatom to the specifed vatom.
+    public func setParent(_ vatom: VatomModel, completion: (Result<VatomModel, BVError>) -> Void) {
+        
+        let payload: [String: Any] = [
+            "ids": [self.id],
+            "parent_id": vatom.id
+        ]
+        
+        // preempt the reactor outcome
+        let undo = DataPool.inventory().preemptiveChange(id: self.id,
+                                                         keyPath: "vAtom::vAtomType.parent_id",
+                                                         value: vatom.id)
+        
+        let endpoint = API.Raw.updateVatom(payload: payload) //FIXME: Make a generic request, not raw
+        // perform the operation
+        BLOCKv.client.request(endpoint) { (data, error) in
+            <#code#>
+        }
+        
+        //self.performAction("Pickup", payload: body, undos: [undo], completion: completion)
+        
+    }
+    
+    /// Fetches the child vatoms for the specified parent id.
+    ///
+    /// Available on both owned and unowned vatoms.
+    ///
+    /// - important:
+    /// This method will inspect the 'inventory' and 'children' regions, if the regions are synchronized the vatoms
+    /// are returned, if not, the regions are first synchronized. This means the method is potentially slow.
+    public func getChildren(completion: @escaping (Result<[VatomModel], BVError>) -> Void) {
+        
+        // check if the vatom is in the owner's inventory region (and stabalized)
+        DataPool.inventory().getStable(id: self.id).map { inventoryVatom -> Guarantee<[VatomModel]> in
+            
+            if inventoryVatom == nil {
+                // inspect the child region (owner & unowned)
+                return DataPool.children(parentID: self.id).getAllStable().map { $0 as! [VatomModel] } // swiftlint:disable:this force_cast
+                
+            } else {
+                // filter current children
+                let children = (DataPool.inventory().getAll() as! [VatomModel]) // swiftlint:disable:this force_cast
+                    .filter { $0.props.parentID == self.id }
+                return Guarantee.value(children)
+            }
+            
+            //FIXME: Very strange double unwrapping - I think it's to do with .map double wrapping?
+            }.done { body in
+                body.done({ children in
+                    completion(.success(children))
+                })
+        }
+        
+    }
+    
+    /// Fetches the child vatoms for the specified parent id.
+    ///
+    /// Available on both owned and unowned vatoms.
+    ///
+    /// - important:
+    /// This method will inspect the 'inventory' region irrespective of sync state. This means the method is fast.
+    public func getCachedChildren(completion: @escaping (Result<[VatomModel], BVError>) -> Void) {
+        
+        //
+        let children = DataPool.inventory().getAll()
+            .compactMap { $0 as? VatomModel }
+            .filter { $0.props.parentID == self.id }
+        
+        completion(.success(children))
+        
+    }
+    
+}

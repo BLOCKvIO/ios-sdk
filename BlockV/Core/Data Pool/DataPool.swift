@@ -98,10 +98,10 @@ public final class DataPool {
     ///
     /// - Parameter region: The region to remove
     static func removeRegion(region: Region) {
-        
+
         // remove region
         regions = regions.filter { $0 !== region }
-        
+
     }
 
     /// Clear out the session info.

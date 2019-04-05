@@ -20,7 +20,7 @@ internal extension Client {
     func request(_ endpoint: Endpoint<Void>) -> Promise<Data> {
         return Promise { self.request(endpoint, completion: $0.resolve) }
     }
-    
+
     func requestJSON(_ endpoint: Endpoint<Void>) -> Promise<Any> {
         return Promise { self.requestJSON(endpoint, completion: $0.resolve) }
     }

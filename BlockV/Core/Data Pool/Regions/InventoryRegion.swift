@@ -258,7 +258,7 @@ class InventoryRegion: BLOCKvRegion {
                     printBV(error: "[DataPool > InventoryRegion] Couldn't process incoming vatom")
                     return
                 }
-                
+
                 //FIXME: Consider where to add onReceived
 
             }.catch { error in

@@ -129,6 +129,37 @@ extension BLOCKv {
 
     }
 
+    /// Sets the parent ID of the specified vatom.
+    ///
+    /// - Parameters:
+    ///   - vatom: Vatom whose parent ID must be set.
+    ///   - parentID: Unique identifier of the parent vatom.
+    ///   - completion: The completion hanlder to call when the request is completed.
+    ///                 This handler is executed on the main thread.
+    public static func setParentID(ofVatoms vatoms: [VatomModel], to parentID: String,
+                                   completion: @escaping (Result<VatomUpdateModel, BVError>) -> Void) {
+
+        let ids = vatoms.map { $0.id }
+        let payload: [String: Any] = [
+            "ids": ids,
+            "parent_id": parentID
+        ]
+
+        let endpoint = API.UserVatom.updateVatom(payload: payload)
+
+        BLOCKv.client.request(endpoint) { (baseModel, error) in
+
+            guard let updateModel = baseModel?.payload, error == nil else {
+                let error = error ?? BVError.custom(reason: "Unknown newtork failure.")
+                completion(.failure(error))
+                return
+            }
+            completion(.success(updateModel))
+
+        }
+
+    }
+
     /// Searches for vAtoms on the BLOCKv platform.
     ///
     /// - Parameters:

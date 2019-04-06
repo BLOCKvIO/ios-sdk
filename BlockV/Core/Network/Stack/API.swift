@@ -14,12 +14,11 @@ import Alamofire
 
 // swiftlint:disable file_length
 
-/// Consolidates all BlockV API endpoints.
+/// Consolidates all BLOCKv API endpoints.
 ///
 /// Endpoints are namespaced to furture proof.
 ///
 /// Endpoints closely match their server counterparts where possible.
-/// If appropriate, some endpoints may represent a single server endpoint.
 ///
 /// The goal is to abstract endpoint specific details. The networking client should
 /// not need to taylor requests for the specific of an endpoint.
@@ -28,8 +27,9 @@ enum API { }
 extension API {
 
     /*
-     All Session, Current User, and Public User endpoints are wrapped in a (unnecessary)
-     container object. This is modelled here using a `BaseModel`.
+     Notes:
+     All Session, Current User, and Public User endpoints are wrapped in a container object. This is modelled as
+     BaseModel.
      */
 
     // MARK: -
@@ -43,7 +43,7 @@ extension API {
 
         /// Builds the endpoint for new user registration.
         ///
-        /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func register(tokens: [RegisterTokenParams], userInfo: UserInfo? = nil) ->
             Endpoint<BaseModel<AuthModel>> {
 
@@ -71,7 +71,7 @@ extension API {
 
         /// Builds the endpoint for user login.
         ///
-        /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func login(tokenParams: LoginTokenParams) -> Endpoint<BaseModel<AuthModel>> {
             return Endpoint(method: .post,
                             path: loginPath,
@@ -89,28 +89,28 @@ extension API {
 
         /// Builds the endpoint to get the current user's properties.
         ///
-        /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func get() -> Endpoint<BaseModel<UserModel>> {
             return Endpoint(path: currentUserPath)
         }
 
         /// Builds the endpoint to get the current user's tokens.
         ///
-        /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func getTokens() -> Endpoint<BaseModel<[FullTokenModel]>> {
             return Endpoint(path: currentUserPath + "/tokens")
         }
 
         /// Builds the endpoint to log out the current user.
         ///
-        /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func logOut() -> Endpoint<BaseModel<GeneralModel>> {
             return Endpoint(method: .post, path: currentUserPath + "/logout")
         }
 
         /// Builds the endpoint to update current user's information.
         ///
-        /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func update(userInfo: UserInfo) -> Endpoint<BaseModel<UserModel>> {
             return Endpoint(method: .patch,
                             path: currentUserPath,
@@ -120,7 +120,7 @@ extension API {
 
         /// Builds the endpoint to verify a token with an OTP code.
         ///
-        /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func verifyToken(_ token: UserToken, code: String) -> Endpoint<BaseModel<UserToken>> {
             return Endpoint(method: .post,
                             path: currentUserPath + "/verify_token",
@@ -134,7 +134,7 @@ extension API {
 
         /// Builds the endpoint to reset a user token.
         ///
-        /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func resetToken(_ token: UserToken) -> Endpoint<BaseModel<UserToken>> {
             return Endpoint(method: .post,
                             path: currentUserPath + "/reset_token",
@@ -144,7 +144,7 @@ extension API {
 
         /// Builds the endpoint to send a verification request for a specific token.
         ///
-        /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func resetTokenVerification(forToken token: UserToken) -> Endpoint<BaseModel<UserToken>> {
             return Endpoint(method: .post,
                             path: currentUserPath + "/reset_token_verification",
@@ -154,7 +154,7 @@ extension API {
 
         /// Builds the endpoint to add a token to the current user.
         ///
-        /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func addToken(_ token: UserToken, isPrimary: Bool) -> Endpoint<BaseModel<FullTokenModel>> {
             return Endpoint(method: .post,
                             path: currentUserPath + "/tokens",
@@ -168,7 +168,7 @@ extension API {
 
         /// Builds the endpoint to delete a token.
         ///
-        /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func deleteToken(id: String) -> Endpoint<BaseModel<GeneralModel>> {
             return Endpoint(method: .delete,
                             path: currentUserPath + "/tokens/\(id)")
@@ -176,7 +176,7 @@ extension API {
 
         /// Builds the endpoint to set a default token.
         ///
-        /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func setDefaultToken(id: String) -> Endpoint<BaseModel<GeneralModel>> {
             return Endpoint(method: .put,
                             path: currentUserPath + "/tokens/\(id)/default")
@@ -186,7 +186,7 @@ extension API {
 
         /// Builds the endpoint for the user's avatar.
         ///
-        /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func uploadAvatar(_ imageData: Data) -> UploadEndpoint<BaseModel<GeneralModel>> {
 
             let bodyPart = MultiformBodyPart(data: imageData,
@@ -205,8 +205,7 @@ extension API {
         /// - Parameters:
         ///   - message: Content of the message.
         ///   - userID: Unique identifier of the recipient user.
-        /// - Returns: The endpoint is generic over a response model. This model is parsed on
-        /// success responses (200...299).
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func sendMessage(_ message: String, toUserId userId: String) -> Endpoint<BaseModel<GeneralModel>> {
             return Endpoint(method: .post,
                             path: currentUserPath + "/message",
@@ -242,7 +241,7 @@ extension API {
 
         /// Builds the endpoint to get a public user's details.
         ///
-        /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func get(id: String) -> Endpoint<BaseModel<PublicUserModel>> {
             return Endpoint(path: "/v1/users/\(id)")
         }
@@ -263,7 +262,7 @@ extension API {
         /// The inventory call is essentially an optimized discover call. The server-pattern is from the child's
         /// perspetive. That is, we specify the id of the parent who's children are to be retunred.
         ///
-        /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func getInventory(parentID: String,
                                  page: Int = 0,
                                  limit: Int = 0) -> Endpoint<BaseModel<UnpackedModel>> {
@@ -279,7 +278,7 @@ extension API {
 
         /// Builds the endpoint to get a vAtom by its unique identifier.
         ///
-        /// The endpoint is generic over a response model. This model is parsed on success responses (200...299).
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func getVatoms(withIDs ids: [String]) -> Endpoint<BaseModel<UnpackedModel>> {
             return Endpoint(method: .post,
                             path: userVatomPath + "/get",
@@ -289,12 +288,22 @@ extension API {
 
         /// Builds the endpoint to trash a vAtom specified by its id.
         ///
-        /// Returns an endpoint over a BaseModel over a GeneralModel.
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func trashVatom(_ id: String) -> Endpoint<BaseModel<GeneralModel>> {
             return Endpoint(method: .post,
                             path: "/v1/user/vatom/trash",
                             parameters: ["this.id": id])
 
+        }
+
+        /// Builds the endpoint to update a vAtom.
+        ///
+        /// - Parameter payload: Raw payload.
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        static func updateVatom(payload: [String: Any]) -> Endpoint<BaseModel<VatomUpdateModel>> {
+            return Endpoint(method: .patch,
+                            path: "/v1/vatoms",
+                            parameters: payload)
         }
 
     }
@@ -307,7 +316,7 @@ extension API {
         /// Builds the endpoint to search for vAtoms.
         ///
         /// - Parameter payload: Raw request payload.
-        /// - Returns: Endpoint generic over `UnpackedModel`.
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func discover(_ payload: [String: Any]) -> Endpoint<BaseModel<UnpackedModel>> {
 
             return Endpoint(method: .post,
@@ -325,7 +334,7 @@ extension API {
         ///   - topRightLat: Top right latitude coordinate.
         ///   - topRightLon: Top right longitude coordinte.
         ///   - filter: The vAtom filter option to apply.
-        /// - Returns: Endpoint generic over `UnpackedModel`.
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func geoDiscover(bottomLeftLat: Double,
                                 bottomLeftLon: Double,
                                 topRightLat: Double,
@@ -367,7 +376,7 @@ extension API {
         ///   - topRightLon: Top right longitude coordinte.
         ///   - precision: The grouping precision applied when computing the groups.
         ///   - filter: The vAtom filter option to apply.
-        /// - Returns: Endpoint generic over `GeoGroupModel`.
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func geoDiscoverGroups(bottomLeftLat: Double,
                                       bottomLeftLon: Double,
                                       topRightLat: Double,
@@ -419,7 +428,7 @@ extension API {
         /// - Parameters:
         ///   - name: Action name.
         ///   - payload: Raw payload for the action.
-        /// - Returns: Returns endpoint generic over Void, i.e. caller will receive raw data.
+        /// - Returns: Constructed endpoint generic over `Void` that may be passed to a request.
         static func custom(name: String, payload: [String: Any]) -> Endpoint<Void> {
             return Endpoint(method: .post,
                             path: actionPath + "/\(name)",
@@ -438,7 +447,7 @@ extension API {
         /// Builds the endpoint for fetching the actions configured for a template ID.
         ///
         /// - Parameter id: Uniquie identifier of the template.
-        /// - Returns: Endpoint for fectching actions.
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func getActions(forTemplateID id: String) -> Endpoint<BaseModel<[ActionModel]>> {
             return Endpoint(method: .get,
                             path: userActionsPath + "/\(id)")
@@ -459,7 +468,7 @@ extension API {
         ///   - cursor: Filters out all threads more recent than the cursor (useful for paging).
         ///             If omitted or set as zero, the most recent threads are returned.
         ///   - count: Defines the number of messages to return (after the cursor).
-        /// - Returns: Endpoint for fetching the thread for the current user.
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func getThreads(cursor: String, count: Int) -> Endpoint<BaseModel<ThreadListModel>> {
 
             let payload: [String: Any] = [
@@ -479,7 +488,7 @@ extension API {
         ///   - cursor: Filters out all message more recent than the cursor (useful for paging).
         ///             If omitted or set as zero, the most recent threads are returned.
         ///   - count: Defines the number of messages to return (after the cursor).
-        /// - Returns: Endpoint for fetching the messages for a specific thread invoving the current user.
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func getMessages(forThreadId threadId: String, cursor: String, count: Int) ->
             Endpoint<BaseModel<MessageListModel>> {
 

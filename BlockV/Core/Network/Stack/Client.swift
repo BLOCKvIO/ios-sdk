@@ -131,7 +131,7 @@ final class Client: ClientProtocol {
         // configure validation
         request.validate() //TODO: May need manual validation
 
-        request.responseData { (dataResponse) in
+        request.responseData(queue: queue) { (dataResponse) in
             switch dataResponse.result {
             case let .success(data): completion(data, nil)
             case let .failure(err):
@@ -142,7 +142,7 @@ final class Client: ClientProtocol {
                 if let err = err as? BVError {
                     completion(nil, err)
                 } else {
-                    // create a wrapped networking errir
+                    // create a wrapped networking error
                     let error = BVError.networking(error: err)
                     completion(nil, error)
                 }
@@ -166,14 +166,14 @@ final class Client: ClientProtocol {
 
         // configure validation
         request.validate()
-
-        request.responseJSON { dataResponse in
+        request.responseJSON(queue: queue) { dataResponse in
             switch dataResponse.result {
             case let .success(json):
-                print("success", json)
                 completion(json, nil)
             case let .failure(err):
-                print("failure", err)
+                // create a wrapped networking error
+                let error = BVError.networking(error: err)
+                completion(nil, error)
             }
         }
 

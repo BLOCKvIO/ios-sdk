@@ -96,22 +96,13 @@ class InventoryRegion: BLOCKvRegion {
         printBV(info: "[DataPool > InventoryRegion] Loading page \(page), got \(previousItems.count) items so far...")
 
         // build raw request
-        let endpoint = API.Raw.getInventory(parentID: "*", page: page, limit: 100)
+        let endpoint = API.Raw.getInventory(parentID: "*", page: page)
 
-        return BLOCKv.client.request(endpoint).then { data -> Promise<[String]?> in
+        return BLOCKv.client.requestJSON(endpoint).then { json -> Promise<[String]?> in
 
-            //TODO: Use a json returning request instead of a raw data request.
-
-            // convert
-            guard let object = try? JSONSerialization.jsonObject(with: data), let json = object as? [String: Any] else {
+            guard let json = json as? [String: Any], let payload = json["payload"] as? [String: Any] else {
                 throw NSError.init("Unable to load") //FIXME: Create a better error
             }
-
-            guard let payload = json["payload"] as? [String: Any] else {
-                throw NSError.init("Unable to load") //FIXME: Create a better error
-            }
-
-            //TODO: This should be factored out.
 
             // create list of items
             var items: [DataObject] = []
@@ -267,7 +258,7 @@ class InventoryRegion: BLOCKvRegion {
                     printBV(error: "[DataPool > InventoryRegion] Couldn't process incoming vatom")
                     return
                 }
-                
+
                 //FIXME: Consider where to add onReceived
 
             }.catch { error in

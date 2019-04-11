@@ -260,6 +260,61 @@ class BLOCKvRegion: Region {
 
     }
 
+    /// Parses the unpackaged vatom payload from the server and returns an array of `DataObject`.
+    ///
+    /// Returns `nil` if the payload cannot be parsed.
+    func parseDataObject(from payload: [String: Any]) -> [DataObject]? {
+
+        // create list of items
+        var items: [DataObject] = []
+
+        // ensure
+        guard
+            let vatoms = payload["vatoms"] as? [[String: Any]] ?? payload["results"] as? [[String: Any]],
+            let faces = payload["faces"] as? [[String: Any]],
+            let actions = payload["actions"] as? [[String: Any]]
+            else { return nil }
+
+        // add faces to the list
+        for face in faces {
+
+            // add data object
+            let obj = DataObject()
+            obj.type = "face"
+            obj.id = face["id"] as? String ?? ""
+            obj.data = face
+            items.append(obj)
+
+        }
+
+        // add actions to the list
+        for action in actions {
+
+            // add data object
+            let obj = DataObject()
+            obj.type = "action"
+            obj.id = action["name"] as? String ?? ""
+            obj.data = action
+            items.append(obj)
+
+        }
+
+        // add vatoms to the list
+        for vatom in vatoms {
+
+            // add data object
+            let obj = DataObject()
+            obj.type = "vatom"
+            obj.id = vatom["id"] as? String ?? ""
+            obj.data = vatom
+            items.append(obj)
+
+        }
+
+        return items
+
+    }
+
     // MARK: - Notifications
 
     // - Add

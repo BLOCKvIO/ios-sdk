@@ -11,11 +11,6 @@
 
 import Foundation
 
-/*
- Issues:
- 1. Dependecy injection of socket manager.
- */
-
 /// Abstract subclass of `Region`. This intermediate class handles updates from the BLOCKv Web socket. Regions should
 /// subclass to automatically handle Web socket updates.
 ///
@@ -31,6 +26,7 @@ import Foundation
 /// - Notifications
 ///   > Add, update, remove notification are broadcast for the changed vatom. An update is always emitted for the parent
 ///   of the changed vatom. This is useful since the parent can then update its state, e.g. on child removal.
+/// - Parsing unpackaged vatom payload into data-objects.
 class BLOCKvRegion: Region {
 
     /// Constructor
@@ -52,28 +48,6 @@ class BLOCKvRegion: Region {
 
     }
 
-    /*
-     The initialiser below allows for dependency injection of the socket manager.
-     */
-
-    /// Initialize with a descriptor and a socket.
-//    init(descriptor: Any, socket: WebSocketManager) throws {
-//        try super.init(descriptor: descriptor)
-//
-//        // subscribe to socket connections
-//        socket.onConnected.subscribe(with: self) { _ in
-//            self.onWebSocketConnect()
-//        }
-//
-//        // subscribe to raw socket messages
-//        socket.onMessageReceivedRaw.subscribe(with: self) { descriptor in
-//            self.onWebSocketMessage(descriptor)
-//        }
-//
-//        // Monitor for timed updates
-//        DataObjectAnimator.shared.add(region: self)
-//    }
-
     deinit {
 
         // stop listening for animation updates
@@ -91,8 +65,6 @@ class BLOCKvRegion: Region {
     /// Called when this region is going to be shut down.
     override func close() {
         super.close()
-
-        //FIXME: Double check that signals do not need to be unsubscribed from.
 
         // remove listeners
         DataObjectAnimator.shared.remove(region: self)
@@ -257,6 +229,61 @@ class BLOCKvRegion: Region {
             printBV(error: error.localizedDescription)
             return nil
         }
+
+    }
+
+    /// Parses the unpackaged vatom payload from the server and returns an array of `DataObject`.
+    ///
+    /// Returns `nil` if the payload cannot be parsed.
+    func parseDataObject(from payload: [String: Any]) -> [DataObject]? {
+
+        // create list of items
+        var items: [DataObject] = []
+
+        // ensure
+        guard
+            let vatoms = payload["vatoms"] as? [[String: Any]] ?? payload["results"] as? [[String: Any]],
+            let faces = payload["faces"] as? [[String: Any]],
+            let actions = payload["actions"] as? [[String: Any]]
+            else { return nil }
+
+        // add faces to the list
+        for face in faces {
+
+            // add data object
+            let obj = DataObject()
+            obj.type = "face"
+            obj.id = face["id"] as? String ?? ""
+            obj.data = face
+            items.append(obj)
+
+        }
+
+        // add actions to the list
+        for action in actions {
+
+            // add data object
+            let obj = DataObject()
+            obj.type = "action"
+            obj.id = action["name"] as? String ?? ""
+            obj.data = action
+            items.append(obj)
+
+        }
+
+        // add vatoms to the list
+        for vatom in vatoms {
+
+            // add data object
+            let obj = DataObject()
+            obj.type = "vatom"
+            obj.id = vatom["id"] as? String ?? ""
+            obj.data = vatom
+            items.append(obj)
+
+        }
+
+        return items
 
     }
 

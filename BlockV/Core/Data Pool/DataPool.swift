@@ -120,7 +120,7 @@ extension DataPool {
 
     /// Returns the global vatom regions for the specified identifier.
     public static func vatom(id: String) -> Region {
-        return DataPool.region(id: "ids", descriptor: [id])
+        return DataPool.region(id: VatomIDRegion.id, descriptor: [id])
     }
 
     /// Returns the global children region for the specifed parent identifier.

@@ -35,8 +35,6 @@ class InventoryRegion: BLOCKvRegion {
     required init(descriptor: Any) throws {
         try super.init(descriptor: descriptor)
 
-        print(DataPool.sessionInfo["userID"])
-
         // make sure we have a valid current user
         guard let userID = DataPool.sessionInfo["userID"] as? String, !userID.isEmpty else {
             throw NSError("You cannot query the inventory region without being logged in.")
@@ -105,56 +103,20 @@ class InventoryRegion: BLOCKvRegion {
             }
 
             // create list of items
-            var items: [DataObject] = []
             var ids = previousItems
 
-            // add faces to the list
-            guard let faces = payload["faces"] as? [[String: Any]] else { return Promise.value(ids) }
-            for face in faces {
-
-                // add data object
-                let obj = DataObject()
-                obj.type = "face"
-                obj.id = face["id"] as? String ?? ""
-                obj.data = face
-                items.append(obj)
-                ids.append(obj.id)
-
+            // parse out data objects
+            guard let items = self.parseDataObject(from: payload) else {
+                return Promise.value(ids)
             }
-
-            // add actions to the list
-            guard let actions = payload["actions"] as? [[String: Any]] else { return Promise.value(ids) }
-            for action in actions {
-
-                // add data object
-                let obj = DataObject()
-                obj.type = "action"
-                obj.id = action["name"] as? String ?? ""
-                obj.data = action
-                items.append(obj)
-                ids.append(obj.id)
-
-            }
-
-            // add vatoms to the list
-            guard let vatomInfos = payload["vatoms"] as? [[String: Any]] else { return Promise.value(ids) }
-            for vatomInfo in vatomInfos {
-
-                // add data object
-                let obj = DataObject()
-                obj.type = "vatom"
-                obj.id = vatomInfo["id"] as? String ?? ""
-                obj.data = vatomInfo
-                items.append(obj)
-                ids.append(obj.id)
-
-            }
+            // append new ids
+            ids.append(contentsOf: items.map { $0.id })
 
             // add data objects
             self.add(objects: items)
 
             // if no more data, stop
-            if vatomInfos.count == 0 {
+            if items.count == 0 {
                 return Promise.value(ids)
             }
 
@@ -199,67 +161,20 @@ class InventoryRegion: BLOCKvRegion {
             BLOCKv.client.request(endpoint).done { data in
 
                 // convert
-                guard let object = try? JSONSerialization.jsonObject(with: data),
-                    let json = object as? [String: Any] else {
+                guard
+                    let object = try? JSONSerialization.jsonObject(with: data),
+                    let json = object as? [String: Any],
+                    let payload = json["payload"] as? [String: Any] else {
                     throw NSError.init("Unable to load") //FIXME: Create a better error
                 }
 
-                guard let payload = json["payload"] as? [String: Any] else {
-                    throw NSError.init("Unable to load") //FIXME: Create a better error
-                }
-
-                // add vatom to new objects list
-                var items: [DataObject] = []
-
-                // add faces to the list
-                guard let faces = payload["faces"] as? [[String: Any]] else { return }
-                for face in faces {
-
-                    // add data object
-                    let obj = DataObject()
-                    obj.type = "face"
-                    obj.id = face["id"] as? String ?? ""
-                    obj.data = face
-                    items.append(obj)
-
-                }
-
-                // add actions to the list
-                guard let actions = payload["actions"] as? [[String: Any]] else { return }
-                for action in actions {
-
-                    // add data object
-                    let obj = DataObject()
-                    obj.type = "action"
-                    obj.id = action["name"] as? String ?? ""
-                    obj.data = action
-                    items.append(obj)
-
-                }
-
-                // add vatoms to the list
-                guard let vatomInfos = payload["vatoms"] as? [[String: Any]] else { return }
-                for vatomInfo in vatomInfos {
-
-                    // add data object
-                    let obj = DataObject()
-                    obj.type = "vatom"
-                    obj.id = vatomInfo["id"] as? String ?? ""
-                    obj.data = vatomInfo
-                    items.append(obj)
-
+                // parse out objects
+                guard let items = self.parseDataObject(from: payload) else {
+                    throw NSError.init("Unable to parse data") //FIXME: Create a better error
                 }
 
                 // add new objects
                 self.add(objects: items)
-
-                // notify vatom received
-                guard let vatom = self.get(id: vatomInfos[0]["id"] as? String ?? "") as? VatomModel else {
-                    printBV(error: "[DataPool > InventoryRegion] Couldn't process incoming vatom")
-                    return
-                }
-
-                //FIXME: Consider where to add onReceived
 
             }.catch { error in
                 printBV(error: "[InventoryRegion] Unable to fetch inventory. \(error.localizedDescription)")

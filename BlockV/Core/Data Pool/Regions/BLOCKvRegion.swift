@@ -10,6 +10,7 @@
 //
 
 import Foundation
+//import DictionaryCoding
 
 /*
  Issues:
@@ -244,19 +245,48 @@ class BLOCKvRegion: Region {
         let actions = objects.values.filter { $0.type == "action" && ($0.data?["name"] as? String)?
             .starts(with: actionNamePrefix) == true }
         objectData["actions"] = actions.map { $0.data }
-
+        
+        // Experiment 1: Descriptor initialiser
+        
         do {
-            if JSONSerialization.isValidJSONObject(objectData) {
-                let rawData = try JSONSerialization.data(withJSONObject: objectData)
-                let vatoms = try JSONDecoder.blockv.decode(VatomModel.self, from: rawData)
-                return vatoms
-            } else {
-                throw NSError.init("Invalid JSON for Vatom: \(object.id)")
-            }
+            let faces = faces.compactMap { $0.data }.compactMap { try? FaceModel(from: $0) }
+            let actions = actions.compactMap { $0.data }.compactMap { try? ActionModel(from: $0) }
+            var vatom = try VatomModel(from: objectData)
+            vatom.faceModels = faces
+            vatom.actionModels = actions
+            return vatom
         } catch {
             printBV(error: error.localizedDescription)
             return nil
         }
+        
+        // Experiemnt 2: Dictionary decoder (dictionary > vatom model)
+        
+//        let decoder = DictionaryDecoder()
+//        decoder.dateDecodingStrategy = .iso8601
+//
+//        do {
+//            let vatoms = try decoder.decode(VatomModel.self, from: objectData)
+//            return vatoms
+//        } catch {
+//            printBV(error: error.localizedDescription)
+//            return nil
+//        }
+        
+        // Experiment 3: Data decoder (json decoder)
+
+//        do {
+//            if JSONSerialization.isValidJSONObject(objectData) {
+//                let rawData = try JSONSerialization.data(withJSONObject: objectData)
+//                let vatoms = try JSONDecoder.blockv.decode(VatomModel.self, from: rawData)
+//                return vatoms
+//            } else {
+//                throw NSError.init("Invalid JSON for Vatom: \(object.id)")
+//            }
+//        } catch {
+//            printBV(error: error.localizedDescription)
+//            return nil
+//        }
 
     }
 

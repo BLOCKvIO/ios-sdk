@@ -185,15 +185,18 @@ extension VatomModel {
         }
 
         // perform the action
-        BLOCKv.performAction(name: name, payload: payload) { (payload, error) in
-            // convert closure to result
-            if let payload = payload, error == nil {
+        BLOCKv.performAction(name: name, payload: payload) { result in
+            
+            switch result {
+            case .success(let payload):
                 completion(.success(payload))
-            } else {
+                
+            case .failure(let error):
                 // run undo closures
                 undos.forEach { $0() }
-                completion(.failure(error!))
+                completion(.failure(error))
             }
+
         }
 
     }

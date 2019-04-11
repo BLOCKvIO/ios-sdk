@@ -158,17 +158,17 @@ class VatomObserver {
     /// Replace all the root vAtom's direct children using remote state.
     private func updateChildVatoms() {
 
-        BLOCKv.getInventory(id: self.rootVatomID) { [weak self] (vatoms, error) in
-
-            // ensure no error
-            guard error == nil else {
-                printBV(error: "Unable to fetch children. Error: \(String(describing: error?.localizedDescription))")
-                return
+        BLOCKv.getInventory(id: self.rootVatomID) { [weak self] result in
+            
+            switch result {
+            case .success(let vatoms):
+                // ensure correct parent ID
+                let validChildren = vatoms.filter { $0.props.parentID == self?.rootVatomID }
+                // replace the list of children
+                self?.childVatomIDs = Set(validChildren.map { $0.id })
+            case .failure(let error):
+                printBV(error: "Unable to fetch children. Error: \(String(describing: error.localizedDescription))")
             }
-            // ensure correct parent ID
-            let validChildren = vatoms.filter { $0.props.parentID == self?.rootVatomID }
-            // replace the list of children
-            self?.childVatomIDs = Set(validChildren.map { $0.id })
 
         }
 

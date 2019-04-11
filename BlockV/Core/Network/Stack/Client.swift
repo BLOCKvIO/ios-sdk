@@ -14,13 +14,13 @@ import Alamofire
 
 protocol ClientProtocol {
 
-    typealias RawCompletion = (_ data: Data?, _ error: BVError?) -> Void
+    typealias RawCompletion = (Result<Data, BVError>) -> Void
 
     /// Request that returns raw data.
     func request(_ endpoint: Endpoint<Void>, completion: @escaping RawCompletion)
 
     /// Request that returns native object (must conform to decodable).
-    func request<T>(_ endpoint: Endpoint<T>, completion: @escaping (T?, BVError?) -> Void ) where T: Decodable
+    func request<T>(_ endpoint: Endpoint<T>, completion: @escaping (Result<T, BVError>) -> Void ) where T: Decodable
 
 }
 
@@ -133,18 +133,19 @@ final class Client: ClientProtocol {
 
         request.responseData(queue: queue) { (dataResponse) in
             switch dataResponse.result {
-            case let .success(data): completion(data, nil)
+            case let .success(data):
+                completion(.success(data))
             case let .failure(err):
 
                 //TODO: The error should be parsed and a BVError created and passed in.
 
                 // check for a BVError
                 if let err = err as? BVError {
-                    completion(nil, err)
+                    completion(.failure(err))
                 } else {
                     // create a wrapped networking error
                     let error = BVError.networking(error: err)
-                    completion(nil, error)
+                    completion(.failure(error))
                 }
             }
         }
@@ -152,7 +153,7 @@ final class Client: ClientProtocol {
     }
 
     /// JSON Completion handler.
-    typealias JSONCompletion = (_ json: Any?, _ error: BVError?) -> Void
+    typealias JSONCompletion = (Result<Any, BVError>) -> Void
 
     func requestJSON(_ endpoint: Endpoint<Void>, completion: @escaping JSONCompletion) {
 
@@ -169,11 +170,11 @@ final class Client: ClientProtocol {
         request.responseJSON(queue: queue) { dataResponse in
             switch dataResponse.result {
             case let .success(json):
-                completion(json, nil)
+                completion(.success(json))
             case let .failure(err):
                 // create a wrapped networking error
                 let error = BVError.networking(error: err)
-                completion(nil, error)
+                completion(.failure(error))
             }
         }
 
@@ -185,7 +186,7 @@ final class Client: ClientProtocol {
     ///   - endpoint: Endpoint for the request
     ///   - completion: The completion handler to call when the request is completed.
     func request<Response>(_ endpoint: Endpoint<Response>,
-                           completion: @escaping (Response?, BVError?) -> Void ) where Response: Decodable {
+                           completion: @escaping (Result<Response, BVError>) -> Void ) where Response: Decodable {
 
         // create request (starts immediately)
         let request = self.sessionManager.request(
@@ -228,7 +229,7 @@ final class Client: ClientProtocol {
                 //                    return
                 //                }
 
-                completion(val, nil)
+                completion(.success(val))
 
                 //TODO: Add some thing like this to pull back to a completion thread?
                 /*
@@ -246,10 +247,10 @@ final class Client: ClientProtocol {
 
                 //FIXME: Can this error casting be done away with?
                 if let err = err as? BVError {
-                    completion(nil, err)
+                    completion(.failure(err))
                 } else {
                     let error = BVError.networking(error: err)
-                    completion(nil, error)
+                    completion(.failure(error))
                 }
 
             }

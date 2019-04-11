@@ -183,17 +183,22 @@ class VatomObserverStore {
     /// Fetch root vAtom's remote state.
     private func updateRootVatom(completion: Completion?) {
 
-        BLOCKv.getVatoms(withIDs: [self.rootVatomID]) { [weak self] (vatoms, error) in
+        BLOCKv.getVatoms(withIDs: [self.rootVatomID]) { [weak self] result in
 
-            // ensure no error
-            guard let rootVatom = vatoms.first, error == nil else {
-                //printBV(error: "Unable to fetch root vAtom: \(String(describing: error?.localizedDescription))")
+            switch result {
+            case .success(let vatoms):
+                // ensure no error
+                guard let rootVatom = vatoms.first else {
+                    return
+                }
+                // update root vAtom
+                self?.rootVatom = rootVatom
+                completion?(nil)
+                
+            case .failure(let error):
                 completion?(error)
-                return
             }
-            // update root vAtom
-            self?.rootVatom = rootVatom
-            completion?(nil)
+    
         }
 
     }
@@ -201,19 +206,23 @@ class VatomObserverStore {
     /// Fetch remote state for the specified child vAtom and adds it to the list of children.
     private func addChildVatom(withID childID: String) {
 
-        BLOCKv.getVatoms(withIDs: [childID]) { [weak self] (vatoms, error) in
-
-            // ensure no error
-            guard let childVatom = vatoms.first, error == nil else {
-                //printBV(error: "Unable to vAtom. Error: \(String(describing: error?.localizedDescription))")
-                return
-            }
-
-            // ensure the vatom is still a child
-            // there is a case, due to the async arch, where the retrieved vAtom may no longer be a child
-            if childVatom.props.parentID == self?.rootVatomID {
-                // insert child (async)
-                self?.childVatoms.insert(childVatom)
+        BLOCKv.getVatoms(withIDs: [childID]) { [weak self] result in
+            
+            switch result {
+            case .success(let vatoms):
+                
+                guard let childVatom = vatoms.first else {
+                    return
+                }
+                
+                // ensure the vatom is still a child
+                // there is a case, due to the async arch, where the retrieved vAtom may no longer be a child
+                if childVatom.props.parentID == self?.rootVatomID {
+                    // insert child (async)
+                    self?.childVatoms.insert(childVatom)
+                }
+            case .failure(let error):
+                printBV(error: "Unable to add child. Error: \(String(describing: error.localizedDescription))")
             }
 
         }
@@ -223,19 +232,18 @@ class VatomObserverStore {
     /// Replace all the root vAtom's direct children using remote state.
     private func updateChildVatoms(completion: Completion?) {
 
-        BLOCKv.getInventory(id: self.rootVatomID) { [weak self] (vatoms, error) in
-
-            // ensure no error
-            guard error == nil else {
-                //printBV(error: "Unable to fetch children. Error: \(String(describing: error?.localizedDescription))")
+        BLOCKv.getInventory(id: self.rootVatomID) { [weak self] result in
+            
+            switch result {
+            case .success(let vatoms):
+                // ensure correct parent ID
+                let validChildren = vatoms.filter { $0.props.parentID == self?.rootVatomID }
+                // replace the list of children
+                self?.childVatoms = Set(validChildren)
+                completion?(nil)
+            case .failure(let error):
                 completion?(error)
-                return
             }
-            // ensure correct parent ID
-            let validChildren = vatoms.filter { $0.props.parentID == self?.rootVatomID }
-            // replace the list of children
-            self?.childVatoms = Set(validChildren)
-            completion?(nil)
 
         }
 

@@ -28,7 +28,7 @@ extension BLOCKv {
     public static func register(withUserToken token: String,
                                 type: UserTokenType,
                                 userInfo: UserInfo? = nil,
-                                completion: @escaping (UserModel?, BVError?) -> Void) {
+                                completion: @escaping (Result<UserModel, BVError>) -> Void) {
         let registerToken = UserToken(value: token, type: type)
         self.register(tokens: [registerToken], userInfo: userInfo, completion: completion)
     }
@@ -43,7 +43,7 @@ extension BLOCKv {
     ///                 This handler is executed on the main queue.
     public static func register(withOAuthToken oauthToken: OAuthTokenRegisterParams,
                                 userInfo: UserInfo? = nil,
-                                completion: @escaping (UserModel?, BVError?) -> Void) {
+                                completion: @escaping (Result<UserModel, BVError>) -> Void) {
         self.register(tokens: [oauthToken], userInfo: userInfo, completion: completion)
     }
 
@@ -56,28 +56,29 @@ extension BLOCKv {
     /// authorized to perform requests.
     public static func register(tokens: [RegisterTokenParams],
                                 userInfo: UserInfo? = nil,
-                                completion: @escaping (UserModel?, BVError?) -> Void) {
+                                completion: @escaping (Result<UserModel, BVError>) -> Void) {
 
         let endpoint = API.Session.register(tokens: tokens, userInfo: userInfo)
 
-        self.client.request(endpoint) { (baseModel, error) in
-
-            // extract model, ensure no error
-            guard let authModel = baseModel?.payload, error == nil else {
+        self.client.request(endpoint) { result in
+            
+            switch result {
+            case .success(let baseModel):
+                // model is available
                 DispatchQueue.main.async {
-                    completion(nil, error)
+                    let authModel = baseModel.payload
+                    // persist credentials
+                    CredentialStore.saveRefreshToken(authModel.refreshToken)
+                    CredentialStore.saveAssetProviders(authModel.assetProviders)
+                    // noifty
+                    self.onLogin()
+                    completion(.success(authModel.user))
                 }
-                return
-            }
-
-            // model is available
-            DispatchQueue.main.async {
-                // persist credentials
-                CredentialStore.saveRefreshToken(authModel.refreshToken)
-                CredentialStore.saveAssetProviders(authModel.assetProviders)
-                // noifty
-                self.onLogin()
-                completion(authModel.user, nil)
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
             }
 
         }
@@ -97,7 +98,7 @@ extension BLOCKv {
     public static func login(withUserToken token: String,
                              type: UserTokenType,
                              password: String,
-                             completion: @escaping (UserModel?, BVError?) -> Void) {
+                             completion: @escaping (Result<UserModel, BVError>) -> Void) {
         let params = UserTokenLoginParams(value: token, type: type, password: password)
         self.login(tokenParams: params, completion: completion)
     }
@@ -111,7 +112,7 @@ extension BLOCKv {
     ///                 This handler is executed on the main queue.
     public static func login(withOAuthToken oauthToken: String,
                              provider: String,
-                             completion: @escaping (UserModel?, BVError?) -> Void) {
+                             completion: @escaping (Result<UserModel, BVError>) -> Void) {
         let params = OAuthTokenLoginParams(provider: provider, oauthToken: oauthToken)
         self.login(tokenParams: params, completion: completion)
     }
@@ -123,37 +124,37 @@ extension BLOCKv {
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
     public static func login(withGuestID id: String,
-                             completion: @escaping (UserModel?, BVError?) -> Void) {
+                             completion: @escaping (Result<UserModel, BVError>) -> Void) {
         let params = GuestIdLoginParams(id: id)
         self.login(tokenParams: params, completion: completion)
     }
 
     /// Login using token params
     fileprivate static func login(tokenParams: LoginTokenParams,
-                                  completion: @escaping (UserModel?, BVError?) -> Void) {
+                                  completion: @escaping (Result<UserModel, BVError>) -> Void) {
 
         let endpoint = API.Session.login(tokenParams: tokenParams)
 
-        self.client.request(endpoint) { (baseModel, error) in
+        self.client.request(endpoint) { result in
 
-            // extract model, ensure no error
-            guard let authModel = baseModel?.payload, error == nil else {
+            switch result {
+            case .success(let baseModel):
+                // model is available
                 DispatchQueue.main.async {
-                    completion(nil, error)
+                    let authModel = baseModel.payload
+                    // persist credentials
+                    CredentialStore.saveRefreshToken(authModel.refreshToken)
+                    CredentialStore.saveAssetProviders(authModel.assetProviders)
+                    // notify
+                    self.onLogin()
+                    // completion
+                    completion(.success(authModel.user))
                 }
-                return
-            }
-
-            // model is available
-            DispatchQueue.main.async {
-
-                // persist credentials
-                CredentialStore.saveRefreshToken(authModel.refreshToken)
-                CredentialStore.saveAssetProviders(authModel.assetProviders)
-                // notify
-                self.onLogin()
-                // completion
-                completion(authModel.user, nil)
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
             }
 
         }
@@ -173,24 +174,24 @@ extension BLOCKv {
 
         let endpoint = API.CurrentUser.logOut()
 
-        self.client.request(endpoint) { (baseModel, error) in
-
+        self.client.request(endpoint) { result in
+            
             // reset
             DispatchQueue.main.async {
                 reset()
             }
-
-            // extract model, ensure no error
-            guard baseModel?.payload != nil, error == nil else {
+            
+            switch result {
+            case .success(let model):
+                // model is available
                 DispatchQueue.main.async {
-                    completion(error!)
+                    completion(nil)
                 }
-                return
-            }
-
-            // model is available
-            DispatchQueue.main.async {
-                completion(nil)
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    completion(error)
+                }
             }
 
         }

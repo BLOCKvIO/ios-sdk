@@ -18,11 +18,34 @@ import PromiseKit
 internal extension Client {
 
     func request(_ endpoint: Endpoint<Void>) -> Promise<Data> {
-        return Promise { self.request(endpoint, completion: $0.resolve) }
+        
+        return Promise { seal in
+            // convert result type into promise
+            self.request(endpoint) { result in
+                switch result {
+                case .success(let model):
+                    seal.fulfill(model)
+                case .failure(let error):
+                    seal.reject(error)
+                }
+            }
+        }
+        
     }
 
     func requestJSON(_ endpoint: Endpoint<Void>) -> Promise<Any> {
-        return Promise { self.requestJSON(endpoint, completion: $0.resolve) }
+        
+        return Promise { seal in
+            self.requestJSON(endpoint) { result in
+                switch result {
+                case .success(let model):
+                    seal.fulfill(model)
+                case .failure(let error):
+                    seal.reject(error)
+                }
+            }
+        }
+        
     }
 
 }

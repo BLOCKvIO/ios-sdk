@@ -139,20 +139,43 @@ extension BLOCKv {
     public static func setParentID(ofVatoms vatoms: [VatomModel], to parentID: String,
                                    completion: @escaping (Result<VatomUpdateModel, BVError>) -> Void) {
 
+        // perform preemptive action, store undo functions
+        let undos = vatoms.map {
+            // tuple: (vatom id, undo function)
+            (id: $0.id, undo: DataPool.inventory().preemptiveChange(id: $0.id,
+                                                                    keyPath: "vAtom::vAtomType.parent_id",
+                                                                    value: parentID))
+        }
+        
         let ids = vatoms.map { $0.id }
         let payload: [String: Any] = [
             "ids": ids,
             "parent_id": parentID
         ]
-
+        
         let endpoint = API.UserVatom.updateVatom(payload: payload)
 
         BLOCKv.client.request(endpoint) { result in
             
             switch result {
             case .success(let baseModel):
-                completion(.success(baseModel.payload))
+                
+                /*
+                 # Note
+                 The most likely scenario where there will be partial containment errors is when setting the parent id
+                 to a container vatom of type `DefinedFolderContainerType`. However, as of writting, the server does
+                 not enforce child policy rules so this always succeed (using the current API).
+                 */
+                let updateVatomModel = baseModel.payload
+                // roll back only those failed containments
+                let undosToRollback = undos.filter { !updateVatomModel.ids.contains($0.id) }
+                undosToRollback.forEach { $0.undo() }
+                // complete
+                completion(.success(updateVatomModel))
+                
             case .failure(let error):
+                // roll back all containments
+                undos.forEach { $0.undo() }
                 completion(.failure(error))
             }
 

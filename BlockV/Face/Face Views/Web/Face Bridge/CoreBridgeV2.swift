@@ -281,17 +281,17 @@ class CoreBridgeV2: CoreBridge {
     private func getVatoms(withIDs ids: [String],
                            completion: @escaping ([String: [VatomModel]]?, BridgeError?) -> Void) {
 
-            BLOCKv.getVatoms(withIDs: ids) { (vatoms, error) in
-
-                // ensure no error
-                guard error == nil else {
+            BLOCKv.getVatoms(withIDs: ids) { result in
+                
+                switch result {
+                case .success(let vatoms):
+                    let response = ["vatoms": vatoms]
+                    completion(response, nil)
+                    
+                case .failure(let error):
                     let bridgeError = BridgeError.viewer("Unable to fetch vAtoms.")
                     completion(nil, bridgeError)
-                    return
                 }
-
-                let response = ["vatoms": vatoms]
-                completion(response, nil)
 
             }
 
@@ -312,19 +312,20 @@ class CoreBridgeV2: CoreBridge {
         let builder = DiscoverQueryBuilder()
         builder.setScope(scope: .parentID, value: backingID)
 
-        BLOCKv.discover(builder) { (vatoms, error) in
+        BLOCKv.discover(builder) { result in
 
-            // ensure no error
-            guard error == nil else {
+            switch result {
+            case .success(let vatoms):
+                // create a list of the child vatoms and add the backing (parent vatom)
+                var permittedIDs = vatoms.map { $0.id }
+                permittedIDs.append(backingID)
+                completion(permittedIDs, nil)
+                
+            case .failure(let error):
                 let bridgeError = BridgeError.viewer("Unable to fetch vAtoms.")
                 completion(nil, bridgeError)
-                return
             }
-            // create a list of the child vatoms and add the backing (parent vatom)
-            var permittedIDs = vatoms.map { $0.id }
-            permittedIDs.append(backingID)
-
-            completion(permittedIDs, nil)
+            
         }
 
     }
@@ -342,17 +343,16 @@ class CoreBridgeV2: CoreBridge {
         let builder = DiscoverQueryBuilder()
         builder.setScope(scope: .parentID, value: id)
 
-        BLOCKv.discover(builder) { (vatoms, error) in
-
-            // ensure no error
-            guard error == nil else {
+        BLOCKv.discover(builder) { result in
+            
+            switch result {
+            case .success(let vatoms):
+                let response = ["vatoms": vatoms]
+                completion(response, nil)
+            case .failure(let error):
                 let bridgeError = BridgeError.viewer("Unable to fetch children for vAtom \(id).")
                 completion(nil, bridgeError)
-                return
             }
-
-            let response = ["vatoms": vatoms]
-            completion(response, nil)
 
         }
 
@@ -365,21 +365,21 @@ class CoreBridgeV2: CoreBridge {
     ///   - completion: Completion handler to call with JSON data to be passed to the webpage.
     private func getPublicUser(userID id: String, completion: @escaping (BRUser?, BridgeError?) -> Void) {
 
-        BLOCKv.getPublicUser(withID: id) { (user, error) in
-
-            // ensure no error
-            guard let user = user, error == nil else {
+        BLOCKv.getPublicUser(withID: id) { result in
+            
+            switch result {
+            case .success(let user):
+                // build response
+                let properties = BRUser.Properties(firstName: user.properties.firstName,
+                                                   lastName: user.properties.lastName,
+                                                   avatarURI: user.properties.avatarURL?.absoluteString ?? "")
+                let response = BRUser(id: user.id, properties: properties)
+                completion(response, nil)
+                
+            case .failure(let error):
                 let bridgeError = BridgeError.viewer("Unable to fetch public user: \(id).")
                 completion(nil, bridgeError)
-                return
             }
-
-            // build response
-            let properties = BRUser.Properties(firstName: user.properties.firstName,
-                                               lastName: user.properties.lastName,
-                                               avatarURI: user.properties.avatarURL?.absoluteString ?? "")
-            let response = BRUser(id: user.id, properties: properties)
-            completion(response, nil)
 
         }
 
@@ -405,16 +405,19 @@ class CoreBridgeV2: CoreBridge {
                 throw BridgeError.viewer("Unable to encode data.")
             }
 
-            BLOCKv.performAction(name: name, payload: dict) { (payload, error) in
-                // ensure no error
-                guard let payload = payload, error == nil else {
+            BLOCKv.performAction(name: name, payload: dict) { result in
+                
+                switch result {
+                case .success(let payload):
+                    // convert to json
+                    let json = try? JSON(payload)
+                    completion(json, nil)
+                    
+                case .failure(let error):
                     let bridgeError = BridgeError.viewer("Unable to perform action: \(name).")
                     completion(nil, bridgeError)
-                    return
                 }
-                // convert to json
-                let json = try? JSON(payload)
-                completion(json, nil)
+
             }
 
         } catch {

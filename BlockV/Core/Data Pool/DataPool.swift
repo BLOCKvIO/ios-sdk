@@ -98,10 +98,10 @@ public final class DataPool {
     ///
     /// - Parameter region: The region to remove
     static func removeRegion(region: Region) {
-        
+
         // remove region
         regions = regions.filter { $0 !== region }
-        
+
     }
 
     /// Clear out the session info.
@@ -115,17 +115,17 @@ extension DataPool {
 
     /// Returns the global inventory region.
     public static func inventory() -> Region {
-        return DataPool.region(id: "inventory", descriptor: "")
+        return DataPool.region(id: InventoryRegion.id, descriptor: "")
     }
 
     /// Returns the global vatom regions for the specified identifier.
     public static func vatom(id: String) -> Region {
-        return DataPool.region(id: "ids", descriptor: [id])
+        return DataPool.region(id: VatomIDRegion.id, descriptor: [id])
     }
 
     /// Returns the global children region for the specifed parent identifier.
     public static func children(parentID: String) -> Region {
-        return DataPool.region(id: "children", descriptor: parentID)
+        return DataPool.region(id: VatomChildrenRegion.id, descriptor: parentID)
     }
 
 }

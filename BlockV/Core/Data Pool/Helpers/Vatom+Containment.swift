@@ -18,121 +18,6 @@ import PromiseKit
 /// container vatom.
 extension VatomModel {
 
-    /// - Parameters:
-    ///   - result: Either `.success` associated with a model containing details of the change, or `.failure` in the
-    ///             case of an error.
-    public typealias UpdateResultHandler = (_ result: Result<VatomUpdateModel, BVError>) -> Void
-
-    /// Adds the specified vatoms to this container vatom as first-level children.
-    ///
-    /// Essentially, the parent id of the specified vatom is updated to id of this container vatom. Those vatoms which
-    /// may not be contained will not be updated.
-    ///
-    /// - important: This request preemptively updates the local data pool. Changes are rolled back if the network
-    ///              request fails.
-    ///
-    /// - Parameters:
-    ///   - vatoms: The child vatoms to add to this container.
-    ///   - completion: The completion hanlder to call when the request is completed.
-    ///                 This handler is executed on the main thread.
-    public func addChildren(_ vatoms: [VatomModel], completion: UpdateResultHandler?) {
-
-        // update parent id of vatom arguments to this container vatom's id
-        self.updateVatoms(vatoms, withNewParentID: self.id, completion: completion)
-
-    }
-
-    /// Removes the specified vatoms from this container vatom and moves them up one level to this container's
-    /// container (which may be the root ".").
-    ///
-    /// Essentially, the parent id of the frist level children is updated with the parent id of this container vatom.
-    /// Those vatoms which may not be contained will not be updated.
-    ///
-    /// - important: This request preemptively updates the local data pool. Changes are rolled back if the network
-    ///              request fails.
-    ///
-    /// - Parameters:
-    ///   - vatoms: The child vatoms to add to this container.
-    ///   - completion: The completion hanlder to call when the request is completed.
-    ///                 This handler is executed on the main thread.
-    public func separateChildren(_ vatoms: [VatomModel], completion: UpdateResultHandler?) {
-
-        // update parent id of vatom arguments to this container vatom's *parent* id
-        self.updateVatoms(vatoms, withNewParentID: self.props.parentID, completion: completion)
-
-    }
-
-    /// Removes all of the child vatoms from this container vatom and moves them up one level to this container's
-    /// container (which may be the root ".").
-    ///
-    /// Essentially, the parent id of the frist level children is updated with the parent id of this container vatom.
-    /// Those vatoms which may not be contained will not be updated.
-    ///
-    /// - important: This request preemptively updates the local data pool. Changes are rolled back if the network
-    ///              request fails.
-    ///
-    /// - Parameters:
-    ///   - vatoms: The child vatoms to add to this container.
-    ///   - completion: The completion hanlder to call when the request is completed.
-    ///                 This handler is executed on the main thread.
-    public func separateAllChildren(completion: UpdateResultHandler?) {
-
-        // list all childen, remove
-        self.listChildren { result in
-            switch result {
-            case .success(let children):
-                self.separateChildren(children, completion: completion)
-            case .failure(let error):
-                completion?(.failure(error))
-            }
-        }
-
-    }
-
-    /// Updates the parent id of the specified vatoms to the provided parent id.
-    ///
-    /// - Parameters:
-    ///   - vatoms: The vatoms whose parent identifier is to be updated.
-    ///   - parentID: Vatom identifier to be used as the parent id.
-    ///   - completion: The completion hanlder to call when the request is completed.
-    ///                 This handler is executed on the main thread.
-    public func updateVatoms(_ vatoms: [VatomModel], withNewParentID parentID: String,
-                             completion: UpdateResultHandler?) {
-
-        // perform preemptive action, store undo functions
-        let undos = vatoms.map {
-            // tuple: (vatom id, undo function)
-            (id: $0.id, undo: DataPool.inventory().preemptiveChange(id: $0.id,
-                                                                    keyPath: "vAtom::vAtomType.parent_id",
-                                                                    value: parentID))
-        }
-
-        // perform the request
-        BLOCKv.setParentID(ofVatoms: vatoms, to: self.id) { result in
-            switch result {
-            case .success(let model):
-
-                /*
-                 # Note
-                 The most likely scenario where there will be partial containment errors is when setting the parent id
-                 to a container vatom of type `DefinedFolderContainerType`. However, as of writting, the server does
-                 not enforce child policy rules so this always succeed (using the current API).
-                 */
-
-                // roll back only those failed containments
-                let undosToRollback = undos.filter { !model.ids.contains($0.id) }
-                undosToRollback.forEach { $0.undo() }
-                // complete
-                completion?(.success(model))
-            case .failure(let error):
-                // roll back all containments
-                undos.forEach { $0.undo() }
-                completion?(.failure(error))
-            }
-        }
-
-    }
-
     /// Fetches the first-level child vatom of this container vatom.
     ///
     /// Available on both owned and unowned vatoms.
@@ -249,8 +134,8 @@ extension VatomModel {
         return false
     }
 
-    /// Enum modeling the know root type.
-    private var rootType: RootType {
+    /// Enum modeling the root type of this vatom.
+    public var type: RootType {
 
         if self.props.rootType == "vAtom::vAtomType" {
             return .standard
@@ -270,13 +155,13 @@ extension VatomModel {
 
     }
 
-    private enum RootType: Equatable {
+    public enum RootType: Equatable {
         case standard
         case container(ContainerType)
         case unknown
     }
 
-    private enum ContainerType: Equatable {
+    public enum ContainerType: Equatable {
         case folder
         case package
         case discover

@@ -15,12 +15,22 @@ public struct VatomUpdateModel: Decodable, Equatable {
 
     let numberUpdated: Int
     let numberErrors: Int
+    let errorMessage: [String: String]
     let ids: [String]
 
     enum CodingKeys: String, CodingKey {
         case numberUpdated = "num_updated"
         case numberErrors = "num_errors"
+        case errorMessage = "error_messages"
         case ids
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        numberUpdated = try values.decode(Int.self, forKey: .numberUpdated)
+        numberErrors = try values.decode(Int.self, forKey: .numberErrors)
+        errorMessage = try values.decodeIfPresent([String: String].self, forKey: .errorMessage) ?? [:]
+        ids = try values.decode([String].self, forKey: .ids)
     }
 
 }

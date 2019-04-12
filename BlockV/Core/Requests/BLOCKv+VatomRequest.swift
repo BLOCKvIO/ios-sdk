@@ -147,14 +147,14 @@ extension BLOCKv {
 
         let endpoint = API.UserVatom.updateVatom(payload: payload)
 
-        BLOCKv.client.request(endpoint) { (baseModel, error) in
-
-            guard let updateModel = baseModel?.payload, error == nil else {
-                let error = error ?? BVError.custom(reason: "Unknown newtork failure.")
+        BLOCKv.client.request(endpoint) { result in
+            
+            switch result {
+            case .success(let baseModel):
+                completion(.success(baseModel.payload))
+            case .failure(let error):
                 completion(.failure(error))
-                return
             }
-            completion(.success(updateModel))
 
         }
 

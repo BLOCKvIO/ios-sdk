@@ -57,7 +57,7 @@ extension WebFaceView: WKScriptMessageHandler {
             script += jsonString
         }
         script += ");"
-        printBV(info: "Posting script for evaluation:\n\(script)")
+//        printBV(info: "Posting script for evaluation:\n\(script)")
 
         // return to main queue
         DispatchQueue.main.async {
@@ -185,13 +185,20 @@ extension WebFaceView {
 
         // create bridge
         switch message.version {
-        case "1.0.0": // original Face SDK
-            self.coreBridge = CoreBridgeV1(faceView: self)
+        case "1.0.0":
+            // lazily create bridge on first web face request (core.init)
+            if self.coreBridge == nil {
+                self.coreBridge = CoreBridgeV1(faceView: self)
+            }
             // transform V1 to V2
             message = self.transformScriptMessage(message)
 
         case "2.0.0":
-            self.coreBridge = CoreBridgeV2(faceView: self)
+            // lazily create bridge on first web face request (core.init)
+            if self.coreBridge == nil {
+                self.coreBridge = CoreBridgeV2(faceView: self)
+            }
+            
         default:
             throw BridgeError.caller("Unsupported Bridge version: \(message.version)")
         }

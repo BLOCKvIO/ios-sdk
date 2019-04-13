@@ -23,7 +23,7 @@ protocol CoreBridge {
     /// - parameters:
     ///   - payload: Payload portion of the response.
     ///   - error: Any error encountered during message processing.
-    typealias Completion = (_ payload: JSON?, _ error: BridgeError?) -> Void
+    typealias Completion = (Result<JSON, BridgeError>) -> Void
 
     /// Processes the message and calls the completion handler once the output is known.
     ///

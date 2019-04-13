@@ -76,7 +76,7 @@ extension WebFaceView: WKScriptMessageHandler {
     ///
     /// Ideally, this function should only allow [String: Any] payloads. However, allows primative types, e.g. Bool,
     /// to be passed across as Javascript strings.
-    func sendResponse(forRequestMessage message: RequestScriptMessage, payload: JSON?, error: BridgeError?) {
+    func sendResponse(forRequestMessage message: RequestScriptMessage, result: Result<JSON, BridgeError>) {
 
         /*
          Note: Accepted Viewer Payloads
@@ -87,32 +87,31 @@ extension WebFaceView: WKScriptMessageHandler {
          - V2: Only objects.
          */
 
-        if let payload = payload {
-
+        switch result {
+        case .success(let payload):
             // create response
             var response: JSON?
             if message.version == "1.0.0" {
                 response = payload
             } else {
                 response = [
-                "name": try! JSON(message.name),
-                "response_id": try! JSON(message.requestID),
-                "payload": payload
+                    "name": try! JSON(message.name),
+                    "response_id": try! JSON(message.requestID),
+                    "payload": payload
                 ]
             }
-
+            
             // encode response
             guard let data = try? JSONEncoder.blockv.encode(response),
                 let jsonString = String.init(data: data, encoding: .utf8) else {
                     // handle error
                     let error = BridgeError.viewer("Unable to encode response.")
-                    self.sendResponse(forRequestMessage: message, payload: nil, error: error)
+                    self.sendResponse(forRequestMessage: message, result: .failure(error))
                     return
             }
             self.postMessage(message.requestID, withJSONString: jsonString)
-
-        } else if let error = error {
-
+            
+        case .failure(let error):
             // create response
             var response: JSON?
             if message.version == "1.0.0" {
@@ -124,19 +123,17 @@ extension WebFaceView: WKScriptMessageHandler {
                     "payload": try! JSON(error.bridgeFormatV2)
                 ]
             }
-
+            
             // encode response
             guard let data = try? JSONEncoder.blockv.encode(response),
                 let jsonString = String.init(data: data, encoding: .utf8) else {
                     // handle error
                     let error = BridgeError.viewer("Unable to encode response.")
-                    self.sendResponse(forRequestMessage: message, payload: nil, error: error)
+                    self.sendResponse(forRequestMessage: message, result: .failure(error))
                     return
             }
             self.postMessage(message.requestID, withJSONString: jsonString)
-
-        } else {
-            assertionFailure("Either 'payload' or 'error' must be non nil.")
+            
         }
 
     }
@@ -224,10 +221,16 @@ extension WebFaceView {
             // determine appropriate responder (core or viewer)
             if coreBridge.canProcessMessage(message.name) {
                 // forward to core bridge
-                coreBridge.processMessage(message) { (payload, error) in
-
-                    // post response
-                    self.sendResponse(forRequestMessage: message, payload: payload, error: error)
+                coreBridge.processMessage(message) { result in
+                    
+                    switch result {
+                    case .success(let payload):
+                        // post response
+                        self.sendResponse(forRequestMessage: message, result: .success(payload))
+                    case .failure(let error):
+                        // post response
+                        self.sendResponse(forRequestMessage: message, result: .failure(error))
+                    }
 
                 }
             } else {
@@ -249,14 +252,12 @@ extension WebFaceView {
                                 completion: { result in
                                     switch result {
                                     case .success(let payload):
-                                        self.sendResponse(forRequestMessage: message, payload: payload, error: nil)
+                                        self.sendResponse(forRequestMessage: message, result: .success(payload))
                                         return
                                     case .failure(let error):
                                         // transform the bridge error
                                         let bridgeError = BridgeError.viewer(error.message)
-                                        self.sendResponse(forRequestMessage: message,
-                                                          payload: nil,
-                                                          error: bridgeError)
+                                        self.sendResponse(forRequestMessage: message, result: .failure(bridgeError))
                                         return
                                     }
         })

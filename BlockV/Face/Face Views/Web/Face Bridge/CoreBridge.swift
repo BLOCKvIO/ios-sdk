@@ -36,10 +36,19 @@ protocol CoreBridge {
     /// Returns `true` if the bridge is capable of processing the message and `false` otherwise.
     func canProcessMessage(_ message: String) -> Bool
 
-    /// Send a formatted vAtom to the Bridge SDK.
+    /// Sends a Vatom over the native bridge.
     ///
     /// This is to specialized for a protocol. Surely something more generic exists.
     func sendVatom(_ vatom: VatomModel)
+    
+    /// Sends the vatoms over the native bridge informing the web face of changes to the backing vatom's first-level
+    /// children.
+    func sendVatomChildren(_ vatoms: [VatomModel])
+    
+    /// Reference to the face view which this bridge is interacting with.
+    ///
+    /// Declare as `weak` to avoid retain cycle.
+    var faceView: WebFaceView? { get }
 
 }
 

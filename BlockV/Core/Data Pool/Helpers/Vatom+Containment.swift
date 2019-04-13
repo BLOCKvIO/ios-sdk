@@ -135,7 +135,7 @@ extension VatomModel {
     }
 
     /// Enum modeling the root type of this vatom.
-    public var type: RootType {
+    public var rootType: RootType {
 
         if self.props.rootType == "vAtom::vAtomType" {
             return .standard

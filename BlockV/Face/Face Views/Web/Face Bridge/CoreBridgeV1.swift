@@ -17,6 +17,11 @@ import GenericJSON
 /// Bridges into the Core module.
 class CoreBridgeV1: CoreBridge {
 
+     // MARK: - Native Bridge Requests
+
+    /// Sends the current vAtom to the Bridge SDK.
+    ///
+    /// Called on state update.
     func sendVatom(_ vatom: VatomModel) {
 
         guard
@@ -37,6 +42,10 @@ class CoreBridgeV1: CoreBridge {
         // fire and forget
         self.faceView?.sendRequestMessage(message, completion: nil)
 
+    }
+
+    func sendVatomChildren(_ vatoms: [VatomModel]) {
+        // V1.0.0 - Unsupported message.
     }
 
     // MARK: - Enums

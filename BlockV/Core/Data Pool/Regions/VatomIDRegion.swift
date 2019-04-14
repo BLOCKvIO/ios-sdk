@@ -60,7 +60,7 @@ class VatomIDRegion: BLOCKvRegion {
         // pause websocket events
         self.pauseMessages()
 
-        let endpoint = API.Raw.getVatoms(withIDs: ids)
+        let endpoint: Endpoint<Void> = API.Vatom.getVatoms(withIDs: ids)
         return BLOCKv.client.requestJSON(endpoint).then { json -> Promise<[String]?> in
 
             guard let json = json as? [String: Any], let payload = json["payload"] as? [String: Any] else {

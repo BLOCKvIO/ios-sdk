@@ -94,7 +94,7 @@ class InventoryRegion: BLOCKvRegion {
         printBV(info: "[DataPool > InventoryRegion] Loading page \(page), got \(previousItems.count) items so far...")
 
         // build raw request
-        let endpoint = API.Raw.getInventory(parentID: "*", page: page)
+        let endpoint: Endpoint<Void> = API.Vatom.getInventory(parentID: "*", page: page)
 
         return BLOCKv.client.requestJSON(endpoint).then { json -> Promise<[String]?> in
 
@@ -157,7 +157,8 @@ class InventoryRegion: BLOCKvRegion {
             // pause this instance's message processing and fetch vatom payload
             self.pauseMessages()
 
-            let endpoint = API.Raw.getVatoms(withIDs: [vatomID])
+            // create endpoint over void
+            let endpoint: Endpoint<Void> = API.Vatom.getVatoms(withIDs: [vatomID])
             BLOCKv.client.request(endpoint).done { data in
 
                 // convert

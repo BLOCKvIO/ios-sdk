@@ -251,21 +251,35 @@ extension API {
     // MARK: -
 
     /// Consolidates all user vatom endpoints.
-    enum UserVatom {
+    enum Vatom {
 
         private static let userVatomPath = "/v1/user/vatom"
-
-        //TODO: Parameterise parameters.
-
-        /// Builds the endpoint to get the current user's inventory.
+        
+        /// Builds an endpoint to get the current user's inventory.
         ///
         /// The inventory call is essentially an optimized discover call. The server-pattern is from the child's
         /// perspetive. That is, we specify the id of the parent who's children are to be retunred.
         ///
-        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        /// - Parameters:
+        ///   - parentID: <#parentID description#>
+        ///   - page: <#page description#>
+        ///   - limit: <#limit description#>
+        /// - Returns: Constructed endpoint specialized to parse out a `UnpackedModel`.
         static func getInventory(parentID: String,
                                  page: Int = 0,
                                  limit: Int = 0) -> Endpoint<BaseModel<UnpackedModel>> {
+            return getInventory(parentID: parentID, page: page, limit: limit)
+            
+        }
+
+        /// Builds the generic endpoint to get the current user's inventory.
+        ///
+        /// - Parameters:
+        ///   - parentID: <#parentID description#>
+        ///   - page: <#page description#>
+        ///   - limit: <#limit description#>
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        static func getInventory<T>(parentID: String, page: Int = 0, limit: Int = 0) -> Endpoint<T> {
             return Endpoint(method: .post,
                             path: userVatomPath + "/inventory",
                             parameters: [
@@ -276,10 +290,19 @@ extension API {
             )
         }
 
-        /// Builds the endpoint to get a vAtom by its unique identifier.
+        /// Builds an endpoint to get a vAtom by its unique identifier.
         ///
-        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        /// - Parameter ids: Unique identifier of the vatom.
+        /// - Returns: Constructed endpoint specialized to parse out a `UnpackedModel`.
         static func getVatoms(withIDs ids: [String]) -> Endpoint<BaseModel<UnpackedModel>> {
+            return getVatoms(withIDs: ids)
+        }
+        
+        /// Builds a generic endpoint to get a vAtom by its unique identifier.
+        ///
+        /// - Parameter ids: Unique identifier of the vatom.
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        static func getVatoms<T>(withIDs ids: [String]) -> Endpoint<T> {
             return Endpoint(method: .post,
                             path: userVatomPath + "/get",
                             parameters: ["ids": ids]
@@ -295,36 +318,69 @@ extension API {
                             parameters: ["this.id": id])
 
         }
+        
+        /// Builds an endpoint to update a vAtom.
+        ///
+        /// - Parameter payload: Raw payload.
+        /// - Returns: Constructed endpoint specialized to parse out a `VatomUpdateModel`.
+        static func updateVatom(payload: [String: Any]) -> Endpoint<BaseModel<VatomUpdateModel>> {
+            return updateVatom(payload: payload)
+        }
 
-        /// Builds the endpoint to update a vAtom.
+        /// Builds a generic endpoint to update a vAtom.
         ///
         /// - Parameter payload: Raw payload.
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
-        static func updateVatom(payload: [String: Any]) -> Endpoint<BaseModel<VatomUpdateModel>> {
+        static func updateVatom<T>(payload: [String: Any]) -> Endpoint<T> {
             return Endpoint(method: .patch,
                             path: "/v1/vatoms",
                             parameters: payload)
         }
+        
+        /// Builds an endpoint to search for vAtoms.
+        ///
+        /// - Parameter payload: Raw request payload.
+        /// - Returns: Constructed endpoint specialized to parse out a `UnpackedModel`.
+        static func discover(_ payload: [String: Any]) -> Endpoint<BaseModel<UnpackedModel>> {
+            return discover(payload)
+        }
 
-    }
-
-    // MARK: -
-
-    /// Consolidtaes all discover endpoints.
-    enum VatomDiscover {
-
-        /// Builds the endpoint to search for vAtoms.
+        /// Builds a generic endpoint to search for vAtoms.
         ///
         /// - Parameter payload: Raw request payload.
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
-        static func discover(_ payload: [String: Any]) -> Endpoint<BaseModel<UnpackedModel>> {
+        static func discover<T>(_ payload: [String: Any]) -> Endpoint<T> {
 
             return Endpoint(method: .post,
                             path: "/v1/vatom/discover",
                             parameters: payload)
         }
+        
+        /// Builds an endpoint to geo search for vAtoms (i.e. search for dropped vAtoms).
+        ///
+        /// Use this endpoint to fetch a collection of vAtoms.
+        ///
+        /// - Parameters:
+        ///   - bottomLeftLat: Bottom left latitude coordinate.
+        ///   - bottomLeftLon: Bottom left longitude coordinate.
+        ///   - topRightLat: Top right latitude coordinate.
+        ///   - topRightLon: Top right longitude coordinte.
+        ///   - filter: The vAtom filter option to apply.
+        /// - Returns: Constructed endpoint specialized to parse out a `UnpackedModel`.
+        static func geoDiscover(bottomLeftLat: Double,
+                                bottomLeftLon: Double,
+                                topRightLat: Double,
+                                topRightLon: Double,
+                                filter: String) -> Endpoint<BaseModel<UnpackedModel>> {
+            
+            return geoDiscover(bottomLeftLat: bottomLeftLat,
+                        bottomLeftLon: bottomLeftLon,
+                        topRightLat: topRightLat,
+                        topRightLon: topRightLon,
+                        filter: filter)
+        }
 
-        /// Builds the endpoint to geo search for vAtoms (i.e. search for dropped vAtoms).
+        /// Builds a generic endpoint to geo search for vAtoms (i.e. search for dropped vAtoms).
         ///
         /// Use this endpoint to fetch a collection of vAtoms.
         ///
@@ -335,11 +391,11 @@ extension API {
         ///   - topRightLon: Top right longitude coordinte.
         ///   - filter: The vAtom filter option to apply.
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
-        static func geoDiscover(bottomLeftLat: Double,
+        static func geoDiscover<T>(bottomLeftLat: Double,
                                 bottomLeftLon: Double,
                                 topRightLat: Double,
                                 topRightLon: Double,
-                                filter: String) -> Endpoint<BaseModel<UnpackedModel>> {
+                                filter: String) -> Endpoint<T> {
 
             // create the payload
             let payload: [String: Any] =

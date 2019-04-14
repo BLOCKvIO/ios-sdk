@@ -252,8 +252,6 @@ extension API {
 
     /// Consolidates all user vatom endpoints.
     enum Vatom {
-
-        private static let userVatomPath = "/v1/user/vatom"
         
         /// Builds an endpoint to get the current user's inventory.
         ///
@@ -363,8 +361,6 @@ extension API {
     /// Consolidates all action endpoints.
     enum VatomAction {
 
-        private static let actionPath = "/v1/user/vatom/action"
-
         /*
          Each action's reactor returns it's own json payload. This does not need to be mapped as yet.
          */
@@ -376,9 +372,7 @@ extension API {
         ///   - payload: Raw payload for the action.
         /// - Returns: Constructed endpoint generic over `Void` that may be passed to a request.
         static func custom(name: String, payload: [String: Any]) -> Endpoint<Void> {
-            return Endpoint(method: .post,
-                            path: actionPath + "/\(name)",
-                parameters: payload)
+            return API.Generic.perform(name: name, payload: payload)
         }
 
     }
@@ -388,15 +382,12 @@ extension API {
     /// Consolidates all the user actions.
     enum UserActions {
 
-        private static let userActionsPath = "/v1/user/actions"
-
         /// Builds the endpoint for fetching the actions configured for a template ID.
         ///
         /// - Parameter id: Uniquie identifier of the template.
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func getActions(forTemplateID id: String) -> Endpoint<BaseModel<[ActionModel]>> {
-            return Endpoint(method: .get,
-                            path: userActionsPath + "/\(id)")
+            return API.Generic.getActions(forTemplateID: id)
         }
 
     }
@@ -406,8 +397,6 @@ extension API {
     /// Consolidtes all the user activity endpoints.
     enum UserActivity {
 
-        private static let userActivityPath = "/v1/activity"
-
         /// Builds the endpoint for fetching the threads involving the current user.
         ///
         /// - Parameters:
@@ -416,15 +405,7 @@ extension API {
         ///   - count: Defines the number of messages to return (after the cursor).
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func getThreads(cursor: String, count: Int) -> Endpoint<BaseModel<ThreadListModel>> {
-
-            let payload: [String: Any] = [
-                "cursor": cursor,
-                "count": count
-            ]
-
-            return Endpoint(method: .post,
-                            path: userActivityPath + "/mythreads",
-                            parameters: payload)
+            return API.Generic.getThreads(cursor: cursor, count: count)
         }
 
         /// Builds the endpoint for fetching the message for a specified thread involving the current user.
@@ -437,17 +418,7 @@ extension API {
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func getMessages(forThreadId threadId: String, cursor: String, count: Int) ->
             Endpoint<BaseModel<MessageListModel>> {
-
-            let payload: [String: Any] = [
-                "name": threadId,
-                "cursor": cursor,
-                "count": count
-            ]
-
-            return Endpoint(method: .post,
-                            path: userActivityPath + "/mythreadmessages",
-                            parameters: payload)
-
+                return API.Generic.getMessages(forThreadId: threadId, cursor: cursor, count: count)
         }
 
     }
@@ -458,7 +429,12 @@ extension API {
     
     enum Generic {
         
-        private static let userVatomPath = "/v1/user/vatom"
+        private static let userVatomPath    = "/v1/user/vatom"
+        private static let userActionsPath  = "/v1/user/actions"
+        private static let actionPath       = "/v1/user/vatom/action"
+        private static let userActivityPath = "/v1/activity"
+        
+        // MARK: Vatoms
         
         /// Builds the generic endpoint to get the current user's inventory.
         ///
@@ -590,6 +566,73 @@ extension API {
                             path: "/v1/vatom/geodiscovergroups",
                             parameters: payload)
             
+        }
+        
+        // MARK: - Perform Actions
+        
+        /// Builds the endpoint to perform and action on a vAtom.
+        ///
+        /// - Parameters:
+        ///   - name: Action name.
+        ///   - payload: Raw payload for the action.
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        static func perform<T>(name: String, payload: [String: Any]) -> Endpoint<T> {
+            return Endpoint(method: .post,
+                            path: actionPath + "/\(name)", parameters: payload)
+        }
+        
+        // MARK: Fetch Actions
+        
+        /// Builds the endpoint for fetching the actions configured for a template ID.
+        ///
+        /// - Parameter id: Uniquie identifier of the template.
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        static func getActions<T>(forTemplateID id: String) -> Endpoint<T> {
+            return Endpoint(method: .get,
+                            path: userActionsPath + "/\(id)")
+        }
+        
+        // MARK: - User Activity
+        
+        /// Builds the endpoint for fetching the threads involving the current user.
+        ///
+        /// - Parameters:
+        ///   - cursor: Filters out all threads more recent than the cursor (useful for paging).
+        ///             If omitted or set as zero, the most recent threads are returned.
+        ///   - count: Defines the number of messages to return (after the cursor).
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        static func getThreads<T>(cursor: String, count: Int) -> Endpoint<T> {
+            
+            let payload: [String: Any] = [
+                "cursor": cursor,
+                "count": count
+            ]
+            
+            return Endpoint(method: .post,
+                            path: userActivityPath + "/mythreads",
+                            parameters: payload)
+        }
+        
+        /// Builds the endpoint for fetching the message for a specified thread involving the current user.
+        ///
+        /// - Parameters:
+        ///   - id: Unique identifier of the thread (a.k.a thread `name`).
+        ///   - cursor: Filters out all message more recent than the cursor (useful for paging).
+        ///             If omitted or set as zero, the most recent threads are returned.
+        ///   - count: Defines the number of messages to return (after the cursor).
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        static func getMessages<T>(forThreadId threadId: String, cursor: String, count: Int) -> Endpoint<T> {
+                
+                let payload: [String: Any] = [
+                    "name": threadId,
+                    "cursor": cursor,
+                    "count": count
+                ]
+                
+                return Endpoint(method: .post,
+                                path: userActivityPath + "/mythreadmessages",
+                                parameters: payload)
+                
         }
         
     }

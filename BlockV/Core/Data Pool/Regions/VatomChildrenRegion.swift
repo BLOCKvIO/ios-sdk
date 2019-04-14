@@ -82,7 +82,7 @@ class VatomChildrenRegion: BLOCKvRegion {
         printBV(info: "[DataPool > VatomChildrenRegion] Loading page \(page), got \(previousItems.count) items so far.")
 
         // create endpoint over void
-        let endpoint: Endpoint<Void> = API.Vatom.discover(builder.toDictionary())
+        let endpoint: Endpoint<Void> = API.Generic.discover(builder.toDictionary())
         return BLOCKv.client.requestJSON(endpoint).then { json -> Promise<[DataObject]> in
 
             // extract payload

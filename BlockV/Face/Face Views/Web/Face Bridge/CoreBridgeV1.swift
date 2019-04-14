@@ -223,7 +223,7 @@ class CoreBridgeV1: CoreBridge {
 
         // async fetch current user
         BLOCKv.getCurrentUser { [weak self] result in
-            
+
             switch result {
             case .success(let user):
                 // model is available
@@ -237,10 +237,10 @@ class CoreBridgeV1: CoreBridge {
                                       firstName: user.firstName,
                                       lastName: user.lastName,
                                       avatarURL: encodedURL?.absoluteString ?? "")
-                
+
                 // fetch backing vAtom
                 self?.getVatomsFormatted(withIDs: [faceView.vatom.id], completion: { (vatoms, error) in
-                    
+
                     // ensure no error
                     guard error == nil else {
                         let bridgeError = BridgeError.viewer("Unable to fetch backing vAtom.")
@@ -260,7 +260,7 @@ class CoreBridgeV1: CoreBridge {
                     let response = BRSetup(viewMode: viewMode,
                                            user: userInfo,
                                            vatomInfo: vatomInfo)
-                    
+
                     do {
                         // json encode the model
                         let json = try JSON.init(encodable: response)
@@ -269,14 +269,14 @@ class CoreBridgeV1: CoreBridge {
                         let bridgeError = BridgeError.viewer("Unable to encode response.")
                         completion(nil, bridgeError)
                     }
-                    
+
                 })
-                
+
             case .failure(let error):
                 // handle error
                     let bridgeError = BridgeError.viewer("Unable to fetch current user.")
                     completion(nil, bridgeError)
-                
+
             }
 
         }
@@ -343,7 +343,7 @@ class CoreBridgeV1: CoreBridge {
     private func getPublicUser(forUserID id: String, completion: @escaping Completion) {
 
         BLOCKv.getPublicUser(withID: id) { result in
-            
+
             switch result {
             case .success(let user):
                 // encode url
@@ -356,7 +356,7 @@ class CoreBridgeV1: CoreBridge {
                                       firstName: user.properties.firstName,
                                       lastName: user.properties.lastName,
                                       avatarURL: encodedURL?.absoluteString ?? "")
-                
+
                 do {
                     // json encode the model
                     let json = try JSON.init(encodable: response)
@@ -365,7 +365,7 @@ class CoreBridgeV1: CoreBridge {
                     let bridgeError = BridgeError.viewer("Unable to encode response.")
                     completion(nil, bridgeError)
                 }
-                
+
             case .failure(let error):
                 // handle error
                 let bridgeError = BridgeError.viewer("Unable to fetch public user: \(id).")
@@ -385,7 +385,7 @@ class CoreBridgeV1: CoreBridge {
     private func getPublicAvatarURL(forUserID id: String, completion: @escaping Completion) {
 
         BLOCKv.getPublicUser(withID: id) { result in
-            
+
             switch result {
             case .success(let user):
                 // encode url
@@ -395,7 +395,7 @@ class CoreBridgeV1: CoreBridge {
                 }
                 // create avatar response
                 let response = PublicAvatarFormat(id: user.id, avatarURL: encodedURL?.absoluteString ?? "")
-                
+
                 do {
                     // json encode the model
                     let json = try JSON.init(encodable: response)
@@ -404,7 +404,7 @@ class CoreBridgeV1: CoreBridge {
                     let bridgeError = BridgeError.viewer("Unable to encode response.")
                     completion(nil, bridgeError)
                 }
-                
+
             case .failure(let error):
                 // handle error
                 let bridgeError = BridgeError.viewer("Unable to fetch public user: \(id).")
@@ -430,19 +430,19 @@ class CoreBridgeV1: CoreBridge {
             }
 
             BLOCKv.performAction(name: name, payload: dict) { result in
-                
+
                 switch result {
                 case .success(let payload):
                     // convert to json
                     let json = try? JSON(payload)
                     completion(json, nil)
-                    
+
                 case .failure(let error):
                     // handle error
                     let bridgeError = BridgeError.viewer("Unable to perform action: \(name).")
                     completion(nil, bridgeError)
                 }
-                
+
             }
 
         } catch {
@@ -478,13 +478,13 @@ private extension CoreBridgeV1 {
         builder.setScope(scope: .parentID, value: backingID)
 
         BLOCKv.discover(builder) { result in
-            
+
             switch result {
             case .success(let vatoms):
                 // create a list of the child vatoms and add the backing (parent vatom)
                 var permittedIDs = vatoms.map { $0.id }
                 permittedIDs.append(backingID)
-                
+
                 completion(permittedIDs, nil)
             case .failure(let error):
                 // handle error
@@ -492,8 +492,6 @@ private extension CoreBridgeV1 {
                 completion(nil, bridgeError)
             }
 
-
-            
         }
 
     }
@@ -507,12 +505,12 @@ private extension CoreBridgeV1 {
     private func getVatomsFormatted(withIDs ids: [String], completion: @escaping BFVatomCompletion) {
 
         BLOCKv.getVatoms(withIDs: ids) { result in
-            
+
             switch result {
             case .success(let vatoms):
                 // convert vAtom into bridge format
                 completion(self.formatVatoms(vatoms), nil)
-                
+
             case .failure(let error):
                 let bridgeError = BridgeError.viewer("Unable to fetch backing vAtom.")
                 completion([], bridgeError)
@@ -531,12 +529,12 @@ private extension CoreBridgeV1 {
         builder.setScope(scope: .parentID, value: id)
 
         BLOCKv.discover(builder) { result in
-            
+
             switch result {
             case .success(let vatoms):
                 // format vatoms
                 completion(self.formatVatoms(vatoms), nil)
-                
+
             case .failure(let error):
                 // handle error
                 let bridgeError = BridgeError.viewer("Unable to fetch children for vAtom \(id).")

@@ -152,29 +152,29 @@ class InventoryCollectionViewController: UICollectionViewController {
     /// Note: Input parameters are left to their defautls.
     fileprivate func fetchInventory() {
         
-        BLOCKv.getInventory { [weak self] (vatomModels, error) in
+        BLOCKv.getInventory { [weak self] result in
             
-            // handle error
-            guard error == nil else {
-                print("\n>>> Error > Viewer: \(error!.localizedDescription)")
-                self?.present(UIAlertController.errorAlert(error!), animated: true)
+            switch result {
+            case .success(let vatomModels):
+                print("\nViewer > Fetched inventory")
+                
+                /*
+                 NOTE
+                 
+                 It is sometimes useful to order vAtoms by their `whenModified` date. This will
+                 ensure new vAtoms appear at the top of the user's inventory.
+                 
+                 Additionally, if a vAtom's state changes on the BLOCKv platform so to will its
+                 `whenModifed` date. For example, if a vAtom is picked up off the map, its
+                 `droppped` flag is set as `false` and the `whenModified` date updated.
+                 */
+                self?.vatoms = vatomModels.sorted { $0.whenModified > $1.whenModified }
+                
+            case .failure(let error):
+                print("\n>>> Error > Viewer: \(error.localizedDescription)")
+                self?.present(UIAlertController.errorAlert(error), animated: true)
                 return
             }
-            
-            // handle success
-            print("\nViewer > Fetched inventory")
-            
-            /*
-             NOTE
-             
-             It is sometimes useful to order vAtoms by their `whenModified` date. This will
-             ensure new vAtoms appear at the top of the user's inventory.
-             
-             Additionally, if a vAtom's state changes on the BLOCKv platform so to will its
-             `whenModifed` date. For example, if a vAtom is picked up off the map, its
-             `droppped` flag is set as `false` and the `whenModified` date updated.
-             */
-            self?.vatoms = vatomModels.sorted { $0.whenModified > $1.whenModified }
             
         }
         
@@ -191,19 +191,19 @@ class InventoryCollectionViewController: UICollectionViewController {
         builder.addDefinedFilter(forField: .templateID, filterOperator: .equal, value: "vatomic.prototyping::DrinkCoupon::v1", combineOperator: .and)
         
         // execute the discover call
-        BLOCKv.discover(builder) { [weak self] (vatomModels, error) in
+        BLOCKv.discover(builder) { [weak self] result in
             
-            // handle error
-            guard error == nil else {
-                print("\n>>> Error > Viewer: \(error!.localizedDescription)")
-                self?.present(UIAlertController.errorAlert(error!), animated: true)
+            switch result {
+            case .success(let vatomModels):
+                print("\nViewer > Fetched discover vatom models")
+                print("\n\(vatomModels)")
+                
+            case .failure(let error):
+                print("\n>>> Error > Viewer: \(error.localizedDescription)")
+                self?.present(UIAlertController.errorAlert(error), animated: true)
                 return
             }
-            
-            // handle success
-            print("\nViewer > Fetched discover vatom models")
-            print("\n\(vatomModels)")
-            
+
         }
         
     }

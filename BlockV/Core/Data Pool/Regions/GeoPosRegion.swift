@@ -16,7 +16,7 @@ import MapKit
 
 /// This region plugin provides access to a collection of vatoms that has been dropped within the specified region on the map.
 /// To get an instance, call `DataPool.region(id: "geopos", descriptor: GeoPosRegionCoordinates(topRight: ..., bottomLeft: ...))`
-class GeoPosRegion : BLOCKvRegion {
+class GeoPosRegion: BLOCKvRegion {
     
     /// Plugin identifier.
     override class var id : String { return "geopos" }
@@ -25,7 +25,7 @@ class GeoPosRegion : BLOCKvRegion {
     let region: GeoPosRegionCoordinates
     
     /// Constructor.
-    required init(descriptor : Any) throws {
+    required init(descriptor: Any) throws {
         
         // check descriptor type
         guard let region = descriptor as? GeoPosRegionCoordinates else {
@@ -44,7 +44,7 @@ class GeoPosRegion : BLOCKvRegion {
     }
     
     /// Our state key is the top-right and bottom-left geopos coordinates
-    override var stateKey : String {
+    override var stateKey: String {
         return "geopos:\(self.region.topRight.latitude),\(self.region.topRight.longitude) \(self.region.bottomLeft.latitude),\(self.region.bottomLeft.longitude)"
     }
     
@@ -75,36 +75,45 @@ class GeoPosRegion : BLOCKvRegion {
         // pause websocket events
         self.pauseMessages()
         
+        let endpoint: Endpoint<Void> = API.Vatom.geoDiscover(
+            bottomLeftLat: self.region.bottomLeft.latitude,
+            bottomLeftLon: self.region.bottomLeft.longitude,
+            topRightLat: self.region.topRight.latitude,
+            topRightLon: self.region.topRight.longitude,
+            filter: "all")
+                
+        BLOCKv.client.request(endpoint).map { data -> [String]? in
+        
         // execute request
-        return Request2.post(endpoint: "/vatom/geodiscover", payload: [
-            "top_right": [
-                "lat": self.region.topRight.latitude,
-                "lon": self.region.topRight.longitude
-            ],
-            "bottom_left": [
-                "lat": self.region.bottomLeft.latitude,
-                "lon": self.region.bottomLeft.longitude
-            ],
-            "filter": "all",
-            "limit": 10000
-            ]).then { data -> [String]? in
-                
+//        return Request2.post(endpoint: "/vatom/geodiscover", payload: [
+//            "top_right": [
+//                "lat": self.region.topRight.latitude,
+//                "lon": self.region.topRight.longitude
+//            ],
+//            "bottom_left": [
+//                "lat": self.region.bottomLeft.latitude,
+//                "lon": self.region.bottomLeft.longitude
+//            ],
+//            "filter": "all",
+//            "limit": 10000
+//            ]).then { data -> [String]? in
+            
                 // parse items
-                guard let items = self.parseDataObject(from: data) else {
-                    return nil
-                }
-                
-                // add all objects
-                self.add(objects: items)
-                
-                // return IDs
-                return items.map { $0.id }
-                
-            }.always {
-                
-                // resume websocket events
-                self.resumeMessages()
-                
+//                guard let items = self.parseDataObject(from: data) else {
+//                    return nil
+//                }
+//
+//                // add all objects
+//                self.add(objects: items)
+//
+//                // return IDs
+//                return items.map { $0.id }
+            
+//            }.always {
+//
+//                // resume websocket events
+//                self.resumeMessages()
+//
         }
         
     }
@@ -149,7 +158,7 @@ class GeoPosRegion : BLOCKvRegion {
         )
         
         // send our region over WebSocket to the server
-        NotificationCenter.default.post(name: Notification.Name.WebSocket.StartBrainUpdates, object: region)
+//        NotificationCenter.default.post(RegionEvent.startBrainUpdates.asNotification)
         
     }
     

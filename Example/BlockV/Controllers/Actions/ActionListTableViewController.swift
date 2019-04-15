@@ -80,25 +80,25 @@ class ActionListTableViewController: UITableViewController {
         
         let templateID = self.vatom.props.templateID
         
-        BLOCKv.getActions(forTemplateID: templateID) { (actions, error) in
+        BLOCKv.getActions(forTemplateID: templateID) { result in
             
             self.hideNavBarActivityRight()
             
-            // unwrap actions, handle error
-            guard let actions = actions, error == nil else {
-                print(error!.localizedDescription)
-                return
+            switch result {
+            case .success(let actions):
+                // success
+                print("Actions: \(actions.debugDescription)")
+                // update data source
+                self.availableActions = actions.map { action -> AvailableAction in
+                    // record
+                    let supported = self.supportedActions.contains(action.name)
+                    return AvailableAction(action: action, isSupported: supported)
+                }
+                self.tableView.reloadData()
+                
+            case .failure(let error):
+                print(error.localizedDescription)
             }
-            
-            // success
-            print("Actions: \(actions.debugDescription)")
-            // update data source
-            self.availableActions = actions.map { action -> AvailableAction in
-                // record
-                let supported = self.supportedActions.contains(action.name)
-                return AvailableAction(action: action, isSupported: supported)
-            }
-            self.tableView.reloadData()
             
         }
         

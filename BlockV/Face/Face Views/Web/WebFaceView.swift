@@ -70,7 +70,6 @@ class WebFaceView: FaceView {
         super.init(vatom: vatom, faceModel: faceModel)
 
         self.addSubview(webView)
-        self.webView.backgroundColor = UIColor.red.withAlphaComponent(0.3)
     }
 
     required public init?(coder aDecoder: NSCoder) {
@@ -99,6 +98,9 @@ class WebFaceView: FaceView {
             return
         }
         self.coreBridge?.sendVatom(vatom)
+        // fetch first-level children
+        let children = self.vatom.listCachedChildren()
+        self.coreBridge?.sendVatomChildren(children)
     }
 
     func unload() {
@@ -124,7 +126,6 @@ class WebFaceView: FaceView {
 extension WebFaceView: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        print(#function)
         self.completion?(nil)
     }
 

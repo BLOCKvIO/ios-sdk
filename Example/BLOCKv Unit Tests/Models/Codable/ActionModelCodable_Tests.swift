@@ -18,35 +18,21 @@ import XCTest
  */
 
 class ActionModelCodable_Tests: XCTestCase {
-    
+
     func testActionDecoding() {
-        
+
         do {
-            let _ = try TestUtility.jsonDecoder.decode(ActionModel.self, from: MockModel2.vatomActionJSON)
+            _ = try TestUtility.jsonDecoder.decode(ActionModel.self, from: MockModel2.vatomActionJSON)
         } catch {
             XCTFail("Decoding failed: \(error.localizedDescription)")
         }
-        
+
     }
-    
+
     func testActionModelCodable() {
-        
-        do {
-            // convert: json data (server format) -> model
-            let model = try TestUtility.jsonDecoder.decode(ActionModel.self, from: MockModel2.vatomActionJSON)
-            let modelFromJSONData = try self.require(model)
-            // convert: model -> json data
-            let data = try TestUtility.jsonEncoder.encode(modelFromJSONData)
-            // convert: json data (encoded format) -> model
-            let modelFromEncodedData = try TestUtility.jsonDecoder.decode(ActionModel.self, from: data)
-            
-            // ensure that server and encoded formats are the same
-            XCTAssertEqual(modelFromJSONData, modelFromEncodedData)
-            
-        } catch {
-            XCTFail(error.localizedDescription)
-        }
-        
+
+        self.decodeEncodeCompare(type: ActionModel.self, from: MockModel2.vatomActionJSON)
+
     }
-    
+
 }

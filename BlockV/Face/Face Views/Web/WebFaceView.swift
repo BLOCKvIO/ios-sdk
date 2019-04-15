@@ -70,7 +70,6 @@ class WebFaceView: FaceView {
         super.init(vatom: vatom, faceModel: faceModel)
 
         self.addSubview(webView)
-        self.webView.backgroundColor = UIColor.red.withAlphaComponent(0.3)
     }
 
     required public init?(coder aDecoder: NSCoder) {
@@ -99,6 +98,9 @@ class WebFaceView: FaceView {
             return
         }
         self.coreBridge?.sendVatom(vatom)
+        // fetch first-level children
+        let children = self.vatom.listCachedChildren()
+        self.coreBridge?.sendVatomChildren(children)
     }
 
     func unload() {
@@ -124,7 +126,6 @@ class WebFaceView: FaceView {
 extension WebFaceView: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        print(#function)
         self.completion?(nil)
     }
 
@@ -136,7 +137,9 @@ extension WebFaceView: WKNavigationDelegate {
         if navigationAction.navigationType == .linkActivated {
             if let url = navigationAction.request.url {
                 // open in Safari.app
-                UIApplication.shared.open(url, options: convertToUIApplicationOpenExternalURLOptionsKeyDictionary([:]), completionHandler: nil)
+                UIApplication.shared.open(url,
+                                          options: convertToUIApplicationOpenExternalURLOptionsKeyDictionary([:]),
+                                          completionHandler: nil)
                 return decisionHandler(.cancel)
             }
         }
@@ -148,6 +151,9 @@ extension WebFaceView: WKNavigationDelegate {
 }
 
 // Helper function inserted by Swift 4.2 migrator.
-fileprivate func convertToUIApplicationOpenExternalURLOptionsKeyDictionary(_ input: [String: Any]) -> [UIApplication.OpenExternalURLOptionsKey: Any] {
-	return Dictionary(uniqueKeysWithValues: input.map { key, value in (UIApplication.OpenExternalURLOptionsKey(rawValue: key), value)})
+private func convertToUIApplicationOpenExternalURLOptionsKeyDictionary(_ input: [String: Any])
+    -> [UIApplication.OpenExternalURLOptionsKey: Any] {
+	return Dictionary(uniqueKeysWithValues: input.map { key, value in
+        (UIApplication.OpenExternalURLOptionsKey(rawValue: key), value)
+    })
 }

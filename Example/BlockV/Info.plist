@@ -17,11 +17,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.1.12</string>
+	<string>1.1.13</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>15</string>
+	<string>16</string>
 	<key>ENVIRONMENT_MAPPING</key>
 	<string>$(ENVIRONMENT_MAPPING)</string>
 	<key>LSRequiresIPhoneOS</key>

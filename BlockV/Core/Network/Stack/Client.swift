@@ -14,12 +14,13 @@ import Alamofire
 
 protocol ClientProtocol {
 
+    typealias RawCompletion = (Result<Data, BVError>) -> Void
+
     /// Request that returns raw data.
-    func request(_ endpoint: Endpoint<Void>, completion: @escaping (Data?, BVError?) -> Void )
+    func request(_ endpoint: Endpoint<Void>, completion: @escaping RawCompletion)
 
     /// Request that returns native object (must conform to decodable).
-    func request<Response>(_ endpoint: Endpoint<Response>,
-                           completion: @escaping (Response?, BVError?) -> Void ) where Response: Decodable
+    func request<T>(_ endpoint: Endpoint<T>, completion: @escaping (Result<T, BVError>) -> Void ) where T: Decodable
 
 }
 
@@ -107,15 +108,17 @@ final class Client: ClientProtocol {
 
     /// Endpoints generic over `void` complete by passing in the raw data response.
     ///
-    /// This is usefull for actions whose reponse payloads are not know since reactors may change at
-    /// any time.
+    /// This is useful for actions whose reponse payloads are not defined. For example, reactors may define their own
+    /// inner payload structure.
     ///
-    /// NOTE: Raw requests do not partake in OAuth and general lifecycle handling.
+    /// - important:
+    /// Do not call this endpoint for auth related calls, e.g login. Raw requests do *not* support through the
+    /// credential refresh mechanism. The access and refresh token will not be extracted and passed to the oauthhandler.
     ///
     /// - Parameters:
     ///   - endpoint: Endpoint for the request
     ///   - completion: The completion handler to call when the request is completed.
-    func request(_ endpoint: Endpoint<Void>, completion: @escaping (Data?, BVError?) -> Void) {
+    func request(_ endpoint: Endpoint<Void>, completion: @escaping RawCompletion) {
 
         // create request
         let request = self.sessionManager.request(
@@ -128,21 +131,50 @@ final class Client: ClientProtocol {
         // configure validation
         request.validate() //TODO: May need manual validation
 
-        request.responseData { (dataResponse) in
+        request.responseData(queue: queue) { (dataResponse) in
             switch dataResponse.result {
-            case let .success(data): completion(data, nil)
+            case let .success(data):
+                completion(.success(data))
             case let .failure(err):
 
                 //TODO: The error should be parsed and a BVError created and passed in.
 
                 // check for a BVError
                 if let err = err as? BVError {
-                    completion(nil, err)
+                    completion(.failure(err))
                 } else {
-                    // create a wrapped networking errir
+                    // create a wrapped networking error
                     let error = BVError.networking(error: err)
-                    completion(nil, error)
+                    completion(.failure(error))
                 }
+            }
+        }
+
+    }
+
+    /// JSON Completion handler.
+    typealias JSONCompletion = (Result<Any, BVError>) -> Void
+
+    func requestJSON(_ endpoint: Endpoint<Void>, completion: @escaping JSONCompletion) {
+
+        // create request
+        let request = self.sessionManager.request(
+            url(path: endpoint.path),
+            method: endpoint.method,
+            parameters: endpoint.parameters,
+            encoding: endpoint.encoding
+        )
+
+        // configure validation
+        request.validate()
+        request.responseJSON(queue: queue) { dataResponse in
+            switch dataResponse.result {
+            case let .success(json):
+                completion(.success(json))
+            case let .failure(err):
+                // create a wrapped networking error
+                let error = BVError.networking(error: err)
+                completion(.failure(error))
             }
         }
 
@@ -154,7 +186,7 @@ final class Client: ClientProtocol {
     ///   - endpoint: Endpoint for the request
     ///   - completion: The completion handler to call when the request is completed.
     func request<Response>(_ endpoint: Endpoint<Response>,
-                           completion: @escaping (Response?, BVError?) -> Void ) where Response: Decodable {
+                           completion: @escaping (Result<Response, BVError>) -> Void ) where Response: Decodable {
 
         // create request (starts immediately)
         let request = self.sessionManager.request(
@@ -197,7 +229,7 @@ final class Client: ClientProtocol {
                 //                    return
                 //                }
 
-                completion(val, nil)
+                completion(.success(val))
 
                 //TODO: Add some thing like this to pull back to a completion thread?
                 /*
@@ -215,10 +247,10 @@ final class Client: ClientProtocol {
 
                 //FIXME: Can this error casting be done away with?
                 if let err = err as? BVError {
-                    completion(nil, err)
+                    completion(.failure(err))
                 } else {
                     let error = BVError.networking(error: err)
-                    completion(nil, error)
+                    completion(.failure(error))
                 }
 
             }

@@ -52,8 +52,8 @@ class ImageLayeredFaceView: FaceView {
 	private var childLayers: [Layer] = []
 
     private var childVatoms: [VatomModel] {
-        // observer store manages the child vatoms
-        return Array(vatomObserverStore.childVatoms)
+        // fetch cached children
+        return self.vatom.listCachedChildren()
     }
 
     // MARK: - Config
@@ -83,25 +83,12 @@ class ImageLayeredFaceView: FaceView {
 
     private let config: Config
 
-	/*
-	NOTE
-	The `vatomChanged()` method called by `VatomView` does not handle child vatom updates.
-	The `VatomObserver` class is used to receive these events. This is required for the Child Count policy type.
-	*/
-
-	/// Class responsible for observing changes related backing vAtom.
-	private var vatomObserverStore: VatomObserverStore
-
     // MARK: - Init
     required init(vatom: VatomModel, faceModel: FaceModel) {
         // init face config
         self.config = Config(faceModel)
 
-        // create an observer for the backing vatom
-        self.vatomObserverStore = VatomObserverStore(vatomID: vatom.id)
-
         super.init(vatom: vatom, faceModel: faceModel)
-        self.vatomObserverStore.delegate = self
 
         self.addSubview(baseLayer)
 
@@ -129,38 +116,20 @@ class ImageLayeredFaceView: FaceView {
          */
         self.loadBaseResource()
 
-        // continue loading by reloading all required data
-        self.refreshData()
-
     }
 
     func vatomChanged(_ vatom: VatomModel) {
 
         self.vatom = vatom
-        if vatom.id != self.vatomObserverStore.rootVatomID {
-            // replace vAtom observer
-            printBV(info: "Image Layered: Vatom Changed. Replacing VatomObserverStore")
-            self.vatomObserverStore = VatomObserverStore(vatomID: vatom.id)
-            self.vatomObserverStore.refresh()
-        }
-
         self.refreshUI()
     }
 
     /// Unload the face view (called when the VatomView must prepare for reuse).
     func unload() {
 		self.baseLayer.image = nil
-        self.vatomObserverStore.cancel()
     }
 
     // MARK: - Refresh
-
-    /// Refresh the model layer (triggers a view layer update).
-    private func refreshData() {
-        self.vatomObserverStore.refresh(rootCompletion: nil) { _ in
-            self.refreshUI()
-        }
-    }
 
     /// Refresh the view layer (does not refresh data layer).
     private func refreshUI() {
@@ -294,30 +263,6 @@ class ImageLayeredFaceView: FaceView {
             loadCompletion?(error)
         }
 
-    }
-
-}
-
-extension ImageLayeredFaceView: VatomObserverStoreDelegate {
-
-    func vatomObserver(_ observer: VatomObserverStore, rootVatomStateUpdated: VatomModel) {
-        // nothing to do
-    }
-
-    func vatomObserver(_ observer: VatomObserverStore, childVatomStateUpdated: VatomModel) {
-        // nothing to do
-    }
-
-    func vatomObserver(_ observer: VatomObserverStore, willAddChildVatom vatomID: String) {
-        // nothing to do
-    }
-
-    func vatomObserver(_ observer: VatomObserverStore, didAddChildVatom childVatom: VatomModel) {
-        self.refreshUI()
-    }
-
-    func vatomObserver(_ observer: VatomObserverStore, didRemoveChildVatom childVatom: VatomModel) {
-        self.refreshUI()
     }
 
 }

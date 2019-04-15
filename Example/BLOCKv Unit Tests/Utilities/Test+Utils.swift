@@ -12,6 +12,7 @@
 import XCTest
 
 extension XCTestCase {
+
     // We conform to LocalizedError in order to be able to output
     // a nice error message.
     private struct RequireError<T>: LocalizedError {
@@ -31,23 +32,58 @@ extension XCTestCase {
         }
         return value
     }
+
 }
 
+extension XCTestCase {
+
+    /// Tests decoding data to a concrete type, and then encoding the concrete type to data.
+    /// Finally, the original data and the encoded data are compared.
+    func decodeEncodeCompare<T: Codable & Equatable>(type: T.Type, from data: Data) {
+
+        do {
+            // decode server data (api json) into concrete type
+            let model = try TestUtility.jsonDecoder.decode(type.self, from: data)
+            let modelFromJSONData = try self.require(model)
+            // encode to data
+            let encodedData = try TestUtility.jsonEncoder.encode(modelFromJSONData)
+            // decode encoded data (codable machineary) into a concrete type
+            let modelFromEncodedData = try TestUtility.jsonDecoder.decode(type, from: encodedData)
+
+            XCTAssertEqual(modelFromJSONData, modelFromEncodedData)
+
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+
+    }
+
+}
+
+// MARK: - BLOCKv Helpers
 
 class TestUtility {
-    
+
     //TODO: Replace with blockv decoder
     static var jsonDecoder: JSONDecoder = {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         return decoder
     }()
-    
+
     //TODO: Replace with blockv encoder
     static var jsonEncoder: JSONEncoder = {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         return encoder
     }()
-    
+
+}
+
+/// Represents the top-level JSON structure for success on BLOCKv platform responses.
+///
+/// This is an extension of BLOCKv's BaseModel. It adds full Codable conformance. Once `BaseModel` supports
+/// Codable this type may be removed.
+public struct BaseModelTest<T>: Codable, Equatable where T: Codable & Equatable {
+    let payload: T
 }

@@ -187,7 +187,7 @@ class ImageProgressFaceView: FaceView {
         let paddingEnd = contentClippingRect.width * CGFloat(self.config.paddingEnd) / imagePixelSize.width
 
         let innerY = contentClippingRect.height - paddingStart - paddingEnd
-        let innerX = contentClippingRect.width - paddingStart - paddingEnd
+//        let innerX = contentClippingRect.width - paddingStart - paddingEnd
 
         let innerProgressY = (contentClippingRect.height - paddingStart - paddingEnd) * progress
         let innerProgressX = (contentClippingRect.width - paddingStart - paddingEnd) * progress

@@ -11,10 +11,12 @@
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
+		AD09ECAF222D5667003F46C0 /* ActivityModelCodable_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD09ECAE222D5667003F46C0 /* ActivityModelCodable_Tests.swift */; };
 		AD0BCC922178828A001836DE /* VatomModelUpdate_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD0BCC912178828A001836DE /* VatomModelUpdate_Tests.swift */; };
 		AD0BCC98217A0106001836DE /* LiveVatomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD0BCC97217A0106001836DE /* LiveVatomView.swift */; };
 		AD36A59F215D1CE4009EFD55 /* CustomLoaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD36A59E215D1CE4009EFD55 /* CustomLoaderView.swift */; };
 		AD36A5B0215E3578009EFD55 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = AD36A5AF215E3578009EFD55 /* CHANGELOG.md */; };
+		AD3B591D224CAF0600257EF3 /* OutboundActionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD3B591C224CAF0600257EF3 /* OutboundActionViewController.swift */; };
 		AD3DB5302157FD7200E00B67 /* TappedVatomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD3DB52F2157FD7200E00B67 /* TappedVatomViewController.swift */; };
 		AD61462E213DC88700204E5B /* FaceSelectionProcedure_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD61462A213DC83D00204E5B /* FaceSelectionProcedure_Tests.swift */; };
 		AD61462F213DC88B00204E5B /* MockModelFaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD61462C213DC87100204E5B /* MockModelFaces.swift */; };
@@ -43,7 +45,6 @@
 		D55B21F52056745700B6D5C2 /* UIViewController+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B21F42056745700B6D5C2 /* UIViewController+Ext.swift */; };
 		D55B21F92056DE6D00B6D5C2 /* UIColor+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B21F82056DE6D00B6D5C2 /* UIColor+Ext.swift */; };
 		D55B21FB2056E04B00B6D5C2 /* InventoryCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B21FA2056E04B00B6D5C2 /* InventoryCollectionViewController.swift */; };
-		D5728D5C206131980041F4F7 /* TransferActionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5728D5B206131980041F4F7 /* TransferActionViewController.swift */; };
 		D5728D5E206155600041F4F7 /* ActionListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5728D5D206155600041F4F7 /* ActionListTableViewController.swift */; };
 		D597FF272051305A009B2910 /* UIAlertController+Etx.swift in Sources */ = {isa = PBXBuildFile; fileRef = D597FF262051305A009B2910 /* UIAlertController+Etx.swift */; };
 		D59C7DDD206CE1D000FCE1DD /* Actions.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D59C7DDC206CE1D000FCE1DD /* Actions.storyboard */; };
@@ -84,10 +85,12 @@
 		A11EBD956A70C6C7890F053F /* Pods-BLOCKv_Unit_Tests.prod.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BLOCKv_Unit_Tests.prod.xcconfig"; path = "Pods/Target Support Files/Pods-BLOCKv_Unit_Tests/Pods-BLOCKv_Unit_Tests.prod.xcconfig"; sourceTree = "<group>"; };
 		A8F8F6BF41E2864BD8FA3FB7 /* Pods-BlockV_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Tests/Pods-BlockV_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		AC9D73DE9B5506A2FFBB74EE /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
+		AD09ECAE222D5667003F46C0 /* ActivityModelCodable_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityModelCodable_Tests.swift; sourceTree = "<group>"; };
 		AD0BCC912178828A001836DE /* VatomModelUpdate_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VatomModelUpdate_Tests.swift; sourceTree = "<group>"; };
 		AD0BCC97217A0106001836DE /* LiveVatomView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LiveVatomView.swift; sourceTree = "<group>"; };
 		AD36A59E215D1CE4009EFD55 /* CustomLoaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomLoaderView.swift; sourceTree = "<group>"; };
 		AD36A5AF215E3578009EFD55 /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = CHANGELOG.md; path = ../CHANGELOG.md; sourceTree = "<group>"; };
+		AD3B591C224CAF0600257EF3 /* OutboundActionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutboundActionViewController.swift; sourceTree = "<group>"; };
 		AD3DB52F2157FD7200E00B67 /* TappedVatomViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TappedVatomViewController.swift; sourceTree = "<group>"; };
 		AD61462A213DC83D00204E5B /* FaceSelectionProcedure_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceSelectionProcedure_Tests.swift; sourceTree = "<group>"; };
 		AD61462C213DC87100204E5B /* MockModelFaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockModelFaces.swift; sourceTree = "<group>"; };
@@ -121,7 +124,6 @@
 		D55B21F42056745700B6D5C2 /* UIViewController+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Ext.swift"; sourceTree = "<group>"; };
 		D55B21F82056DE6D00B6D5C2 /* UIColor+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Ext.swift"; sourceTree = "<group>"; };
 		D55B21FA2056E04B00B6D5C2 /* InventoryCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryCollectionViewController.swift; sourceTree = "<group>"; };
-		D5728D5B206131980041F4F7 /* TransferActionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferActionViewController.swift; sourceTree = "<group>"; };
 		D5728D5D206155600041F4F7 /* ActionListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionListTableViewController.swift; sourceTree = "<group>"; };
 		D597FF262051305A009B2910 /* UIAlertController+Etx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Etx.swift"; sourceTree = "<group>"; };
 		D59C7DDC206CE1D000FCE1DD /* Actions.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Actions.storyboard; sourceTree = "<group>"; };
@@ -280,6 +282,7 @@
 				ADA07DF021A94025007A6322 /* FaceModelCodable_Tests.swift */,
 				ADA07DF121A94025007A6322 /* VatomModelCodable_Tests.swift */,
 				ADA07DF221A94025007A6322 /* ActionModelCodable_Tests.swift */,
+				AD09ECAE222D5667003F46C0 /* ActivityModelCodable_Tests.swift */,
 			);
 			path = Codable;
 			sourceTree = "<group>";
@@ -338,8 +341,8 @@
 		D5728D5A206130E40041F4F7 /* Actions */ = {
 			isa = PBXGroup;
 			children = (
+				AD3B591C224CAF0600257EF3 /* OutboundActionViewController.swift */,
 				D5728D5D206155600041F4F7 /* ActionListTableViewController.swift */,
-				D5728D5B206131980041F4F7 /* TransferActionViewController.swift */,
 			);
 			path = Actions;
 			sourceTree = "<group>";
@@ -466,6 +469,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -553,6 +557,7 @@
 				"${BUILT_PRODUCTS_DIR}/JWTDecode/JWTDecode.framework",
 				"${BUILT_PRODUCTS_DIR}/NVActivityIndicatorView/NVActivityIndicatorView.framework",
 				"${BUILT_PRODUCTS_DIR}/Nuke/Nuke.framework",
+				"${BUILT_PRODUCTS_DIR}/PromiseKit/PromiseKit.framework",
 				"${BUILT_PRODUCTS_DIR}/Signals/Signals.framework",
 				"${BUILT_PRODUCTS_DIR}/Starscream/Starscream.framework",
 				"${BUILT_PRODUCTS_DIR}/VatomFace3D/VatomFace3D.framework",
@@ -566,6 +571,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/JWTDecode.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/NVActivityIndicatorView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Nuke.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PromiseKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Signals.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Starscream.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VatomFace3D.framework",
@@ -597,6 +603,7 @@
 			files = (
 				AD0BCC98217A0106001836DE /* LiveVatomView.swift in Sources */,
 				D5475764205D124100E6FE90 /* UIView+Ext.swift in Sources */,
+				AD3B591D224CAF0600257EF3 /* OutboundActionViewController.swift in Sources */,
 				AD920A5C215FB47200CEFC1D /* PasswordTableViewController.swift in Sources */,
 				D547576B205E67AD00E6FE90 /* VatomCell.swift in Sources */,
 				D519A84B205E83AB006B0D19 /* VatomDetailTableViewController.swift in Sources */,
@@ -617,7 +624,6 @@
 				D55B21EA2052E38000B6D5C2 /* RoundedImageView.swift in Sources */,
 				D5728D5E206155600041F4F7 /* ActionListTableViewController.swift in Sources */,
 				AD36A59F215D1CE4009EFD55 /* CustomLoaderView.swift in Sources */,
-				D5728D5C206131980041F4F7 /* TransferActionViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -635,6 +641,7 @@
 				ADA07DF721A94061007A6322 /* KeyPath_Tests.swift in Sources */,
 				AD0BCC922178828A001836DE /* VatomModelUpdate_Tests.swift in Sources */,
 				ADA07DFA21A94068007A6322 /* ActionModelCodable_Tests.swift in Sources */,
+				AD09ECAF222D5667003F46C0 /* ActivityModelCodable_Tests.swift in Sources */,
 				D530759C21119E2A00DE7FD0 /* MockModel.swift in Sources */,
 				ADA07DF921A94068007A6322 /* VatomModelCodable_Tests.swift in Sources */,
 			);

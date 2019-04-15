@@ -105,27 +105,28 @@ class TappedVatomViewController: UIViewController {
         print(#function)
 
         // refresh the vatom
-        BLOCKv.getVatoms(withIDs: [vatom!.id]) { [weak self] (responseVatom, error) in
-
-            // handle error
-            guard error == nil else {
-                print("\n>>> Error > Viewer: \(error!.localizedDescription)")
-                self?.present(UIAlertController.errorAlert(error!), animated: true)
+        BLOCKv.getVatoms(withIDs: [vatom!.id]) { [weak self] result in
+            
+            switch result {
+            case .success(let responseVatoms):
+                // ensure a vatom was returned
+                guard let responseVatom = responseVatoms.first else {
+                    print("\n>>> Error > Viewer: No vAtom found")
+                    return
+                }
+                
+                self?.vatom = responseVatom
+                
+                // update the vatom view
+                self?.vatomViewA.update(usingVatom: responseVatom)
+                self?.vatomViewB.update(usingVatom: responseVatom)
+                self?.vatomViewC.update(usingVatom: responseVatom)
+                
+            case .failure(let error):
+                print("\n>>> Error > Viewer: \(error.localizedDescription)")
+                self?.present(UIAlertController.errorAlert(error), animated: true)
                 return
             }
-
-            // ensure a vatom was returned
-            guard let responseVatom = responseVatom.first else {
-                print("\n>>> Error > Viewer: No vAtom found")
-                return
-            }
-            
-            self?.vatom = responseVatom
-            
-            // update the vatom view
-            self?.vatomViewA.update(usingVatom: responseVatom)
-            self?.vatomViewB.update(usingVatom: responseVatom)
-            self?.vatomViewC.update(usingVatom: responseVatom)
 
         }
         

@@ -251,39 +251,27 @@ extension API {
     // MARK: -
 
     /// Consolidates all user vatom endpoints.
-    enum UserVatom {
+    enum Vatom {
 
-        private static let userVatomPath = "/v1/user/vatom"
-
-        //TODO: Parameterise parameters.
-
-        /// Builds the endpoint to get the current user's inventory.
+        /// Builds an endpoint to get the current user's inventory.
         ///
         /// The inventory call is essentially an optimized discover call. The server-pattern is from the child's
         /// perspetive. That is, we specify the id of the parent who's children are to be retunred.
         ///
-        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        /// - Returns: Constructed endpoint specialized to parse out a `UnpackedModel`.
         static func getInventory(parentID: String,
                                  page: Int = 0,
                                  limit: Int = 0) -> Endpoint<BaseModel<UnpackedModel>> {
-            return Endpoint(method: .post,
-                            path: userVatomPath + "/inventory",
-                            parameters: [
-                                "parent_id": parentID,
-                                "page": page,
-                                "limit": limit
-                ]
-            )
+            return API.Generic.getInventory(parentID: parentID, page: page, limit: limit)
+
         }
 
-        /// Builds the endpoint to get a vAtom by its unique identifier.
+        /// Builds an endpoint to get a vAtom by its unique identifier.
         ///
-        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        /// - Parameter ids: Unique identifier of the vatom.
+        /// - Returns: Constructed endpoint specialized to parse out a `UnpackedModel`.
         static func getVatoms(withIDs ids: [String]) -> Endpoint<BaseModel<UnpackedModel>> {
-            return Endpoint(method: .post,
-                            path: userVatomPath + "/get",
-                            parameters: ["ids": ids]
-            )
+            return API.Generic.getVatoms(withIDs: ids)
         }
 
         /// Builds the endpoint to trash a vAtom specified by its id.
@@ -296,35 +284,204 @@ extension API {
 
         }
 
-        /// Builds the endpoint to update a vAtom.
+        /// Builds an endpoint to update a vAtom.
         ///
         /// - Parameter payload: Raw payload.
-        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        /// - Returns: Constructed endpoint specialized to parse out a `VatomUpdateModel`.
         static func updateVatom(payload: [String: Any]) -> Endpoint<BaseModel<VatomUpdateModel>> {
-            return Endpoint(method: .patch,
-                            path: "/v1/vatoms",
-                            parameters: payload)
+            return API.Generic.updateVatom(payload: payload)
+        }
+
+        /// Builds an endpoint to search for vAtoms.
+        ///
+        /// - Parameter payload: Raw request payload.
+        /// - Returns: Constructed endpoint specialized to parse out a `UnpackedModel`.
+        static func discover(_ payload: [String: Any]) -> Endpoint<BaseModel<UnpackedModel>> {
+            return API.Generic.discover(payload)
+        }
+
+        /// Builds an endpoint to geo search for vAtoms (i.e. search for dropped vAtoms).
+        ///
+        /// Use this endpoint to fetch a collection of vAtoms.
+        ///
+        /// - Parameters:
+        ///   - bottomLeftLat: Bottom left latitude coordinate.
+        ///   - bottomLeftLon: Bottom left longitude coordinate.
+        ///   - topRightLat: Top right latitude coordinate.
+        ///   - topRightLon: Top right longitude coordinte.
+        ///   - filter: The vAtom filter option to apply.
+        /// - Returns: Constructed endpoint specialized to parse out a `UnpackedModel`.
+        static func geoDiscover(bottomLeftLat: Double,
+                                bottomLeftLon: Double,
+                                topRightLat: Double,
+                                topRightLon: Double,
+                                filter: String) -> Endpoint<BaseModel<UnpackedModel>> {
+
+            return API.Generic.geoDiscover(bottomLeftLat: bottomLeftLat,
+                        bottomLeftLon: bottomLeftLon,
+                        topRightLat: topRightLat,
+                        topRightLon: topRightLon,
+                        filter: filter)
+        }
+
+        /// Builds the endpoint to geo search for vAtom groups (i.e. search for clusters of dropped vAtoms).
+        ///
+        /// Use this endpoint to fetch an collection of groups/annotation indicating the count
+        /// of vAtoms at a particular location.
+        ///
+        /// - Parameters:
+        ///   - bottomLeftLat: Bottom left latitude coordinate.
+        ///   - bottomLeftLon: Bottom left longitude coordinate.
+        ///   - topRightLat: Top right latitude coordinate.
+        ///   - topRightLon: Top right longitude coordinte.
+        ///   - precision: The grouping precision applied when computing the groups.
+        ///   - filter: The vAtom filter option to apply.
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        static func geoDiscoverGroups(bottomLeftLat: Double,
+                                      bottomLeftLon: Double,
+                                      topRightLat: Double,
+                                      topRightLon: Double,
+                                      precision: Int,
+                                      filter: String) -> Endpoint<BaseModel<GeoModel>> {
+
+            return API.Generic.geoDiscoverGroups(bottomLeftLat: bottomLeftLat,
+                                                     bottomLeftLon: bottomLeftLon,
+                                                     topRightLat: topRightLat,
+                                                     topRightLon: topRightLon,
+                                                     precision: precision,
+                                                     filter: filter)
+
         }
 
     }
 
     // MARK: -
 
-    /// Consolidtaes all discover endpoints.
-    enum VatomDiscover {
+    /// Consolidates all action endpoints.
+    enum VatomAction {
 
-        /// Builds the endpoint to search for vAtoms.
+        /*
+         Each action's reactor returns it's own json payload. This does not need to be mapped as yet.
+         */
+
+        /// Builds the endpoint to perform and action on a vAtom.
+        ///
+        /// - Parameters:
+        ///   - name: Action name.
+        ///   - payload: Raw payload for the action.
+        /// - Returns: Constructed endpoint generic over `Void` that may be passed to a request.
+        static func custom(name: String, payload: [String: Any]) -> Endpoint<Void> {
+            return API.Generic.perform(name: name, payload: payload)
+        }
+
+    }
+
+    // MARK: -
+
+    /// Consolidates all the user actions.
+    enum UserActions {
+
+        /// Builds the endpoint for fetching the actions configured for a template ID.
+        ///
+        /// - Parameter id: Uniquie identifier of the template.
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        static func getActions(forTemplateID id: String) -> Endpoint<BaseModel<[ActionModel]>> {
+            return API.Generic.getActions(forTemplateID: id)
+        }
+
+    }
+
+    // MARK: -
+
+    /// Consolidtes all the user activity endpoints.
+    enum UserActivity {
+
+        /// Builds the endpoint for fetching the threads involving the current user.
+        ///
+        /// - Parameters:
+        ///   - cursor: Filters out all threads more recent than the cursor (useful for paging).
+        ///             If omitted or set as zero, the most recent threads are returned.
+        ///   - count: Defines the number of messages to return (after the cursor).
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        static func getThreads(cursor: String, count: Int) -> Endpoint<BaseModel<ThreadListModel>> {
+            return API.Generic.getThreads(cursor: cursor, count: count)
+        }
+
+        /// Builds the endpoint for fetching the message for a specified thread involving the current user.
+        ///
+        /// - Parameters:
+        ///   - id: Unique identifier of the thread (a.k.a thread `name`).
+        ///   - cursor: Filters out all message more recent than the cursor (useful for paging).
+        ///             If omitted or set as zero, the most recent threads are returned.
+        ///   - count: Defines the number of messages to return (after the cursor).
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        static func getMessages(forThreadId threadId: String, cursor: String, count: Int) ->
+            Endpoint<BaseModel<MessageListModel>> {
+                return API.Generic.getMessages(forThreadId: threadId, cursor: cursor, count: count)
+        }
+
+    }
+
+}
+
+extension API {
+
+    enum Generic {
+
+        private static let userVatomPath    = "/v1/user/vatom"
+        private static let userActionsPath  = "/v1/user/actions"
+        private static let actionPath       = "/v1/user/vatom/action"
+        private static let userActivityPath = "/v1/activity"
+
+        // MARK: Vatoms
+
+        /// Builds the generic endpoint to get the current user's inventory.
+        ///
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        static func getInventory<T>(parentID: String, page: Int = 0, limit: Int = 0) -> Endpoint<T> {
+            return Endpoint(method: .post,
+                            path: userVatomPath + "/inventory",
+                            parameters: [
+                                "parent_id": parentID,
+                                "page": page,
+                                "limit": limit
+                ]
+            )
+        }
+
+        /// Builds a generic endpoint to get a vAtom by its unique identifier.
+        ///
+        /// - Parameter ids: Unique identifier of the vatom.
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        static func getVatoms<T>(withIDs ids: [String]) -> Endpoint<T> {
+            return Endpoint(method: .post,
+                            path: userVatomPath + "/get",
+                            parameters: ["ids": ids]
+            )
+        }
+
+        /// Builds a generic endpoint to update a vAtom.
+        ///
+        /// - Parameter payload: Raw payload.
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        static func updateVatom<T>(payload: [String: Any]) -> Endpoint<T> {
+            return Endpoint(method: .patch,
+                            path: "/v1/vatoms",
+                            parameters: payload)
+        }
+
+        /// Builds a generic endpoint to search for vAtoms.
         ///
         /// - Parameter payload: Raw request payload.
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
-        static func discover(_ payload: [String: Any]) -> Endpoint<BaseModel<UnpackedModel>> {
+        static func discover<T>(_ payload: [String: Any]) -> Endpoint<T> {
 
             return Endpoint(method: .post,
                             path: "/v1/vatom/discover",
                             parameters: payload)
         }
 
-        /// Builds the endpoint to geo search for vAtoms (i.e. search for dropped vAtoms).
+        /// Builds a generic endpoint to geo search for vAtoms (i.e. search for dropped vAtoms).
         ///
         /// Use this endpoint to fetch a collection of vAtoms.
         ///
@@ -335,11 +492,11 @@ extension API {
         ///   - topRightLon: Top right longitude coordinte.
         ///   - filter: The vAtom filter option to apply.
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
-        static func geoDiscover(bottomLeftLat: Double,
-                                bottomLeftLon: Double,
-                                topRightLat: Double,
-                                topRightLon: Double,
-                                filter: String) -> Endpoint<BaseModel<UnpackedModel>> {
+        static func geoDiscover<T>(bottomLeftLat: Double,
+                                   bottomLeftLon: Double,
+                                   topRightLat: Double,
+                                   topRightLon: Double,
+                                   filter: String) -> Endpoint<T> {
 
             // create the payload
             let payload: [String: Any] =
@@ -377,12 +534,12 @@ extension API {
         ///   - precision: The grouping precision applied when computing the groups.
         ///   - filter: The vAtom filter option to apply.
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
-        static func geoDiscoverGroups(bottomLeftLat: Double,
-                                      bottomLeftLon: Double,
-                                      topRightLat: Double,
-                                      topRightLon: Double,
-                                      precision: Int,
-                                      filter: String) -> Endpoint<BaseModel<GeoModel>> {
+        static func geoDiscoverGroups<T>(bottomLeftLat: Double,
+                                         bottomLeftLon: Double,
+                                         topRightLat: Double,
+                                         topRightLon: Double,
+                                         precision: Int,
+                                         filter: String) -> Endpoint<T> {
 
             assert(1...12 ~= precision, "You must specify a value in the open range [1...12].")
 
@@ -410,57 +567,31 @@ extension API {
 
         }
 
-    }
-
-    // MARK: -
-
-    /// Consolidates all action endpoints.
-    enum VatomAction {
-
-        private static let actionPath = "/v1/user/vatom/action"
-
-        /*
-         Each action's reactor returns it's own json payload. This does not need to be mapped as yet.
-         */
+        // MARK: - Perform Actions
 
         /// Builds the endpoint to perform and action on a vAtom.
         ///
         /// - Parameters:
         ///   - name: Action name.
         ///   - payload: Raw payload for the action.
-        /// - Returns: Constructed endpoint generic over `Void` that may be passed to a request.
-        static func custom(name: String, payload: [String: Any]) -> Endpoint<Void> {
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        static func perform<T>(name: String, payload: [String: Any]) -> Endpoint<T> {
             return Endpoint(method: .post,
-                            path: actionPath + "/\(name)",
-                parameters: payload)
+                            path: actionPath + "/\(name)", parameters: payload)
         }
 
-    }
-
-    // MARK: -
-
-    /// Consolidates all the user actions.
-    enum UserActions {
-
-        private static let userActionsPath = "/v1/user/actions"
+        // MARK: Fetch Actions
 
         /// Builds the endpoint for fetching the actions configured for a template ID.
         ///
         /// - Parameter id: Uniquie identifier of the template.
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
-        static func getActions(forTemplateID id: String) -> Endpoint<BaseModel<[ActionModel]>> {
+        static func getActions<T>(forTemplateID id: String) -> Endpoint<T> {
             return Endpoint(method: .get,
                             path: userActionsPath + "/\(id)")
         }
 
-    }
-
-    // MARK: -
-
-    /// Consolidtes all the user activity endpoints.
-    enum UserActivity {
-
-        private static let userActivityPath = "/v1/activity"
+        // MARK: - User Activity
 
         /// Builds the endpoint for fetching the threads involving the current user.
         ///
@@ -469,7 +600,7 @@ extension API {
         ///             If omitted or set as zero, the most recent threads are returned.
         ///   - count: Defines the number of messages to return (after the cursor).
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
-        static func getThreads(cursor: String, count: Int) -> Endpoint<BaseModel<ThreadListModel>> {
+        static func getThreads<T>(cursor: String, count: Int) -> Endpoint<T> {
 
             let payload: [String: Any] = [
                 "cursor": cursor,
@@ -489,18 +620,17 @@ extension API {
         ///             If omitted or set as zero, the most recent threads are returned.
         ///   - count: Defines the number of messages to return (after the cursor).
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
-        static func getMessages(forThreadId threadId: String, cursor: String, count: Int) ->
-            Endpoint<BaseModel<MessageListModel>> {
+        static func getMessages<T>(forThreadId threadId: String, cursor: String, count: Int) -> Endpoint<T> {
 
-            let payload: [String: Any] = [
-                "name": threadId,
-                "cursor": cursor,
-                "count": count
-            ]
+                let payload: [String: Any] = [
+                    "name": threadId,
+                    "cursor": cursor,
+                    "count": count
+                ]
 
-            return Endpoint(method: .post,
-                            path: userActivityPath + "/mythreadmessages",
-                            parameters: payload)
+                return Endpoint(method: .post,
+                                path: userActivityPath + "/mythreadmessages",
+                                parameters: payload)
 
         }
 

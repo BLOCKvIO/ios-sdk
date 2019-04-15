@@ -25,7 +25,7 @@ extension BLOCKv {
         let endpoint = API.CurrentUser.get()
 
         self.client.request(endpoint) { result in
-            
+
             switch result {
             case .success(let baseModel):
                 // model is available
@@ -301,7 +301,7 @@ extension BLOCKv {
         let endpoint = API.CurrentUser.deleteToken(id: tokenId)
 
         self.client.request(endpoint) { result in
-            
+
             switch result {
             case .success(let baseModel):
                 // model is available
@@ -336,7 +336,7 @@ extension BLOCKv {
         let endpoint = API.CurrentUser.setDefaultToken(id: tokenId)
 
         self.client.request(endpoint) { result in
-            
+
             switch result {
             case .success(let baseModel):
                 // model is available

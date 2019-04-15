@@ -38,7 +38,7 @@ extension BLOCKv {
                                     limit: Int = 0,
                                     completion: @escaping (Result<[VatomModel], BVError>) -> Void) {
 
-        let endpoint = API.UserVatom.getInventory(parentID: id, page: page, limit: limit)
+        let endpoint = API.Vatom.getInventory(parentID: id, page: page, limit: limit)
 
         self.client.request(endpoint) { result in
 
@@ -75,7 +75,7 @@ extension BLOCKv {
     public static func getVatoms(withIDs ids: [String],
                                  completion: @escaping (Result<[VatomModel], BVError>) -> Void) {
 
-        let endpoint = API.UserVatom.getVatoms(withIDs: ids)
+        let endpoint = API.Vatom.getVatoms(withIDs: ids)
 
         self.client.request(endpoint) { result in
 
@@ -108,7 +108,7 @@ extension BLOCKv {
     ///                 This handler is executed on the main queue.
     public static func trashVatom(_ id: String, completion: @escaping (BVError?) -> Void) {
 
-        let endpoint = API.UserVatom.trashVatom(id)
+        let endpoint = API.Vatom.trashVatom(id)
 
         self.client.request(endpoint) { result in
 
@@ -146,20 +146,20 @@ extension BLOCKv {
                                                                     keyPath: "vAtom::vAtomType.parent_id",
                                                                     value: parentID))
         }
-        
+
         let ids = vatoms.map { $0.id }
         let payload: [String: Any] = [
             "ids": ids,
             "parent_id": parentID
         ]
-        
-        let endpoint = API.UserVatom.updateVatom(payload: payload)
+
+        let endpoint = API.Vatom.updateVatom(payload: payload)
 
         BLOCKv.client.request(endpoint) { result in
-            
+
             switch result {
             case .success(let baseModel):
-                
+
                 /*
                  # Note
                  The most likely scenario where there will be partial containment errors is when setting the parent id
@@ -172,7 +172,7 @@ extension BLOCKv {
                 undosToRollback.forEach { $0.undo() }
                 // complete
                 completion(.success(updateVatomModel))
-                
+
             case .failure(let error):
                 // roll back all containments
                 undos.forEach { $0.undo() }
@@ -199,7 +199,7 @@ extension BLOCKv {
         // explicitly set return type to payload
         builder.setReturn(type: .payload)
         self.discover(payload: builder.toDictionary()) { result in
-            
+
             switch result {
             case .success(let discoverResult):
                 // model is available
@@ -212,7 +212,7 @@ extension BLOCKv {
                     completion(.failure(error))
                 }
             }
-            
+
         }
     }
 
@@ -234,10 +234,10 @@ extension BLOCKv {
     public static func discover(payload: [String: Any],
                                 completion: @escaping (Result<DiscoverResult, BVError>) -> Void) {
 
-        let endpoint = API.VatomDiscover.discover(payload)
+        let endpoint = API.Vatom.discover(payload)
 
         self.client.request(endpoint) { result in
-            
+
             switch result {
             case .success(let baseModel):
                 // model is available
@@ -282,7 +282,7 @@ extension BLOCKv {
                                    filter: VatomGeoFilter = .vatoms,
                                    completion: @escaping (Result<[VatomModel], BVError>) -> Void) {
 
-        let endpoint = API.VatomDiscover.geoDiscover(bottomLeftLat: bottomLeftLat,
+        let endpoint = API.Vatom.geoDiscover(bottomLeftLat: bottomLeftLat,
                                                      bottomLeftLon: bottomLeftLon,
                                                      topRightLat: topRightLat,
                                                      topRightLon: topRightLon,
@@ -328,7 +328,7 @@ extension BLOCKv {
                                          filter: VatomGeoFilter = .vatoms,
                                          completion: @escaping (Result<GeoModel, BVError>) -> Void) {
 
-        let endpoint = API.VatomDiscover.geoDiscoverGroups(bottomLeftLat: bottomLeftLat,
+        let endpoint = API.Vatom.geoDiscoverGroups(bottomLeftLat: bottomLeftLat,
                                                            bottomLeftLon: bottomLeftLon,
                                                            topRightLat: topRightLat,
                                                            topRightLon: topRightLon,
@@ -402,10 +402,10 @@ extension BLOCKv {
         let endpoint = API.VatomAction.custom(name: name, payload: payload)
 
         self.client.request(endpoint) { result in
-            
+
             switch result {
             case .success(let data):
-                
+
                 do {
                     guard
                         let object = try JSONSerialization.jsonObject(with: data) as? [String: Any],
@@ -416,12 +416,12 @@ extension BLOCKv {
                     DispatchQueue.main.async {
                         completion(.success(payload))
                     }
-                    
+
                 } catch {
                     let error = BVError.modelDecoding(reason: error.localizedDescription)
                     completion(.failure(error))
                 }
-                
+
             case .failure(let error):
                 // handle error
                 DispatchQueue.main.async {
@@ -432,7 +432,7 @@ extension BLOCKv {
         }
 
     }
-    
+
     // MARK: - Common Actions for Unowned vAtoms
 
     /// Performs an acquire action on a vAtom.
@@ -451,9 +451,9 @@ extension BLOCKv {
 
         // perform the action
         self.performAction(name: "Acquire", payload: body) { result in
-            
+
             //FIXME: Call into Data Pool
-            
+
             completion(result)
         }
 

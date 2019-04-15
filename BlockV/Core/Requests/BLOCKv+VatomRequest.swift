@@ -38,7 +38,7 @@ extension BLOCKv {
                                     limit: Int = 0,
                                     completion: @escaping (Result<[VatomModel], BVError>) -> Void) {
 
-        let endpoint = API.UserVatom.getInventory(parentID: id, page: page, limit: limit)
+        let endpoint = API.Vatom.getInventory(parentID: id, page: page, limit: limit)
 
         self.client.request(endpoint) { result in
 
@@ -75,7 +75,7 @@ extension BLOCKv {
     public static func getVatoms(withIDs ids: [String],
                                  completion: @escaping (Result<[VatomModel], BVError>) -> Void) {
 
-        let endpoint = API.UserVatom.getVatoms(withIDs: ids)
+        let endpoint = API.Vatom.getVatoms(withIDs: ids)
 
         self.client.request(endpoint) { result in
 
@@ -108,7 +108,7 @@ extension BLOCKv {
     ///                 This handler is executed on the main queue.
     public static func trashVatom(_ id: String, completion: @escaping (BVError?) -> Void) {
 
-        let endpoint = API.UserVatom.trashVatom(id)
+        let endpoint = API.Vatom.trashVatom(id)
 
         self.client.request(endpoint) { result in
 
@@ -153,7 +153,7 @@ extension BLOCKv {
             "parent_id": parentID
         ]
         
-        let endpoint = API.UserVatom.updateVatom(payload: payload)
+        let endpoint = API.Vatom.updateVatom(payload: payload)
 
         BLOCKv.client.request(endpoint) { result in
             
@@ -234,7 +234,7 @@ extension BLOCKv {
     public static func discover(payload: [String: Any],
                                 completion: @escaping (Result<DiscoverResult, BVError>) -> Void) {
 
-        let endpoint = API.VatomDiscover.discover(payload)
+        let endpoint = API.Vatom.discover(payload)
 
         self.client.request(endpoint) { result in
             
@@ -282,7 +282,7 @@ extension BLOCKv {
                                    filter: VatomGeoFilter = .vatoms,
                                    completion: @escaping (Result<[VatomModel], BVError>) -> Void) {
 
-        let endpoint = API.VatomDiscover.geoDiscover(bottomLeftLat: bottomLeftLat,
+        let endpoint = API.Vatom.geoDiscover(bottomLeftLat: bottomLeftLat,
                                                      bottomLeftLon: bottomLeftLon,
                                                      topRightLat: topRightLat,
                                                      topRightLon: topRightLon,
@@ -328,7 +328,7 @@ extension BLOCKv {
                                          filter: VatomGeoFilter = .vatoms,
                                          completion: @escaping (Result<GeoModel, BVError>) -> Void) {
 
-        let endpoint = API.VatomDiscover.geoDiscoverGroups(bottomLeftLat: bottomLeftLat,
+        let endpoint = API.Vatom.geoDiscoverGroups(bottomLeftLat: bottomLeftLat,
                                                            bottomLeftLon: bottomLeftLon,
                                                            topRightLat: topRightLat,
                                                            topRightLon: topRightLon,

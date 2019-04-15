@@ -124,29 +124,28 @@ class UserInfoTableViewController: UITableViewController {
         
         let userInfo = buildForm()
         
-        BLOCKv.updateCurrentUser(userInfo) {
-            [weak self] (userModel, error) in
+        BLOCKv.updateCurrentUser(userInfo) { [weak self] result in
             
             // reset nav bar
             self?.hideNavBarActivityRight()
             self?.navigationItem.setRightBarButton(self!.doneButton, animated: true)
             
-            // handle error
-            guard let model = userModel, error == nil else {
-                print(">>> Error > Viewer: \(error!.localizedDescription)")
-                self?.present(UIAlertController.errorAlert(error!), animated: true)
+            switch result {
+            case .success(let userModel):
+                print("Viewer > \(userModel)\n")
+                
+                // update the model
+                self?.userModel = userModel
+                self?.tableView.reloadData()
+                
+                // pop back
+                self?.navigationController?.popViewController(animated: true)
+                
+            case .failure(let error):
+                print(">>> Error > Viewer: \(error.localizedDescription)")
+                self?.present(UIAlertController.errorAlert(error), animated: true)
                 return
             }
-            
-            // handle success
-            print("Viewer > \(model)\n")
-            
-            // update the model
-            self?.userModel = model
-            self?.tableView.reloadData()
-            
-            // pop back
-            self?.navigationController?.popViewController(animated: true)
             
         }
         

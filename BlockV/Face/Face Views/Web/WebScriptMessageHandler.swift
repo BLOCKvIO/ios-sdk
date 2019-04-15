@@ -195,7 +195,7 @@ extension WebFaceView {
             if self.coreBridge == nil {
                 self.coreBridge = CoreBridgeV2(faceView: self)
             }
-            
+
         default:
             throw BridgeError.caller("Unsupported Bridge version: \(message.version)")
         }

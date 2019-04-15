@@ -32,7 +32,7 @@ class CoreBridgeV2: CoreBridge {
         case setVatomParent         = "core.vatom.parent.set"
         case observeVatomChildren   = "core.vatom.children.observe"
     }
-    
+
     /// Represents the Native Bridge Request contract.
     enum NativeBridgeMessageName: String {
         // 2.0
@@ -43,7 +43,7 @@ class CoreBridgeV2: CoreBridge {
 
     /// Reference to the face view which this bridge is interacting with.
     weak var faceView: WebFaceView?
-    
+
     // MARK: - Initializer
     
     required init(faceView: WebFaceView) {
@@ -113,8 +113,8 @@ class CoreBridgeV2: CoreBridge {
         return !(MessageName(rawValue: message) == nil)
     }
 
-    // swiftlint:disable cyclomatic_complexity
-
+    // swiftlint:disable:next cyclomatic_complexity
+    // swiftlint:disable:next function_body_length
     /// Processes the face script message and calls the completion handler with the result for encoding.
     func processMessage(_ scriptMessage: RequestScriptMessage, completion: @escaping (Result<JSON, BridgeError>) -> Void) {
 
@@ -452,7 +452,7 @@ class CoreBridgeV2: CoreBridge {
                            completion: @escaping (Result<[String: [VatomModel]], BridgeError>) -> Void) {
 
             BLOCKv.getVatoms(withIDs: ids) { result in
-                
+
                 switch result {
                 case .success(let vatoms):
                     let response = ["vatoms": vatoms]
@@ -495,7 +495,7 @@ class CoreBridgeV2: CoreBridge {
                 let bridgeError = BridgeError.viewer("Unable to fetch vAtoms.")
                 completion(.failure(bridgeError))
             }
-            
+
         }
 
     }
@@ -514,7 +514,7 @@ class CoreBridgeV2: CoreBridge {
         builder.setScope(scope: .parentID, value: id)
 
         BLOCKv.discover(builder) { result in
-            
+
             switch result {
             case .success(let vatoms):
                 let response = ["vatoms": vatoms]
@@ -536,7 +536,7 @@ class CoreBridgeV2: CoreBridge {
     private func getPublicUser(userID id: String, completion: @escaping (Result<BRUser, BridgeError>) -> Void) {
 
         BLOCKv.getPublicUser(withID: id) { result in
-            
+
             switch result {
             case .success(let user):
                 // build response
@@ -576,7 +576,7 @@ class CoreBridgeV2: CoreBridge {
             }
 
             BLOCKv.performAction(name: name, payload: dict) { result in
-                
+
                 switch result {
                 case .success(let payload):
                     // convert to json
@@ -651,7 +651,7 @@ class CoreBridgeV2: CoreBridge {
         // update parent id
         BLOCKv.setParentID(ofVatoms: [vatom], to: parentId) { result in
             switch result {
-            case .success(let x):
+            case .success:
                 let response: JSON = ["new_parent_id": JSON.string(parentId)]
                 completion(.success(response))
 

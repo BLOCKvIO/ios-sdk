@@ -276,7 +276,7 @@ class CoreBridgeV1: CoreBridge {
                 // handle error
                     let bridgeError = BridgeError.viewer("Unable to fetch current user.")
                     completion(.failure(bridgeError))
-                
+
             }
 
         }
@@ -440,7 +440,7 @@ class CoreBridgeV1: CoreBridge {
                         return
                     }
                     completion(.success(json))
-                    
+
                 case .failure(let error):
                     // handle error
                     let bridgeError = BridgeError.viewer("Unable to perform action: \(name).")

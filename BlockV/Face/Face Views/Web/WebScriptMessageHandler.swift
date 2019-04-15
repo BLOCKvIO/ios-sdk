@@ -100,7 +100,7 @@ extension WebFaceView: WKScriptMessageHandler {
                     "payload": payload
                 ]
             }
-            
+
             // encode response
             guard let data = try? JSONEncoder.blockv.encode(response),
                 let jsonString = String.init(data: data, encoding: .utf8) else {
@@ -110,7 +110,7 @@ extension WebFaceView: WKScriptMessageHandler {
                     return
             }
             self.postMessage(message.requestID, withJSONString: jsonString)
-            
+
         case .failure(let error):
             // create response
             var response: JSON?
@@ -123,7 +123,7 @@ extension WebFaceView: WKScriptMessageHandler {
                     "payload": try! JSON(error.bridgeFormatV2)
                 ]
             }
-            
+
             // encode response
             guard let data = try? JSONEncoder.blockv.encode(response),
                 let jsonString = String.init(data: data, encoding: .utf8) else {
@@ -133,7 +133,7 @@ extension WebFaceView: WKScriptMessageHandler {
                     return
             }
             self.postMessage(message.requestID, withJSONString: jsonString)
-            
+
         }
 
     }
@@ -222,7 +222,7 @@ extension WebFaceView {
             if coreBridge.canProcessMessage(message.name) {
                 // forward to core bridge
                 coreBridge.processMessage(message) { result in
-                    
+
                     switch result {
                     case .success(let payload):
                         // post response

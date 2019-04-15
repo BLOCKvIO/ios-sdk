@@ -45,15 +45,6 @@ class ImagePolicyFaceView: FaceView {
     /// struct immutalbe and is ONLY populated on init.
     private let config: Config
 
-    /*
-     NOTE
-     The `vatomChanged()` method called by `VatomView` does not handle child vatom updates.
-     The `VatomObserver` class is used to receive these events. This is required for the Child Count policy type.
-     */
-
-    /// Class responsible for observing changes related backing vAtom.
-    private var vatomObserver: VatomObserver
-
     // MARK: - Initialization
 
     required init(vatom: VatomModel, faceModel: FaceModel) {
@@ -67,11 +58,8 @@ class ImagePolicyFaceView: FaceView {
             self.config = Config() // default values
         }
 
-        // create an observer for the backing vatom
-        self.vatomObserver = VatomObserver(vatomID: vatom.id)
         super.init(vatom: vatom, faceModel: faceModel)
 
-        self.vatomObserver.delegate = self
         // add image view
         self.addSubview(animatedImageView)
         animatedImageView.frame = self.bounds
@@ -107,14 +95,15 @@ class ImagePolicyFaceView: FaceView {
 
     /// Unload the face view (called when the VatomView must prepare for reuse).
     func unload() {
-        self.vatomObserver.cancel()
+        
     }
 
     // MARK: - Face Code
 
     /// Current count of child vAtoms.
     private var currentChildCount: Int {
-        return vatomObserver.childVatomIDs.count
+        // inspect cached children
+        return self.vatom.listCachedChildren().count
     }
 
     /// Updates the interface using local state.
@@ -217,20 +206,6 @@ class ImagePolicyFaceView: FaceView {
             completion?(error)
         }
 
-    }
-
-}
-
-// MARK: - Vatom Observer Delegate
-
-extension ImagePolicyFaceView: VatomObserverDelegate {
-
-    func vatomObserver(_ observer: VatomObserver, didAddChildVatom vatomID: String) {
-        self.updateUIDebounced()
-    }
-
-    func vatomObserver(_ observer: VatomObserver, didRemoveChildVatom vatomID: String) {
-        self.updateUIDebounced()
     }
 
 }

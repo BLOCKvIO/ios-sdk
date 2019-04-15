@@ -303,7 +303,7 @@ extension BLOCKv {
         self.client.request(endpoint) { result in
 
             switch result {
-            case .success(let baseModel):
+            case .success:
                 // model is available
                 DispatchQueue.main.async {
                     completion(nil)
@@ -338,7 +338,7 @@ extension BLOCKv {
         self.client.request(endpoint) { result in
 
             switch result {
-            case .success(let baseModel):
+            case .success:
                 // model is available
                 DispatchQueue.main.async {
                     completion(nil)
@@ -399,7 +399,7 @@ extension BLOCKv {
         self.client.request(endpoint) { result in
 
             switch result {
-            case .success(let baseModel):
+            case .success:
                 // model is available
                 DispatchQueue.main.async {
                     completion(nil)

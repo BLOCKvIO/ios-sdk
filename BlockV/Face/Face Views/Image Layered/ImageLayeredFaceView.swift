@@ -221,7 +221,7 @@ class ImageLayeredFaceView: FaceView {
 			}, completion: { _ in
 
 				// remove it
-				if let index = self.childLayers.index(of: layer) {
+				if let index = self.childLayers.firstIndex(of: layer) {
 					self.childLayers.remove(at: index)
 				}
 				layer.removeFromSuperview()

@@ -252,7 +252,7 @@ extension API {
 
     /// Consolidates all user vatom endpoints.
     enum Vatom {
-        
+
         /// Builds an endpoint to get the current user's inventory.
         ///
         /// The inventory call is essentially an optimized discover call. The server-pattern is from the child's
@@ -263,7 +263,7 @@ extension API {
                                  page: Int = 0,
                                  limit: Int = 0) -> Endpoint<BaseModel<UnpackedModel>> {
             return API.Generic.getInventory(parentID: parentID, page: page, limit: limit)
-            
+
         }
 
         /// Builds an endpoint to get a vAtom by its unique identifier.
@@ -273,7 +273,6 @@ extension API {
         static func getVatoms(withIDs ids: [String]) -> Endpoint<BaseModel<UnpackedModel>> {
             return API.Generic.getVatoms(withIDs: ids)
         }
-        
 
         /// Builds the endpoint to trash a vAtom specified by its id.
         ///
@@ -284,7 +283,7 @@ extension API {
                             parameters: ["this.id": id])
 
         }
-        
+
         /// Builds an endpoint to update a vAtom.
         ///
         /// - Parameter payload: Raw payload.
@@ -292,7 +291,7 @@ extension API {
         static func updateVatom(payload: [String: Any]) -> Endpoint<BaseModel<VatomUpdateModel>> {
             return API.Generic.updateVatom(payload: payload)
         }
-        
+
         /// Builds an endpoint to search for vAtoms.
         ///
         /// - Parameter payload: Raw request payload.
@@ -300,7 +299,7 @@ extension API {
         static func discover(_ payload: [String: Any]) -> Endpoint<BaseModel<UnpackedModel>> {
             return API.Generic.discover(payload)
         }
-        
+
         /// Builds an endpoint to geo search for vAtoms (i.e. search for dropped vAtoms).
         ///
         /// Use this endpoint to fetch a collection of vAtoms.
@@ -317,7 +316,7 @@ extension API {
                                 topRightLat: Double,
                                 topRightLon: Double,
                                 filter: String) -> Endpoint<BaseModel<UnpackedModel>> {
-            
+
             return API.Generic.geoDiscover(bottomLeftLat: bottomLeftLat,
                         bottomLeftLon: bottomLeftLon,
                         topRightLat: topRightLat,
@@ -426,16 +425,16 @@ extension API {
 }
 
 extension API {
-    
+
     enum Generic {
-        
+
         private static let userVatomPath    = "/v1/user/vatom"
         private static let userActionsPath  = "/v1/user/actions"
         private static let actionPath       = "/v1/user/vatom/action"
         private static let userActivityPath = "/v1/activity"
-        
+
         // MARK: Vatoms
-        
+
         /// Builds the generic endpoint to get the current user's inventory.
         ///
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
@@ -449,7 +448,7 @@ extension API {
                 ]
             )
         }
-        
+
         /// Builds a generic endpoint to get a vAtom by its unique identifier.
         ///
         /// - Parameter ids: Unique identifier of the vatom.
@@ -460,7 +459,7 @@ extension API {
                             parameters: ["ids": ids]
             )
         }
-        
+
         /// Builds a generic endpoint to update a vAtom.
         ///
         /// - Parameter payload: Raw payload.
@@ -470,18 +469,18 @@ extension API {
                             path: "/v1/vatoms",
                             parameters: payload)
         }
-        
+
         /// Builds a generic endpoint to search for vAtoms.
         ///
         /// - Parameter payload: Raw request payload.
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func discover<T>(_ payload: [String: Any]) -> Endpoint<T> {
-            
+
             return Endpoint(method: .post,
                             path: "/v1/vatom/discover",
                             parameters: payload)
         }
-        
+
         /// Builds a generic endpoint to geo search for vAtoms (i.e. search for dropped vAtoms).
         ///
         /// Use this endpoint to fetch a collection of vAtoms.
@@ -498,7 +497,7 @@ extension API {
                                    topRightLat: Double,
                                    topRightLon: Double,
                                    filter: String) -> Endpoint<T> {
-            
+
             // create the payload
             let payload: [String: Any] =
                 [
@@ -514,14 +513,14 @@ extension API {
                     ],
                     "filter": filter
             ]
-            
+
             // create the endpoint
             return Endpoint(method: .post,
                             path: "/v1/vatom/geodiscover",
                             parameters: payload)
-            
+
         }
-        
+
         /// Builds the endpoint to geo search for vAtom groups (i.e. search for clusters of dropped vAtoms).
         ///
         /// Use this endpoint to fetch an collection of groups/annotation indicating the count
@@ -541,9 +540,9 @@ extension API {
                                          topRightLon: Double,
                                          precision: Int,
                                          filter: String) -> Endpoint<T> {
-            
+
             assert(1...12 ~= precision, "You must specify a value in the open range [1...12].")
-            
+
             // create the payload
             let payload: [String: Any] =
                 [
@@ -560,16 +559,16 @@ extension API {
                     "precision": precision,
                     "filter": filter
             ]
-            
+
             // create the endpoint
             return Endpoint(method: .post,
                             path: "/v1/vatom/geodiscovergroups",
                             parameters: payload)
-            
+
         }
-        
+
         // MARK: - Perform Actions
-        
+
         /// Builds the endpoint to perform and action on a vAtom.
         ///
         /// - Parameters:
@@ -580,9 +579,9 @@ extension API {
             return Endpoint(method: .post,
                             path: actionPath + "/\(name)", parameters: payload)
         }
-        
+
         // MARK: Fetch Actions
-        
+
         /// Builds the endpoint for fetching the actions configured for a template ID.
         ///
         /// - Parameter id: Uniquie identifier of the template.
@@ -591,9 +590,9 @@ extension API {
             return Endpoint(method: .get,
                             path: userActionsPath + "/\(id)")
         }
-        
+
         // MARK: - User Activity
-        
+
         /// Builds the endpoint for fetching the threads involving the current user.
         ///
         /// - Parameters:
@@ -602,17 +601,17 @@ extension API {
         ///   - count: Defines the number of messages to return (after the cursor).
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func getThreads<T>(cursor: String, count: Int) -> Endpoint<T> {
-            
+
             let payload: [String: Any] = [
                 "cursor": cursor,
                 "count": count
             ]
-            
+
             return Endpoint(method: .post,
                             path: userActivityPath + "/mythreads",
                             parameters: payload)
         }
-        
+
         /// Builds the endpoint for fetching the message for a specified thread involving the current user.
         ///
         /// - Parameters:
@@ -622,19 +621,19 @@ extension API {
         ///   - count: Defines the number of messages to return (after the cursor).
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func getMessages<T>(forThreadId threadId: String, cursor: String, count: Int) -> Endpoint<T> {
-                
+
                 let payload: [String: Any] = [
                     "name": threadId,
                     "cursor": cursor,
                     "count": count
                 ]
-                
+
                 return Endpoint(method: .post,
                                 path: userActivityPath + "/mythreadmessages",
                                 parameters: payload)
-                
+
         }
-        
+
     }
-    
+
 }

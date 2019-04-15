@@ -182,7 +182,7 @@ extension BLOCKv {
             }
 
             switch result {
-            case .success(let model):
+            case .success:
                 // model is available
                 DispatchQueue.main.async {
                     completion(nil)

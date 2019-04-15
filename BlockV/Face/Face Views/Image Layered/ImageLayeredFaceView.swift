@@ -119,7 +119,7 @@ class ImageLayeredFaceView: FaceView {
     }
 
     func vatomChanged(_ vatom: VatomModel) {
-        
+
         self.vatom = vatom
         self.refreshUI()
     }
@@ -128,7 +128,7 @@ class ImageLayeredFaceView: FaceView {
     func unload() {
 		self.baseLayer.image = nil
     }
-    
+
     func refresh() {
         refreshUI()
     }
@@ -147,7 +147,7 @@ class ImageLayeredFaceView: FaceView {
     ///
     /// This method uses *local* data.
     private func updateLayers() {
-        
+
         var newLayers: [Layer] = []
         for childVatom in self.childVatoms {
 
@@ -270,4 +270,3 @@ class ImageLayeredFaceView: FaceView {
     }
 
 }
-

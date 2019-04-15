@@ -75,45 +75,30 @@ class GeoPosRegion: BLOCKvRegion {
         // pause websocket events
         self.pauseMessages()
         
-        let endpoint: Endpoint<Void> = API.Vatom.geoDiscover(
+        let endpoint: Endpoint<Void> = API.Generic.geoDiscover(
             bottomLeftLat: self.region.bottomLeft.latitude,
             bottomLeftLon: self.region.bottomLeft.longitude,
             topRightLat: self.region.topRight.latitude,
             topRightLon: self.region.topRight.longitude,
             filter: "all")
-                
-        BLOCKv.client.request(endpoint).map { data -> [String]? in
         
         // execute request
-//        return Request2.post(endpoint: "/vatom/geodiscover", payload: [
-//            "top_right": [
-//                "lat": self.region.topRight.latitude,
-//                "lon": self.region.topRight.longitude
-//            ],
-//            "bottom_left": [
-//                "lat": self.region.bottomLeft.latitude,
-//                "lon": self.region.bottomLeft.longitude
-//            ],
-//            "filter": "all",
-//            "limit": 10000
-//            ]).then { data -> [String]? in
+        return BLOCKv.client.requestJSON(endpoint).map { json -> [String]? in
             
-                // parse items
-//                guard let items = self.parseDataObject(from: data) else {
-//                    return nil
-//                }
-//
-//                // add all objects
-//                self.add(objects: items)
-//
-//                // return IDs
-//                return items.map { $0.id }
+            // parse items
+            guard let json = json as? [String: Any], let items = self.parseDataObject(from: data) else {
+                return nil
+            }
+            // add all objects
+            self.add(objects: items)
+            // return IDs
+            return items.map { $0.id }
             
-//            }.always {
-//
-//                // resume websocket events
-//                self.resumeMessages()
-//
+        }.ensure {
+                
+            // resume websocket events
+            self.resumeMessages()
+                
         }
         
     }
@@ -158,7 +143,7 @@ class GeoPosRegion: BLOCKvRegion {
         )
         
         // send our region over WebSocket to the server
-//        NotificationCenter.default.post(RegionEvent.startBrainUpdates.asNotification)
+        NotificationCenter.default.post(RegionEvent.startBrainUpdates.asNotification)
         
     }
     

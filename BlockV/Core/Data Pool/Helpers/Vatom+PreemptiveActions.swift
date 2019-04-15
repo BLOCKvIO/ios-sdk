@@ -124,6 +124,7 @@ extension VatomModel {
                        completion: @escaping (Result<[String: Any], BVError>) -> Void) {
 
         let body = [
+            "this.id": self.id,
             "geo.pos": [
                 "Lat": latitude,
                 "Lon": longitude

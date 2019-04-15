@@ -129,10 +129,6 @@ class ImageLayeredFaceView: FaceView {
 		self.baseLayer.image = nil
     }
 
-    func refresh() {
-        refreshUI()
-    }
-
     // MARK: - Refresh
 
     /// Refresh the view layer (does not refresh data layer).

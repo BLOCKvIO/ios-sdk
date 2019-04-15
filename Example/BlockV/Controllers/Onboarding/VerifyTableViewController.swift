@@ -102,25 +102,25 @@ class VerifyTableViewController: UITableViewController {
         // show loader
         self.showNavBarActivityRight()
         
-        BLOCKv.getCurrentUserTokens { [weak self] (fullTokens, error) in
+        BLOCKv.getCurrentUserTokens { [weak self] result in
             
             // hide loader
             self?.hideNavBarActivityRight()
             
-            // handle error
-            guard let model = fullTokens, error == nil else {
-                print(">>> Error > Viewer: \(error!.localizedDescription)")
-                self?.present(UIAlertController.errorAlert(error!), animated: true)
+            switch result {
+            case .success(let fullTokens):
+                print("Viewer > \(fullTokens)\n")
+                
+                // update the tokens
+                self?.allTokens = fullTokens
+                self?.tableView.reloadData()
+                
+            case .failure(let error):
+                print(">>> Error > Viewer: \(error.localizedDescription)")
+                self?.present(UIAlertController.errorAlert(error), animated: true)
                 return
             }
-            
-            // handle success
-            print("Viewer > \(model)\n")
-            
-            // update the tokens
-            self?.allTokens = model
-            self?.tableView.reloadData()
-            
+
         }
         
     }
@@ -224,27 +224,27 @@ extension VerifyTableViewController: VerfiyTokenDelegate {
         // show loader
         self.showNavBarActivityRight()
         
-        BLOCKv.verifyUserToken(token.value, type: token.type, code: code) {
-            [weak self] (userToken, error) in
+        BLOCKv.verifyUserToken(token.value, type: token.type, code: code) { [weak self] result in
             
             // hide loader
             self?.hideNavBarActivityRight()
             self?.navigationItem.rightBarButtonItem = self?.nextBarButton
             
-            // handle error
-            guard let model = userToken, error == nil else {
-                print(">>> Error > Viewer: \(error!.localizedDescription)")
-                self?.present(UIAlertController.errorAlert(error!), animated: true)
+            switch result {
+            case .success(let userToken):
+                self?.tableView.reloadData()
+                self?.present(UIAlertController.okAlert(title: "Info", message: "Token: \(userToken.value) has been verified."), animated: true)
+                
+                completion(true)
+                print("Viewer > \(userToken)\n")
+                
+            case .failure(let error):
+                print(">>> Error > Viewer: \(error.localizedDescription)")
+                self?.present(UIAlertController.errorAlert(error), animated: true)
                 completion(false)
                 return
             }
             
-            // handle success
-            self?.tableView.reloadData()
-            self?.present(UIAlertController.okAlert(title: "Info", message: "Token: \(model.value) has been verified."), animated: true)
-            
-            completion(true)
-            print("Viewer > \(model)\n")
         }
     }
     
@@ -253,29 +253,29 @@ extension VerifyTableViewController: VerfiyTokenDelegate {
         // show loader
         self.showNavBarActivityRight()
         
-        BLOCKv.resetVerification(forUserToken: token.value, type: token.type) {
-            [weak self] (userToken, error) in
+        BLOCKv.resetVerification(forUserToken: token.value, type: token.type) { [weak self] result in
             
             // hide loader
             self?.hideNavBarActivityRight()
             self?.navigationItem.rightBarButtonItem = self?.nextBarButton
             
-            // handle error
-            guard let model = userToken, error == nil else {
-                print(">>> Error > Viewer: \(error!.localizedDescription)")
-                self?.present(UIAlertController.errorAlert(error!), animated: true)
+            switch result {
+            case .success(let userToken):
+                self?.tableView.reloadData()
+                self?.present(UIAlertController.okAlert(title: "Info",
+                                                        message: "An verification link/OTP has been sent to your token."),
+                              animated: true)
+                
+                completion(true)
+                print("Viewer > \(userToken)\n")
+                
+            case .failure(let error):
+                print(">>> Error > Viewer: \(error.localizedDescription)")
+                self?.present(UIAlertController.errorAlert(error), animated: true)
                 completion(false)
                 return
             }
             
-            // handle success
-            self?.tableView.reloadData()
-            self?.present(UIAlertController.okAlert(title: "Info",
-                                                    message: "An verification link/OTP has been sent to your token."),
-                          animated: true)
-            
-            completion(true)
-            print("Viewer > \(model)\n")
         }
     }
     

@@ -61,7 +61,7 @@ extension BLOCKv {
         let endpoint = API.Session.register(tokens: tokens, userInfo: userInfo)
 
         self.client.request(endpoint) { result in
-            
+
             switch result {
             case .success(let baseModel):
                 // model is available
@@ -175,12 +175,12 @@ extension BLOCKv {
         let endpoint = API.CurrentUser.logOut()
 
         self.client.request(endpoint) { result in
-            
+
             // reset
             DispatchQueue.main.async {
                 reset()
             }
-            
+
             switch result {
             case .success(let model):
                 // model is available

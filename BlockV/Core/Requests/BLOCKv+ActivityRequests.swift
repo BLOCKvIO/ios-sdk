@@ -30,7 +30,7 @@ extension BLOCKv {
         let endpoint = API.UserActivity.getThreads(cursor: cursor, count: count)
 
         self.client.request(endpoint) { result in
-            
+
             switch result {
             case .success(let baseModel):
                 // model is available
@@ -66,7 +66,7 @@ extension BLOCKv {
         let endpoint = API.UserActivity.getMessages(forThreadId: threadId, cursor: cursor, count: count)
 
         self.client.request(endpoint) { result in
-            
+
             switch result {
             case .success(let baseModel):
                 // model is available
@@ -97,7 +97,7 @@ extension BLOCKv {
         let endpoint = API.CurrentUser.sendMessage(message, toUserId: userId)
 
         self.client.request(endpoint) { result in
-            
+
             switch result {
             case .success(let baseModel):
                 // model is available

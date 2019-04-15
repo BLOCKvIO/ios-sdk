@@ -186,11 +186,11 @@ extension VatomModel {
 
         // perform the action
         BLOCKv.performAction(name: name, payload: payload) { result in
-            
+
             switch result {
             case .success(let payload):
                 completion(.success(payload))
-                
+
             case .failure(let error):
                 // run undo closures
                 undos.forEach { $0() }

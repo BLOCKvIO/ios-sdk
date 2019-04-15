@@ -24,7 +24,7 @@ public struct VatomUpdateModel: Decodable, Equatable {
         case errorMessage = "error_messages"
         case ids
     }
-    
+
     public init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         numberUpdated = try values.decode(Int.self, forKey: .numberUpdated)

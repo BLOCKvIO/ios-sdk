@@ -82,7 +82,7 @@ class CoreBridgeV1: CoreBridge {
     }
 
     // swiftlint:disable cyclomatic_complexity
-
+    // swiftlint:disable function_body_length
     /// Processes the face script message and calls the completion handler with the result for encoding.
     func processMessage(_ scriptMessage: RequestScriptMessage, completion: @escaping Completion) {
 
@@ -366,7 +366,7 @@ class CoreBridgeV1: CoreBridge {
                     completion(.failure(bridgeError))
                 }
 
-            case .failure(let error):
+            case .failure:
                 // handle error
                 let bridgeError = BridgeError.viewer("Unable to fetch public user: \(id).")
                 completion(.failure(bridgeError))
@@ -405,7 +405,7 @@ class CoreBridgeV1: CoreBridge {
                     completion(.failure(bridgeError))
                 }
 
-            case .failure(let error):
+            case .failure:
                 // handle error
                 let bridgeError = BridgeError.viewer("Unable to fetch public user: \(id).")
                 completion(.failure(bridgeError))
@@ -441,7 +441,7 @@ class CoreBridgeV1: CoreBridge {
                     }
                     completion(.success(json))
 
-                case .failure(let error):
+                case .failure:
                     // handle error
                     let bridgeError = BridgeError.viewer("Unable to perform action: \(name).")
                     completion(.failure(bridgeError))
@@ -490,7 +490,7 @@ private extension CoreBridgeV1 {
                 permittedIDs.append(backingID)
 
                 completion(permittedIDs, nil)
-            case .failure(let error):
+            case .failure:
                 // handle error
                 let bridgeError = BridgeError.viewer("Unable to fetch vAtoms.")
                 completion(nil, bridgeError)
@@ -515,7 +515,7 @@ private extension CoreBridgeV1 {
                 // convert vAtom into bridge format
                 completion(self.formatVatoms(vatoms), nil)
 
-            case .failure(let error):
+            case .failure:
                 let bridgeError = BridgeError.viewer("Unable to fetch backing vAtom.")
                 completion([], bridgeError)
             }
@@ -539,7 +539,7 @@ private extension CoreBridgeV1 {
                 // format vatoms
                 completion(self.formatVatoms(vatoms), nil)
 
-            case .failure(let error):
+            case .failure:
                 // handle error
                 let bridgeError = BridgeError.viewer("Unable to fetch children for vAtom \(id).")
                 completion([], bridgeError)

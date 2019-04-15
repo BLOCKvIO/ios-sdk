@@ -113,10 +113,11 @@ class CoreBridgeV2: CoreBridge {
         return !(MessageName(rawValue: message) == nil)
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
-    // swiftlint:disable:next function_body_length
     /// Processes the face script message and calls the completion handler with the result for encoding.
-    func processMessage(_ scriptMessage: RequestScriptMessage, completion: @escaping (Result<JSON, BridgeError>) -> Void) {
+    // swiftlint:disable cyclomatic_complexity
+    // swiftlint:disable function_body_length
+    func processMessage(_ scriptMessage: RequestScriptMessage,
+                        completion: @escaping (Result<JSON, BridgeError>) -> Void) {
 
         let message = MessageName(rawValue: scriptMessage.name)!
         //printBV(info: "CoreBride_2: \(message)")
@@ -181,7 +182,7 @@ class CoreBridgeV2: CoreBridge {
 
                     })
 
-                case .failure(let error):
+                case .failure:
                     let bridgeError = BridgeError.viewer("Unable to fetch vAtoms.")
                     completion(.failure(bridgeError))
                 }
@@ -340,10 +341,11 @@ class CoreBridgeV2: CoreBridge {
                         // set parent
                         self.setParentId(on: childVatomId, parentId: parentId, completion: completion)
                     } else {
-                        let bridgeError = BridgeError.viewer("This method is only permitted on the backing vatom or one of its children.")
+                        let message = "This method is only permitted on the backing vatom or one of its children."
+                        let bridgeError = BridgeError.viewer(message)
                         completion(.failure(bridgeError))
                     }
-                case .failure(let error):
+                case .failure:
                     let bridgeError = BridgeError.viewer("Unable to fetch vAtoms.")
                     completion(.failure(bridgeError))
                 }
@@ -456,7 +458,7 @@ class CoreBridgeV2: CoreBridge {
                     let response = ["vatoms": vatoms]
                     completion(.success(response))
 
-                case .failure(let error):
+                case .failure:
                     let bridgeError = BridgeError.viewer("Unable to fetch vAtoms.")
                     completion(.failure(bridgeError))
                 }
@@ -489,7 +491,7 @@ class CoreBridgeV2: CoreBridge {
                 permittedIDs.append(backingID)
                 completion(.success(permittedIDs))
 
-            case .failure(let error):
+            case .failure:
                 let bridgeError = BridgeError.viewer("Unable to fetch vAtoms.")
                 completion(.failure(bridgeError))
             }
@@ -517,7 +519,7 @@ class CoreBridgeV2: CoreBridge {
             case .success(let vatoms):
                 let response = ["vatoms": vatoms]
                 completion(.success(response))
-            case .failure(let error):
+            case .failure:
                 let bridgeError = BridgeError.viewer("Unable to fetch children for vAtom \(id).")
                 completion(.failure(bridgeError))
             }
@@ -544,7 +546,7 @@ class CoreBridgeV2: CoreBridge {
                 let response = BRUser(id: user.id, properties: properties)
                 completion(.success(response))
 
-            case .failure(let error):
+            case .failure:
                 let bridgeError = BridgeError.viewer("Unable to fetch public user: \(id).")
                 completion(.failure(bridgeError))
             }
@@ -585,7 +587,7 @@ class CoreBridgeV2: CoreBridge {
                     }
                     completion(.success(json))
 
-                case .failure(let error):
+                case .failure:
                     let bridgeError = BridgeError.viewer("Unable to perform action: \(name).")
                     completion(.failure(bridgeError))
                 }
@@ -610,7 +612,8 @@ class CoreBridgeV2: CoreBridge {
     /// - Parameters:
     ///   - urlStrings: Array of URL strings to be encoded (if possible).
     ///   - completion: Completion handler to call with JSON data to be passed to the Web Face SDK.
-    private func encodeResources(_ urlStrings: [String], completion: @escaping (Result<[String], BridgeError>) -> Void) {
+    private func encodeResources(_ urlStrings: [String],
+                                 completion: @escaping (Result<[String], BridgeError>) -> Void) {
 
         // convert to URL type
         let urls = urlStrings.map { URL(string: $0) }
@@ -654,7 +657,8 @@ class CoreBridgeV2: CoreBridge {
                 completion(.success(response))
 
             case .failure(let error):
-                let bridgeError = BridgeError.viewer("Unable to set parent Id: \(parentId). \(error.localizedDescription)")
+                let message = "Unable to set parent Id: \(parentId). \(error.localizedDescription)"
+                let bridgeError = BridgeError.viewer(message)
                 completion(.failure(bridgeError))
             }
         }

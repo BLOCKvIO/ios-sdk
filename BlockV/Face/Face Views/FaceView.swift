@@ -11,11 +11,6 @@
 
 import Foundation
 
-/*
- When implementing a Face View, it is worth considering how it will work for should work for both owned and unowned
- (public) vAtoms.
- */
-
 /// TODO: This operator is useful, but has a drawback in that it always makes an assignment.
 infix operator ?=
 internal func ?=<T> (lhs: inout T, rhs: T?) {
@@ -39,6 +34,8 @@ public protocol FaceViewIdentifiable {
 }
 
 /// The protocol that face views must adopt to receive lifecycle events.
+///
+///  When implementing a Face View, it is worth considering how it will work for both owned and unowned (public) vAtoms.
 public protocol FaceViewLifecycle: class {
 
     /// Boolean value indicating whether the face view has loaded. After load has completed that boolean must be

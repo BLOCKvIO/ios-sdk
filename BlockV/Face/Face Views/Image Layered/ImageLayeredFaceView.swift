@@ -109,14 +109,16 @@ class ImageLayeredFaceView: FaceView {
         self.loadResources { [weak self] error in
 
             guard let self = self else { return }
+
+            // update ui
+            self.updateLayers()
+
             // update state and inform delegate of load completion
             if let error = error {
                 self.isLoaded = false
-                self.updateLayers()
                 completion?(error)
             } else {
                 self.isLoaded = true
-                self.updateLayers()
                 completion?(nil)
             }
         }
@@ -129,13 +131,14 @@ class ImageLayeredFaceView: FaceView {
         if self.vatom.id == vatom.id {
             // replace vatom, update UI
             self.vatom = vatom
-            self.updateLayers()
         } else {
             // replace vatom, reset and update UI
             self.vatom = vatom
             self.reset()
-            self.updateLayers()
         }
+        // update ui
+        self.updateLayers()
+
     }
 
     /// Resets the contents of the face view.

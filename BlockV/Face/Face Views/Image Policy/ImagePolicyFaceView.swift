@@ -101,13 +101,14 @@ class ImagePolicyFaceView: FaceView {
         if self.vatom.id == vatom.id {
             // replace vatom, update UI
             self.vatom = vatom
-            self.updateUI(completion: nil)
+            
         } else {
             // replace vatom, reset and update UI
             self.vatom = vatom
             self.reset()
-            self.updateUI(completion: nil)
         }
+        // update ui
+        self.updateUI(completion: nil)
 
     }
 

@@ -168,17 +168,17 @@ class ImageProgressFaceView: FaceView {
     /// Updates the backing Vatom and loads the new state.
     func vatomChanged(_ vatom: VatomModel) {
 
-         if self.vatom.id == vatom.id {
+        if self.vatom.id == vatom.id {
             // replace vatom, update UI
             self.vatom = vatom
-            self.updateUI()
-         } else {
+        } else {
             // replace vatom, reset and load
             self.vatom = vatom
             self.reset()
-            self.setNeedsLayout()
-            self.updateUI()
-         }
+        }
+        // update ui
+        self.setNeedsLayout()
+        self.updateUI()
 
     }
 

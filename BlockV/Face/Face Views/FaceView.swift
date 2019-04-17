@@ -50,12 +50,11 @@ public protocol FaceViewLifecycle: class {
     /// All content and state should be reset on calling load.
     ///
     /// - important:
-    /// This method will only be called once by the Vatom View Life Cycle (VVLC). This is the trigger for the face view
-    /// to gathering necessary resources and lay out its content.
+    /// This method will only be called only once by the Vatom View Life Cycle (VVLC). This is the trigger for the face
+    /// view to gathering necessary resources and lay out its content.
     ///
-    /// Face views should call the `FaceViewDelegate`'s `faceView(didLoad:)` method once the face view has completed
-    /// loading or encoutered and error during.
-    func load()
+    /// Face views *must* call the completion handler once loading has completed or errored out.
+    func load(completion: ((Error?) -> Void)?)
 
     /*
      # NOTE
@@ -67,7 +66,7 @@ public protocol FaceViewLifecycle: class {
      Perhaps vatomChanged(_ vatom:  VatomModel) should be updated to accept the face model for the rare case it has
      changed? That said, modifiying the faces after init is bad proactice.
      */
-    
+
     /// Called to inform the face view the specified vAtom should be rendered.
     ///
     /// Face views should respond to this method by refreshing their content. Typically, this is achieved by internally
@@ -111,7 +110,7 @@ open class BaseFaceView: UIView {
     public internal(set) var faceModel: FaceModel
 
     /// Face view delegate.
-    weak var delegate: FaceViewDelegate?
+    weak public internal(set) var delegate: FaceViewDelegate?
 
     /// Initializes a BaseFaceView using a vAtom and a face model.
     ///

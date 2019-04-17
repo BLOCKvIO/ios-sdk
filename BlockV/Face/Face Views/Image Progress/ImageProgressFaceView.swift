@@ -140,27 +140,27 @@ class ImageProgressFaceView: FaceView {
     // MARK: - FaceView Lifecycle
 
     /// Begins loading the face view's content.
-    func load() {
+    func load(completion: ((Error?) -> Void)?) {
 
         // reset content
         self.reset()
         /// load required resources
         self.loadResources { [weak self] error in
-            
+
             guard let self = self else { return }
             // update state and inform delegate of load completion
             if let error = error {
                 self.setNeedsLayout()
                 self.updateUI()
                 self.isLoaded = false
-                self.delegate?.faceView(self, didLoad: error)
+                completion?(error)
             } else {
                 self.setNeedsLayout()
                 self.updateUI()
                 self.isLoaded = true
-                self.delegate?.faceView(self, didLoad: nil)
+                completion?(nil)
             }
-            
+
         }
 
     }
@@ -179,9 +179,9 @@ class ImageProgressFaceView: FaceView {
             self.setNeedsLayout()
             self.updateUI()
          }
-        
+
     }
-    
+
     /// Resets the contents of the face view.
     private func reset() {
         emptyImageView.image = nil
@@ -287,13 +287,13 @@ class ImageProgressFaceView: FaceView {
 
         // ensure encoding passes
         do {
-            
+
             let encodedEmptyURL = try BLOCKv.encodeURL(emptyImageResource.url)
             let encodedFullURL = try BLOCKv.encodeURL(fullImageResource.url)
-            
+
             dispatchGroup.enter()
             dispatchGroup.enter()
-            
+
             var requestEmpty = ImageRequest(url: encodedEmptyURL)
             // use unencoded url as cache key
             requestEmpty.cacheKey = emptyImageResource.url
@@ -301,7 +301,7 @@ class ImageProgressFaceView: FaceView {
             Nuke.loadImage(with: requestEmpty, into: self.emptyImageView) { (_, _) in
                 self.dispatchGroup.leave()
             }
-            
+
             var requestFull = ImageRequest(url: encodedFullURL)
             // use unencoded url as cache key
             requestFull.cacheKey = fullImageResource.url
@@ -309,12 +309,12 @@ class ImageProgressFaceView: FaceView {
             Nuke.loadImage(with: requestFull, into: self.fullImageView) { (_, _) in
                 self.dispatchGroup.leave()
             }
-            
+
             dispatchGroup.notify(queue: .main) {
                 self.isLoaded = true
                 completion(nil)
             }
-            
+
         } catch {
             completion(error)
         }

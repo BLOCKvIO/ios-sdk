@@ -124,8 +124,8 @@ class ImageFaceView: FaceView {
     // MARK: - Face View Lifecycle
 
     /// Begins loading the face view's content.
-    func load() {
-        
+    func load(completion: ((Error?) -> Void)?) {
+
         /*
          # Pattern
          1. Call `reset` (which sets `isLoaded` to false)
@@ -134,22 +134,22 @@ class ImageFaceView: FaceView {
          >>> set `isLoaded` to true
          >>> call the delegate
          */
-        
+
         // reset content
         self.reset()
         // load required resources
         self.loadResources { [weak self] error in
-            
+
             guard let self = self else { return }
             // update state and inform delegate of load completion
             if let error = error {
                 self.isLoaded = false
-                self.delegate?.faceView(self, didLoad: error)
+                completion?(error)
             } else {
                 self.isLoaded = true
-                self.delegate?.faceView(self, didLoad: nil)
+                completion?(nil)
             }
-            
+
         }
     }
 
@@ -168,12 +168,11 @@ class ImageFaceView: FaceView {
 
         // reset content
         self.reset()
-        // replace current vatom
         self.vatom = vatom
-        self.load()
+        self.loadResources(completion: nil)
 
     }
-    
+
     /// Resets the contents of the face view.
     private func reset() {
         self.animatedImageView.image = nil
@@ -190,40 +189,40 @@ class ImageFaceView: FaceView {
 
     // MARK: - Resources
 
-    private func loadResources(completion: @escaping (Error?) -> Void) {
+    private func loadResources(completion: ((Error?) -> Void)?) {
 
         // extract resource model
         guard let resourceModel = vatom.props.resources.first(where: { $0.name == config.imageName }) else {
-            completion(FaceError.missingVatomResource)
+            completion?(FaceError.missingVatomResource)
             return
         }
-        
+
         do {
             // encode url
             let encodeURL = try BLOCKv.encodeURL(resourceModel.url)
-            
+
             //FIXME: Where should this go?
             ImagePipeline.Configuration.isAnimatedImageDataEnabled = true
-            
+
             //TODO: Should the size of the VatomView be factoring in and the image be resized?
-            
+
             var request = ImageRequest(url: encodeURL)
             // use unencoded url as cache key
             request.cacheKey = resourceModel.url
-            
+
             /*
              Nuke's `loadImage` cancels any exisitng requests and nils out the old image. This takes care of the reuse-pool
              use case where the same face view is used to display a vatom of the same template variation.
              */
-            
+
             // load image (auto cancel previous)
             Nuke.loadImage(with: request, into: self.animatedImageView) { (_, error) in
                 self.isLoaded = true
-                completion(error)
+                completion?(error)
             }
-            
+
         } catch {
-            completion(error)
+            completion?(error)
         }
 
     }

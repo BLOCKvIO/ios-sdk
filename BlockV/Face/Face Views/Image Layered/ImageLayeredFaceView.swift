@@ -101,23 +101,23 @@ class ImageLayeredFaceView: FaceView {
     // MARK: - Face View Lifecycle
 
     /// Begins loading the face view's content.
-    func load() {
+    func load(completion: ((Error?) -> Void)?) {
 
         // reset content
         self.reset()
         // load required resources
         self.loadResources { [weak self] error in
-            
+
             guard let self = self else { return }
             // update state and inform delegate of load completion
             if let error = error {
                 self.isLoaded = false
                 self.updateLayers()
-                self.delegate?.faceView(self, didLoad: error)
+                completion?(error)
             } else {
                 self.isLoaded = true
                 self.updateLayers()
-                self.delegate?.faceView(self, didLoad: nil)
+                completion?(nil)
             }
         }
 
@@ -125,7 +125,7 @@ class ImageLayeredFaceView: FaceView {
 
     /// Updates the backing Vatom and loads the new state.
     func vatomChanged(_ vatom: VatomModel) {
-        
+
         if self.vatom.id == vatom.id {
             // replace vatom, update UI
             self.vatom = vatom
@@ -137,7 +137,7 @@ class ImageLayeredFaceView: FaceView {
             self.updateLayers()
         }
     }
-    
+
     /// Resets the contents of the face view.
     private func reset() {
         self.baseLayer.image = nil
@@ -244,7 +244,7 @@ class ImageLayeredFaceView: FaceView {
 			timeOffset += 0.2
 		}
 	}
-    
+
     /// Remove all child layers without animation.
     private func removeAllLayers() {
         childLayers.forEach { $0.removeFromSuperview() }
@@ -272,9 +272,9 @@ class ImageLayeredFaceView: FaceView {
             var request = ImageRequest(url: encodeURL)
             // use unencoded url as cache key
             request.cacheKey = resourceModel.url
-            
+
             // load image (auto cancel previous)
-            Nuke.loadImage(with: request, into: self.baseLayer) { (response, error) in
+            Nuke.loadImage(with: request, into: self.baseLayer) { (_, error) in
                 self.isLoaded = true
                 completion(error)
             }

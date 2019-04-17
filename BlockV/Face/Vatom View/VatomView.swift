@@ -449,7 +449,29 @@ open class VatomView: UIView {
         self.insertSubview(newFaceView, at: 0)
 
         // 1. instruct face view to load its content (must be able to handle being called multiple times).
-        newFaceView.load()
+        newFaceView.load { [weak self] (error) in
+
+            ///printBV(info: "Face view load completion called.")
+
+            guard let self = self else { return }
+
+            // Error - Case 2 -  Display error view if the face view encounters an error during its load operation.
+
+            // ensure no error
+            guard error == nil else {
+                // face view encountered an error
+                self.selectedFaceView?.removeFromSuperview()
+                self.state = .error
+                self.vatomViewDelegate?.vatomView(self, didLoadFaceView: .failure(VVLCError.faceViewLoadFailed) )
+                return
+            }
+
+            // show face
+            self.state = .completed
+            // inform delegate
+            self.vatomViewDelegate?.vatomView(self, didLoadFaceView: .success(self.selectedFaceView!))
+
+        }
 
     }
 
@@ -459,39 +481,17 @@ open class VatomView: UIView {
 ///
 /// This is the conduit of communication between the VatomView and it's Face View.
 extension VatomView: FaceViewDelegate {
-    
-    func faceView(_ faceView: FaceView,
-                  didSendMessage message: String,
-                  withObject object: [String: JSON],
-                  completion: ((Result<JSON, FaceMessageError>) -> Void)?) {
-        
+
+    public func faceView(_ faceView: FaceView,
+                         didSendMessage message: String,
+                         withObject object: [String: JSON],
+                         completion: ((Result<JSON, FaceMessageError>) -> Void)?) {
+
         // forward the message to the vatom view delegate
         self.vatomViewDelegate?.vatomView(self,
                                           didRecevieFaceMessage: message,
                                           withObject: object,
                                           completion: completion)
     }
-    
-    func faceView(_ faceView: FaceView, didLoad error: Error?) {
-        
-        // forward the result to the vatom view delegate
-        if let error = error {
-            
-            // face view encountered an error
-            self.selectedFaceView?.removeFromSuperview()
-            self.state = .error
-            self.vatomViewDelegate?.vatomView(self, didLoadFaceView: .failure(VVLCError.faceViewLoadFailed) )
-            
-            // inform delegate
-            //TODO: Error information is lost here. Does the face view need a specific error.
-            let vvlcError = VVLCError.faceViewLoadFailed
-            self.vatomViewDelegate?.vatomView(self, didLoadFaceView: Result.failure(vvlcError))
-        } else {
-            // show face
-            self.state = .completed
-            // inform delegate
-            self.vatomViewDelegate?.vatomView(self, didLoadFaceView: .success(faceView))
-        }
-    }
-    
+
 }

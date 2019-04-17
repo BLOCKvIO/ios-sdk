@@ -73,23 +73,23 @@ class ImagePolicyFaceView: FaceView {
     // MARK: - Face View Lifecycle
 
     /// Begins loading the face view's content.
-    func load() {
+    func load(completion: ((Error?) -> Void)?) {
         // reset content
         self.reset()
         // update state
         self.updateUI { [weak self] error in
-            
+
             guard let self = self else { return }
             // inform delegate of load completion
             if let error = error {
                 self.isLoaded = false
-                self.delegate?.faceView(self, didLoad: error)
+                completion?(error)
             } else {
                 self.isLoaded = true
-                self.delegate?.faceView(self, didLoad: nil)
+                completion?(nil)
             }
         }
-        
+
     }
 
     /// Updates the backing Vatom and loads the new state.
@@ -110,7 +110,7 @@ class ImagePolicyFaceView: FaceView {
         }
 
     }
-    
+
     /// Resets the contents of the face view.
     private func reset() {
         self.animatedImageView.image = nil

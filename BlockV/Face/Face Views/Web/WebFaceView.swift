@@ -80,9 +80,13 @@ class WebFaceView: FaceView {
 
     var isLoaded: Bool = false
 
+    /// Holds the completion handler.
+    private var completion: ((Error?) -> Void)?
+
     /// Begins loading the face view's content.
-    func load() {
-        
+    func load(completion: ((Error?) -> Void)?) {
+        // store the completion
+        self.completion = completion
         self.loadFace()
     }
 
@@ -98,7 +102,7 @@ class WebFaceView: FaceView {
         let children = self.vatom.listCachedChildren()
         self.coreBridge?.sendVatomChildren(children)
     }
-    
+
     /// Resets the contents of the face view.
     private func reset() {
         
@@ -127,8 +131,7 @@ class WebFaceView: FaceView {
 extension WebFaceView: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        // inform delegate of load completion
-        self.delegate?.faceView(self, didLoad: nil)
+        self.completion?(nil)
     }
 
     func webView(_ webView: WKWebView,

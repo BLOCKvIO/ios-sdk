@@ -170,13 +170,16 @@ extension BLOCKv {
                 // roll back only those failed containments
                 let undosToRollback = undos.filter { !updateVatomModel.ids.contains($0.id) }
                 undosToRollback.forEach { $0.undo() }
-                // complete
-                completion(.success(updateVatomModel))
+                DispatchQueue.main.async {
+                    completion(.success(updateVatomModel))
+                }
 
             case .failure(let error):
                 // roll back all containments
                 undos.forEach { $0.undo() }
-                completion(.failure(error))
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
             }
 
         }

@@ -10,6 +10,7 @@
 //
 
 import Foundation
+import GenericJSON
 
 // MARK: - Protocols
 
@@ -472,6 +473,25 @@ open class VatomView: UIView {
 
         }
 
+    }
+
+}
+
+/// Extend VatomView to conform to `FaceViewDelegate`.
+///
+/// This is the conduit of communication between the VatomView and it's Face View.
+extension VatomView: FaceViewDelegate {
+
+    public func faceView(_ faceView: FaceView,
+                         didSendMessage message: String,
+                         withObject object: [String: JSON],
+                         completion: ((Result<JSON, FaceMessageError>) -> Void)?) {
+
+        // forward the message to the vatom view delegate
+        self.vatomViewDelegate?.vatomView(self,
+                                          didRecevieFaceMessage: message,
+                                          withObject: object,
+                                          completion: completion)
     }
 
 }

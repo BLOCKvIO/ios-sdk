@@ -100,41 +100,57 @@ class ImageLayeredFaceView: FaceView {
 
     // MARK: - Face View Lifecycle
 
-    /// Holds the completion to call when the face view has completed loading.
-    private var loadCompletion: ((Error?) -> Void)?
-
-    /// Begin loading the face view's content.
+    /// Begins loading the face view's content.
     func load(completion: ((Error?) -> Void)?) {
 
-        // assign a single load completion closure
-        loadCompletion = { (error) in
-            completion?(error)
+        // reset content
+        self.reset()
+        // load required resources
+        self.loadResources { [weak self] error in
+
+            guard let self = self else { return }
+
+            // update ui
+            self.updateLayers()
+
+            // update state and inform delegate of load completion
+            if let error = error {
+                self.isLoaded = false
+                completion?(error)
+            } else {
+                self.isLoaded = true
+                completion?(nil)
+            }
         }
-        /*
-         Business logic:
-         This face is considered to be 'loaded' once the base image has been downloaded and loaded into the view.
-         */
-        self.loadBaseResource()
 
     }
 
+    /// Updates the backing Vatom and loads the new state.
     func vatomChanged(_ vatom: VatomModel) {
 
-        self.vatom = vatom
-        self.refreshUI()
+        if self.vatom.id == vatom.id {
+            // replace vatom, update UI
+            self.vatom = vatom
+        } else {
+            // replace vatom, reset and update UI
+            self.vatom = vatom
+            self.reset()
+        }
+        // update ui
+        self.updateLayers()
+
+    }
+
+    /// Resets the contents of the face view.
+    private func reset() {
+        self.baseLayer.image = nil
+        self.removeAllLayers()
     }
 
     /// Unload the face view (called when the VatomView must prepare for reuse).
     func unload() {
-		self.baseLayer.image = nil
-    }
-
-    // MARK: - Refresh
-
-    /// Refresh the view layer (does not refresh data layer).
-    private func refreshUI() {
-        self.loadBaseResource()
-        self.updateLayers()
+        self.reset()
+        //TODO: Cancel downloads
     }
 
     // MARK: - Layer Management
@@ -232,17 +248,23 @@ class ImageLayeredFaceView: FaceView {
 		}
 	}
 
+    /// Remove all child layers without animation.
+    private func removeAllLayers() {
+        childLayers.forEach { $0.removeFromSuperview() }
+        childLayers = []
+    }
+
     // MARK: - Resources
 
     /// Loads the resource for the backing vAtom's "layerImage" into the base layer.
     ///
     /// Calls the `loadCompletion` closure asynchronously. Note: the mechanics of `loadImage(with:into:)` mean only the
     /// latest completion handler will be executed since all previous tasks are cancelled.
-    private func loadBaseResource() {
+    private func loadResources(completion: @escaping (Error?) -> Void) {
 
         // extract resource model
         guard let resourceModel = vatom.props.resources.first(where: { $0.name == config.imageName }) else {
-            loadCompletion?(FaceError.missingVatomResource)
+            completion(FaceError.missingVatomResource)
             return
         }
 
@@ -253,14 +275,14 @@ class ImageLayeredFaceView: FaceView {
             var request = ImageRequest(url: encodeURL)
             // use unencoded url as cache key
             request.cacheKey = resourceModel.url
-            // load image (automatically handles reuse)
-            // GOTCHA: Upon calling load, previous requests are cancelled allong with their completion handlers.
+
+            // load image (auto cancel previous)
             Nuke.loadImage(with: request, into: self.baseLayer) { (_, error) in
                 self.isLoaded = true
-                self.loadCompletion?(error)
+                completion(error)
             }
         } catch {
-            loadCompletion?(error)
+            completion(error)
         }
 
     }

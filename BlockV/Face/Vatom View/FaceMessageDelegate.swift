@@ -111,11 +111,27 @@ public struct FaceMessageError: Error {
 
 /// The protocol face views must conform to in order to communicate
 protocol FaceViewDelegate: class {
+    
+    /*
+     Is this delegate method required?
+     OPtions:
+     1. Callback in load
+     2. Delegate methods informing the owner of vatom view that the load completed.
+     
+     1. Have promblems cause it's hard to 
+     */
 
+    /// Called when the face view completes loading.
+    ///
+    /// - Parameters:
+    ///   - faceView: The face view from which this message was received.
+    ///   - result: Outcome of the face view load operation.
+    func faceView(_ faceView: FaceView, didLoad outcome: Error?)
+    
     /// Called when the vatom view receives a message from the face.
     ///
     /// - Parameters:
-    ///   - vatomView: The `VatomView` instance which the face message was received from.
+    ///   - faceView: The face view from which this message was received.
     ///   - message: The unique identifier of the message.
     ///   - object: Companion object which addtional information relevant to the request.
     ///   - completion: The completion handler to call once the request has been processed.
@@ -123,24 +139,5 @@ protocol FaceViewDelegate: class {
                   didSendMessage message: String,
                   withObject object: [String: JSON],
                   completion: ((Result<JSON, FaceMessageError>) -> Void)?)
-
-}
-
-/// Extend VatomView to conform to `FaceViewDelegate`.
-///
-/// This is the conduit of communication between the VatomView and it's Face View.
-extension VatomView: FaceViewDelegate {
-
-    func faceView(_ faceView: FaceView,
-                  didSendMessage message: String,
-                  withObject object: [String: JSON],
-                  completion: ((Result<JSON, FaceMessageError>) -> Void)?) {
-
-        // forward the message to the vatom view delegate
-        self.vatomViewDelegate?.vatomView(self,
-                                          didRecevieFaceMessage: message,
-                                          withObject: object,
-                                          completion: completion)
-    }
 
 }

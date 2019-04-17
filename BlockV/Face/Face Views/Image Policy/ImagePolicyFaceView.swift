@@ -72,30 +72,55 @@ class ImagePolicyFaceView: FaceView {
 
     // MARK: - Face View Lifecycle
 
-    /// Begin loading the face view's content.
-    func load(completion: ((Error?) -> Void)?) {
-        // update resources
-        updateUI(completion: completion)
+    /// Begins loading the face view's content.
+    func load() {
+        // reset content
+        self.reset()
+        // update state
+        self.updateUI { [weak self] error in
+            
+            guard let self = self else { return }
+            // inform delegate of load completion
+            if let error = error {
+                self.isLoaded = false
+                self.delegate?.faceView(self, didLoad: error)
+            } else {
+                self.isLoaded = true
+                self.delegate?.faceView(self, didLoad: nil)
+            }
+        }
+        
     }
 
-    /// Respond to updates or replacement of the current vAtom.
+    /// Updates the backing Vatom and loads the new state.
+    ///
+    /// The VVLC ensures the vatom will share the same template variation. This means the vatom will have the same
+    /// resources but the state of the face (e.g. which recsources it is showing) may be different.
     func vatomChanged(_ vatom: VatomModel) {
 
-        /*
-         NOTE:
-         - Changes to to the backing vAtom must be reflected in the face view.
-         - Specifically, updates to the backing vAtom or it's children may afect the required image policy image.
-         */
-
-        // replace current vatom
-        self.vatom = vatom
-        self.updateUIDebounced()
+        if self.vatom.id == vatom.id {
+            // replace vatom, update UI
+            self.vatom = vatom
+            self.updateUI(completion: nil)
+        } else {
+            // replace vatom, reset and update UI
+            self.vatom = vatom
+            self.reset()
+            self.updateUI(completion: nil)
+        }
 
     }
+    
+    /// Resets the contents of the face view.
+    private func reset() {
+        self.animatedImageView.image = nil
+        self.animatedImageView.animatedImage = nil
+    }
 
-    /// Unload the face view (called when the VatomView must prepare for reuse).
+    /// Unload face view. Reset all content.
     func unload() {
-
+        self.reset()
+        //TODO: Cancel all downloads
     }
 
     // MARK: - Face Code
@@ -114,18 +139,6 @@ class ImagePolicyFaceView: FaceView {
         let resourceName = self.extractImageName()
         self.updateImageView(withResource: resourceName, completion: completion)
     }
-
-    /// Updates the interface using local state (debounced).
-    ///
-    /// This property debounces the UI update. This avoids the case where numerous parent ID state changes could cause
-    /// unecessary resource downloads. Essentially, it ensure the the vAtom is "settled" before updating the UI.
-    private lazy var updateUIDebounced = {
-        // NOTE: Debounce will cancel work items.
-        return debounce(delay: DispatchTimeInterval.milliseconds(500)) {
-            self.updateUI(completion: nil)
-            //printBV(info: "Debounced: updateUI called")
-        }
-    }()
 
     /// Update the face view using *local* data.
     ///

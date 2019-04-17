@@ -139,24 +139,59 @@ class ImageProgressFaceView: FaceView {
 
     // MARK: - FaceView Lifecycle
 
-    func load(completion: ((Error?) -> Void)?) {
+    /// Begins loading the face view's content.
+    func load() {
 
-        self.updateResources { (error) in
-            self.setNeedsLayout()
-            self.updateUI()
-            completion?(error)
+        // reset content
+        self.reset()
+        /// load required resources
+        self.loadResources { [weak self] error in
+            
+            guard let self = self else { return }
+            // update state and inform delegate of load completion
+            if let error = error {
+                self.setNeedsLayout()
+                self.updateUI()
+                self.isLoaded = false
+                self.delegate?.faceView(self, didLoad: error)
+            } else {
+                self.setNeedsLayout()
+                self.updateUI()
+                self.isLoaded = true
+                self.delegate?.faceView(self, didLoad: nil)
+            }
+            
         }
 
     }
 
+    /// Updates the backing Vatom and loads the new state.
     func vatomChanged(_ vatom: VatomModel) {
 
-        // update vatom
-        self.vatom = vatom
-        updateUI()
+         if self.vatom.id == vatom.id {
+            // replace vatom, update UI
+            self.vatom = vatom
+            self.updateUI()
+         } else {
+            // replace vatom, reset and load
+            self.vatom = vatom
+            self.reset()
+            self.setNeedsLayout()
+            self.updateUI()
+         }
+        
+    }
+    
+    /// Resets the contents of the face view.
+    private func reset() {
+        emptyImageView.image = nil
+        fullImageView.image = nil
     }
 
-    func unload() { }
+    func unload() {
+        reset()
+        //TODO: Cancel all downloads
+    }
 
     // MARK: - View Lifecycle
 
@@ -239,48 +274,49 @@ class ImageProgressFaceView: FaceView {
 
     /// Fetches required resources and populates the relevant `ImageView`s. The completion handler is called once all
     /// images are downloaded (or an error is encountered).
-    private func updateResources(completion: ((Error?) -> Void)?) {
+    private func loadResources(completion: @escaping (Error?) -> Void) {
 
         // ensure required resources are present
         guard
             let emptyImageResource = vatom.props.resources.first(where: { $0.name == self.config.emptyImageName }),
             let fullImageResource = vatom.props.resources.first(where: { $0.name == self.config.fullImageName })
             else {
-                printBV(error: "\(#file) - failed to extract resources.")
+                completion(FaceError.missingVatomResource)
                 return
         }
 
         // ensure encoding passes
-        guard
-            let encodedEmptyURL = try? BLOCKv.encodeURL(emptyImageResource.url),
-            let encodedFullURL = try? BLOCKv.encodeURL(fullImageResource.url)
-            else {
-                printBV(error: "\(#file) - failed to encode resources.")
-                return
-        }
-
-        dispatchGroup.enter()
-        dispatchGroup.enter()
-
-        var requestEmpty = ImageRequest(url: encodedEmptyURL)
-        // use unencoded url as cache key
-        requestEmpty.cacheKey = emptyImageResource.url
-        // load image (automatically handles reuse)
-        Nuke.loadImage(with: requestEmpty, into: self.emptyImageView) { (_, _) in
-            self.dispatchGroup.leave()
-        }
-
-        var requestFull = ImageRequest(url: encodedFullURL)
-        // use unencoded url as cache key
-        requestFull.cacheKey = fullImageResource.url
-        // load image (automatically handles reuse)
-        Nuke.loadImage(with: requestFull, into: self.fullImageView) { (_, _) in
-            self.dispatchGroup.leave()
-        }
-
-        dispatchGroup.notify(queue: .main) {
-            self.isLoaded = true
-            completion?(nil)
+        do {
+            
+            let encodedEmptyURL = try BLOCKv.encodeURL(emptyImageResource.url)
+            let encodedFullURL = try BLOCKv.encodeURL(fullImageResource.url)
+            
+            dispatchGroup.enter()
+            dispatchGroup.enter()
+            
+            var requestEmpty = ImageRequest(url: encodedEmptyURL)
+            // use unencoded url as cache key
+            requestEmpty.cacheKey = emptyImageResource.url
+            // load image (automatically handles reuse)
+            Nuke.loadImage(with: requestEmpty, into: self.emptyImageView) { (_, _) in
+                self.dispatchGroup.leave()
+            }
+            
+            var requestFull = ImageRequest(url: encodedFullURL)
+            // use unencoded url as cache key
+            requestFull.cacheKey = fullImageResource.url
+            // load image (automatically handles reuse)
+            Nuke.loadImage(with: requestFull, into: self.fullImageView) { (_, _) in
+                self.dispatchGroup.leave()
+            }
+            
+            dispatchGroup.notify(queue: .main) {
+                self.isLoaded = true
+                completion(nil)
+            }
+            
+        } catch {
+            completion(error)
         }
 
     }

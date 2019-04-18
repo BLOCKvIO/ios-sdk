@@ -167,17 +167,17 @@ extension BLOCKv {
                  not enforce child policy rules so this always succeed (using the current API).
                  */
                 let updateVatomModel = baseModel.payload
-                // roll back only those failed containments
-                let undosToRollback = undos.filter { !updateVatomModel.ids.contains($0.id) }
-                undosToRollback.forEach { $0.undo() }
                 DispatchQueue.main.async {
+                    // roll back only those failed containments
+                    let undosToRollback = undos.filter { !updateVatomModel.ids.contains($0.id) }
+                    undosToRollback.forEach { $0.undo() }
                     completion(.success(updateVatomModel))
                 }
 
             case .failure(let error):
-                // roll back all containments
-                undos.forEach { $0.undo() }
                 DispatchQueue.main.async {
+                    // roll back all containments
+                    undos.forEach { $0.undo() }
                     completion(.failure(error))
                 }
             }

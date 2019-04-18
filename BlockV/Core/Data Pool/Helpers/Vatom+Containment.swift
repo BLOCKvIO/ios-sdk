@@ -25,7 +25,7 @@ extension VatomModel {
     /// - important:
     /// This method will inspect the 'inventory' and 'children' regions, if the regions are synchronized the vatoms
     /// are returned, if not, the regions are first synchronized. This means the method is potentially slow.
-    public func listChildren(completion: @escaping (Result<[VatomModel], BVError>) -> Void) {
+    public func listChildren(completion: @escaping (Swift.Result<[VatomModel], BVError>) -> Void) {
 
         // check if the vatom is in the owner's inventory region (and stabalized)
         DataPool.inventory().getStable(id: self.id).map { inventoryVatom -> Guarantee<[VatomModel]> in

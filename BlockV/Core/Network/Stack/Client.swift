@@ -14,13 +14,13 @@ import Alamofire
 
 protocol ClientProtocol {
 
-    typealias RawCompletion = (Result<Data, BVError>) -> Void
+    typealias RawCompletion = (Swift.Result<Data, BVError>) -> Void
 
     /// Request that returns raw data.
     func request(_ endpoint: Endpoint<Void>, completion: @escaping RawCompletion)
 
     /// Request that returns native object (must conform to decodable).
-    func request<T>(_ endpoint: Endpoint<T>, completion: @escaping (Result<T, BVError>) -> Void ) where T: Decodable
+    func request<T>(_ endpoint: Endpoint<T>, completion: @escaping (Swift.Result<T, BVError>) -> Void ) where T: Decodable
 
 }
 
@@ -153,7 +153,7 @@ final class Client: ClientProtocol {
     }
 
     /// JSON Completion handler.
-    typealias JSONCompletion = (Result<Any, BVError>) -> Void
+    typealias JSONCompletion = (Swift.Result<Any, BVError>) -> Void
 
     func requestJSON(_ endpoint: Endpoint<Void>, completion: @escaping JSONCompletion) {
 
@@ -186,7 +186,7 @@ final class Client: ClientProtocol {
     ///   - endpoint: Endpoint for the request
     ///   - completion: The completion handler to call when the request is completed.
     func request<Response>(_ endpoint: Endpoint<Response>,
-                           completion: @escaping (Result<Response, BVError>) -> Void ) where Response: Decodable {
+                           completion: @escaping (Swift.Result<Response, BVError>) -> Void ) where Response: Decodable {
 
         // create request (starts immediately)
         let request = self.sessionManager.request(

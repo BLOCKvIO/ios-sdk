@@ -37,7 +37,7 @@ public enum RegionEvent: String {
     case destabalized = "region.destablaized"
     /// Triggered when the region begins synchronization.
     case synchronizing = "region.synchronizing"
-    
+
     case startBrainUpdates = "region.brainUpdates.start"
 
 }

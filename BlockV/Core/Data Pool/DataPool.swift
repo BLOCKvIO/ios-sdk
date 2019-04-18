@@ -136,7 +136,7 @@ extension DataPool {
         return DataPool.region(id: VatomChildrenRegion.id, descriptor: parentID)
     }
 
-    /// Returns the geo pos region for the specifed parent identifier.
+    /// Returns the geo pos region for the specifed coordinate region.
     public static func geoPos(region: MKCoordinateRegion) -> Region {
         return DataPool.region(id: GeoPosRegion.id, descriptor: region)
     }

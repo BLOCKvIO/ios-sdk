@@ -126,17 +126,17 @@ extension DataPool {
         return DataPool.region(id: InventoryRegion.id, descriptor: "")
     }
 
-    /// Returns the global vatom regions for the specified identifier.
+    /// Returns the vatom region for the specified identifier.
     public static func vatom(id: String) -> Region {
         return DataPool.region(id: VatomIDRegion.id, descriptor: [id])
     }
 
-    /// Returns the global children region for the specifed parent identifier.
+    /// Returns the children region for the specifed parent identifier.
     public static func children(parentID: String) -> Region {
         return DataPool.region(id: VatomChildrenRegion.id, descriptor: parentID)
     }
 
-    /// Returns the global children region for the specifed parent identifier.
+    /// Returns the geo pos region for the specifed parent identifier.
     public static func geoPos(region: MKCoordinateRegion) -> Region {
         return DataPool.region(id: GeoPosRegion.id, descriptor: region)
     }

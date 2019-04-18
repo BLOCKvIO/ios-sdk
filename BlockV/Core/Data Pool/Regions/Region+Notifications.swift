@@ -38,8 +38,6 @@ public enum RegionEvent: String {
     /// Triggered when the region begins synchronization.
     case synchronizing = "region.synchronizing"
 
-    case startBrainUpdates = "region.brainUpdates.start"
-
 }
 
 extension RegionEvent {

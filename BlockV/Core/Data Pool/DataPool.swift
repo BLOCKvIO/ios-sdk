@@ -116,7 +116,7 @@ public final class DataPool {
 }
 
 extension DataPool {
-    
+
     /*
      Convenience functions for fetching/creating regions. Only the abstract `Region` type is returned.
      */
@@ -135,10 +135,10 @@ extension DataPool {
     public static func children(parentID: String) -> Region {
         return DataPool.region(id: VatomChildrenRegion.id, descriptor: parentID)
     }
-    
+
     /// Returns the global children region for the specifed parent identifier.
-    public static func geoPos(regionCoordinated: MKCoordinateRegion) -> Region {
-        return DataPool.region(id: GeoPosRegion.id, descriptor: regionCoordinated)
+    public static func geoPos(region: MKCoordinateRegion) -> Region {
+        return DataPool.region(id: GeoPosRegion.id, descriptor: region)
     }
 
 }

@@ -23,7 +23,6 @@ public final class AuthorizationServer {
     let domain: String // login web app domain
     let scope: String // requested scope
     let redirectURI: String // publisher registered redirect url
-//    let callbackURLScheme: String
 
     var receivedCode: String?
     var receivedState: String?
@@ -43,8 +42,6 @@ public final class AuthorizationServer {
     // MARK: - Methods
 
     /// Begins delegated authorization.
-    ///
-    /// - Parameter handler: <#handler description#>
     public func authorize(handler: @escaping (Bool) -> Void) {
 
         savedState = generateState(withLength: 20)
@@ -59,8 +56,11 @@ public final class AuthorizationServer {
             URLQueryItem(name: "scope", value: scope)
         ]
 
+        //TODO: Should the `callbackURLScheme` include more than the redirectURL, e.g. bundle identifier?
         // init an auth session
-        authSession = SFAuthenticationSession(url: urlComp.url!, callbackURLScheme: "io.blockv://auth", completionHandler: { (url, error) in
+        authSession = SFAuthenticationSession(url: urlComp.url!,
+                                              callbackURLScheme: redirectURI,
+                                              completionHandler: { (url, error) in
             guard error == nil else {
                 return handler(false)
             }
@@ -78,7 +78,7 @@ public final class AuthorizationServer {
     /// `code` and `state` instance properties are updated.
     ///
     /// - Parameter url: Parses out the information in the redirect URL.
-    /// - Returns: <#return value description#>
+    /// - Returns: Boolean value indicating the outcome of parsing the authorize redirect url.
     func parseAuthorizeRedirectURL(_ url: URL) -> Bool {
 
         // decompose into components

@@ -82,9 +82,9 @@ public final class BLOCKv {
                 // pre-mapped environment (do not modify)
                 self.environment = mappedEnvironment
                 #endif
-                
+
             } else {
-                
+
                 // 3rd party API consumers must always point to production.
                 self.environment = .production
 
@@ -266,20 +266,6 @@ public final class BLOCKv {
 
     /// Holds a closure to call on logout
     public static var onLogout: (() -> Void)?
-
-    /// Sets the BLOCKv platform environment.
-    ///
-    /// By setting the environment you are informing the SDK which BLOCKv
-    /// platform environment to interact with.
-    ///
-    /// Typically, you would call `setEnvironment` in `application(_:didFinishLaunchingWithOptions:)`.
-    @available(*, deprecated, message: "BLOCKv now defaults to production. You may remove this call.")
-    public static func setEnvironment(_ environment: BVEnvironment) {
-        self.environment = environment
-
-        //FIXME: *Changing* the environment should nil out the client and access credentials.
-
-    }
 
     /// This function is called everytime a user session is launched.
     ///

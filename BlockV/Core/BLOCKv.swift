@@ -27,7 +27,7 @@ public final class BLOCKv {
     /// The App ID to be passed to the BLOCKv platform.
     ///
     /// Must be set once by the host app.
-    fileprivate static var appID: String? {
+    internal fileprivate(set) static var appID: String? {
         // willSet is only called outside of the initialisation context, i.e.
         // setting the appID after its init will cause a fatal error.
         willSet {
@@ -42,7 +42,7 @@ public final class BLOCKv {
     /// The BLOCKv platform environment to use.
     ///
     /// Must be set by the host app.
-    fileprivate static var environment: BVEnvironment? {
+    internal fileprivate(set) static var environment: BVEnvironment? {
         willSet {
             if environment != nil { reset() }
         }
@@ -59,6 +59,38 @@ public final class BLOCKv {
     /// This method must be called ONLY once.
     public static func configure(appID: String) {
         self.appID = appID
+
+        // - CONFIGURE ENVIRONMENT
+
+        // only modify if not set
+        if environment == nil {
+
+            /*
+             The presense of the ENVIRONMENT_MAPPING user defined plist key allows the SDK to use pre-mapped
+             environments. This is only used internally for the BLOCKv apps. 3rd party API consumers must always use
+             the production environment.
+             */
+
+            // check if the plist contains a user defined key (internal only)
+            if let environmentString = Bundle.main.infoDictionary?["ENVIRONMENT_MAPPING"] as? String,
+                let mappedEnvironment = BVEnvironment(rawValue: environmentString) {
+
+                #if DEBUG
+                // environment for experimentation (safe to modify)
+                self.environment = .production
+                #else
+                // pre-mapped environment (do not modify)
+                self.environment = mappedEnvironment
+                #endif
+                
+            } else {
+                
+                // 3rd party API consumers must always point to production.
+                self.environment = .production
+
+            }
+
+        }
 
         // NOTE: Since `configure` is called only once in the app's lifecycle. We do not
         // need to worry about multiple registrations.
@@ -90,38 +122,6 @@ public final class BLOCKv {
             requests.
             """
         precondition(BLOCKv.appID != nil, warning)
-
-        // - CONFIGURE ENVIRONMENT
-
-        // only modify if not set
-        if environment == nil {
-
-            /*
-             The presense of the ENVIRONMENT_MAPPING user defined plist key allows the SDK to use pre-mapped
-             environments. This is only used internally for the BLOCKv apps. 3rd party API consumers must always use
-             the production environment.
-             */
-
-            // check if the plist contains a user defined key (internal only)
-            if let environmentString = Bundle.main.infoDictionary?["ENVIRONMENT_MAPPING"] as? String,
-                let mappedEnvironment = BVEnvironment(rawValue: environmentString) {
-
-                #if DEBUG
-                // environment for experimentation (safe to modify)
-                self.environment = .production
-                #else
-                // pre-mapped environment (do not modify)
-                self.environment = mappedEnvironment
-                #endif
-
-            } else {
-
-                // 3rd party API consumers must always point to production.
-                self.environment = .production
-
-            }
-
-        }
 
         // return the configuration (inexpensive object)
         return Client.Configuration(baseURLString: BLOCKv.environment!.apiServerURLString,

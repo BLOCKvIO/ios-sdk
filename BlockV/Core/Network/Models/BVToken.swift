@@ -17,12 +17,10 @@ import Foundation
 struct BVToken: Codable, Equatable {
     let token: String
     let tokenType: String
-    let expiresIn: Int
 
     enum CodingKeys: String, CodingKey {
         case token = "token"
         case tokenType = "token_type"
-        case expiresIn = "expires_in"
     }
 }
 

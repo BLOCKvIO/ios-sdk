@@ -172,6 +172,8 @@ open class VatomView: UIView {
         self.loaderView = VatomView.defaultLoaderView.init()
         self.errorView = VatomView.defaultErrorView.init()
         super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        
+        commonSetup()
     }
 
     /// Intializes using a vatom and optional procedure.
@@ -338,6 +340,7 @@ open class VatomView: UIView {
          */
 
         guard let vatom = vatom else {
+            self.state = .error
             self.vatomViewDelegate?.vatomView(self, didSelectFaceView: .failure(VVLCError.faceViewSelectionFailed))
             assertionFailure("Developer error: vatom must not be nil.")
             return

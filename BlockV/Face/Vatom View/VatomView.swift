@@ -172,7 +172,7 @@ open class VatomView: UIView {
         self.loaderView = VatomView.defaultLoaderView.init()
         self.errorView = VatomView.defaultErrorView.init()
         super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
-        
+
         commonSetup()
     }
 

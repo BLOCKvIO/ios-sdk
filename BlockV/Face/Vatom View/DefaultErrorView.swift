@@ -48,7 +48,7 @@ internal final class DefaultErrorView: UIView & VatomViewError {
         button.tintColor = UIColor.orange
         return button
     }()
-    
+
     private let activatedImageView: FLAnimatedImageView = {
         let imageView = FLAnimatedImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -114,7 +114,7 @@ internal final class DefaultErrorView: UIView & VatomViewError {
         guard let encodeURL = try? BLOCKv.encodeURL(resourceModel.url) else {
             return
         }
-        
+
         ImagePipeline.Configuration.isAnimatedImageDataEnabled = true
 
         var request = ImageRequest(url: encodeURL)

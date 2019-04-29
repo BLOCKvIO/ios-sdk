@@ -14,7 +14,7 @@ import CoreLocation
 
 /// Represents a geo discover groups response.
 public struct GeoModel: Decodable {
-    let groups: [GeoGroupModel]
+    public let groups: [GeoGroupModel]
 
     enum CodingKeys: String, CodingKey {
         case groups

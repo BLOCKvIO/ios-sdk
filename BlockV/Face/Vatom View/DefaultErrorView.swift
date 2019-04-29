@@ -10,6 +10,7 @@
 //
 
 import UIKit
+import FLAnimatedImage
 import Nuke
 
 /// Default error view.
@@ -48,9 +49,10 @@ internal final class DefaultErrorView: UIView & VatomViewError {
         return button
     }()
 
-    private let activatedImageView: UIImageView = {
-        let imageView = UIImageView()
+    private let activatedImageView: FLAnimatedImageView = {
+        let imageView = FLAnimatedImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.clipsToBounds = true
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
@@ -112,6 +114,8 @@ internal final class DefaultErrorView: UIView & VatomViewError {
         guard let encodeURL = try? BLOCKv.encodeURL(resourceModel.url) else {
             return
         }
+
+        ImagePipeline.Configuration.isAnimatedImageDataEnabled = true
 
         var request = ImageRequest(url: encodeURL)
         // use unencoded url as cache key

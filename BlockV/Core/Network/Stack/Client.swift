@@ -219,14 +219,10 @@ final class Client: ClientProtocol {
                     // inject token into session's oauth handler
                     self.oauthHandler.set(accessToken: model.payload.accessToken.token,
                                           refreshToken: model.payload.refreshToken.token)
-                } else if let model = val as? BaseModel<OAuthTokenExchangeModel> {
+                } else if let model = val as? OAuthTokenExchangeModel {
                     // inject token into session's oauth handler
-                    self.oauthHandler.set(accessToken: model.payload.accessToken,
-                                          refreshToken: model.payload.refreshToken)
-                } else if let model =  val as? BaseModel<TemporaryOAuthTokenExchangeModel> { //FIXME: Remove this!
-                    // inject token into session's oauth handler
-                    self.oauthHandler.set(accessToken: model.payload.accessToken.token,
-                                          refreshToken: model.payload.refreshToken.token)
+                    self.oauthHandler.set(accessToken: model.accessToken,
+                                          refreshToken: model.refreshToken)
                 }
 
                 completion(.success(val))

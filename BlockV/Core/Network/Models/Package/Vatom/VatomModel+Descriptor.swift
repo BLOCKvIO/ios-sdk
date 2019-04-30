@@ -17,7 +17,7 @@ protocol Descriptable {
 }
 
 extension VatomModel: Descriptable {
-    
+
     init(from descriptor: [String: Any]) throws {
 
         guard
@@ -25,17 +25,15 @@ extension VatomModel: Descriptable {
             let _version        = descriptor["version"] as? String,
             let _whenCreated    = descriptor["when_created"] as? String,
             let _whenModified   = descriptor["when_modified"] as? String,
-            let _isUnpublished  = descriptor["unpublished"] as? Bool,
             let _private        = descriptor["private"] as? [String: Any],
             let _rootDescriptor = descriptor["vAtom::vAtomType"] as? [String: Any]
-            
+
             else { throw BVError.modelDecoding(reason: "Model decoding failed: \(type(of: self))") }
 
         self.id = _id
         self.version = _version
         self.whenCreated = DateFormatter.blockvDateFormatter.date(from: _whenCreated)! //FIXME: force
         self.whenModified = DateFormatter.blockvDateFormatter.date(from: _whenModified)! //FIXME: force
-        self.isUnpublished = _isUnpublished
         self.private = try? JSON.init(_private)
         self.props = try RootProperties(from: _rootDescriptor)
 
@@ -45,14 +43,16 @@ extension VatomModel: Descriptable {
         self.eth = nil
         self.eos = nil
 
+        self.isUnpublished = (descriptor["unpublished"] as? Bool) ?? false
+
     }
 
 }
 
 extension RootProperties: Descriptable {
-    
-    init(from descriptor: [String : Any]) throws {
-        
+
+    init(from descriptor: [String: Any]) throws {
+
         guard
             let _author                 = descriptor["author"] as? String,
             let _rootType               = descriptor["category"] as? String,
@@ -61,7 +61,7 @@ extension RootProperties: Descriptable {
             let _publisherFQDN          = descriptor["publisher_fqdn"] as? String,
             let _title                  = descriptor["title"] as? String,
             let _description            = descriptor["description"] as? String,
-            
+
             let _category               = descriptor["category"] as? String,
             let _clonedFrom             = descriptor["cloned_from"] as? String,
             let _cloningScore           = descriptor["cloning_score"] as? Double,
@@ -74,19 +74,19 @@ extension RootProperties: Descriptable {
             let _parentID               = descriptor["parent_id"] as? String,
             let _transferredBy          = descriptor["transferred_by"] as? String,
             let _visibilityDescriptor   = descriptor["visibility"] as? [String: Any],
-            
+
             let _isAcquirable           = descriptor["acquirable"] as? Bool,
             let _isRedeemable           = descriptor["redeemable"] as? Bool,
             let _isDisabled             = descriptor["disabled"] as? Bool,
             let _isDropped              = descriptor["dropped"] as? Bool,
             let _isTradeable            = descriptor["tradeable"] as? Bool,
             let _isTransferable         = descriptor["transferable"] as? Bool,
-            
+
             let _geoPositionDescriptor  = descriptor["geo_pos"] as? [String: Any],
             let _resourceDescriptor     = descriptor["resources"] as? [[String: Any]]
-            
+
             else { throw BVError.modelDecoding(reason: "Model decoding failed.") }
-        
+
         // decode if present
         let _childPolicyDescriptor  = descriptor["child_policy"] as? [[String: Any]] ?? []
         let _tags                   = descriptor["tags"] as? [String] ?? []
@@ -98,7 +98,7 @@ extension RootProperties: Descriptable {
         self.publisherFQDN = _publisherFQDN
         self.title = _title
         self.description = _description
-        
+
         self.category = _category
         self.childPolicy = _childPolicyDescriptor.compactMap { try? VatomChildPolicy(from: $0) }
         self.clonedFrom = _clonedFrom
@@ -120,46 +120,46 @@ extension RootProperties: Descriptable {
         self.isDropped = _isDropped
         self.isTradeable = _isTradeable
         self.isTransferable = _isTransferable
-        
+
         self.geoPosition = try GeoPosition(from: _geoPositionDescriptor)
         self.resources = _resourceDescriptor.compactMap { try? VatomResourceModel(from: $0) }
-        
+
     }
-    
+
 }
 
 extension RootProperties.Visibility: Descriptable {
-    
-    init(from descriptor: [String : Any]) throws {
+
+    init(from descriptor: [String: Any]) throws {
         guard
             let _type = descriptor["type"] as? String,
             let _value = descriptor["value"] as? String
             else { throw BVError.modelDecoding(reason: "Model decoding failed.") }
-        
+
         self.type = _type
         self.value = _value
-        
+
     }
-    
+
 }
 
 extension RootProperties.Commerce: Descriptable {
-    
-    init(from descriptor: [String : Any]) throws {
+
+    init(from descriptor: [String: Any]) throws {
         guard
             let _pricingDescriptor = descriptor["pricing"] as? [String: Any],
             let _vatomPricing = try? VatomPricing(from: _pricingDescriptor)
             else { throw BVError.modelDecoding(reason: "Model decoding failed.") }
-        
+
         self.pricing = _vatomPricing
 
     }
-    
+
 }
 
 extension VatomPricing: Descriptable {
 
-    init(from descriptor: [String : Any]) throws {
+    init(from descriptor: [String: Any]) throws {
         guard
             let _pricingType        = descriptor["pricingType"] as? String,
             let _valueDescriptor    = descriptor["value"] as? [String: Any],
@@ -182,8 +182,8 @@ extension VatomPricing: Descriptable {
 
 extension VatomChildPolicy: Descriptable {
 
-    init(from descriptor: [String : Any]) throws {
-        
+    init(from descriptor: [String: Any]) throws {
+
         guard
             let _count = descriptor["count"] as? Int,
             let _creationPolicyDescriptor = descriptor["creation_policy"] as? [String: Any],
@@ -198,8 +198,8 @@ extension VatomChildPolicy: Descriptable {
 }
 
 extension VatomChildPolicy.CreationPolicy: Descriptable {
-    
-    init(from descriptor: [String : Any]) throws {
+
+    init(from descriptor: [String: Any]) throws {
         guard
         let _autoCreate            = descriptor["auto_create"] as? String,
         let _autoCreateCount       = descriptor["auto_create_count"] as? Int,
@@ -217,14 +217,14 @@ extension VatomChildPolicy.CreationPolicy: Descriptable {
         self.enforcePolicyCountMin = _enforcePolicyCountMin
         self.policyCountMax = _policyCountMax
         self.policyCountMin = _policyCountMin
-        
+
     }
-    
+
 }
 
 extension RootProperties.GeoPosition: Descriptable {
-    
-    init(from descriptor: [String : Any]) throws {
+
+    init(from descriptor: [String: Any]) throws {
         guard
             let _type = descriptor["type"] as? String,
             let _coordinates = descriptor["coordinates"] as? [Double]
@@ -233,12 +233,12 @@ extension RootProperties.GeoPosition: Descriptable {
         self.type = _type
         self.coordinates = _coordinates
     }
-    
+
 }
 
 extension VatomResourceModel: Descriptable {
-    
-    init(from descriptor: [String : Any]) throws {
+
+    init(from descriptor: [String: Any]) throws {
         guard
             let _name = descriptor["name"] as? String,
             let _type = descriptor["resourceType"] as? String,
@@ -249,128 +249,7 @@ extension VatomResourceModel: Descriptable {
         self.name = _name
         self.type = _type
         self.url = _url
-    
+
      }
-    
-}
 
-// MARK: - FaceModel + Descriptable
-
-extension FaceModel: Descriptable {
-    
-    init(from descriptor: [String : Any]) throws {
-        
-        guard
-        let _id = descriptor["id"] as? String,
-        let _templateID = descriptor["template"] as? String,
-        let _metaDescriptor = descriptor["meta"] as? [String: Any],
-        let _propertiesDescriptor = descriptor["properties"] as? [String: Any]
-        else { throw BVError.modelDecoding(reason: "Model decoding failed.") }
-        
-        self.id = _id
-        self.templateID = _templateID
-        self.properties = try Properties(from: _propertiesDescriptor)
-        self.meta = try MetaModel(from: _metaDescriptor)
-        // convenience
-        isNative   = properties.displayURL.hasPrefix("native://")
-        isWeb      = properties.displayURL.hasPrefix("https://")
-        
-    }
-    
-    
-}
-
-extension FaceModel.Properties: Descriptable {
-    
-    init(from descriptor: [String : Any]) throws {
-        guard
-            let _displayURL = descriptor["display_url"] as? String,
-            let _constraintsDescriptor = descriptor["constraints"] as? [String: Any],
-            let _resources = descriptor["resources"] as? [String]
-            else { throw BVError.modelDecoding(reason: "Model decoding failed.") }
-        
-        let _config = descriptor["config"] as? [String: Any]
-
-        self.displayURL = _displayURL
-        self.constraints = try FaceModel.Properties.Constraints(from: _constraintsDescriptor)
-        self.resources = _resources
-        self.config = try? JSON(_config)
-        
-    }
-    
-}
-
-extension FaceModel.Properties.Constraints: Descriptable {
-    
-    init(from descriptor: [String : Any]) throws {
-        guard
-            let _viewMode = descriptor["view_mode"] as? String,
-            let _platform = descriptor["platform"] as? String
-            else { throw BVError.modelDecoding(reason: "Model decoding failed.") }
-        
-        self.viewMode = _viewMode
-        self.platform = _platform
-        
-    }
-    
-}
-
-extension MetaModel: Descriptable {
-
-    init(from descriptor: [String : Any]) throws {
-        guard
-            let _createdBy = descriptor["created_by"] as? String,
-            let _dataType = descriptor["data_type"] as? String,
-            let _whenCreated = descriptor["when_created"] as? String,
-            let _whenModified = descriptor["when_modified"] as? String,
-            let _whenCreatedDate = DateFormatter.blockvDateFormatter.date(from: _whenCreated),
-            let _whenModifiedDate = DateFormatter.blockvDateFormatter.date(from: _whenModified)
-            else { throw BVError.modelDecoding(reason: "Model decoding failed.") }
-        
-        self.init(createdBy: _createdBy,
-                  dataType: _dataType,
-                  whenCreated: _whenCreatedDate,
-                  whenModified: _whenModifiedDate)
-
-    }
-
-}
-
-// MARK: - FaceModel + Descriptable
-
-extension ActionModel: Descriptable {
-    
-    init(from descriptor: [String : Any]) throws {
-        
-        guard
-        let _compoundName = descriptor["name"] as?  String,
-        let _metaDescriptor = descriptor["meta"] as? [String: Any],
-        let _propertiesDescriptor = descriptor["properties"] as? [String: Any]
-        else { throw BVError.modelDecoding(reason: "Model decoding failed.") }
-
-        let (templateID, actionName) = try ActionModel.splitCompoundName(_compoundName)
-        let meta = try MetaModel(from: _metaDescriptor)
-        let properties = try Properties(from: _propertiesDescriptor)
-        
-        self.init(compoundName: _compoundName,
-                  name: actionName,
-                  templateID: templateID,
-                  meta: meta,
-                  properties: properties)
-    
-    }
-    
-    
-}
-
-extension ActionModel.Properties: Descriptable {
-    
-    init(from descriptor: [String : Any]) throws {
-        guard
-            let _reactor = descriptor["reactor"] as? String
-            else { throw BVError.modelDecoding(reason: "Model decoding failed.") }
-        
-        self.init(reactor: _reactor)
-    }
-    
 }

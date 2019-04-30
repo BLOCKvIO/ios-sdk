@@ -218,8 +218,7 @@ class BLOCKvRegion: Region {
             .starts(with: actionNamePrefix) == true }
         objectData["actions"] = actions.map { $0.data }
         
-        // Experiment 1: Descriptor initialiser
-        
+        // create vatoms, face, anf actions using member-wise initilializer
         do {
             let faces = faces.compactMap { $0.data }.compactMap { try? FaceModel(from: $0) }
             let actions = actions.compactMap { $0.data }.compactMap { try? ActionModel(from: $0) }
@@ -231,34 +230,6 @@ class BLOCKvRegion: Region {
             printBV(error: error.localizedDescription)
             return nil
         }
-        
-        // Experiemnt 2: Dictionary decoder (dictionary > vatom model)
-        
-//        let decoder = DictionaryDecoder()
-//        decoder.dateDecodingStrategy = .iso8601
-//
-//        do {
-//            let vatoms = try decoder.decode(VatomModel.self, from: objectData)
-//            return vatoms
-//        } catch {
-//            printBV(error: error.localizedDescription)
-//            return nil
-//        }
-        
-        // Experiment 3: Data decoder (json decoder)
-
-//        do {
-//            if JSONSerialization.isValidJSONObject(objectData) {
-//                let rawData = try JSONSerialization.data(withJSONObject: objectData)
-//                let vatoms = try JSONDecoder.blockv.decode(VatomModel.self, from: rawData)
-//                return vatoms
-//            } else {
-//                throw NSError.init("Invalid JSON for Vatom: \(object.id)")
-//            }
-//        } catch {
-//            printBV(error: error.localizedDescription)
-//            return nil
-//        }
 
     }
 

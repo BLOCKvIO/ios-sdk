@@ -127,18 +127,8 @@ public final class AuthorizationServer {
         // perform request
         BLOCKv.client.request(endpoint) { result in
             switch result {
-            case .success(let model):
-                //FIXME: Temporary converstion between temporary token model
-                let oauthTokenExchangeModel = OAuthTokenExchangeModel(accessToken: model.payload.accessToken.token,
-                                                                      refreshToken: model.payload.refreshToken.token,
-                                                                      tokenType: model.payload.accessToken.tokenType,
-                                                                      expriesIn: nil,
-                                                                      scope: nil)
-
-                completion(.success(oauthTokenExchangeModel))
-
-            case .failure(let error):
-                completion(.failure(error))
+            case .success(let model): completion(.success(model))
+            case .failure(let error): completion(.failure(error))
             }
         }
 

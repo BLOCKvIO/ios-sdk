@@ -246,9 +246,11 @@ extension BLOCKv {
 
         self.client.request(endpoint) { result in
 
-            // reset
             DispatchQueue.main.async {
+                // reset sdk state
                 reset()
+                // give viewer opportunity to reset their state
+                onLogout?()
             }
 
             switch result {

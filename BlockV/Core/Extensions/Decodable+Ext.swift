@@ -46,7 +46,7 @@ extension KeyedDecodingContainer {
 
     /// Returns `nil` if the key is absent, or if the type cannot be decoded
     func decodeSafelyIfPresent<T: Decodable>(_ type: T.Type, forKey key: KeyedDecodingContainer.Key) -> T? {
-        let decoded = try? decodeIfPresent(Safe<T>.self, forKey: key)
+        let decoded = ((try? decodeIfPresent(Safe<T>.self, forKey: key)) as Safe<T>??)
         return decoded??.value
     }
 

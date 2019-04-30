@@ -80,17 +80,17 @@ class WebFaceView: FaceView {
 
     var isLoaded: Bool = false
 
-    var timer: Timer?
-
     /// Holds the completion handler.
     private var completion: ((Error?) -> Void)?
 
+    /// Begins loading the face view's content.
     func load(completion: ((Error?) -> Void)?) {
         // store the completion
         self.completion = completion
         self.loadFace()
     }
 
+    /// Updates the backing Vatom and loads the new state.
     func vatomChanged(_ vatom: VatomModel) {
         // if the vatom has changed, load the face url again
         if vatom.id != self.vatom.id {
@@ -101,6 +101,11 @@ class WebFaceView: FaceView {
         // fetch first-level children
         let children = self.vatom.listCachedChildren()
         self.coreBridge?.sendVatomChildren(children)
+    }
+
+    /// Resets the contents of the face view.
+    private func reset() {
+        
     }
 
     func unload() {

@@ -10,6 +10,7 @@
 //
 
 import Foundation
+import GenericJSON
 
 // MARK: - Protocols
 
@@ -171,6 +172,8 @@ open class VatomView: UIView {
         self.loaderView = VatomView.defaultLoaderView.init()
         self.errorView = VatomView.defaultErrorView.init()
         super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+
+        commonSetup()
     }
 
     /// Intializes using a vatom and optional procedure.
@@ -337,6 +340,7 @@ open class VatomView: UIView {
          */
 
         guard let vatom = vatom else {
+            self.state = .error
             self.vatomViewDelegate?.vatomView(self, didSelectFaceView: .failure(VVLCError.faceViewSelectionFailed))
             assertionFailure("Developer error: vatom must not be nil.")
             return
@@ -472,6 +476,25 @@ open class VatomView: UIView {
 
         }
 
+    }
+
+}
+
+/// Extend VatomView to conform to `FaceViewDelegate`.
+///
+/// This is the conduit of communication between the VatomView and it's Face View.
+extension VatomView: FaceViewDelegate {
+
+    public func faceView(_ faceView: FaceView,
+                         didSendMessage message: String,
+                         withObject object: [String: JSON],
+                         completion: ((Result<JSON, FaceMessageError>) -> Void)?) {
+
+        // forward the message to the vatom view delegate
+        self.vatomViewDelegate?.vatomView(self,
+                                          didRecevieFaceMessage: message,
+                                          withObject: object,
+                                          completion: completion)
     }
 
 }

@@ -217,6 +217,38 @@ public class WebSocketManager {
         self.connect()
     }
 
+    // MARK: - Commands
+
+    /// Writes a raw payload to the socket.
+    func write(_ payload: [String: Any]) {
+
+        DispatchQueue.global(qos: .userInitiated).async {
+            // serialize data
+            guard let data = try? JSONSerialization.data(withJSONObject: payload) else {
+                return
+            }
+            // write
+            self.socket?.write(data: data)
+        }
+
+    }
+
+    /// Writes a region command using the specified payload to the socket.
+    func writeRegionCommand(_ payload: [String: Any]) {
+        // command package
+        let commandPackage: [String: Any] = [
+            "cmd": "monitor",
+            "id": "1",
+            "version": "1",
+            "type": "command",
+            "payload": payload
+        ]
+        print(#function, payload)
+        // write
+        self.write(commandPackage)
+
+    }
+
 }
 
 // MARK: - Extension WebSocket Delegate

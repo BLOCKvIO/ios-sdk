@@ -34,13 +34,19 @@ public enum BVError: Error {
     case networking(error: Error)
     /// Models a Web socket error.
     case webSocket(error: WebSocketErrorReason)
-
-    //FIXME: REMOVE AT SOME POINT
+    /// Models a session error.
+    case session(reason: SessionErrorReason)
     /// Models a custom error. This should be used in very limited circumstances.
     /// A more defined error is preferred.
     case custom(reason: String)
 
     // MARK: Reasons
+
+    public enum SessionErrorReason: Equatable {
+        case invalidAuthoriationCode
+        case nonMatchingStates
+        
+    }
 
     /// Platform error. Associated values: `code` and `message`.
     public enum PlatformErrorReason: Equatable {
@@ -202,6 +208,8 @@ extension BVError: LocalizedError {
             return reason.localizedDescription
         case .modelDecoding(let reason):
             return "Model decoding failed with error: \(reason)"
+        case .session(let reason):
+            return "Session error: \(reason)"
         case .custom(reason: let reason):
             return reason
         }

@@ -11,6 +11,7 @@
 
 import Foundation
 import PromiseKit
+import MapKit
 
 /*
  # Notes:
@@ -30,7 +31,10 @@ public final class DataPool {
 
     /// List of available plugins, i.e. region classes.
     internal static let plugins: [Region.Type] = [
-        InventoryRegion.self
+        InventoryRegion.self,
+        VatomChildrenRegion.self,
+        VatomIDRegion.self,
+        GeoPosRegion.self
     ]
 
     /// List of active regions.
@@ -113,19 +117,28 @@ public final class DataPool {
 
 extension DataPool {
 
+    /*
+     Convenience functions for fetching/creating regions. Only the abstract `Region` type is returned.
+     */
+
     /// Returns the global inventory region.
     public static func inventory() -> Region {
         return DataPool.region(id: InventoryRegion.id, descriptor: "")
     }
 
-    /// Returns the global vatom regions for the specified identifier.
+    /// Returns the vatom region for the specified identifier.
     public static func vatom(id: String) -> Region {
         return DataPool.region(id: VatomIDRegion.id, descriptor: [id])
     }
 
-    /// Returns the global children region for the specifed parent identifier.
+    /// Returns the children region for the specifed parent identifier.
     public static func children(parentID: String) -> Region {
         return DataPool.region(id: VatomChildrenRegion.id, descriptor: parentID)
+    }
+
+    /// Returns the geo pos region for the specifed coordinate region.
+    public static func geoPos(region: MKCoordinateRegion) -> Region {
+        return DataPool.region(id: GeoPosRegion.id, descriptor: region)
     }
 
 }

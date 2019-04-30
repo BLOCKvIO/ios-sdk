@@ -11,24 +11,18 @@
 
 import Foundation
 
-/// BlockV token model.
-///
-/// Used to represent a refresh or access token.
-struct BVToken: Codable, Equatable {
-    let token: String
+public struct OAuthTokenExchangeModel: Decodable, Equatable {
+    let accessToken: String
+    let refreshToken: String
     let tokenType: String
+    let expriesIn: Double
+    let scope: String
 
     enum CodingKeys: String, CodingKey {
-        case token = "token"
-        case tokenType = "token_type"
-    }
-}
-
-/// BLOCKv refresh token response
-struct RefreshModel: Decodable {
-    let accessToken: BVToken
-
-    enum CodingKeys: String, CodingKey {
-        case accessToken = "access_token"
+        case accessToken    = "access_token"
+        case refreshToken   = "refresh_token"
+        case tokenType      = "token_type"
+        case expriesIn      = "expires_in"
+        case scope          = "scope"
     }
 }

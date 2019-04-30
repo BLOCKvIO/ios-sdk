@@ -34,4 +34,11 @@ public enum BVEnvironment: String {
         }
     }
 
+    var oauthWebApp: String {
+        switch self {
+        case .production: return "https://login.blockv.io"
+        case .development: return "https:/login.blockv.net"
+        }
+    }
+
 }

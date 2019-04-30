@@ -11,24 +11,12 @@
 
 import Foundation
 
-public struct TemporaryOAuthTokenExchangeModel: Decodable, Equatable {
-
-    let accessToken: BVToken
-    let refreshToken: BVToken
-    
-    enum CodingKeys: String, CodingKey {
-        case accessToken    = "access_token"
-        case refreshToken   = "refresh_token"
-    }
-    
-}
-
 public struct OAuthTokenExchangeModel: Decodable, Equatable {
     let accessToken: String
     let refreshToken: String
-    let tokenType: String? //FIXME: Make non-optional when server is updated
-    let expriesIn: Double? //FIXME: Make non-optional when server is updated
-    let scope: String? //FIXME: Make non-optional when server is updated
+    let tokenType: String
+    let expriesIn: Double
+    let scope: String
 
     enum CodingKeys: String, CodingKey {
         case accessToken    = "access_token"

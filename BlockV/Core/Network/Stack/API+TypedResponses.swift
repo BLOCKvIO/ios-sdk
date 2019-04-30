@@ -24,7 +24,7 @@ extension API {
         ///
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func tokenExchange(grantType: String, clientID: String, code: String, redirectURI: String)
-            -> Endpoint<BaseModel<TemporaryOAuthTokenExchangeModel>> {
+            -> Endpoint<OAuthTokenExchangeModel> {
                 return API.Generic.token(grantType: grantType, clientID: clientID, code: code, redirectURI: redirectURI)
         }
 

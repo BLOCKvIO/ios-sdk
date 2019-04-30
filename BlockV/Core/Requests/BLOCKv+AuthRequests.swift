@@ -62,7 +62,7 @@ extension BLOCKv {
                             // pull back to main queue
                             DispatchQueue.main.async {
 
-                                let refreshToken = BVToken(token: tokens.refreshToken, tokenType: tokens.tokenType!)
+                                let refreshToken = BVToken(token: tokens.refreshToken, tokenType: tokens.tokenType)
                                 // persist refresh token and credential
                                 CredentialStore.saveRefreshToken(refreshToken)
                                 CredentialStore.saveAssetProviders(model.payload.assetProviders)

@@ -50,6 +50,9 @@ class ImageFaceView: FaceView {
         /// ### Legacy Support
         /// The first resource name in the resources array (if present) is used in place of the activate image.
         init(_ faceModel: FaceModel) {
+            
+            // enable animated images
+            ImagePipeline.Configuration.isAnimatedImageDataEnabled = true
 
             // legacy: overwrite fallback if needed
             self.imageName ?= faceModel.properties.resources.first
@@ -112,13 +115,15 @@ class ImageFaceView: FaceView {
     /// Inspects the face config first and uses the scale if available. If no face config is found, a simple heuristic
     /// is used to choose the best content mode.
     private func updateContentMode() {
-
+        self.animatedImageView.contentMode = configuredContentMode
+    }
+    
+    var configuredContentMode: UIView.ContentMode {
         // check face config
         switch config.scale {
-        case .fill: animatedImageView.contentMode = .scaleAspectFill
-        case .fit:  animatedImageView.contentMode = .scaleAspectFit
+        case .fill: return .scaleAspectFill
+        case .fit:  return .scaleAspectFit
         }
-
     }
 
     // MARK: - Face View Lifecycle
@@ -166,10 +171,7 @@ class ImageFaceView: FaceView {
          - Thus, no meaningful UI update can be made.
          */
 
-        // reset content
-        self.reset()
         self.vatom = vatom
-        self.loadResources(completion: nil)
 
     }
 
@@ -188,6 +190,14 @@ class ImageFaceView: FaceView {
     }
 
     // MARK: - Resources
+    
+    var nukeContentMode: ImageDecompressor.ContentMode {
+        // check face config, convert to nuke content mode
+        switch config.scale {
+        case .fill: return .aspectFill
+        case .fit:  return .aspectFit
+        }
+    }
 
     private func loadResources(completion: ((Error?) -> Void)?) {
 
@@ -200,13 +210,11 @@ class ImageFaceView: FaceView {
         do {
             // encode url
             let encodeURL = try BLOCKv.encodeURL(resourceModel.url)
-
-            //FIXME: Where should this go?
-            ImagePipeline.Configuration.isAnimatedImageDataEnabled = true
-
-            //TODO: Should the size of the VatomView be factoring in and the image be resized?
-
-            var request = ImageRequest(url: encodeURL)
+            // create request
+            var request = ImageRequest(url: encodeURL,
+                                       targetSize: pixelSize,
+                                       contentMode: nukeContentMode)
+            
             // use unencoded url as cache key
             request.cacheKey = resourceModel.url
 

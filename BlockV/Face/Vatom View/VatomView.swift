@@ -74,7 +74,6 @@ open class VatomView: UIView {
                 self.loaderView.startAnimating()
                 self.errorView.isHidden = true
             case .error:
-                self.errorView.vatom = vatom
                 self.loaderView.isHidden = true
                 self.loaderView.stopAnimating()
                 self.errorView.isHidden = false

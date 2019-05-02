@@ -79,7 +79,7 @@ extension VatomModel {
         let undo = DataPool.inventory().preemptiveRemove(id: self.id)
 
         // perform the action
-        self.performAction("Redeem", payload: body, undos: [undo], completion: completion)
+        self.performAction("Activate", payload: body, undos: [undo], completion: completion)
 
     }
 

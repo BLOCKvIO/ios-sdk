@@ -59,6 +59,9 @@ class ImagePolicyFaceView: FaceView {
         }
 
         super.init(vatom: vatom, faceModel: faceModel)
+        
+        // enable animated images
+        ImagePipeline.Configuration.isAnimatedImageDataEnabled = true
 
         // add image view
         self.addSubview(animatedImageView)
@@ -208,7 +211,9 @@ class ImagePolicyFaceView: FaceView {
             // encode url
             let encodeURL = try BLOCKv.encodeURL(resourceModel.url)
 
-            var request = ImageRequest(url: encodeURL)
+            var request = ImageRequest(url: encodeURL,
+                                       targetSize: pixelSize,
+                                       contentMode: .aspectFit)
             // use unencoded url as cache key
             request.cacheKey = resourceModel.url
             // load image (automatically handles reuse)

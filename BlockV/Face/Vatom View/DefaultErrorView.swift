@@ -75,13 +75,15 @@ internal final class DefaultErrorView: UIView & VatomViewError {
         activityIndicator.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
         activityIndicator.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
 
-        infoButton.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 12).isActive = true
-        infoButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 12).isActive = true
+        infoButton.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -12).isActive = true
+        infoButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -12).isActive = true
 
         activatedImageView.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
         activatedImageView.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
         activatedImageView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
         activatedImageView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
+        
+        ImagePipeline.Configuration.isAnimatedImageDataEnabled = true
 
     }
 
@@ -97,11 +99,10 @@ internal final class DefaultErrorView: UIView & VatomViewError {
     private func loadResources() {
 
         activityIndicator.startAnimating()
-        defer { self.activityIndicator.stopAnimating() }
 
         // extract error
         guard let vatom = vatom else {
-            assertionFailure("vatom must not be nil.")
+            assertionFailure("Vatom must not be nil.")
             return
         }
 
@@ -115,9 +116,10 @@ internal final class DefaultErrorView: UIView & VatomViewError {
             return
         }
 
-        ImagePipeline.Configuration.isAnimatedImageDataEnabled = true
-
-        var request = ImageRequest(url: encodeURL)
+        // create request
+        var request = ImageRequest(url: encodeURL,
+                                   targetSize: pixelSize,
+                                   contentMode: .aspectFit)
         // use unencoded url as cache key
         request.cacheKey = resourceModel.url
         // load the image (reuse pool is automatically handled)
@@ -127,4 +129,16 @@ internal final class DefaultErrorView: UIView & VatomViewError {
 
     }
 
+}
+
+extension DefaultErrorView {
+    
+    /// Size of the bounds of the view in pixels.
+    public var pixelSize: CGSize {
+        get {
+            return CGSize(width: self.bounds.size.width * UIScreen.main.scale,
+                          height: self.bounds.size.height * UIScreen.main.scale)
+        }
+    }
+    
 }

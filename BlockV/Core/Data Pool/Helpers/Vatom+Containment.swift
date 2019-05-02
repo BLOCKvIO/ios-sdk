@@ -140,13 +140,13 @@ extension VatomModel {
         if self.props.rootType == "vAtom::vAtomType" {
             return .standard
         } else {
-            if self.props.rootType.hasSuffix("FolderContainerType") {
+            if self.props.rootType.hasSuffix("::FolderContainerType") {
                 return .container(.folder)
-            } else if self.props.rootType.hasSuffix("PackageContainerType") {
+            } else if self.props.rootType.hasSuffix("::PackageContainerType") {
                 return .container(.package)
-            } else if self.props.rootType.hasSuffix("DiscoverContainerType") {
+            } else if self.props.rootType.hasSuffix("::DiscoverContainerType") {
                 return .container(.discover)
-            } else if self.props.rootType.hasSuffix("DefinedFolderContainerType") {
+            } else if self.props.rootType.hasSuffix("::DefinedFolderContainerType") {
                 return .container(.defined)
             } else {
                 return .unknown

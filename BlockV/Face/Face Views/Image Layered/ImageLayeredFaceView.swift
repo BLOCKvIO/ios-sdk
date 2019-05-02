@@ -128,14 +128,8 @@ class ImageLayeredFaceView: FaceView {
     /// Updates the backing Vatom and loads the new state.
     func vatomChanged(_ vatom: VatomModel) {
 
-        if self.vatom.id == vatom.id {
-            // replace vatom, update UI
-            self.vatom = vatom
-        } else {
-            // replace vatom, reset and update UI
-            self.vatom = vatom
-            self.reset()
-        }
+        // replace vatom
+        self.vatom = vatom
         // update ui
         self.updateLayers()
 
@@ -206,7 +200,9 @@ class ImageLayeredFaceView: FaceView {
 			return layer
 		}
 
-        var request = ImageRequest(url: encodeURL)
+        var request = ImageRequest(url: encodeURL,
+                                   targetSize: pixelSize,
+                                   contentMode: .aspectFit)
         // use unencoded url as cache key
         request.cacheKey = resourceModel.url
         // load image (automatically handles reuse)
@@ -272,7 +268,9 @@ class ImageLayeredFaceView: FaceView {
             // encode url
             let encodeURL = try BLOCKv.encodeURL(resourceModel.url)
 
-            var request = ImageRequest(url: encodeURL)
+            var request = ImageRequest(url: encodeURL,
+                                       targetSize: pixelSize,
+                                       contentMode: .aspectFit)
             // use unencoded url as cache key
             request.cacheKey = resourceModel.url
 

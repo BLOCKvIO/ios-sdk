@@ -99,6 +99,12 @@ public protocol FaceViewLifecycle: class {
 
 /// Abstract class all face views must derive from.
 open class BaseFaceView: UIView {
+    
+    public var isActivated = false
+    
+    open func doActivate() {
+        
+    }
 
     /// Vatom to render.
     public internal(set) var vatom: VatomModel

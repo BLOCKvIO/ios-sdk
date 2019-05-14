@@ -13,17 +13,18 @@ import UIKit
 import FLAnimatedImage
 import Nuke
 import GenericJSON
+import Foundation
 
 /// Native Image face view
 ///
 /// Displays a resource based on the frist matching item in the policy array.
-class ImagePolicyFaceView: FaceView {
+open class ImagePolicyFaceView: FaceView {
 
-    class var displayURL: String { return "native://image-policy" }
+    open class var displayURL: String { return "native://image-policy" }
 
     // MARK: - Properties
 
-    lazy var animatedImageView: FLAnimatedImageView = {
+    open lazy var animatedImageView: FLAnimatedImageView = {
         let imageView = FLAnimatedImageView()
         imageView.autoresizingMask = [ .flexibleWidth, .flexibleHeight ]
         imageView.contentMode = .scaleAspectFit
@@ -47,7 +48,7 @@ class ImagePolicyFaceView: FaceView {
 
     // MARK: - Initialization
 
-    required init(vatom: VatomModel, faceModel: FaceModel) {
+    public required init(vatom: VatomModel, faceModel: FaceModel) {
 
         // init face config (or legacy private section) fallback on default values
         if let config = faceModel.properties.config {
@@ -67,16 +68,45 @@ class ImagePolicyFaceView: FaceView {
         self.addSubview(animatedImageView)
         animatedImageView.frame = self.bounds
 
+        self.becomeFirstResponder()
     }
 
-    required init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) should not be called on Face Views. Please use VatomView.")
     }
+    
+//    // MARK: - Shake
+//    
+//    open override var canBecomeFirstResponder: Bool {
+//        return true
+//    }
+//    
+//    override open func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+//        
+//        if (motion == UIEvent.EventSubtype.motionShake)
+//        {
+//            print("Shake baby!!!")
+//            self.performLove()
+//        }
+//    }
+    
+    // MARK: - Actions
+    
+    func performLove() {
+        print(#function)
+        
+    }
+    
+    func perfromFeed() {
+        print(#function)
+        
+    }
+    
 
     // MARK: - Face View Lifecycle
 
     /// Begins loading the face view's content.
-    func load(completion: ((Error?) -> Void)?) {
+    public func load(completion: ((Error?) -> Void)?) {
         // reset content
         self.reset()
         // update state
@@ -99,7 +129,7 @@ class ImagePolicyFaceView: FaceView {
     ///
     /// The VVLC ensures the vatom will share the same template variation. This means the vatom will have the same
     /// resources but the state of the face (e.g. which recsources it is showing) may be different.
-    func vatomChanged(_ vatom: VatomModel) {
+    open func vatomChanged(_ vatom: VatomModel) {
 
         if self.vatom.id == vatom.id {
             // replace vatom, update UI
@@ -122,7 +152,7 @@ class ImagePolicyFaceView: FaceView {
     }
 
     /// Unload face view. Reset all content.
-    func unload() {
+    public func unload() {
         self.reset()
         //TODO: Cancel all downloads
     }

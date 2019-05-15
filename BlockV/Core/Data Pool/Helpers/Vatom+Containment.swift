@@ -112,7 +112,10 @@ extension VatomModel {
             // check if there is a maximum number of children
             if policy.creationPolicy.enforcePolicyCountMax {
                 // check if current child count is less then policy max
-                if policy.creationPolicy.policyCountMax > self.listCachedChildren().count {
+                let children = self.listCachedChildren().filter {
+                    $0.props.templateVariationID ==  policy.templateVariationID
+                }
+                if policy.creationPolicy.policyCountMax > children.count {
                     return true
                 }
             } else {

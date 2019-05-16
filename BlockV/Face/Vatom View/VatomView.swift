@@ -427,7 +427,6 @@ open class VatomView: UIView {
 
 //            printBV(info: "Face view for face model: \(faceViewType)")
 
-            //let selectedFaceView: FaceView = ImageFaceView(vatom: vatom, faceModel: selectedFace, host: self)
             let newSelectedFaceView: FaceView = viewType.init(vatom: vatom,
                                                               faceModel: newSelectedFaceModel)
             newSelectedFaceView.delegate = self

@@ -273,7 +273,7 @@ open class VatomView: UIView {
         errorView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
 
         self.state = .loading
-        
+
     }
 
     // MARK: - State Management
@@ -381,7 +381,7 @@ open class VatomView: UIView {
 //        printBV(info: "Face model changed - Replacing face view.")
 
         // 2. check if the face model has not changed
-            
+
         if (vatom.props.templateVariationID == oldVatom?.props.templateVariationID) &&
             (newSelectedFaceModel == self.selectedFaceModel) {
 
@@ -413,7 +413,7 @@ open class VatomView: UIView {
             } else {
                 faceViewType = roster[newSelectedFaceModel.properties.displayURL]
             }
-            
+
             guard let viewType = faceViewType else {
                 // viewer developer MUST have registered the face view with the face registry
                 self.vatomViewDelegate?.vatomView(self, didSelectFaceView: .failure(VVLCError.faceViewSelectionFailed))
@@ -436,10 +436,9 @@ open class VatomView: UIView {
             self.replaceFaceView(with: newSelectedFaceView)
             // inform delegate
             self.vatomViewDelegate?.vatomView(self, didSelectFaceView: .success(newSelectedFaceView))
-            
+
         }
 
-        
     }
 
     /// Replaces the current face view (if any) with the specified face view and starts the FVLC.

@@ -18,6 +18,12 @@ extension API {
     /// Namespace for session related endpoints with a typed reponse model.
     enum Session {
         
+        // MARK: - Version & Support
+        
+        static func getSupportedVersion() -> Endpoint<BaseModel<AppUpdateModel>> {
+            return Endpoint(path: "/v1/general/app/version")
+        }
+        
         // MARK: - OAuth
         
         /// Builds the endpoint to exchange an auth code for session tokens.

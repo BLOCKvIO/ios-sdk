@@ -269,5 +269,31 @@ extension BLOCKv {
         }
 
     }
+    
+    /// Fetches information regarding app versioning and support.
+    ///
+    /// - Parameter result: Complettion handler that is called when the
+    public static func getSupportedVersion(result: @escaping (Result<AppUpdateModel, BVError>) -> Void) {
+        
+        let endpoint = API.Session.getSupportedVersion()
+        // send request
+        self.client.request(endpoint) { innerResult in
+            
+            switch innerResult {
+            case .success(let model):
+                // model is available
+                DispatchQueue.main.async {
+                    result(.success(model.payload))
+                }
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    result(.failure(error))
+                }
+            }
+            
+        }
+        
+    }
 
 }

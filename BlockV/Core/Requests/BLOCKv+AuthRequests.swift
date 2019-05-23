@@ -270,4 +270,62 @@ extension BLOCKv {
 
     }
 
+    /// Fetches information regarding app versioning and support.
+    ///
+    /// - Parameter result: Complettion handler that is called when the request is completed.
+    public static func getSupportedVersion(result: @escaping (Result<AppUpdateModel, BVError>) -> Void) {
+
+        let endpoint = API.Session.getSupportedVersion()
+        // send request
+        self.client.request(endpoint) { innerResult in
+
+            switch innerResult {
+            case .success(let model):
+                // model is available
+                DispatchQueue.main.async {
+                    result(.success(model.payload))
+                }
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    result(.failure(error))
+                }
+            }
+
+        }
+
+    }
+
+    /// Updates the push notification settings for this device.
+    ///
+    /// - Parameters:
+    ///   - fcmToken: Firebase cloud messaging token.
+    ///   - platformID: Identifier of the current plaform. Defaults to "ios" - recommended.
+    ///   - enabled: Flag indicating whether push notifications should be sent to this device. Defaults to `true`.
+    ///   - completion: Completion handler that is called when the request is completed.
+    public static func updatePushNotification(fcmToken: String,
+                                              platformID: String,
+                                              enabled: Bool,
+                                              completion: @escaping ((Error?) -> Void)) {
+
+        let endpoint = API.Session.updatePushNotification(fcmToken: fcmToken, platformID: platformID, enabled: enabled)
+        // send request
+        self.client.request(endpoint) { result in
+
+            switch result {
+            case .success:
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    completion(error)
+                }
+            }
+
+        }
+
+    }
+
 }

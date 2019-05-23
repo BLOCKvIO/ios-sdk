@@ -120,7 +120,7 @@ class WebFaceView: FaceView {
             printBV(error: "Cannot initialise URL from: \(faceURL)")
             return
         }
-        let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 20)
+        let request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 20)
         self.webView.load(request)
     }
 

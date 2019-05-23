@@ -465,41 +465,44 @@ open class VatomView: UIView {
 
         // 1. instruct face view to load its content (must be able to handle being called multiple times).
         newFaceView.load { [weak self] (error) in
-
+            
             guard let self = self else { return }
-
-            /*
-             Important:
-             - Since vatom view may be in a reuse pool, and load is async, we must check the underlying vatom has not
-             changed.
-             - As the vatom-view comes out of the reuse pool, `update(usingVatom:procedure:)` is called. Since `load` is
-             async, by the time load's closure executes the underlying vatom may have changed.
-             */
-            guard self.vatom!.id == contextID else {
-                // vatom-view is no longer displaying the original vatom
-                printBV(info: "Load completed, but original vatom has changed.")
-                return
+            
+            DispatchQueue.main.async {
+                
+                /*
+                 Important:
+                 - Since vatom view may be in a reuse pool, and load is async, we must check the underlying vatom has not
+                 changed.
+                 - As the vatom-view comes out of the reuse pool, `update(usingVatom:procedure:)` is called. Since `load` is
+                 async, by the time load's closure executes the underlying vatom may have changed.
+                 */
+                guard self.vatom!.id == contextID else {
+                    // vatom-view is no longer displaying the original vatom
+                    printBV(info: "Load completed, but original vatom has changed.")
+                    return
+                }
+                
+                // Error - Case 2 -  Display error view if the face view encounters an error during its load operation.
+                
+                // ensure no error
+                guard error == nil else {
+                    
+                    // face view encountered an error
+                    self.selectedFaceView?.unload()
+                    self.selectedFaceView?.removeFromSuperview()
+                    self.selectedFaceView = nil
+                    self.state = .error
+                    self.vatomViewDelegate?.vatomView(self, didLoadFaceView: .failure(VVLCError.faceViewLoadFailed) )
+                    return
+                }
+                
+                // show face
+                self.state = .completed
+                // inform delegate
+                self.vatomViewDelegate?.vatomView(self, didLoadFaceView: .success(self.selectedFaceView!))
+                
             }
-
-            // Error - Case 2 -  Display error view if the face view encounters an error during its load operation.
-
-            // ensure no error
-            guard error == nil else {
-
-                // face view encountered an error
-                self.selectedFaceView?.unload()
-                self.selectedFaceView?.removeFromSuperview()
-                self.selectedFaceView = nil
-                self.state = .error
-                self.vatomViewDelegate?.vatomView(self, didLoadFaceView: .failure(VVLCError.faceViewLoadFailed) )
-                return
-            }
-
-            // show face
-            self.state = .completed
-            // inform delegate
-            self.vatomViewDelegate?.vatomView(self, didLoadFaceView: .success(self.selectedFaceView!))
-
         }
 
     }

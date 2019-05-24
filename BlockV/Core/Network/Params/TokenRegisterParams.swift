@@ -23,6 +23,7 @@ public struct UserInfo: Encodable {
     public var birthday: String?
     public var isAvatarPublic: Bool?
     public var language: String?
+    public var nonPushNotification: Bool? // email/sms
 
     public init(firstName: String? = nil,
                 lastName: String? = nil,
@@ -30,7 +31,8 @@ public struct UserInfo: Encodable {
                 password: String? = nil,
                 birthday: String? = nil,
                 isAvatarPublic: Bool? = true,
-                language: String? = nil) {
+                language: String? = nil,
+                nonPushNotification: Bool? = false) {
 
         self.firstName = firstName
         self.lastName = lastName
@@ -39,6 +41,7 @@ public struct UserInfo: Encodable {
         self.birthday = birthday
         self.isAvatarPublic = isAvatarPublic
         self.language = language
+        self.nonPushNotification = nonPushNotification
     }
 
     enum CodingKeys: String, CodingKey {
@@ -49,6 +52,7 @@ public struct UserInfo: Encodable {
         case birthday       = "birthday"
         case isAvatarPublic = "avatar_public"
         case language       = "language"
+        case nonPushNotification = "nonpush_notification"
     }
 
 }
@@ -64,7 +68,8 @@ extension UserInfo: DictionaryCodable {
             "password": password ?? "",
             "birthday": birthday ?? "",
             "avatar_public": isAvatarPublic ?? true,
-            "language": language ?? ""
+            "language": language ?? "",
+            "nonpush_notification": nonPushNotification ??  false
         ]
     }
 
@@ -94,6 +99,9 @@ extension UserInfo: DictionaryCodable {
         }
         if let language = language {
             params["language"] = language
+        }
+        if let nonPushNotification = nonPushNotification {
+            params["nonpush_notification"] = nonPushNotification
         }
 
         return params

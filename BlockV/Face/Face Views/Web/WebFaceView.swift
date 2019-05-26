@@ -53,9 +53,11 @@ class WebFaceView: FaceView {
         webConfiguration.userContentController.add(LeakAvoider(delegate: self), name: "vatomicBridge")
         webConfiguration.userContentController.add(LeakAvoider(delegate: self), name: "blockvBridge")
 
-        // content controller
+        // web view
         let webView = WKWebView(frame: self.bounds, configuration: webConfiguration)
         webView.navigationDelegate = self
+        webView.scrollView.isScrollEnabled = false
+        webView.scrollView.contentInsetAdjustmentBehavior = .never
         webView.autoresizingMask = [ .flexibleWidth, .flexibleHeight ]
         return webView
 

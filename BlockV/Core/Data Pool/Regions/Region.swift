@@ -60,7 +60,7 @@ public class Region {
     let noCache = false
 
     /// All objects currently in our cache.
-    var objects: [String: DataObject] = [:]
+    private(set) var objects: [String: DataObject] = [:]
 
     /// `true` if data in this region is in sync with the backend.
     public internal(set) var synchronized = false {
@@ -130,21 +130,7 @@ public class Region {
 
             // check if subclass returned an array of IDs
             if let ids = ids {
-
-                // create a list of keys to remove
-                var keysToRemove: [String] = []
-                for id in self.objects.keys {
-
-                    // check if it's in our list
-                    if !ids.contains(id) {
-                        keysToRemove.append(id)
-                    }
-
-                }
-
-                // Rrmove objects
-                self.remove(ids: keysToRemove)
-
+                self.diffedRemove(ids: ids)
             }
 
             // data is up to date
@@ -295,6 +281,25 @@ public class Region {
         }
 
     }
+    
+    /// Computes a diff between the supplied ids and the current object ids. Removes the stale ids.
+    func diffedRemove(ids: [String]) {
+        
+        // create a diff of keys to remove
+        var keysToRemove: [String] = []
+        for id in self.objects.keys {
+            
+            // check if it's in our list
+            if !ids.contains(id) {
+                keysToRemove.append(id)
+            }
+            
+        }
+        
+        // remove objects
+        self.remove(ids: keysToRemove)
+        
+    }
 
     /// Removes the specified objects from our pool.
     ///
@@ -346,9 +351,9 @@ public class Region {
     public func getAllStable() -> Guarantee<[Any]> {
 
         // synchronize now
-        return self.synchronize().map({
+        return self.synchronize().map {
             return self.getAll()
-        })
+        }
 
     }
 

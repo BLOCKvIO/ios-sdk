@@ -46,6 +46,11 @@ public class Region {
         case failedParsingResponse
         case failedParsingObject
     }
+    
+    /// Serial io queue.
+    ///
+    /// Each subclass with have it's own io queue (the label does not dictate uniqueness).
+    let ioQueue = DispatchQueue(label: "io.blockv.sdk.datapool-io", qos: .utility)
 
     /// Constructor
     required init(descriptor: Any) throws { }
@@ -109,7 +114,7 @@ public class Region {
 
         // remove pending error
         self.error = nil
-        self.emit(.updated)
+        self.emit(.updated) //FIXME: Why is this update broadcast?
 
         // stop if already in sync
         if synchronized {
@@ -427,60 +432,72 @@ public class Region {
 
     /// Load objects from local storage.
     func loadFromCache() -> Promise<Void> {
-
-        // get filename
-        let startTime = Date.timeIntervalSinceReferenceDate
-        let filename = self.stateKey.replacingOccurrences(of: ":", with: "_")
-
-        // get temporary file location
-        let file = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(filename)
-            .appendingPathExtension("json")
-
-        // read data
-        guard let data = try? Data(contentsOf: file) else {
-            printBV(error: ("[DataPool > Region] Unable to read cached data"))
-            return Promise()
-        }
-
-        // parse JSON
-        guard let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [[Any]] else {
-            printBV(error: "[DataPool > Region] Unable to parse cached JSON")
-            return Promise()
-        }
-
-        // create objects
-        let objects = json.map { fields -> DataObject? in
-
-            // get fields
-            guard let id = fields[0] as? String, let type = fields[1] as? String,
-                let data = fields[2] as? [String: Any] else {
-                return nil
+        
+        return Promise { (resolver: Resolver) in
+            
+            ioQueue.async {
+                
+                // get filename
+                let startTime = Date.timeIntervalSinceReferenceDate
+                let filename = self.stateKey.replacingOccurrences(of: ":", with: "_")
+                
+                // get temporary file location
+                let file = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(filename)
+                    .appendingPathExtension("json")
+                
+                // read data
+                guard let data = try? Data(contentsOf: file) else {
+                    printBV(error: ("[DataPool > Region] Unable to read cached data"))
+                    resolver.fulfill_()
+                    return
+                }
+                
+                // parse JSON
+                guard let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [[Any]] else {
+                    printBV(error: "[DataPool > Region] Unable to parse cached JSON")
+                    resolver.fulfill_()
+                    return
+                }
+                
+                // create objects
+                let objects = json.map { fields -> DataObject? in
+                    
+                    // get fields
+                    guard let id = fields[0] as? String, let type = fields[1] as? String,
+                        let data = fields[2] as? [String: Any] else {
+                            return nil
+                    }
+                    
+                    // create DataObject
+                    let obj = DataObject()
+                    obj.id = id
+                    obj.type = type
+                    obj.data = data
+                    return obj
+                    
+                }
+                
+                // Strip out nils
+                let cleanObjects = objects.compactMap { $0 }
+                
+                DispatchQueue.main.async {
+                    // add objects
+                    self.add(objects: cleanObjects)
+                }
+                
+                // done
+                let delay = (Date.timeIntervalSinceReferenceDate - startTime) * 1000
+                printBV(info: ("[DataPool > Region] Loaded \(cleanObjects.count) from cache in \(Int(delay))ms"))
+                resolver.fulfill_()
+                
             }
-
-            // create DataObject
-            let obj = DataObject()
-            obj.id = id
-            obj.type = type
-            obj.data = data
-            return obj
-
+            
         }
-
-        // Strip out nils
-        let cleanObjects = objects.compactMap { $0 }
-
-        // add objects
-        self.add(objects: cleanObjects)
-
-        // done
-        let delay = (Date.timeIntervalSinceReferenceDate - startTime) * 1000
-        printBV(info: ("[DataPool > Region] Loaded \(cleanObjects.count) from cache in \(Int(delay))ms"))
-        return Promise()
 
     }
 
     var saveTask: DispatchWorkItem?
-
+    
     /// Saves the region to local storage.
     func save() {
 
@@ -527,12 +544,12 @@ public class Region {
 
             // done
             let delay = (Date.timeIntervalSinceReferenceDate - startTime) * 1000
-            printBV(info: ("[DataPool > Region] Saved \(self.objects.count) items to disk in \(Int(delay))ms"))
+            printBV(info: ("[DataPool > Region] Saved \(self.objects.count) objects to disk in \(Int(delay))ms"))
 
         }
 
         // Debounce save task
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: saveTask!)
+        ioQueue.asyncAfter(deadline: .now() + 5, execute: saveTask!)
 
     }
 

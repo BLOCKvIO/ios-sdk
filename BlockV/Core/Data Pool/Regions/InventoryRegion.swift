@@ -80,53 +80,6 @@ class InventoryRegion: BLOCKvRegion {
 
     }
 
-    /// Fetches all objects from the server.
-    ///
-    /// Recursivly pages through the server's pool until all object have been found.
-    fileprivate func fetch(page: Int = 1, previousItems: [String] = []) -> Promise<[String]?> {
-
-        // stop if closed
-        if closed {
-            return Promise.value(previousItems)
-        }
-
-        // execute it
-        printBV(info: "[DataPool > InventoryRegion] Loading page \(page), got \(previousItems.count) items so far...")
-
-        // build raw request
-        let endpoint: Endpoint<Void> = API.Generic.getInventory(parentID: "*", page: page)
-
-        return BLOCKv.client.requestJSON(endpoint).then { json -> Promise<[String]?> in
-
-            guard let json = json as? [String: Any], let payload = json["payload"] as? [String: Any] else {
-                throw NSError.init("Unable to load") //FIXME: Create a better error
-            }
-
-            // create list of items
-            var ids = previousItems
-
-            // parse out data objects
-            guard let items = self.parseDataObject(from: payload) else {
-                return Promise.value(ids)
-            }
-            // append new ids
-            ids.append(contentsOf: items.map { $0.id })
-
-            // add data objects
-            self.add(objects: items)
-
-            // if no more data, stop
-            if items.count == 0 {
-                return Promise.value(ids)
-            }
-
-            // done, get next page
-            return self.fetch(page: page + 1, previousItems: ids)
-
-        }
-
-    }
-
     /// Called on Web socket message.
     ///
     /// Allows super to handle 'state_update', then goes on to process 'inventory' events.
@@ -166,12 +119,12 @@ class InventoryRegion: BLOCKvRegion {
                     let object = try? JSONSerialization.jsonObject(with: data),
                     let json = object as? [String: Any],
                     let payload = json["payload"] as? [String: Any] else {
-                    throw NSError.init("Unable to load") //FIXME: Create a better error
+                    throw RegionError.failedParsingRespnse
                 }
 
                 // parse out objects
                 guard let items = self.parseDataObject(from: payload) else {
-                    throw NSError.init("Unable to parse data") //FIXME: Create a better error
+                    throw RegionError.failedParsingObject
                 }
 
                 // add new objects
@@ -192,7 +145,7 @@ class InventoryRegion: BLOCKvRegion {
         }
 
     }
-    
+
     /// Page size parameter sent to the server.
     private let pageSize = 100
     /// Upper bound to prevent infinite recursion.
@@ -207,96 +160,96 @@ class InventoryRegion: BLOCKvRegion {
 }
 
 extension InventoryRegion {
-    
+
     func fetchBatched(maxConcurrent: Int = 4) -> Promise<[String]?> {
-        
+
         let intialRange: CountableClosedRange<Int> = 1...maxConcurrent
         return fetchRange(intialRange)
-        
+
     }
-    
+
     private func fetchRange(_ range: CountableClosedRange<Int>) -> Promise<[String]?> {
-        
+
         iteration += 1
-        
+
         print("[Pager] fetching range \(range) in iteration \(iteration).")
-        
+
         var promises: [Promise<[String]?>] = []
-        
+
         // tracking flag
         var shouldRecurse = true
-        
+
         for i in range {
-            
+
             // build raw request
             let endpoint: Endpoint<Void> = API.Generic.getInventory(parentID: "*", page: i, limit: pageSize)
-            
+
             // exectute request
             let promise = BLOCKv.client.requestJSON(endpoint).then(on: .global(qos: .userInitiated)) { json -> Promise<[String]?> in
-                
+
                 guard let json = json as? [String: Any],
                     let payload = json["payload"] as? [String: Any] else {
-                        throw NSError.init("Unable to load") //FIXME: Create a better error
+                        throw RegionError.failedParsingRespnse
                 }
-                
+
                 // parse out data objects
                 guard let items = self.parseDataObject(from: payload) else {
                     return Promise.value([])
                 }
                 let newIds = items.map { $0.id }
-                
+
                 return Promise { (resolver: Resolver) in
-                    
+
                     DispatchQueue.main.async {
-                        
+
                         // append new ids
                         self.cummulativeIds.append(contentsOf: newIds)
-                        
+
                         // add data objects
                         self.add(objects: items)
-                        
+
                         if (items.count == 0) || (self.proccessedPageCount > self.maxReasonablePages) {
                             shouldRecurse = false
                         }
-                        
+
                         return resolver.fulfill(newIds)
-                        
+
                     }
                 }
-                
+
             }.ensure {
                 // increment page count
                 self.proccessedPageCount += 1
             }
-            
+
             promises.append(promise)
-            
+
         }
-        
-        return when(resolved: promises).then { results -> Promise<[String]?> in
-            
+
+        return when(resolved: promises).then { _ -> Promise<[String]?> in
+
             // check stopping condition
             if shouldRecurse {
-                
+
                 print("[Pager] recursing.")
-                
-                // create the next range
+
+                // create the next range (with equal width)
                 let nextLower = range.upperBound.advanced(by: 1)
-                let nextUpper = range.upperBound.advanced(by: range.upperBound) // ranges alway have equal width
+                let nextUpper = range.upperBound.advanced(by: range.upperBound)
                 let nextRange: CountableClosedRange<Int> = nextLower...nextUpper
-                
+
                 return self.fetchRange(nextRange)
-                
+
             } else {
-                
+
                 print("[Pager] stopping condition hit.")
 
                 return Promise.value(self.cummulativeIds)
-                
+
             }
-            
+
         }
-        
+
     }
-    
+
 }

@@ -43,7 +43,7 @@ import PromiseKit
 public class Region {
 
     enum RegionError: Error {
-        case failedParsingRespnse
+        case failedParsingResponse
         case failedParsingObject
     }
 

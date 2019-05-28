@@ -119,7 +119,7 @@ class InventoryRegion: BLOCKvRegion {
                     let object = try? JSONSerialization.jsonObject(with: data),
                     let json = object as? [String: Any],
                     let payload = json["payload"] as? [String: Any] else {
-                    throw RegionError.failedParsingRespnse
+                    throw RegionError.failedParsingResponse
                 }
 
                 // parse out objects
@@ -189,7 +189,7 @@ extension InventoryRegion {
 
                 guard let json = json as? [String: Any],
                     let payload = json["payload"] as? [String: Any] else {
-                        throw RegionError.failedParsingRespnse
+                        throw RegionError.failedParsingResponse
                 }
 
                 // parse out data objects

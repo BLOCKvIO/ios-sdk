@@ -499,7 +499,7 @@ open class VatomView: UIView {
                  */
                 guard self.vatom!.id == contextID else {
                     // vatom-view is no longer displaying the original vatom
-                    printBV(info: "Load completed, but original vatom has changed.")
+                    //                    printBV(info: "Load completed, but original vatom has changed.")
                     return
                 }
                 

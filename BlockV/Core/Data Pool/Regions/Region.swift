@@ -42,6 +42,11 @@ import PromiseKit
 /// - Persistance.
 public class Region {
 
+    enum RegionError: Error {
+        case failedParsingRespnse
+        case failedParsingObject
+    }
+
     /// Constructor
     required init(descriptor: Any) throws { }
 

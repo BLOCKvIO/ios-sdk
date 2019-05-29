@@ -81,7 +81,7 @@ public final class DataPool {
             // unable to load from disk
             printBV(error: "[DataPool] Unable to load region state from disk. " + err.localizedDescription)
 
-        }.then { _ -> Guarantee<Void> in
+        }.then { _ -> Guarantee<[Any]> in
 
             // start sync'ing region data with the server
             return region.synchronize()

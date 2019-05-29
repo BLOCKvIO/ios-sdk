@@ -84,21 +84,28 @@ public class Region {
 
     /// `true` if this region has been closed.
     public fileprivate(set) var closed = false
+    
+    /// Concurrent worker queue.
+    let workerQueue = DispatchQueue(label: "io.blockv.sdk.datapool-worker", qos: .userInitiated, attributes: .concurrent)
 
     /// Re-synchronizes the region by manually fetching objects from the server again.
-    public func forceSynchronize() -> Guarantee<Void> {
+    public func forceSynchronize() -> Guarantee<[Any]> {
         self.synchronized = false
         return self.synchronize()
     }
+    
+    public var isSynchronizing: Bool {
+        return !(_syncPromise == nil)
+    }
 
     /// Currently executing synchronization promise. `nil` if there is no synchronization underway.
-    private var _syncPromise: Guarantee<Void>?
+    private var _syncPromise: Guarantee<[Any]>?
 
     /// Attempts to stablaize the region by querying the backend for all data.
     ///
     /// - Returns: Promise which resolves when complete.
     @discardableResult
-    public func synchronize() -> Guarantee<Void> {
+    public func synchronize() -> Guarantee<[Any]> {
 
         self.emit(.synchronizing, userInfo: [:])
 
@@ -109,18 +116,24 @@ public class Region {
 
         // remove pending error
         self.error = nil
-        self.emit(.updated)
+//        self.emit(.updated) //FIXME: This seems an odd place for an `.update` call
 
         // stop if already in sync
         if synchronized {
-            return Guarantee()
+            
+            Guarantee { resolver in
+                workerQueue.async {
+                     resolver(self.getAll())
+                }
+            }
+
         }
 
         // ask the subclass to load it's data
         printBV(info: "[DataPool > Region] Starting synchronization for region \(self.stateKey)")
 
         // load objects
-        _syncPromise = self.load().map { ids -> Void in
+        _syncPromise = self.load().then { ids -> Guarantee<[Any]> in
 
             /*
              The subclass is expected to call the add method as it finds object, and then, once
@@ -132,11 +145,18 @@ public class Region {
             if let ids = ids {
                 self.diffedRemove(ids: ids)
             }
-
-            // data is up to date
-            self.synchronized = true
-            self._syncPromise = nil
-            printBV(info: "[DataPool > Region] Region '\(self.stateKey)' is now in sync!")
+            
+            return Guarantee { resolver in
+                self.workerQueue.async {
+                    resolver(self.getAll())
+                    DispatchQueue.main.async {
+                        // data is up to date
+                        self.synchronized = true
+                        self._syncPromise = nil
+                        printBV(info: "[DataPool > Region] Region '\(self.stateKey)' is now in sync!")
+                    }
+                }
+            }
 
         }.recover { err in
             // error handling, notify listeners of an error
@@ -144,6 +164,7 @@ public class Region {
             self.error = err
             printBV(error: "[DataPool > Region] Unable to load: " + err.localizedDescription)
             self.emit(.error, userInfo: ["error": err])
+            return Guarantee.value([]) //FIXME: Surely a better approach is to return the errors from data pool?
         }
 
         // return promise
@@ -348,18 +369,58 @@ public class Region {
     /// Returns all the objects within this region. Waits until the region is stable first.
     ///
     /// - Returns: Array of objects. Check the region-specific map() function to see what types are returned.
-    public func getAllStable() -> Guarantee<[Any]> {
+    public func getAllStable() -> Guarantee<[Any]> { //FIXME: This function is no longer needed, rather call `synchronize` directly.
 
         // synchronize now
-        return self.synchronize().map {
-            return self.getAll()
-        }
+        return self.synchronize()
 
     }
+    
+//    public func getAllConcurrently() -> [Any] {
+//
+//        // create array of all items
+//        var items: [Any] = []
+//
+//        let max = objects.count
+//
+//        let objs = Array(objects.values)
+//
+//        for i in stride(from: 0, to: max - 10, by: 10) {
+//
+//            // wrong: https://stackoverflow.com/questions/54775099/is-it-possible-to-specify-the-dispatchqueue-for-dispatchqueue-concurrentperfo
+//
+//            DispatchQueue.concurrentPerform(iterations: 10) { index in
+//
+//                let object = objs[i + index]
+//
+//                // check for cached concrete type
+//                if let cached = object.cached {
+//                    items.append(cached)
+//                    return
+//                }
+//
+//                // map to the plugin's intended type
+//                guard let mapped = self.map(object) else {
+//                    return
+//                }
+//
+//                // cache it
+//                object.cached = mapped
+//
+//                // add to list
+//                items.append(mapped)
+//
+//            }
+//
+//        }
+//
+//        return items
+//
+//    }
 
     /// Returns all the objects within this region. Does NOT wait until the region is stable first.
     public func getAll() -> [Any] {
-
+        
         // create array of all items
         var items: [Any] = []
         for object in objects.values {
@@ -390,9 +451,8 @@ public class Region {
 
     /// Returns an object within this region by it's ID. Waits until the region is stable first.
     public func getStable(id: String) -> Guarantee<Any?> {
-
-        // synchronize now
-        return self.synchronize().map {
+        
+        return self.synchronize().map { _ in
             // get item
             return self.get(id: id)
         }

@@ -291,8 +291,9 @@ public final class BLOCKv {
             fatalError("Invalid cliam")
         }
 
-        // standup the client
+        // standup the client & socket
         _ = client
+        _ = socket.connect()
 
         // standup data pool
         DataPool.sessionInfo = ["userID": userId]

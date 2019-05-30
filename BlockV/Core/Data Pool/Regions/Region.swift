@@ -42,15 +42,36 @@ import PromiseKit
 /// - Persistance.
 public class Region {
 
+    // MARK: - Enums
+    
     enum RegionError: Error {
         case failedParsingResponse
         case failedParsingObject
     }
     
-    /// Serial io queue.
+    // MARK: - Dispatch Queues
+    
+    /// Serial i/o queue.
     ///
     /// Each subclass with have it's own io queue (the label does not dictate uniqueness).
-    let ioQueue = DispatchQueue(label: "io.blockv.sdk.datapool-io", qos: .utility)
+    let ioQueue = DispatchQueue(label: "io.blockv.sdk.datapool-io",
+                                qos: .userInitiated)
+    
+    /// Concurrent worker queue.
+    ///
+    /// Use to process mappings and transfromations.
+    let workerQueue = DispatchQueue(label: "io.blockv.sdk.datapool-worker",
+                                    qos: .userInteractive,
+                                    attributes: .concurrent)
+    
+    /// Concurrent synchronization.
+    ///
+    /// Used exclusively for object synchronization queue (serial write, concurrent read).
+    let syncQueue = DispatchQueue(label: "io.blockv.sdk.object-sync",
+                                  qos: .userInitiated,
+                                  attributes: .concurrent)
+    
+    // MARK: - Initialization
 
     /// Constructor
     required init(descriptor: Any) throws { }
@@ -63,13 +84,24 @@ public class Region {
 
     /// `true` if this region contains temporary objects which should not be cached to disk, `false` otherwise.
     let noCache = false
+    
+    private var _objects: [String: DataObject] = [:]
 
     /// All objects currently in our cache.
-    private(set) var objects: [String: DataObject] = [:]
+    private(set) var objects: [String: DataObject] {
+        get { // sync read (concurrent queue)
+            return syncQueue.sync { _objects }
+        }
+        set {
+            syncQueue.sync(flags: .barrier) { _objects = newValue }
+        }
+    }
 
     /// `true` if data in this region is in sync with the backend.
     public internal(set) var synchronized = false {
         didSet {
+            dispatchPrecondition(condition: DispatchPredicate.onQueue(.main))
+
             if synchronized {
                 self.emit(.stabalized, userInfo: [:])
             } else {
@@ -89,12 +121,12 @@ public class Region {
 
     /// `true` if this region has been closed.
     public fileprivate(set) var closed = false
-    
-    /// Concurrent worker queue.
-    let workerQueue = DispatchQueue(label: "io.blockv.sdk.datapool-worker", qos: .userInitiated, attributes: .concurrent)
 
     /// Re-synchronizes the region by manually fetching objects from the server again.
     public func forceSynchronize() -> Guarantee<[Any]> {
+        
+        dispatchPrecondition(condition: DispatchPredicate.onQueue(.main))
+
         self.synchronized = false
         return self.synchronize()
     }
@@ -108,9 +140,13 @@ public class Region {
 
     /// Attempts to stablaize the region by querying the backend for all data.
     ///
+    /// If the region is already stable, local data is returned.
+    ///
     /// - Returns: Promise which resolves when complete.
     @discardableResult
     public func synchronize() -> Guarantee<[Any]> {
+        
+        dispatchPrecondition(condition: DispatchPredicate.onQueue(.main))
 
         self.emit(.synchronizing, userInfo: [:])
 
@@ -191,6 +227,8 @@ public class Region {
     /// Stop and destroy this region. Subclasses can override this to do stuff on close.
     public func close() {
 
+        dispatchPrecondition(condition: DispatchPredicate.onQueue(.main))
+
         // notify data pool we have closed
         DataPool.removeRegion(region: self)
         // we're closed
@@ -213,6 +251,8 @@ public class Region {
     ///
     /// - Parameter objects: The objects to add
     func add(objects: [DataObject]) {
+        
+        dispatchPrecondition(condition: DispatchPredicate.onQueue(.main))
 
         // go through each object
         for obj in objects {
@@ -244,10 +284,6 @@ public class Region {
 
             }
 
-            // emit event
-            //FIXME: Why was this being broadcast?
-//            self.emit(.objectUpdated, userInfo: ["id": obj.id])
-
         }
 
         // Notify updated
@@ -262,6 +298,8 @@ public class Region {
     ///
     /// - Parameter objects: The list of changes to perform to our data objects.
     func update(objects: [DataObjectUpdateRecord]) {
+        
+        dispatchPrecondition(condition: DispatchPredicate.onQueue(.main))
 
         // batch emit events, so if a object is updated multiple times, only one event is sent
         var changedIDs = Set<String>()
@@ -331,6 +369,8 @@ public class Region {
     ///
     /// - Parameter ids: The IDs of objects to remove
     func remove(ids: [String]) {
+        
+        dispatchPrecondition(condition: DispatchPredicate.onQueue(.main))
 
         // remove all data objects with the specified IDs
         var didUpdate = false
@@ -371,55 +411,13 @@ public class Region {
         return object
     }
 
-    /// Returns all the objects within this region. Waits until the region is stable first.
-    ///
-    /// - Returns: Array of objects. Check the region-specific map() function to see what types are returned.
-    public func getAllStable() -> Guarantee<[Any]> { //FIXME: This function is no longer needed, rather call `synchronize` directly.
-
-        // synchronize now
-        return self.synchronize()
-
-    }
-    
-//    public func getAllConcurrently() -> [Any] {
+//    /// Returns all the objects within this region. Waits until the region is stable first.
+//    ///
+//    /// - Returns: Array of objects. Check the region-specific map() function to see what types are returned.
+//    public func getAllStable() -> Guarantee<[Any]> { //FIXME: This function is no longer needed, rather call `synchronize` directly.
 //
-//        // create array of all items
-//        var items: [Any] = []
-//
-//        let max = objects.count
-//
-//        let objs = Array(objects.values)
-//
-//        for i in stride(from: 0, to: max - 10, by: 10) {
-//
-//            // wrong: https://stackoverflow.com/questions/54775099/is-it-possible-to-specify-the-dispatchqueue-for-dispatchqueue-concurrentperfo
-//
-//            DispatchQueue.concurrentPerform(iterations: 10) { index in
-//
-//                let object = objs[i + index]
-//
-//                // check for cached concrete type
-//                if let cached = object.cached {
-//                    items.append(cached)
-//                    return
-//                }
-//
-//                // map to the plugin's intended type
-//                guard let mapped = self.map(object) else {
-//                    return
-//                }
-//
-//                // cache it
-//                object.cached = mapped
-//
-//                // add to list
-//                items.append(mapped)
-//
-//            }
-//
-//        }
-//
-//        return items
+//        // synchronize now
+//        return self.synchronize()
 //
 //    }
 
@@ -493,6 +491,8 @@ public class Region {
     /// Load objects from local storage.
     func loadFromCache() -> Promise<Void> {
         
+        dispatchPrecondition(condition: DispatchPredicate.onQueue(.main))
+        
         return Promise { (resolver: Resolver) in
             
             ioQueue.async {
@@ -543,6 +543,8 @@ public class Region {
                 DispatchQueue.main.async {
                     // add objects
                     self.add(objects: cleanObjects)
+                    
+                    self.emit(.loadedFromCache)
                 }
                 
                 // done
@@ -560,6 +562,8 @@ public class Region {
     
     /// Saves the region to local storage.
     func save() {
+        
+        dispatchPrecondition(condition: DispatchPredicate.onQueue(.main))
 
         // cancel the pending save task
         if saveTask != nil {
@@ -624,6 +628,8 @@ public class Region {
     ///   - value: The new value
     /// - Returns: An undo function
     func preemptiveChange(id: String, keyPath: String, value: Any) -> UndoFunction {
+        
+        dispatchPrecondition(condition: DispatchPredicate.onQueue(.main))
 
         // get object. If it doesn't exist, do nothing and return an undo function which does nothing.
         guard let object = objects[id], object.data != nil else {
@@ -665,6 +671,8 @@ public class Region {
     /// - Parameter id: The object ID to remove
     /// - Returns: An undo function
     func preemptiveRemove(id: String) -> UndoFunction {
+        
+        dispatchPrecondition(condition: DispatchPredicate.onQueue(.main))
 
         // remove object
         guard let removedObject = objects.removeValue(forKey: id) else {

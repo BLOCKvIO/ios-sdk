@@ -215,9 +215,14 @@ class ImageFaceView: FaceView {
                                        targetSize: pixelSize,
                                        contentMode: nukeContentMode)
             
-            // use unencoded url as cache key
-            request.cacheKey = resourceModel.url
-
+            // create a hash for the cacheKey
+            var hasher = Hasher()
+            hasher.combine(resourceModel.url)
+            hasher.combine(pixelSize.width)
+            hasher.combine(pixelSize.height)
+            // set cache key
+            request.cacheKey = hasher.finalize()
+            
             /*
              Nuke's `loadImage` cancels any exisitng requests and nils out the old image. This takes care of the reuse-pool
              use case where the same face view is used to display a vatom of the same template variation.

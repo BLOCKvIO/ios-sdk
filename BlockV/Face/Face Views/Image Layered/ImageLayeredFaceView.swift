@@ -271,13 +271,9 @@ class ImageLayeredFaceView: FaceView {
             var request = ImageRequest(url: encodeURL,
                                        targetSize: pixelSize,
                                        contentMode: .aspectFit)
-            // create a hash for the cacheKey
-            var hasher = Hasher()
-            hasher.combine(resourceModel.url)
-            hasher.combine(pixelSize.width)
-            hasher.combine(pixelSize.height)
+
             // set cache key
-            request.cacheKey = hasher.finalize()
+            request.cacheKey = request.generateCacheKey(url: resourceModel.url, targetSize: pixelSize)
 
             // load image (auto cancel previous)
             Nuke.loadImage(with: request, into: self.baseLayer) { (_, error) in

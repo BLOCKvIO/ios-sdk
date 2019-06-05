@@ -288,28 +288,18 @@ class ImageProgressFaceView: FaceView {
             dispatchGroup.enter()
 
             var requestEmpty = ImageRequest(url: encodedEmptyURL)
-            // create a hash for the cacheKey
-            var hasherEmpty = Hasher()
-            hasherEmpty.combine(emptyImageResource.url)
-            hasherEmpty.combine(pixelSize.width)
-            hasherEmpty.combine(pixelSize.height)
             // set cache key
-            requestEmpty.cacheKey = hasherEmpty.finalize()
-            
+            requestEmpty.cacheKey = requestEmpty.generateCacheKey(url: emptyImageResource.url, targetSize: pixelSize)
+
             // load image (automatically handles reuse)
             Nuke.loadImage(with: requestEmpty, into: self.emptyImageView) { (_, _) in
                 self.dispatchGroup.leave()
             }
 
             var requestFull = ImageRequest(url: encodedFullURL)
-            // create a hash for the cacheKey
-            var hasherFull = Hasher()
-            hasherFull.combine(fullImageResource.url)
-            hasherFull.combine(pixelSize.width)
-            hasherFull.combine(pixelSize.height)
             // set cache key
-            requestFull.cacheKey = hasherFull.finalize()
-            
+            requestFull.cacheKey = requestFull.generateCacheKey(url: fullImageResource.url, targetSize: pixelSize)
+
             // load image (automatically handles reuse)
             Nuke.loadImage(with: requestFull, into: self.fullImageView) { (_, _) in
                 self.dispatchGroup.leave()

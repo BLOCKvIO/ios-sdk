@@ -127,17 +127,10 @@ internal final class DefaultErrorView: BoundedView & VatomViewError {
         // create request
         var request = ImageRequest(url: encodeURL,
                                    targetSize: pixelSize,
-                                   contentMode: .aspectFit)
+                                   contentMode: .aspectFill)
         
-        // create a hash for the cacheKey
-        var hasher = Hasher()
-        hasher.combine(resourceModel.url)
-        hasher.combine(pixelSize.width)
-        hasher.combine(pixelSize.height)
         // set cache key
-        request.cacheKey = hasher.finalize()
-    
-        print("CacheKey", request.cacheKey)
+        request.cacheKey = request.generateCacheKey(url: resourceModel.url, targetSize: pixelSize)
         
         // load image
         Nuke.loadImage(with: request, into: activatedImageView) { [weak self] (_, _) in
@@ -161,7 +154,6 @@ extension DefaultErrorView {
     }
 
 }
-
 
 /// This view class provides a convenient way to know when the bounds of a view have been set.
 class BoundedView: UIView {

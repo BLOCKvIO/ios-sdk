@@ -50,7 +50,7 @@ class ImageFaceView: FaceView {
         /// ### Legacy Support
         /// The first resource name in the resources array (if present) is used in place of the activate image.
         init(_ faceModel: FaceModel) {
-            
+
             // enable animated images
             ImagePipeline.Configuration.isAnimatedImageDataEnabled = true
 
@@ -117,7 +117,7 @@ class ImageFaceView: FaceView {
     private func updateContentMode() {
         self.animatedImageView.contentMode = configuredContentMode
     }
-    
+
     var configuredContentMode: UIView.ContentMode {
         // check face config
         switch config.scale {
@@ -190,7 +190,7 @@ class ImageFaceView: FaceView {
     }
 
     // MARK: - Resources
-    
+
     var nukeContentMode: ImageDecompressor.ContentMode {
         // check face config, convert to nuke content mode
         switch config.scale {
@@ -214,15 +214,10 @@ class ImageFaceView: FaceView {
             var request = ImageRequest(url: encodeURL,
                                        targetSize: pixelSize,
                                        contentMode: nukeContentMode)
-            
-            // create a hash for the cacheKey
-            var hasher = Hasher()
-            hasher.combine(resourceModel.url)
-            hasher.combine(pixelSize.width)
-            hasher.combine(pixelSize.height)
+
             // set cache key
-            request.cacheKey = hasher.finalize()
-            
+            request.cacheKey = request.generateCacheKey(url: resourceModel.url, targetSize: pixelSize)
+
             /*
              Nuke's `loadImage` cancels any exisitng requests and nils out the old image. This takes care of the reuse-pool
              use case where the same face view is used to display a vatom of the same template variation.

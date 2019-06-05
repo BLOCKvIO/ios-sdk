@@ -33,3 +33,20 @@ extension FLAnimatedImageView {
         }
     }
 }
+
+
+extension ImageRequest {
+    
+    /// Generates a cache key based on the specified arguments.
+    func generateCacheKey(url: URL, targetSize: CGSize? = nil) -> Int {
+        // create a hash for the cacheKey
+        var hasher = Hasher()
+        hasher.combine(url)
+        if let targetSize = targetSize {
+            hasher.combine(targetSize.width)
+            hasher.combine(targetSize.height)
+        }
+        return hasher.finalize()
+    }
+    
+}

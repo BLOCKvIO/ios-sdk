@@ -249,6 +249,18 @@ public class WebSocketManager {
 
     }
 
+    // MARK: Debugging
+    
+    /// Writes a ping frame to the socket.
+    func writePing(data: Data = Data(), completion: @escaping () -> Void) {
+        
+        // write a ping control frame
+        self.socket?.write(ping: data) {
+            completion()
+        }
+        
+    }
+
 }
 
 // MARK: - Extension WebSocket Delegate

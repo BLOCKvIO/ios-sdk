@@ -211,15 +211,15 @@ extension InventoryRegion {
                         if (items.count == 0) || (self.proccessedPageCount > self.maxReasonablePages) {
                             shouldRecurse = false
                         }
+                        
+                        // increment page count
+                        self.proccessedPageCount += 1
 
                         return resolver.fulfill(newIds)
 
                     }
                 }
 
-            }.ensure {
-                // increment page count
-                self.proccessedPageCount += 1
             }
 
             promises.append(promise)

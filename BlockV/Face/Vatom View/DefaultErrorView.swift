@@ -18,7 +18,7 @@ import Nuke
 /// Shows:
 /// 1. vAtoms activated image.
 /// 2. Warning trigangle (that is tappable).
-internal final class DefaultErrorView: UIView & VatomViewError {
+internal final class DefaultErrorView: BoundedView & VatomViewError {
 
     // MARK: - Debug
 
@@ -59,7 +59,8 @@ internal final class DefaultErrorView: UIView & VatomViewError {
 
     var vatom: VatomModel? {
         didSet {
-            self.loadResources()
+            // raise flag that layout is needed on the bounds are known
+            self.requiresBoundsBasedLayout = true
         }
     }
 
@@ -90,6 +91,12 @@ internal final class DefaultErrorView: UIView & VatomViewError {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    override func layoutWithKnownBounds() {
+        super.layoutWithKnownBounds()
+        // only at this point is the frame know, and therefore the target size is valid
+        loadResources()
+    }
 
     // MARK: - Logic
 
@@ -97,6 +104,7 @@ internal final class DefaultErrorView: UIView & VatomViewError {
     ///
     /// The error view uses the activated image as a placeholder.
     private func loadResources() {
+        print(#function, self.bounds)
 
         activityIndicator.startAnimating()
 
@@ -119,10 +127,12 @@ internal final class DefaultErrorView: UIView & VatomViewError {
         // create request
         var request = ImageRequest(url: encodeURL,
                                    targetSize: pixelSize,
-                                   contentMode: .aspectFit)
-        // use unencoded url as cache key
-        request.cacheKey = resourceModel.url
-        // load the image (reuse pool is automatically handled)
+                                   contentMode: .aspectFill)
+        
+        // set cache key
+        request.cacheKey = request.generateCacheKey(url: resourceModel.url, targetSize: pixelSize)
+        
+        // load image
         Nuke.loadImage(with: request, into: activatedImageView) { [weak self] (_, _) in
             self?.activityIndicator.stopAnimating()
         }
@@ -134,11 +144,49 @@ internal final class DefaultErrorView: UIView & VatomViewError {
 extension DefaultErrorView {
 
     /// Size of the bounds of the view in pixels.
-    public var pixelSize: CGSize {
+    ///
+    /// Be sure to call this property *after* the view has been layed out.
+    var pixelSize: CGSize {
         get {
             return CGSize(width: self.bounds.size.width * UIScreen.main.scale,
                           height: self.bounds.size.height * UIScreen.main.scale)
         }
     }
 
+}
+
+/// This view class provides a convenient way to know when the bounds of a view have been set.
+class BoundedView: UIView {
+    
+    /// Setting this value to `true` will trigger a subview layout and ensure that `layoutWithKnowBounds()` is called
+    /// thereafter.
+    var requiresBoundsBasedLayout = false {
+        didSet {
+            if requiresBoundsBasedLayout {
+                // trigger a new layout cycle
+                hasCompletedLayoutSubviews = false
+                self.setNeedsLayout()
+            }
+        }
+    }
+    
+    /// Boolean value indicating whether a layout pass has been completed since `requiresBoundsBasedLayout`
+    private var hasCompletedLayoutSubviews = false
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        if requiresBoundsBasedLayout && !hasCompletedLayoutSubviews {
+            layoutWithKnownBounds()
+            hasCompletedLayoutSubviews = true
+            requiresBoundsBasedLayout = false
+        }
+        
+    }
+    
+    /// Called only after `layoutSubviews` has been called (i.e. bounds are set).
+    func layoutWithKnownBounds() {
+        // subclass should override
+    }
+    
 }

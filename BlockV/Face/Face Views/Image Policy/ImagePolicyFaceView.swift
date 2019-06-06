@@ -59,7 +59,7 @@ class ImagePolicyFaceView: FaceView {
         }
 
         super.init(vatom: vatom, faceModel: faceModel)
-        
+
         // enable animated images
         ImagePipeline.Configuration.isAnimatedImageDataEnabled = true
 
@@ -104,7 +104,7 @@ class ImagePolicyFaceView: FaceView {
         if self.vatom.id == vatom.id {
             // replace vatom, update UI
             self.vatom = vatom
-            
+
         } else {
             // replace vatom, reset and update UI
             self.vatom = vatom
@@ -214,8 +214,10 @@ class ImagePolicyFaceView: FaceView {
             var request = ImageRequest(url: encodeURL,
                                        targetSize: pixelSize,
                                        contentMode: .aspectFit)
-            // use unencoded url as cache key
-            request.cacheKey = resourceModel.url
+
+            // set cache key
+            request.cacheKey = request.generateCacheKey(url: resourceModel.url, targetSize: pixelSize)
+
             // load image (automatically handles reuse)
             Nuke.loadImage(with: request, into: self.animatedImageView) { (_, error) in
                 self.isLoaded = true

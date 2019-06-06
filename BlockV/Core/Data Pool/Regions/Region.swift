@@ -236,11 +236,15 @@ public class Region {
         }
 
     }
+    
+    enum Source: String {
+        case brain
+    }
 
     /// Updates data objects within our pool.
     ///
     /// - Parameter objects: The list of changes to perform to our data objects.
-    func update(objects: [DataObjectUpdateRecord]) {
+    func update(objects: [DataObjectUpdateRecord], source: Source? = nil) {
 
         // batch emit events, so if a object is updated multiple times, only one event is sent
         var changedIDs = Set<String>()
@@ -276,7 +280,7 @@ public class Region {
 
         // notify each item that was updated
         for id in changedIDs {
-            self.emit(.objectUpdated, userInfo: ["id": id])
+            self.emit(.objectUpdated, userInfo: ["id": id, "source": source?.rawValue ?? ""])
         }
 
         // notify overall update

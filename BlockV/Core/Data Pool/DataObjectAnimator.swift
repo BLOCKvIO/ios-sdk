@@ -156,7 +156,7 @@ internal class DataObjectAnimator {
 
         // execute the changes on all regions
         for region in self.regions {
-            region.value?.update(objects: changes)
+            region.value?.update(objects: changes, source: .brain)
         }
 
     }

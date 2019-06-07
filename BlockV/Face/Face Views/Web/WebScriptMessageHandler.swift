@@ -102,14 +102,19 @@ extension WebFaceView: WKScriptMessageHandler {
             }
 
             // encode response
-            guard let data = try? JSONEncoder.blockv.encode(response),
-                let jsonString = String.init(data: data, encoding: .utf8) else {
-                    // handle error
-                    let error = BridgeError.viewer("Unable to encode response.")
-                    self.sendResponse(forRequestMessage: message, result: .failure(error))
-                    return
+            if let jsonString = response?.stringValue?.json {
+                // corner case: ui.qr.scan return a top-level string which JSONEncoder cannot encode
+                self.postMessage(message.requestID, withJSONString: jsonString)
+            } else {
+                guard let data = try? JSONEncoder.blockv.encode(response),
+                    let jsonString = String.init(data: data, encoding: .utf8) else {
+                        // handle error
+                        let error = BridgeError.viewer("Unable to encode response.")
+                        self.sendResponse(forRequestMessage: message, result: .failure(error))
+                        return
+                }
+                self.postMessage(message.requestID, withJSONString: jsonString)
             }
-            self.postMessage(message.requestID, withJSONString: jsonString)
 
         case .failure(let error):
             // create response
@@ -246,20 +251,28 @@ extension WebFaceView {
     private func routeMessageToViewer(_ message: RequestScriptMessage) {
 
         // notify the host's message delegate of the custom message from the web page
-        self.delegate?.faceView(self,
-                                didSendMessage: message.name,
-                                withObject: message.payload,
-                                completion: { result in
-                                    switch result {
-                                    case .success(let payload):
-                                        self.sendResponse(forRequestMessage: message, result: .success(payload))
-                                        return
-                                    case .failure(let error):
-                                        // transform the bridge error
-                                        let bridgeError = BridgeError.viewer(error.message)
-                                        self.sendResponse(forRequestMessage: message, result: .failure(bridgeError))
-                                        return
-                                    }
+        self.delegate?.faceView(self, didSendMessage: message.name, withObject: message.payload, completion:
+            { result in
+                switch result {
+                case .success(let payload):
+
+                    // v1.0.0 backward compatibility
+                    if message.version == "1.0.0" && message.name == "viewer.qr.scan" {
+                        // transform reponse paylaod from ["data": <text>] to <text>.
+                        if let newPayload = payload["data"] {
+                            self.sendResponse(forRequestMessage: message, result: .success(newPayload))
+                            return
+                        }
+                    }
+
+                    self.sendResponse(forRequestMessage: message, result: .success(payload))
+                    return
+                case .failure(let error):
+                    // transform the bridge error
+                    let bridgeError = BridgeError.viewer(error.message)
+                    self.sendResponse(forRequestMessage: message, result: .failure(bridgeError))
+                    return
+                }
         })
 
     }
@@ -306,6 +319,19 @@ extension WebFaceView {
 
         return message
 
+    }
+
+}
+
+fileprivate extension String {
+
+    /// Returns a JSON compatible version of the string.
+    var json: String {
+        return "\"" + self
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "\r", with: "\\r")
+            .replacingOccurrences(of: "\n", with: "\\n")
+            .replacingOccurrences(of: "\"", with: "\\\"") + "\""
     }
 
 }

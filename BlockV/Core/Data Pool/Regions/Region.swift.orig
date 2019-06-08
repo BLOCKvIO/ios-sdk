@@ -300,10 +300,14 @@ public class Region {
 
     /// Updates data objects within our pool.
     ///
-    /// - Parameter objects: The list of changes to perform to our data objects.        
-    func update(objects: [DataObjectUpdateRecord], source: Source? = nil) {
+    /// - Parameter objects: The list of changes to perform to our data objects.
+<<<<<<< HEAD
+    func update(objects: [DataObjectUpdateRecord]) {
         
         dispatchPrecondition(condition: DispatchPredicate.onQueue(.main))
+=======
+    func update(objects: [DataObjectUpdateRecord], source: Source? = nil) {
+>>>>>>> dev-open-viewer
 
         // batch emit events, so if a object is updated multiple times, only one event is sent
         var changedIDs = Set<String>()

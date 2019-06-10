@@ -50,3 +50,17 @@ extension ImageRequest {
     }
     
 }
+
+extension UIImageView {
+    
+    /// Size of the bounds of the view in pixels.
+    ///
+    /// Be sure to call this property *after* the view has been layed out.
+    var pixelSize: CGSize {
+        get {
+            return CGSize(width: self.bounds.size.width * UIScreen.main.scale,
+                          height: self.bounds.size.height * UIScreen.main.scale)
+        }
+    }
+    
+}

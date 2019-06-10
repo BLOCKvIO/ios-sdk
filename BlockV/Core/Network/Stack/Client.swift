@@ -119,6 +119,8 @@ final class Client: ClientProtocol {
     ///   - endpoint: Endpoint for the request
     ///   - completion: The completion handler to call when the request is completed.
     func request(_ endpoint: Endpoint<Void>, completion: @escaping RawCompletion) {
+        
+        let endpoint = self.upgradeEndpoint(endpoint)
 
         // create request
         let request = self.sessionManager.request(
@@ -158,6 +160,8 @@ final class Client: ClientProtocol {
 
     func requestJSON(_ endpoint: Endpoint<Void>, completion: @escaping JSONCompletion) {
 
+        let endpoint = self.upgradeEndpoint(endpoint)
+
         // create request
         let request = self.sessionManager.request(
             url(path: endpoint.path),
@@ -189,6 +193,8 @@ final class Client: ClientProtocol {
     ///   - completion: The completion handler to call when the request is completed.
     func request<Response>(_ endpoint: Endpoint<Response>,
                            completion: @escaping (Swift.Result<Response, BVError>) -> Void ) where Response: Decodable {
+
+        let endpoint = self.upgradeEndpoint(endpoint)
 
         // create request (starts immediately)
         let request = self.sessionManager.request(
@@ -319,4 +325,49 @@ final class Client: ClientProtocol {
         return baseURL.appendingPathComponent(path)
     }
 
+}
+
+extension Client {
+    
+    /// Upgrades the endpoint to V2.
+    fileprivate func upgradeEndpoint<T>(_ endpoint: Endpoint<T>) -> Endpoint<T> {
+        
+        // check if cyclers are enabled, else return original
+        guard Debug.isCyclersEnabled else { return endpoint }
+        
+        // check if the endpoint is eligible
+        if (endpoint.method == .post && endpoint.path.contains("/user/vatom/action/")) ||
+            (endpoint.method == .post && endpoint.path.contains("/vatoms")) ||
+            (endpoint.method == .patch && endpoint.path.contains("/vatoms")) ||
+            (endpoint.method == .post && endpoint.path.contains("/user/vatom/trash")) {
+            
+            // construct a new endpoint
+            let path = endpoint.path.replacingOccurrences(of: "v1", with: "v2")
+            var endpoint2 = Endpoint<T>(method: endpoint.method,
+                                        path: path,
+                                        parameters: endpoint.parameters,
+                                        encoding: endpoint.encoding,
+                                        headers: endpoint.headers)
+            return endpoint2
+        }
+        
+        // return original
+        return endpoint
+    }
+    
+}
+
+public class Debug {
+    
+    static let cyclersKey = "com.blockv.io.cyclers.enabled"
+    
+    public static var isCyclersEnabled: Bool {
+        get {
+            return UserDefaults.standard.bool(forKey: cyclersKey)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: cyclersKey)
+        }
+    }
+    
 }

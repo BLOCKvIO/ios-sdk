@@ -98,7 +98,7 @@ public protocol FaceViewLifecycle: class {
 }
 
 /// Abstract class all face views must derive from.
-open class BaseFaceView: UIView {
+open class BaseFaceView: BoundedView {
 
     /// Vatom to render.
     public internal(set) var vatom: VatomModel
@@ -129,4 +129,44 @@ open class BaseFaceView: UIView {
 enum FaceError: Error {
     case missingVatomResource
     case invalidURL
+}
+
+
+/// This view class provides a convenient way to know when the bounds of a view have been set.
+open class BoundedView: UIView {
+    
+    /// Setting this value to `true` will trigger a subview layout and ensure that `layoutWithKnowBounds()` is called
+    /// after the layout.
+    var requiresBoundsBasedSetup = false {
+        didSet {
+            if requiresBoundsBasedSetup {
+                // trigger a new layout cycle
+                hasCompletedLayoutSubviews = false
+                self.setNeedsLayout()
+            }
+        }
+    }
+    
+    /// Boolean value indicating whether a layout pass has been completed since `requiresBoundsBasedLayout`
+    private var hasCompletedLayoutSubviews = false
+    
+    override open func layoutSubviews() {
+        super.layoutSubviews()
+        
+        if requiresBoundsBasedSetup && !hasCompletedLayoutSubviews {
+            setupWithBounds()
+            hasCompletedLayoutSubviews = true
+            requiresBoundsBasedSetup = false
+        }
+        
+    }
+    
+    /// Called only after `layoutSubviews` has been called (i.e. bounds are set).
+    ///
+    /// This function is usefull for cases where the bounds of the view are important, for example, scaling an image
+    /// to the correct size.
+    func setupWithBounds() {
+        // subclass should override
+    }
+    
 }

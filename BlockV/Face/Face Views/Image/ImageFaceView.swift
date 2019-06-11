@@ -127,6 +127,8 @@ class ImageFaceView: FaceView {
     }
 
     // MARK: - Face View Lifecycle
+    
+    private var storedCompletion: ((Error?) -> Void)?
 
     /// Begins loading the face view's content.
     func load(completion: ((Error?) -> Void)?) {
@@ -142,20 +144,11 @@ class ImageFaceView: FaceView {
 
         // reset content
         self.reset()
-        // load required resources
-        self.loadResources { [weak self] error in
-
-            guard let self = self else { return }
-            // update state and inform delegate of load completion
-            if let error = error {
-                self.isLoaded = false
-                completion?(error)
-            } else {
-                self.isLoaded = true
-                completion?(nil)
-            }
-
-        }
+        // store the completion
+        self.storedCompletion = completion
+        //
+        self.requiresBoundsBasedSetup = true
+        
     }
 
     /// Updates the backing Vatom and loads the new state.
@@ -197,6 +190,26 @@ class ImageFaceView: FaceView {
         case .fill: return .aspectFill
         case .fit:  return .aspectFit
         }
+    }
+    
+    override func setupWithBounds() {
+        super.setupWithBounds()
+        
+        // load required resources
+        self.loadResources { [weak self] error in
+            
+            guard let self = self else { return }
+            // update state and inform delegate of load completion
+            if let error = error {
+                self.isLoaded = false
+                self.storedCompletion?(error)
+            } else {
+                self.isLoaded = true
+                self.storedCompletion?(nil)
+            }
+            
+        }
+        
     }
 
     private func loadResources(completion: ((Error?) -> Void)?) {

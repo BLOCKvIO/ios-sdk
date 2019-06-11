@@ -53,7 +53,8 @@ public final class AuthorizationServer {
             URLQueryItem(name: "client_id", value: clientID),
             URLQueryItem(name: "redirect_uri", value: redirectURI),
             URLQueryItem(name: "state", value: savedState!),
-            URLQueryItem(name: "scope", value: scope)
+            URLQueryItem(name: "scope", value: scope),
+            URLQueryItem(name: "nopadding", value: "1")
         ]
 
         //TODO: Should the `callbackURLScheme` include more than the redirectURL, e.g. bundle identifier?

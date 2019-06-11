@@ -77,7 +77,7 @@ public extension VatomViewDelegate {
 public enum VVLCError: Error, CustomStringConvertible {
 
     /// Face selection failed.
-    case faceViewSelectionFailed
+    case faceViewSelectionFailed(reason: String)
     /// A face model was selected but no corresponding face view was registered.
     case unregisteredFaceViewSelected(_ displayURL: String)
     /// The face view failed to load.

@@ -48,7 +48,7 @@ class FloatingHUDWindow: UIWindow {
 ///
 /// HUD content should be added as a subview to the view controller's view. If the view's need to capture touch events
 /// they should conform to the `FloatingView` protocol.
-class DebugHUDViewController: UIViewController {
+public class DebugHUDViewController: UIViewController {
 
     // MARK: - Properties
 
@@ -62,13 +62,18 @@ class DebugHUDViewController: UIViewController {
     }()
 
     private let window = FloatingHUDWindow()
+    
+    public var isHidden: Bool {
+        didSet { self.window.isHidden = isHidden }
+    }
 
     // MARK: - Initializer
 
-    init() {
+    public init() {
+        isHidden = true
         super.init(nibName: nil, bundle: nil)
         window.windowLevel = UIWindow.Level(rawValue: CGFloat.greatestFiniteMagnitude)
-        window.isHidden = false
+        window.isHidden = true
         window.rootViewController = self
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidShow),
                                                name: UIResponder.keyboardDidShowNotification,
@@ -81,7 +86,7 @@ class DebugHUDViewController: UIViewController {
 
     // MARK: - Life cycle
 
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
 
         self.setup()

@@ -102,6 +102,12 @@ public class WebSocketManager {
         return decoder
     }()
 
+    /// Time interval between reconnect attempts (measured in seconds).
+    private let reconnectInterval: TimeInterval = 5
+
+    /// Timer intendend to trigger reconnects.
+    private var reconnectTimer: Timer?
+
     /// Web socket instance
     private var socket: WebSocket?
     private let baseURLString: String
@@ -269,6 +275,11 @@ extension WebSocketManager: WebSocketDelegate {
 
     public func websocketDidConnect(socket: WebSocketClient) {
         printBV(info: "Web socket - Connected")
+
+        // invalidate auto-reconnect timer
+        self.reconnectTimer?.invalidate()
+        self.reconnectTimer = nil
+
         self.onConnected.fire(())
     }
 
@@ -285,9 +296,20 @@ extension WebSocketManager: WebSocketDelegate {
         // Fire an error informing the observers that the Web socket has disconnected.
         self.onDisconnected.fire((nil))
 
-        //TODO: The Web socket should reconnect here:
-        // The app may fire this message when entering the foreground
-        // (after the Web socket was disconnected after entering the background).
+        /*
+         Note
+         The app may fire this message when entering the foreground (after the Web socket was disconnected after
+         entering the background).
+         */
+
+        if !shouldAutoConnect { return }
+
+        // attempt to reconnect
+        self.connect()
+        // attempt to reconnect in `n` seconds
+        self.reconnectTimer = Timer.scheduledTimer(withTimeInterval: reconnectInterval, repeats: true, block: { _ in
+            self.connect()
+        })
 
     }
 

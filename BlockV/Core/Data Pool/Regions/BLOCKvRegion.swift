@@ -10,7 +10,6 @@
 //
 
 import Foundation
-//import DictionaryCoding
 
 /// Abstract subclass of `Region`. This intermediate class handles updates from the BLOCKv Web socket. Regions should
 /// subclass to automatically handle Web socket updates.

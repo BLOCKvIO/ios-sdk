@@ -186,6 +186,8 @@ class BLOCKvRegion: Region {
         // build up index
         self.createIndex(objects: objects)
         
+        print(templateIndex)
+        
         super.add(objects: objects)
     }
 
@@ -229,9 +231,10 @@ class BLOCKvRegion: Region {
 
         // get vatom info
         guard let template = object.data![keyPath: "vAtom::vAtomType.template"] as? String else { return nil }
+<<<<<<< HEAD
         
-        let faceIds = self.templateIndex[template.lowercased()]?.faceIdentifiers ?? []
-        let actionIds = self.templateIndex[template.lowercased()]?.actionIdentifiers ?? []
+        let faceIds = self.templateIndex[template]?.faceIdentifiers ?? []
+        let actionIds = self.templateIndex[template]?.actionIdentifiers ?? []
         
         let faces = objects.filter { faceIds.contains($0.key) }
         let actions = objects.filter {actionIds.contains($0.key) }
@@ -239,9 +242,23 @@ class BLOCKvRegion: Region {
         objectData["faces"] = faces.map { $0.value.data }
         objectData["actions"] = actions.map { $0.value.data }
 
+=======
+
+        // fetch all faces linked to this vatom
+        let faces = objects.values.filter { $0.type == "face" && $0.data?["template"] as? String == template }
+        objectData["faces"] = faces.map { $0.data }
+
+        // fetch all actions linked to this vatom
+        let actionNamePrefix = template + "::Action::"
+        let actions = objects.values.filter { $0.type == "action" && ($0.data?["name"] as? String)?
+            .starts(with: actionNamePrefix) == true }
+        objectData["actions"] = actions.map { $0.data }
+        
+        // create vatoms, face, anf actions using member-wise initilializer
+>>>>>>> core/fix/vatom-descriptable
         do {
-            let faces = faces.compactMap { $0.value.data }.compactMap { try? FaceModel(from: $0) }
-            let actions = actions.compactMap { $0.value.data }.compactMap { try? ActionModel(from: $0) }
+            let faces = faces.compactMap { $0.data }.compactMap { try? FaceModel(from: $0) }
+            let actions = actions.compactMap { $0.data }.compactMap { try? ActionModel(from: $0) }
             var vatom = try VatomModel(from: objectData)
             vatom.faceModels = faces
             vatom.actionModels = actions
@@ -415,6 +432,7 @@ class BLOCKvRegion: Region {
 
 }
 
+
 extension BLOCKvRegion {
     
     /// Creates a fast lookup index mapping template identifers to their faces and actions.
@@ -423,7 +441,17 @@ extension BLOCKvRegion {
         // build up index
         for object in objects {
             
-            if object.type == "face" {
+            if object.type == "vatom" {
+                
+                // find template
+                guard let templateID = object.data![keyPath: "vAtom::vAtomType.template"] as? String else {
+                    assertionFailure("Missing template id.")
+                    return
+                }
+                self.templateIndex[templateID] = TemplateMap()
+            }
+                
+            else if object.type == "face" {
                 
                 // find template
                 guard let faceTemplateID = object.data![keyPath: "template"] as? String else {
@@ -431,11 +459,7 @@ extension BLOCKvRegion {
                     return
                 }
                 // insert mapped face id
-                if let map = self.templateIndex[faceTemplateID.lowercased()] {
-                    self.templateIndex[faceTemplateID.lowercased()]!.faceIdentifiers.insert(object.id)
-                } else {
-                    self.templateIndex[faceTemplateID.lowercased()] = TemplateMap()
-                }
+                self.templateIndex[faceTemplateID]?.faceIdentifiers.insert(object.id)
                 
             }
                 
@@ -455,12 +479,8 @@ extension BLOCKvRegion {
                 // extract template id
                 let actionTemplateID = String(compoundName[compoundName.startIndex..<markerRange.lowerBound])
                 // insert mapped face id
-                if let map = self.templateIndex[actionTemplateID.lowercased()] {
-                    self.templateIndex[actionTemplateID.lowercased()]!.actionIdentifiers.insert(object.id)
-                } else {
-                    self.templateIndex[actionTemplateID.lowercased()] = TemplateMap()
-                }
-
+                self.templateIndex[actionTemplateID]?.actionIdentifiers.insert(object.id)
+                
             }
             
         }

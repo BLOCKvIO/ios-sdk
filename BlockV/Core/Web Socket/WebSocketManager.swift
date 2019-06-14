@@ -102,8 +102,11 @@ public class WebSocketManager {
         return decoder
     }()
 
-    /// Time interval between reconnect attempts (measured in seconds).
-    private let reconnectInterval: TimeInterval = 5
+    /// Delay option enum used to create a reconnect interval (measured in seconds).
+    let delayOption = DelayOption.exponential(initial: 1, base: 1.2, maxDelay: 5)
+    
+    /// Tally of the numnber of reconnect attempts.
+    private var reconnectCount: Int = 0
 
     /// Timer intendend to trigger reconnects.
     private var reconnectTimer: Timer?
@@ -279,6 +282,7 @@ extension WebSocketManager: WebSocketDelegate {
         // invalidate auto-reconnect timer
         self.reconnectTimer?.invalidate()
         self.reconnectTimer = nil
+        self.reconnectCount = 0
 
         self.onConnected.fire(())
     }
@@ -307,7 +311,9 @@ extension WebSocketManager: WebSocketDelegate {
         // attempt to reconnect
         self.connect()
         // attempt to reconnect in `n` seconds
-        self.reconnectTimer = Timer.scheduledTimer(withTimeInterval: reconnectInterval, repeats: true, block: { _ in
+        let delay = delayOption.make(reconnectCount)
+        self.reconnectTimer = Timer.scheduledTimer(withTimeInterval: delay, repeats: true, block: { _ in
+            self.reconnectCount += 1
             self.connect()
         })
 

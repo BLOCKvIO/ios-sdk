@@ -216,15 +216,15 @@ class BLOCKvRegion: Region {
         let actions = objects.values.filter { $0.type == "action" && ($0.data?["name"] as? String)?
             .starts(with: actionNamePrefix) == true }
         objectData["actions"] = actions.map { $0.data }
-
+        
+        // create vatoms, face, anf actions using member-wise initilializer
         do {
-            if JSONSerialization.isValidJSONObject(objectData) {
-                let rawData = try JSONSerialization.data(withJSONObject: objectData)
-                let vatoms = try JSONDecoder.blockv.decode(VatomModel.self, from: rawData)
-                return vatoms
-            } else {
-                throw NSError.init("Invalid JSON for Vatom: \(object.id)")
-            }
+            let faces = faces.compactMap { $0.data }.compactMap { try? FaceModel(from: $0) }
+            let actions = actions.compactMap { $0.data }.compactMap { try? ActionModel(from: $0) }
+            var vatom = try VatomModel(from: objectData)
+            vatom.faceModels = faces
+            vatom.actionModels = actions
+            return vatom
         } catch {
             printBV(error: error.localizedDescription)
             return nil

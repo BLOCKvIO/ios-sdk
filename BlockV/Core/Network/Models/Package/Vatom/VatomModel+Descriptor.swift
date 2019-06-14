@@ -55,7 +55,7 @@ extension RootProperties: Descriptable {
 
         guard
             let _author                 = descriptor["author"] as? String,
-            let _rootType               = descriptor["category"] as? String,
+            let _rootType               = descriptor["root_type"] as? String,
             let _templateID             = descriptor["template"] as? String,
             let _templateVariationID    = descriptor["template_variation"] as? String,
             let _publisherFQDN          = descriptor["publisher_fqdn"] as? String,

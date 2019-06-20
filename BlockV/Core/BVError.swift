@@ -61,6 +61,7 @@ public enum BVError: Error {
         //
         case malformedRequestBody(Int, String)
         case invalidDataValidation(Int, String)
+        case vatomNotOwned(Int, String)
         //
         case vatomNotFound(Int, String)
         //
@@ -106,6 +107,8 @@ public enum BVError: Error {
             case 1004: self = .malformedRequestBody(code, message)
             // vAtom is unrecognized by the platform.
             case 1701: self = .vatomNotFound(code, message)
+            // vAtom not owned by current user
+            case 1604: self = .vatomNotOwned(code, message)
             // User token (phone, email, id) is unrecognized by the platfrom.
             case 2030: self = .unknownUserToken(code, message)
             // Login phone/email wrong. password
@@ -240,6 +243,7 @@ extension BVError.PlatformErrorReason {
         case let .malformedRequestBody(code, message),
              let .invalidDataValidation(code, message),
              let .vatomNotFound(code, message),
+             let .vatomNotOwned(code, message),
              let .avatarUploadFailed(code, message),
              let .unableToRetrieveToken(code, message),
              let .tokenUnavailable(code, message),

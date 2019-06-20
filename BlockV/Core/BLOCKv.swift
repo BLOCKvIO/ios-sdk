@@ -12,6 +12,7 @@
 import Foundation
 import Alamofire
 import JWTDecode
+import Nuke
 
 /*
  Goal:
@@ -98,6 +99,13 @@ public final class BLOCKv {
                                                selector: #selector(handleUserAuthorisationRequired),
                                                name: Notification.Name.BVInternal.UserAuthorizationRequried,
                                                object: nil)
+
+        // configure in-memory cache (store processed images ready for display)
+        ImageCache.shared.costLimit = ImageCache.defaultCostLimit()
+
+        // configure http cache (store unprocessed image data at the http level)
+        DataLoader.sharedUrlCache.memoryCapacity = 50 // 50 MB
+        DataLoader.sharedUrlCache.diskCapacity = 180 // 180 MB
 
         // handle session launch
         if self.isLoggedIn {

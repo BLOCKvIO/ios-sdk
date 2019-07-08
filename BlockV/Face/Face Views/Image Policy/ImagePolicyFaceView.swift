@@ -322,7 +322,7 @@ private extension ImagePolicyFaceView {
                 }
 
                 // child count
-                if let countMax = imagePolicyDescriptor["count_max"]?.floatValue {
+                if let countMax = imagePolicyDescriptor["count_max"]?.doubleValue {
                     let childCountPolicy = ChildCount(resourceName: resourceName, countMax: Int(countMax))
                     self.policies.append(childCountPolicy)
                     continue

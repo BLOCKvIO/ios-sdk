@@ -164,15 +164,25 @@ class ImagePolicyFaceView: FaceView {
             } else if let policy = policy as? Config.FieldLookup {
 
                 // create key path and split into head and tail
-                guard let component = KeyPath(policy.field).headAndTail(),
-                    // only private section lookups are allowed
-                    component.head == "private",
+                guard let component = KeyPath(policy.field).headAndTail() else { continue }
+                
+                var vatomValue: JSON?
+                // check container
+                if component.head == "private" {
                     // current value on the vatom
-                    let vatomValue = self.vatom.private?[keyPath: component.tail.path] else {
-                        continue
+                    let vatomValue = self.vatom.private?[keyPath: component.tail.path]
+                } else if component.head == "vAtom::vAtomType" {
+                    //TODO: Create a keypath-to-keypath look up
+                    if component.tail.path == "cloning_score" {
+                        vatomValue = try? JSON(self.vatom.props.cloningScore)
+                    } else if component.tail.path == "num_direct_clones" {
+                        vatomValue = try? JSON(self.vatom.props.numberDirectClones)
+                    }
                 }
-
-                if vatomValue == policy.value {
+                
+                guard let value = vatomValue else { continue }
+                
+                if value == policy.value {
                     // update image
                     //print(">>:: vAtom Value: \(vatomValue) | Policy Value: \(policy.value)\n")
                     return policy.resourceName

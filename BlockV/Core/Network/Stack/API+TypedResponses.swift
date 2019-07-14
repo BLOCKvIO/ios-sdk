@@ -122,6 +122,9 @@ extension API {
             return Endpoint(path: currentUserPath + "/tokens")
         }
         
+        /// Builds the endpoint to get the current user's accounts.
+        ///
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func getAccounts() -> Endpoint<BaseModel<AddressAccountModel>> {
             return Endpoint(path: currentUserPath + "/accounts")
         }

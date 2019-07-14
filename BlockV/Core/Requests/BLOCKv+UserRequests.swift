@@ -286,6 +286,32 @@ extension BLOCKv {
         }
 
     }
+    
+    /// Fetches the current user's accounts description from the BLOCKv platform.
+    ///
+    ///   - completion: The completion handler to call when the request is completed.
+    ///                 This handler is executed on the main queue.
+    public static func getCurrentUserBlockchainAccounts(completion: @escaping (Result<AddressAccountModel, BVError>) -> Void) {
+        
+        let endpoint = API.CurrentUser.getAccounts()
+        
+        self.client.request(endpoint) { result in
+            
+            switch result {
+            case .success(let baseModel):
+                // model is available
+                DispatchQueue.main.async {
+                    completion(.success(baseModel.payload))
+                }
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+            }
+        }
+        
+    }
 
     /// Removes the token from the current user's token list on the BLOCKv platform.
     ///

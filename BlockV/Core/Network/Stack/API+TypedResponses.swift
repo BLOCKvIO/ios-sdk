@@ -121,6 +121,10 @@ extension API {
         static func getTokens() -> Endpoint<BaseModel<[FullTokenModel]>> {
             return Endpoint(path: currentUserPath + "/tokens")
         }
+        
+        static func getAccounts() -> Endpoint<BaseModel<AddressAccountModel>> {
+            return Endpoint(path: currentUserPath + "/accounts")
+        }
 
         /// Builds the endpoint to log out the current user.
         ///

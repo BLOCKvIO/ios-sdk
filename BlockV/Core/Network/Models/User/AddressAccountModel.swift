@@ -21,10 +21,10 @@ public struct AddressAccountModel: Codable {
     public let createdAt: Date
     
     enum CodingKeys: String, CodingKey {
-        case id    = "id"
+        case id
         case userId    = "user_id"
-        case address    = "address"
-        case type   = "type"
+        case address
+        case type
         case createdAt = "created_at"
     }
     

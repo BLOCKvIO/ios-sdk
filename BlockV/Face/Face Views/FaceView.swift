@@ -137,7 +137,7 @@ open class BoundedView: UIView {
     
     /// Setting this value to `true` will trigger a subview layout and ensure that `layoutWithKnowBounds()` is called
     /// after the layout.
-    var requiresBoundsBasedSetup = false {
+    open var requiresBoundsBasedSetup = false {
         didSet {
             if requiresBoundsBasedSetup {
                 // trigger a new layout cycle
@@ -165,7 +165,7 @@ open class BoundedView: UIView {
     ///
     /// This function is usefull for cases where the bounds of the view are important, for example, scaling an image
     /// to the correct size.
-    func setupWithBounds() {
+    open func setupWithBounds() {
         // subclass should override
     }
     

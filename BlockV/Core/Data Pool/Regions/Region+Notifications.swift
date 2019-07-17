@@ -14,6 +14,9 @@ import Foundation
 /// Possible events
 public enum RegionEvent: String {
 
+    /// TRiggered when a cached version of the data is available.
+    case loadedFromCache = "region.loadedFromCache"
+
     /// Triggered when any data in the region changes. This also indicates that there is no longer an error.
     case updated = "region.updated"
 

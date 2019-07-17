@@ -33,7 +33,7 @@ extension VatomModel {
             if inventoryVatom == nil {
                 // inspect the child region (owner & unowned)
                 return DataPool.children(parentID: self.id)
-                    .getAllStable()
+                    .synchronize()
                     .map { $0 as! [VatomModel] } // swiftlint:disable:this force_cast
 
             } else {

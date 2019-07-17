@@ -18,7 +18,7 @@ protocol Descriptable {
 
 extension VatomModel: Descriptable {
 
-    init(from descriptor: [String: Any]) throws {
+    public init(from descriptor: [String: Any]) throws {
 
         guard
             let _id             = descriptor["id"] as? String,

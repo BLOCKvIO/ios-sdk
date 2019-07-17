@@ -247,7 +247,7 @@ public class Region {
     func update(objects: [DataObjectUpdateRecord], source: Source? = nil) {
 
         // batch emit events, so if a object is updated multiple times, only one event is sent
-        var changedIDs = Set<String>()
+        var changedObjects: [String: DataObject] = [:]
 
         for obj in objects {
 
@@ -274,17 +274,19 @@ public class Region {
             self.did(update: existingObject, withFields: obj.changes)
 
             // emit event
-            changedIDs.insert(obj.id)
+            changedObjects[obj.id] = existingObject
 
         }
 
         // notify each item that was updated
-        for id in changedIDs {
-            self.emit(.objectUpdated, userInfo: ["id": id, "source": source?.rawValue ?? ""])
+        for object in changedObjects {
+            self.emit(.objectUpdated, userInfo: ["id": object.key,
+                                                 object.value.type: object.value.data,
+                                                 "source": source?.rawValue ?? ""])
         }
 
         // notify overall update
-        if changedIDs.count > 0 {
+        if changedObjects.count > 0 {
             self.emit(.updated)
             self.save()
         }
@@ -583,7 +585,7 @@ public class Region {
         // update to new value
         object.data![keyPath: KeyPath(keyPath)] = value
         object.cached = nil
-        self.emit(.objectUpdated, userInfo: ["id": id])
+        self.emit(.objectUpdated, userInfo: ["id": id, object.type: object.data])
         self.emit(.updated)
         self.save()
 
@@ -596,7 +598,7 @@ public class Region {
             // update to new value
             object.data![keyPath: KeyPath(keyPath)] = oldValue
             object.cached = nil
-            self.emit(.objectUpdated, userInfo: ["id": id])
+            self.emit(.objectUpdated, userInfo: ["id": id, object.type: object.data])
             self.emit(.updated)
             self.save()
 

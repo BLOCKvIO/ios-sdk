@@ -314,9 +314,9 @@ class BLOCKvRegion: Region {
         }
         DispatchQueue.main.async {
             // broadcast update the vatom's parent
-            self.emit(.objectUpdated, userInfo: ["id": parentID])
-            // broadbast the add
-            self.emit(.objectAdded, userInfo: ["id": object.id])
+            self.emit(.objectUpdated, userInfo: ["id": parentID, object.type: object.data])
+            // broadcast the add
+            self.emit(.objectAdded, userInfo: ["id": object.id, object.type: object.data])
         }
     }
 
@@ -333,8 +333,8 @@ class BLOCKvRegion: Region {
             return
         }
         DispatchQueue.main.async {
-            self.emit(.objectUpdated, userInfo: ["id": oldParentID])
-            self.emit(.objectUpdated, userInfo: ["id": newParentID])
+            self.emit(.objectUpdated, userInfo: ["id": oldParentID, object.type: object.data])
+            self.emit(.objectUpdated, userInfo: ["id": newParentID, object.type: object.data])
         }
 
     }
@@ -350,14 +350,14 @@ class BLOCKvRegion: Region {
             return
         }
         DispatchQueue.main.async {
-            self.emit(.objectUpdated, userInfo: ["id": oldParentID])
-            self.emit(.objectUpdated, userInfo: ["id": newParentID])
+            self.emit(.objectUpdated, userInfo: ["id": oldParentID, object.type: object.data])
+            self.emit(.objectUpdated, userInfo: ["id": newParentID, object.type: object.data])
         }
 
     }
 
     /// Called when an object is about to be updated.
-    override func will(update: DataObject, keyPath: String, oldValue: Any?, newValue: Any?) {
+    override func will(update object: DataObject, keyPath: String, oldValue: Any?, newValue: Any?) {
 
         // check if parent ID is changing
         if keyPath != "vAtom::vAtomType.parent_id" {
@@ -368,8 +368,8 @@ class BLOCKvRegion: Region {
         guard let oldParentID = oldValue as? String else { return }
         guard let newParentID = newValue as? String else { return }
         DispatchQueue.main.async {
-            self.emit(.objectUpdated, userInfo: ["id": oldParentID])
-            self.emit(.objectUpdated, userInfo: ["id": newParentID])
+            self.emit(.objectUpdated, userInfo: ["id": oldParentID, object.type: object.data])
+            self.emit(.objectUpdated, userInfo: ["id": newParentID, object.type: object.data])
         }
 
     }
@@ -385,9 +385,9 @@ class BLOCKvRegion: Region {
         }
         DispatchQueue.main.async {
             if parentID != "." {
-                self.emit(.objectUpdated, userInfo: ["id": parentID])
+                self.emit(.objectUpdated, userInfo: ["id": parentID, object.type: object.data])
             }
-            self.emit(.objectRemoved, userInfo: ["id": object.id])
+            self.emit(.objectRemoved, userInfo: ["id": object.id, object.type: object.data])
         }
 
     }

@@ -49,6 +49,8 @@
 		D597FF272051305A009B2910 /* UIAlertController+Etx.swift in Sources */ = {isa = PBXBuildFile; fileRef = D597FF262051305A009B2910 /* UIAlertController+Etx.swift */; };
 		D59C7DDD206CE1D000FCE1DD /* Actions.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D59C7DDC206CE1D000FCE1DD /* Actions.storyboard */; };
 		D5E3AC9F2049883900CFFEEA /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E3AC9E2049883800CFFEEA /* LoginViewController.swift */; };
+		D9BEC41D22E0C48C0068F280 /* AddressModelCodable_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9BEC41922E0BCDB0068F280 /* AddressModelCodable_Tests.swift */; };
+		D9BEC41E22E0C4A40068F280 /* MockAddressModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9BEC41B22E0BEBD0068F280 /* MockAddressModel.swift */; };
 		FE05FFA026A3E5A0C79B6E20 /* Pods_BLOCKv_Unit_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7956FE101E9335CDDC8248F3 /* Pods_BLOCKv_Unit_Tests.framework */; };
 /* End PBXBuildFile section */
 
@@ -128,6 +130,8 @@
 		D597FF262051305A009B2910 /* UIAlertController+Etx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Etx.swift"; sourceTree = "<group>"; };
 		D59C7DDC206CE1D000FCE1DD /* Actions.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Actions.storyboard; sourceTree = "<group>"; };
 		D5E3AC9E2049883800CFFEEA /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		D9BEC41922E0BCDB0068F280 /* AddressModelCodable_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressModelCodable_Tests.swift; sourceTree = "<group>"; };
+		D9BEC41B22E0BEBD0068F280 /* MockAddressModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAddressModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -283,6 +287,7 @@
 				ADA07DF121A94025007A6322 /* VatomModelCodable_Tests.swift */,
 				ADA07DF221A94025007A6322 /* ActionModelCodable_Tests.swift */,
 				AD09ECAE222D5667003F46C0 /* ActivityModelCodable_Tests.swift */,
+				D9BEC41922E0BCDB0068F280 /* AddressModelCodable_Tests.swift */,
 			);
 			path = Codable;
 			sourceTree = "<group>";
@@ -293,6 +298,7 @@
 				AD61462C213DC87100204E5B /* MockModelFaces.swift */,
 				D5307588211199C200DE7FD0 /* MockModel.swift */,
 				ADA07DFC21A9464C007A6322 /* MockModel2.swift */,
+				D9BEC41B22E0BEBD0068F280 /* MockAddressModel.swift */,
 			);
 			path = Mocks;
 			sourceTree = "<group>";
@@ -636,8 +642,10 @@
 				AD61462F213DC88B00204E5B /* MockModelFaces.swift in Sources */,
 				ADA07DF621A94061007A6322 /* BVError_Tests.swift in Sources */,
 				ADA07DF821A94068007A6322 /* FaceModelCodable_Tests.swift in Sources */,
+				D9BEC41D22E0C48C0068F280 /* AddressModelCodable_Tests.swift in Sources */,
 				AD61462E213DC88700204E5B /* FaceSelectionProcedure_Tests.swift in Sources */,
 				D53075A42112E9E000DE7FD0 /* FaceModel_Tests.swift in Sources */,
+				D9BEC41E22E0C4A40068F280 /* MockAddressModel.swift in Sources */,
 				ADA07DF721A94061007A6322 /* KeyPath_Tests.swift in Sources */,
 				AD0BCC922178828A001836DE /* VatomModelUpdate_Tests.swift in Sources */,
 				ADA07DFA21A94068007A6322 /* ActionModelCodable_Tests.swift in Sources */,
@@ -794,7 +802,7 @@
 				DEVELOPMENT_TEAM = WA2R22UJPX;
 				ENVIRONMENT_MAPPING = dev_env;
 				INFOPLIST_FILE = BlockV/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -D DEBUG";
@@ -818,7 +826,7 @@
 				DEVELOPMENT_TEAM = WA2R22UJPX;
 				ENVIRONMENT_MAPPING = dev_env;
 				INFOPLIST_FILE = BlockV/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.blockv.sdk.sample.${CONFIGURATION}";
@@ -1043,7 +1051,7 @@
 				DEVELOPMENT_TEAM = WA2R22UJPX;
 				ENVIRONMENT_MAPPING = prod_env;
 				INFOPLIST_FILE = BlockV/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.blockv.sdk.sample.${CONFIGURATION}";

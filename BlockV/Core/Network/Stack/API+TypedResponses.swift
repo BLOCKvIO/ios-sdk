@@ -260,6 +260,21 @@ extension API {
 
     /// Namespace for vatom related endpoints with a typed reponse model.
     enum Vatom {
+        
+        /// Builds an endpoint to get the current user's inventory sync hash.
+        ///
+        /// - Returns: Constructed endpoint specialized to parse out a `InventoryHashModel`.
+        static func getInventoryHash() -> Endpoint<BaseModel<InventoryHashModel>> {
+            return API.Generic.getInventoryHash()
+        }
+        
+        /// Builds an endpoint to get the current user's inventory vatoms' sync number.
+        ///
+        /// - Returns: Constructed endpoint specialized to parse out a `InventorySyncModel`.
+        static func getInventoryVatomSyncNumbers(limit: Int = 1000,
+                                                 token: String) -> Endpoint<BaseModel<InventorySyncModel>> {
+            return API.Generic.getInventoryVatomSyncNumbers(limit: limit, token: token)
+        }
 
         /// Builds an endpoint to get the current user's inventory.
         ///

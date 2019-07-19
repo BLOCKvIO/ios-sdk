@@ -12,7 +12,7 @@
 import Foundation
 
 /// Eth address response model.
-public struct AddressAccountModel: Codable {
+public struct AddressAccountModel: Codable, Equatable {
     
     public let id: String
     public let userId: String

@@ -28,23 +28,5 @@ public struct AddressAccountModel: Codable, Equatable {
         case createdAt = "created_at"
     }
     
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decode(String.self, forKey: .id)
-        userId = try container.decode(String.self, forKey: .userId)
-        address = try container.decode(String.self, forKey: .address)
-        type = try container.decode(String.self, forKey: .type)
-        createdAt = try container.decode(Date.self, forKey: .createdAt)
-    }
-    
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(id, forKey: .id)
-        try container.encode(userId, forKey: .userId)
-        try container.encode(address, forKey: .address)
-        try container.encode(type, forKey: .type)
-        try container.encode(createdAt, forKey: .createdAt)
-    }
-    
 }
 

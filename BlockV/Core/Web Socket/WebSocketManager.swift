@@ -61,6 +61,8 @@ public class WebSocketManager {
         case stateUpdate = "state_update"
         /// Activity event
         case activity    = "my_events"
+        /// Map event (unowned vatom)
+        case map         = "map"
     }
 
     // MARK: - Signals
@@ -80,6 +82,9 @@ public class WebSocketManager {
 
     /// Fires when the Web socket receives an **activity** update event.
     public let onActivityUpdate = Signal<WSActivityEvent>()
+    
+    /// Fires when the Web socket receives a *map* update event for *unowned* vatoms.
+    public let onMapUpdate = Signal<WSMapEvent>()
 
     // - Lifecycle
 
@@ -396,6 +401,14 @@ extension WebSocketManager: WebSocketDelegate {
                     // FIXME: Allow resources to be encoded.
                     let activityEvent = try blockvJSONDecoder.decode(WSActivityEvent.self, from: data)
                     self.onActivityUpdate.fire(activityEvent)
+                } catch {
+                    printBV(error: error.localizedDescription)
+                }
+                
+            case .map:
+                do {
+                    let mapEvent = try blockvJSONDecoder.decode(WSMapEvent.self, from: data)
+                    self.onMapUpdate.fire(mapEvent)
                 } catch {
                     printBV(error: error.localizedDescription)
                 }

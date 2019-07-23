@@ -12,6 +12,8 @@
 import Foundation
 import GenericJSON
 
+//swiftlint:disable identifier_name
+
 protocol Descriptable {
     init(from descriptor: [String: Any]) throws
 }

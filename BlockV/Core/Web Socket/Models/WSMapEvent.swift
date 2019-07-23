@@ -12,20 +12,6 @@
 import Foundation
 import MapKit
 
-/*
- {
-  "msg_type": "map",
-  "payload": {
-    "event_id": "map_ed949f70-d520-4c3a-8f78-0ada05678160",
-    "op": "remove",
-    "vatom_id": "ed949f70-d520-4c3a-8f78-0ada05678160",
-    "action_name": "Pickup",
-    "lat": -33.93383934281483,
-    "lon": 18.51217876331921
-  }
-}
- */
-
 /// Web socket event model - unowned map vatoms.
 public struct WSMapEvent: Decodable {
     

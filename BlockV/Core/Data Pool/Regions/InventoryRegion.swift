@@ -202,10 +202,10 @@ extension InventoryRegion {
         // tracking flag
         var shouldRecurse = true
 
-        for i in range {
+        for page in range {
 
             // build raw request
-            let endpoint: Endpoint<Void> = API.Generic.getInventory(parentID: "*", page: i, limit: pageSize)
+            let endpoint: Endpoint<Void> = API.Generic.getInventory(parentID: "*", page: page, limit: pageSize)
 
             // exectute request
             let promise = BLOCKv.client.requestJSON(endpoint).then(on: .global(qos: .userInitiated)) { json -> Promise<[String]?> in

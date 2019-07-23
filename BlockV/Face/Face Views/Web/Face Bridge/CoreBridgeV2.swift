@@ -12,10 +12,12 @@
 import Foundation
 import GenericJSON
 
+//FIXME: Remove temporary disable type_body_length
+
 /// Core Bridge (Version 2.0.0)
 ///
 /// Bridges into the Core module.
-class CoreBridgeV2: CoreBridge {
+class CoreBridgeV2: CoreBridge { //swiftlint:disable:this type_body_length
 
     // MARK: - Enums
 

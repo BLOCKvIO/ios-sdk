@@ -30,6 +30,8 @@
 		ADA07DF921A94068007A6322 /* VatomModelCodable_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA07DF121A94025007A6322 /* VatomModelCodable_Tests.swift */; };
 		ADA07DFA21A94068007A6322 /* ActionModelCodable_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA07DF221A94025007A6322 /* ActionModelCodable_Tests.swift */; };
 		ADA07DFE21A94737007A6322 /* MockModel2.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA07DFC21A9464C007A6322 /* MockModel2.swift */; };
+		ADA36A4322E717140064BB58 /* MockWebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA36A4222E717140064BB58 /* MockWebSocket.swift */; };
+		ADA36A4622E717B70064BB58 /* WebSocketEvent_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA36A4522E717B70064BB58 /* WebSocketEvent_Tests.swift */; };
 		CDC268C7232CDB5AF1386116 /* Pods_BlockV_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DE93FD598C0B61200B996A4 /* Pods_BlockV_Example.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		D519A84B205E83AB006B0D19 /* VatomDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D519A84A205E83AB006B0D19 /* VatomDetailTableViewController.swift */; };
 		D530759C21119E2A00DE7FD0 /* MockModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5307588211199C200DE7FD0 /* MockModel.swift */; };
@@ -106,6 +108,8 @@
 		ADA07DF121A94025007A6322 /* VatomModelCodable_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VatomModelCodable_Tests.swift; sourceTree = "<group>"; };
 		ADA07DF221A94025007A6322 /* ActionModelCodable_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActionModelCodable_Tests.swift; sourceTree = "<group>"; };
 		ADA07DFC21A9464C007A6322 /* MockModel2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockModel2.swift; sourceTree = "<group>"; };
+		ADA36A4222E717140064BB58 /* MockWebSocket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockWebSocket.swift; sourceTree = "<group>"; };
+		ADA36A4522E717B70064BB58 /* WebSocketEvent_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebSocketEvent_Tests.swift; sourceTree = "<group>"; };
 		B5A79A9FDD3524D3628C080E /* Pods-BlockV_Example.dev.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Example.dev.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Example/Pods-BlockV_Example.dev.xcconfig"; sourceTree = "<group>"; };
 		BC27A08D03F2D2401C48F394 /* Pods-BlockV_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Example/Pods-BlockV_Example.release.xcconfig"; sourceTree = "<group>"; };
 		C55D0BD7FD8ECD417C235202 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
@@ -303,6 +307,15 @@
 			path = Mocks;
 			sourceTree = "<group>";
 		};
+		ADA36A4422E7178F0064BB58 /* Web Socket */ = {
+			isa = PBXGroup;
+			children = (
+				ADA36A4222E717140064BB58 /* MockWebSocket.swift */,
+				ADA36A4522E717B70064BB58 /* WebSocketEvent_Tests.swift */,
+			);
+			path = "Web Socket";
+			sourceTree = "<group>";
+		};
 		D519A849205E8360006B0D19 /* Inventory */ = {
 			isa = PBXGroup;
 			children = (
@@ -337,6 +350,7 @@
 		D53075A02111DBD600DE7FD0 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				ADA36A4422E7178F0064BB58 /* Web Socket */,
 				ADA07DEF21A94025007A6322 /* Codable */,
 				D53075A32112E9E000DE7FD0 /* FaceModel_Tests.swift */,
 				AD0BCC912178828A001836DE /* VatomModelUpdate_Tests.swift */,
@@ -642,6 +656,7 @@
 				AD61462F213DC88B00204E5B /* MockModelFaces.swift in Sources */,
 				ADA07DF621A94061007A6322 /* BVError_Tests.swift in Sources */,
 				ADA07DF821A94068007A6322 /* FaceModelCodable_Tests.swift in Sources */,
+				ADA36A4622E717B70064BB58 /* WebSocketEvent_Tests.swift in Sources */,
 				D9BEC41D22E0C48C0068F280 /* AddressModelCodable_Tests.swift in Sources */,
 				AD61462E213DC88700204E5B /* FaceSelectionProcedure_Tests.swift in Sources */,
 				D53075A42112E9E000DE7FD0 /* FaceModel_Tests.swift in Sources */,
@@ -652,6 +667,7 @@
 				AD09ECAF222D5667003F46C0 /* ActivityModelCodable_Tests.swift in Sources */,
 				D530759C21119E2A00DE7FD0 /* MockModel.swift in Sources */,
 				ADA07DF921A94068007A6322 /* VatomModelCodable_Tests.swift in Sources */,
+				ADA36A4322E717140064BB58 /* MockWebSocket.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

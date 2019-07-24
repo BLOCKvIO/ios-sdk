@@ -18,32 +18,32 @@ public class ResourceDownloader {
     
     private static var _dataCache: DataCache?
     
-    static var dataCache: DataCache? {
+    private static var dataCache: DataCache? {
         if let cache = _dataCache { return cache }
-        let cache = try? DataCache(name: "io.viewer.resources")
+        let cache = try? DataCache(name: "io.viewer.resource_cache")
         cache?.sizeLimit = 1024 * 1024 * 300 // 300 MB
         self._dataCache = cache
         return cache
     }
     
-    /// Currently running downloads
+    /// Currently running downloads.
     internal static var currentDownloads: [ResourceDownloader] = []
     
-    /// Download a resource
+    /// Downloads the resource specified by the URL.
     public static func download(url: URL) -> ResourceDownloader {
         
-        // Check if currently downloading
+        // check if currently downloading
         if let existing = currentDownloads.first(where: { $0.url == url }) {
             return existing
         }
         
-        // Do download
+        // download
         let download = ResourceDownloader(url: url)
         
-        // Store it in the list of current downloads
+        // store it in the list of current downloads
         currentDownloads.append(download)
         
-        // Done, return it
+        // done
         return download
         
     }
@@ -135,7 +135,7 @@ public class ResourceDownloader {
         case downloadFailed
     }
     
-    /// Add a callback for when the download is complete
+    /// Add a callback for when the download is complete.
     public func onComplete(_ callBack: @escaping CallbackComplete) {
         
         // check if done already
@@ -164,6 +164,7 @@ public class ResourceDownloader {
 
 private extension URL {
     
+    /// Creates an MD5 hash value using the URL (after the queury components have been removed).
     var cacheHash: String {
         let absoluteTrimmedQuery = self.absoluteStringByTrimmingQuery!
         return absoluteTrimmedQuery.md5
@@ -173,6 +174,7 @@ private extension URL {
 
 private extension URL {
     
+    /// Returns the string representing the URL without query components.
     var absoluteStringByTrimmingQuery: String? {
         if var urlcomponents = URLComponents(url: self, resolvingAgainstBaseURL: false) {
             urlcomponents.query = nil

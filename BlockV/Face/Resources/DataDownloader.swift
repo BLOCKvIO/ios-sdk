@@ -16,10 +16,14 @@ public protocol Cancellable: class {
 }
 
 public protocol DataDownloading {
-    /// - parameter didReceiveData: Can be called multiple times if streaming
-    /// is supported.
-    /// - parameter completion: Must be called once after all (or none in case
-    /// of an error) `didReceiveData` closures have been called.
+
+    /// - Parameters:
+    ///   - url: Request URL.
+    ///   - destination: Destination directory.
+    ///   - progress: Progress value.
+    ///   - completion: Must be called once after all (or none in case
+    /// of an error) `didFinishDownloadingTo` has been called.
+    /// - Returns: Cancellable item.
     func downloadData(url: URL,
                       destination: @escaping DataDownloader.Destination,
                       progress: @escaping (NSNumber) -> Void,

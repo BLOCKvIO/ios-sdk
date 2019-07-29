@@ -39,6 +39,19 @@ public class DataDownloader: DataDownloading {
     public let session: URLSession
     private let _impl: _DataDownloader
     
+    public static var recommendedCacheDirectory: URL {
+        
+        let directory = FileManager.SearchPathDirectory.cachesDirectory
+        let domain = FileManager.SearchPathDomainMask.userDomainMask
+        
+        let directoryURLs = FileManager.default.urls(for: directory, in: domain)
+        
+        let destinationURL = directoryURLs.first!
+            .appendingPathComponent("face_data")
+            .appendingPathComponent("resources")
+        return destinationURL
+    }
+    
     /// A closure executed once a download request has successfully completed in order to determine where to move the
     /// temporary file written to during the download process. The closure takes two arguments: the temporary file URL
     /// and the
@@ -53,17 +66,10 @@ public class DataDownloader: DataDownloading {
         
         let hash = url.path.md5
         
-        let directory = FileManager.SearchPathDirectory.cachesDirectory
-        let domain = FileManager.SearchPathDomainMask.userDomainMask
-        
-        let directoryURLs = FileManager.default.urls(for: directory, in: domain)
-        let destinationURL = directoryURLs.first!
-            .appendingPathComponent("face_data")
-            .appendingPathComponent("resources")
+        return recommendedCacheDirectory
             .appendingPathComponent(hash)
             .appendingPathComponent(url.lastTwoPathComponents)
         
-        return destinationURL
     }
     
     /// Returns a default configuration which has a `nil` set as a `urlCache`.

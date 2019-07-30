@@ -165,6 +165,28 @@ class BLOCKvRegion: Region {
         self.update(objects: [changes])
 
     }
+    
+    private var templateIndex: [String: TemplateMap] = [:]
+    
+    fileprivate struct TemplateMap: Equatable {
+        
+        fileprivate var faceIdentifiers: Set<String> = []
+        fileprivate var actionIdentifiers: Set<String> = []
+        
+        init() {
+            self.faceIdentifiers = []
+            self.faceIdentifiers = []
+        }
+        
+    }
+    
+    override func add(objects: [DataObject]) {
+        
+        // build up index
+        self.createIndex(objects: objects)
+        
+        super.add(objects: objects)
+    }
 
     // MARK: - Transformations
 
@@ -206,21 +228,19 @@ class BLOCKvRegion: Region {
 
         // get vatom info
         guard let template = object.data![keyPath: "vAtom::vAtomType.template"] as? String else { return nil }
-
-        // fetch all faces linked to this vatom
-        let faces = objects.values.filter { $0.type == "face" && $0.data?["template"] as? String == template }
-        objectData["faces"] = faces.map { $0.data }
-
-        // fetch all actions linked to this vatom
-        let actionNamePrefix = template + "::Action::"
-        let actions = objects.values.filter { $0.type == "action" && ($0.data?["name"] as? String)?
-            .starts(with: actionNamePrefix) == true }
-        objectData["actions"] = actions.map { $0.data }
         
-        // create vatoms, face, anf actions using member-wise initilializer
+        let faceIds = self.templateIndex[template.lowercased()]?.faceIdentifiers ?? []
+        let actionIds = self.templateIndex[template.lowercased()]?.actionIdentifiers ?? []
+        
+        let faces = objects.filter { faceIds.contains($0.key) }
+        let actions = objects.filter {actionIds.contains($0.key) }
+        
+        objectData["faces"] = faces.map { $0.value.data }
+        objectData["actions"] = actions.map { $0.value.data }
+
         do {
-            let faces = faces.compactMap { $0.data }.compactMap { try? FaceModel(from: $0) }
-            let actions = actions.compactMap { $0.data }.compactMap { try? ActionModel(from: $0) }
+            let faces = faces.compactMap { $0.value.data }.compactMap { try? FaceModel(from: $0) }
+            let actions = actions.compactMap { $0.value.data }.compactMap { try? ActionModel(from: $0) }
             var vatom = try VatomModel(from: objectData)
             vatom.faceModels = faces
             vatom.actionModels = actions
@@ -392,4 +412,58 @@ class BLOCKvRegion: Region {
 
     }
 
+}
+
+extension BLOCKvRegion {
+    
+    /// Creates a fast lookup index mapping template identifers to their faces and actions.
+    func createIndex(objects: [DataObject]) {
+        
+        // build up index
+        for object in objects {
+            
+            if object.type == "face" {
+                
+                // find template
+                guard let faceTemplateID = object.data![keyPath: "template"] as? String else {
+                    assertionFailure("Missing template id.")
+                    return
+                }
+                // insert mapped face id
+                if let map = self.templateIndex[faceTemplateID.lowercased()] {
+                    self.templateIndex[faceTemplateID.lowercased()]!.faceIdentifiers.insert(object.id)
+                } else {
+                    self.templateIndex[faceTemplateID.lowercased()] = TemplateMap()
+                }
+                
+            }
+                
+            else if object.type == "action" {
+                
+                // find compound name
+                guard let compoundName = object.data![keyPath: "name"] as? String else {
+                    assertionFailure("Missing compound name.")
+                    return
+                }
+                
+                // find the marker
+                guard let markerRange = compoundName.range(of: "::action::", options: .caseInsensitive, range: nil,
+                                                           locale: nil)
+                    else { return }
+                
+                // extract template id
+                let actionTemplateID = String(compoundName[compoundName.startIndex..<markerRange.lowerBound])
+                // insert mapped face id
+                if let map = self.templateIndex[actionTemplateID.lowercased()] {
+                    self.templateIndex[actionTemplateID.lowercased()]!.actionIdentifiers.insert(object.id)
+                } else {
+                    self.templateIndex[actionTemplateID.lowercased()] = TemplateMap()
+                }
+
+            }
+            
+        }
+        
+    }
+    
 }

@@ -56,6 +56,24 @@ extension API {
         }
 
         // MARK: Vatoms
+        
+        /// Builds the generic endpoint to get the current user's inventory vatom's sync number.
+        ///
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        static func getInventoryVatomSyncNumbers<T>(limit: Int = 1000, token: String) -> Endpoint<T> {
+            return Endpoint(method: .get,
+                            path: userVatomPath + "/inventory/index",
+                            parameters: ["limit": limit, "nextToken": token],
+                            encoding: URLEncoding.queryString)
+        }
+        
+        /// Builds the generic endpoint to get the current user's inventory sync hash.
+        ///
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        static func getInventoryHash<T>() -> Endpoint<T> {
+            return Endpoint(method: .get,
+                            path: userVatomPath + "/inventory/hash")
+        }
 
         /// Builds the generic endpoint to get the current user's inventory.
         ///

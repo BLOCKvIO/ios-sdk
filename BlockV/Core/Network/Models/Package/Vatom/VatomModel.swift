@@ -23,6 +23,7 @@ public struct VatomModel: Equatable {
     // variables
     public var whenModified: Date
     public var isUnpublished: Bool
+    public var sync: UInt
 
     /// Template properties.
     ///
@@ -58,6 +59,7 @@ public struct VatomModel: Equatable {
         case actionModels      = "actions"
         case eos               = "eos"
         case eth               = "eth"
+        case sync              = "sync"
     }
 
 }
@@ -71,6 +73,7 @@ extension VatomModel: Codable {
         version           = try items.decode(String.self, forKey: .version)
         whenCreated       = try items.decode(Date.self, forKey: .whenCreated)
         whenModified      = try items.decode(Date.self, forKey: .whenModified)
+        sync              = try items.decode(UInt.self, forKey: .sync)
         props             = try items.decode(RootProperties.self, forKey: .props)
 
         isUnpublished     = try items.decodeIfPresent(Bool.self, forKey: .isUnpublished) ?? false

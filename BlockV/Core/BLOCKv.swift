@@ -104,8 +104,8 @@ public final class BLOCKv {
         ImageCache.shared.costLimit = ImageCache.defaultCostLimit()
 
         // configure http cache (store unprocessed image data at the http level)
-        DataLoader.sharedUrlCache.memoryCapacity = 50 // 50 MB
-        DataLoader.sharedUrlCache.diskCapacity = 180 // 180 MB
+        DataLoader.sharedUrlCache.memoryCapacity = 80 * 1024 * 1024  // 80 MB
+        DataLoader.sharedUrlCache.diskCapacity = 180  // 180 MB
 
         // handle session launch
         if self.isLoggedIn {
@@ -349,4 +349,30 @@ func printBV(info string: String) {
 
 func printBV(error string: String) {
     print("\nBV SDK >>> Error: \(string)")
+}
+
+extension BLOCKv {
+
+    public enum Debug {
+
+        //// Returns the cache size of the face data resource disk caches.
+        public static var faceDataResourceCacheSize: UInt64? {
+            return try? FileManager.default.allocatedSizeOfDirectory(at: DataDownloader.recommendedCacheDirectory)
+        }
+
+        /// Returns the cache size of all data pool region disk caches.
+        public static var regionCacheSize: UInt64? {
+            return try? FileManager.default.allocatedSizeOfDirectory(at: Region.recommendedCacheDirectory)
+        }
+
+        /// Clears all disk caches.
+        public static func clearCache() {
+            ImageCache.shared.removeAll()
+            DataLoader.sharedUrlCache.removeAllCachedResponses()
+            try? FileManager.default.removeItem(at: DataDownloader.recommendedCacheDirectory)
+            try? FileManager.default.removeItem(at: Region.recommendedCacheDirectory)
+        }
+
+    }
+
 }

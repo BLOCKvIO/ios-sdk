@@ -53,9 +53,11 @@ class WebFaceView: FaceView {
         webConfiguration.userContentController.add(LeakAvoider(delegate: self), name: "vatomicBridge")
         webConfiguration.userContentController.add(LeakAvoider(delegate: self), name: "blockvBridge")
 
-        // content controller
+        // web view
         let webView = WKWebView(frame: self.bounds, configuration: webConfiguration)
         webView.navigationDelegate = self
+        webView.scrollView.isScrollEnabled = false
+        webView.scrollView.contentInsetAdjustmentBehavior = .never
         webView.autoresizingMask = [ .flexibleWidth, .flexibleHeight ]
         return webView
 
@@ -80,17 +82,17 @@ class WebFaceView: FaceView {
 
     var isLoaded: Bool = false
 
-    var timer: Timer?
-
     /// Holds the completion handler.
     private var completion: ((Error?) -> Void)?
 
+    /// Begins loading the face view's content.
     func load(completion: ((Error?) -> Void)?) {
         // store the completion
         self.completion = completion
         self.loadFace()
     }
 
+    /// Updates the backing Vatom and loads the new state.
     func vatomChanged(_ vatom: VatomModel) {
         // if the vatom has changed, load the face url again
         if vatom.id != self.vatom.id {
@@ -101,6 +103,11 @@ class WebFaceView: FaceView {
         // fetch first-level children
         let children = self.vatom.listCachedChildren()
         self.coreBridge?.sendVatomChildren(children)
+    }
+
+    /// Resets the contents of the face view.
+    private func reset() {
+        
     }
 
     func unload() {
@@ -115,7 +122,7 @@ class WebFaceView: FaceView {
             printBV(error: "Cannot initialise URL from: \(faceURL)")
             return
         }
-        let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 20)
+        let request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 20)
         self.webView.load(request)
     }
 

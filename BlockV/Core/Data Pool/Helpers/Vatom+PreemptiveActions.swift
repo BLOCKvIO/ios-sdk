@@ -79,7 +79,7 @@ extension VatomModel {
         let undo = DataPool.inventory().preemptiveRemove(id: self.id)
 
         // perform the action
-        self.performAction("Redeem", payload: body, undos: [undo], completion: completion)
+        self.performAction("Activate", payload: body, undos: [undo], completion: completion)
 
     }
 
@@ -123,7 +123,8 @@ extension VatomModel {
                        latitude: Double,
                        completion: @escaping (Result<[String: Any], BVError>) -> Void) {
 
-        let body = [
+        let body: [String: Any] = [
+            "this.id": self.id,
             "geo.pos": [
                 "Lat": latitude,
                 "Lon": longitude

@@ -11,6 +11,14 @@
 
 import Foundation
 
+struct AssetProviderRefreshModel: Decodable, Equatable {
+    let assetProviders: [AssetProviderModel]
+
+    enum CodingKeys: String, CodingKey {
+        case assetProviders = "asset_provider"
+    }
+}
+
 typealias URLEncoder = (_ url: URL, _ assetProviders: [AssetProviderModel]) -> URL
 
 struct AssetProviderModel: Codable, Equatable {

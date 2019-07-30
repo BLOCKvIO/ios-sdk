@@ -60,6 +60,9 @@ class ImagePolicyFaceView: FaceView {
 
         super.init(vatom: vatom, faceModel: faceModel)
 
+        // enable animated images
+        ImagePipeline.Configuration.isAnimatedImageDataEnabled = true
+
         // add image view
         self.addSubview(animatedImageView)
         animatedImageView.frame = self.bounds
@@ -72,30 +75,56 @@ class ImagePolicyFaceView: FaceView {
 
     // MARK: - Face View Lifecycle
 
-    /// Begin loading the face view's content.
+    /// Begins loading the face view's content.
     func load(completion: ((Error?) -> Void)?) {
-        // update resources
-        updateUI(completion: completion)
+        // reset content
+        self.reset()
+        // update state
+        self.updateUI { [weak self] error in
+
+            guard let self = self else { return }
+            // inform delegate of load completion
+            if let error = error {
+                self.isLoaded = false
+                completion?(error)
+            } else {
+                self.isLoaded = true
+                completion?(nil)
+            }
+        }
+
     }
 
-    /// Respond to updates or replacement of the current vAtom.
+    /// Updates the backing Vatom and loads the new state.
+    ///
+    /// The VVLC ensures the vatom will share the same template variation. This means the vatom will have the same
+    /// resources but the state of the face (e.g. which recsources it is showing) may be different.
     func vatomChanged(_ vatom: VatomModel) {
 
-        /*
-         NOTE:
-         - Changes to to the backing vAtom must be reflected in the face view.
-         - Specifically, updates to the backing vAtom or it's children may afect the required image policy image.
-         */
+        if self.vatom.id == vatom.id {
+            // replace vatom, update UI
+            self.vatom = vatom
 
-        // replace current vatom
-        self.vatom = vatom
-        self.updateUIDebounced()
+        } else {
+            // replace vatom, reset and update UI
+            self.vatom = vatom
+            self.reset()
+        }
+        // update ui
+        self.updateUI(completion: nil)
 
     }
 
-    /// Unload the face view (called when the VatomView must prepare for reuse).
-    func unload() {
+    /// Resets the contents of the face view.
+    private func reset() {
+        self.animatedImageView.image = nil
+        self.animatedImageView.animatedImage = nil
+    }
 
+    /// Unload face view. Reset all content.
+    func unload() {
+        self.reset()
+        //TODO: Cancel all downloads
     }
 
     // MARK: - Face Code
@@ -114,18 +143,6 @@ class ImagePolicyFaceView: FaceView {
         let resourceName = self.extractImageName()
         self.updateImageView(withResource: resourceName, completion: completion)
     }
-
-    /// Updates the interface using local state (debounced).
-    ///
-    /// This property debounces the UI update. This avoids the case where numerous parent ID state changes could cause
-    /// unecessary resource downloads. Essentially, it ensure the the vAtom is "settled" before updating the UI.
-    private lazy var updateUIDebounced = {
-        // NOTE: Debounce will cancel work items.
-        return debounce(delay: DispatchTimeInterval.milliseconds(500)) {
-            self.updateUI(completion: nil)
-            //printBV(info: "Debounced: updateUI called")
-        }
-    }()
 
     /// Update the face view using *local* data.
     ///
@@ -147,15 +164,25 @@ class ImagePolicyFaceView: FaceView {
             } else if let policy = policy as? Config.FieldLookup {
 
                 // create key path and split into head and tail
-                guard let component = KeyPath(policy.field).headAndTail(),
-                    // only private section lookups are allowed
-                    component.head == "private",
+                guard let component = KeyPath(policy.field).headAndTail() else { continue }
+                
+                var vatomValue: JSON?
+                // check container
+                if component.head == "private" {
                     // current value on the vatom
-                    let vatomValue = self.vatom.private?[keyPath: component.tail.path] else {
-                        continue
+                    let vatomValue = self.vatom.private?[keyPath: component.tail.path]
+                } else if component.head == "vAtom::vAtomType" {
+                    //TODO: Create a keypath-to-keypath look up
+                    if component.tail.path == "cloning_score" {
+                        vatomValue = try? JSON(self.vatom.props.cloningScore)
+                    } else if component.tail.path == "num_direct_clones" {
+                        vatomValue = try? JSON(self.vatom.props.numberDirectClones)
+                    }
                 }
-
-                if vatomValue == policy.value {
+                
+                guard let value = vatomValue else { continue }
+                
+                if value == policy.value {
                     // update image
                     //print(">>:: vAtom Value: \(vatomValue) | Policy Value: \(policy.value)\n")
                     return policy.resourceName
@@ -194,9 +221,13 @@ class ImagePolicyFaceView: FaceView {
             // encode url
             let encodeURL = try BLOCKv.encodeURL(resourceModel.url)
 
-            var request = ImageRequest(url: encodeURL)
-            // use unencoded url as cache key
-            request.cacheKey = resourceModel.url
+            var request = ImageRequest(url: encodeURL,
+                                       targetSize: pixelSize,
+                                       contentMode: .aspectFit)
+
+            // set cache key
+            request.cacheKey = request.generateCacheKey(url: resourceModel.url, targetSize: pixelSize)
+
             // load image (automatically handles reuse)
             Nuke.loadImage(with: request, into: self.animatedImageView) { (_, error) in
                 self.isLoaded = true
@@ -301,7 +332,7 @@ private extension ImagePolicyFaceView {
                 }
 
                 // child count
-                if let countMax = imagePolicyDescriptor["count_max"]?.floatValue {
+                if let countMax = imagePolicyDescriptor["count_max"]?.doubleValue {
                     let childCountPolicy = ChildCount(resourceName: resourceName, countMax: Int(countMax))
                     self.policies.append(childCountPolicy)
                     continue

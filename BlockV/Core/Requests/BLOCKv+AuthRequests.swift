@@ -16,6 +16,76 @@ extension BLOCKv {
 
     // MARK: - Register
 
+    //FIXME: callbackURLScheme - where does this get set?
+    public static func oauth(scope: String, redirectURI: String, completion: @escaping (BVError?) -> Void) {
+
+        // ensure host app has set an app id
+        let warning = """
+            Please call 'BLOCKv.configure(appID:)' with your issued app ID before making network
+            requests.
+            """
+        precondition(BLOCKv.appID != nil, warning)
+
+        // extract config variables
+        let appID = BLOCKv.appID!
+        let webAppDomain = BLOCKv.environment!.oauthWebApp
+
+        let authServer = AuthorizationServer(clientID: appID,
+                                             domain: webAppDomain,
+                                             scope: scope,
+                                             redirectURI: redirectURI)
+
+        // start delegated authorization
+        authServer.authorize { success in
+
+            guard success else {
+                printBV(error: ("OAuth Authorize error."))
+                return
+            }
+            // exchange code for tokens
+            authServer.getToken { result in
+
+                switch result {
+                case .success(let tokens):
+                    /*
+                     At this point, accces and refresh tokens have been injected into the oauthhandler by the client
+                     response inspector.
+                     */
+
+                    // build endpoint
+                    let endpoint = API.Session.getAssetProviders()
+                    // perform api call
+                    BLOCKv.client.request(endpoint) { result in
+                        switch result {
+                        case .success(let model):
+
+                            // pull back to main queue
+                            DispatchQueue.main.async {
+
+                                let refreshToken = BVToken(token: tokens.refreshToken, tokenType: tokens.tokenType)
+                                // persist refresh token and credential
+                                CredentialStore.saveRefreshToken(refreshToken)
+                                CredentialStore.saveAssetProviders(model.payload.assetProviders)
+                                // noifty on login process
+                                self.onLogin()
+                                completion(nil)
+                            }
+
+                        case .failure(let error):
+                            completion(error)
+                        }
+                    }
+
+                case .failure(let error):
+                    completion(error)
+                }
+
+            }
+
+        }
+
+    }
+
     /// Registers a user on the BLOCKv platform. Accepts a user token (phone or email).
     ///
     /// - Parameters:
@@ -176,14 +246,74 @@ extension BLOCKv {
 
         self.client.request(endpoint) { result in
 
-            // reset
             DispatchQueue.main.async {
+                // reset sdk state
                 reset()
+                // give viewer opportunity to reset their state
+                onLogout?()
             }
 
             switch result {
+            case .success:
+                // model is available
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    completion(error)
+                }
+            }
+
+        }
+
+    }
+
+    /// Fetches information regarding app versioning and support.
+    ///
+    /// - Parameter result: Complettion handler that is called when the request is completed.
+    public static func getSupportedVersion(result: @escaping (Result<AppUpdateModel, BVError>) -> Void) {
+
+        let endpoint = API.Session.getSupportedVersion()
+        // send request
+        self.client.request(endpoint) { innerResult in
+
+            switch innerResult {
             case .success(let model):
                 // model is available
+                DispatchQueue.main.async {
+                    result(.success(model.payload))
+                }
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    result(.failure(error))
+                }
+            }
+
+        }
+
+    }
+
+    /// Updates the push notification settings for this device.
+    ///
+    /// - Parameters:
+    ///   - fcmToken: Firebase cloud messaging token.
+    ///   - platformID: Identifier of the current plaform. Defaults to "ios" - recommended.
+    ///   - enabled: Flag indicating whether push notifications should be sent to this device. Defaults to `true`.
+    ///   - completion: Completion handler that is called when the request is completed.
+    public static func updatePushNotification(fcmToken: String,
+                                              platformID: String,
+                                              enabled: Bool,
+                                              completion: @escaping ((Error?) -> Void)) {
+
+        let endpoint = API.Session.updatePushNotification(fcmToken: fcmToken, platformID: platformID, enabled: enabled)
+        // send request
+        self.client.request(endpoint) { result in
+
+            switch result {
+            case .success:
                 DispatchQueue.main.async {
                     completion(nil)
                 }

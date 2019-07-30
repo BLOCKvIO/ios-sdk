@@ -113,7 +113,7 @@ extension BLOCKv {
         self.client.request(endpoint) { result in
 
             switch result {
-            case .success(let baseModel):
+            case .success:
                 // model is available
                 DispatchQueue.main.async {
                     completion(nil)
@@ -167,16 +167,19 @@ extension BLOCKv {
                  not enforce child policy rules so this always succeed (using the current API).
                  */
                 let updateVatomModel = baseModel.payload
-                // roll back only those failed containments
-                let undosToRollback = undos.filter { !updateVatomModel.ids.contains($0.id) }
-                undosToRollback.forEach { $0.undo() }
-                // complete
-                completion(.success(updateVatomModel))
+                DispatchQueue.main.async {
+                    // roll back only those failed containments
+                    let undosToRollback = undos.filter { !updateVatomModel.ids.contains($0.id) }
+                    undosToRollback.forEach { $0.undo() }
+                    completion(.success(updateVatomModel))
+                }
 
             case .failure(let error):
-                // roll back all containments
-                undos.forEach { $0.undo() }
-                completion(.failure(error))
+                DispatchQueue.main.async {
+                    // roll back all containments
+                    undos.forEach { $0.undo() }
+                    completion(.failure(error))
+                }
             }
 
         }
@@ -435,7 +438,7 @@ extension BLOCKv {
 
     // MARK: - Common Actions for Unowned vAtoms
 
-    /// Performs an acquire action on a vAtom.
+    /// Performs an acquire action on the specified vatom id.
     ///
     /// Often, only a vAtom's ID is known, e.g. scanning a QR code with an embeded vAtom
     /// ID. This call is useful is such circumstances.
@@ -448,15 +451,28 @@ extension BLOCKv {
                                     completion: @escaping (Result<[String: Any], BVError>) -> Void) {
 
         let body = ["this.id": id]
-
         // perform the action
         self.performAction(name: "Acquire", payload: body) { result in
-
-            //FIXME: Call into Data Pool
-
             completion(result)
         }
 
+    }
+    
+    /// Performs an acquire pub variation action on the specified vatom id.
+    ///
+    /// - Parameters:
+    ///   - id: The id of the vAtom to acquire.
+    ///   - completion: The completion handler to call when the action is completed.
+    ///                 This handler is executed on the main queue.
+    public static func acquirePubVariation(withID id: String,
+                                           completion: @escaping (Result<[String: Any], BVError>) -> Void) {
+        
+        let body = ["this.id": id]
+        // perform the action
+        self.performAction(name: "AcquirePubVariation", payload: body) { result in
+            completion(result)
+        }
+        
     }
 
 }

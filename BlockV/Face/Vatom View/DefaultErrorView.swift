@@ -10,6 +10,7 @@
 //
 
 import UIKit
+import FLAnimatedImage
 import Nuke
 
 /// Default error view.
@@ -17,7 +18,7 @@ import Nuke
 /// Shows:
 /// 1. vAtoms activated image.
 /// 2. Warning trigangle (that is tappable).
-internal final class DefaultErrorView: UIView & VatomViewError {
+internal final class DefaultErrorView: BoundedView & VatomViewError {
 
     // MARK: - Debug
 
@@ -48,16 +49,18 @@ internal final class DefaultErrorView: UIView & VatomViewError {
         return button
     }()
 
-    private let activatedImageView: UIImageView = {
-        let imageView = UIImageView()
+    private let activatedImageView: FLAnimatedImageView = {
+        let imageView = FLAnimatedImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.clipsToBounds = true
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
 
     var vatom: VatomModel? {
         didSet {
-            self.loadResources()
+            // raise flag that layout is needed on the bounds are known
+            self.requiresBoundsBasedSetup = true
         }
     }
 
@@ -73,18 +76,26 @@ internal final class DefaultErrorView: UIView & VatomViewError {
         activityIndicator.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
         activityIndicator.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
 
-        infoButton.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 12).isActive = true
-        infoButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 12).isActive = true
+        infoButton.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -12).isActive = true
+        infoButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -12).isActive = true
 
         activatedImageView.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
         activatedImageView.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
         activatedImageView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
         activatedImageView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
 
+        ImagePipeline.Configuration.isAnimatedImageDataEnabled = true
+
     }
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func setupWithBounds() {
+        super.setupWithBounds()
+        // only at this point is the bounds known which can be used to compute the target size
+        loadResources()
     }
 
     // MARK: - Logic
@@ -95,11 +106,10 @@ internal final class DefaultErrorView: UIView & VatomViewError {
     private func loadResources() {
 
         activityIndicator.startAnimating()
-        defer { self.activityIndicator.stopAnimating() }
 
         // extract error
         guard let vatom = vatom else {
-            assertionFailure("vatom must not be nil.")
+            assertionFailure("Vatom must not be nil.")
             return
         }
 
@@ -112,11 +122,17 @@ internal final class DefaultErrorView: UIView & VatomViewError {
         guard let encodeURL = try? BLOCKv.encodeURL(resourceModel.url) else {
             return
         }
-
-        var request = ImageRequest(url: encodeURL)
-        // use unencoded url as cache key
-        request.cacheKey = resourceModel.url
-        // load the image (reuse pool is automatically handled)
+        
+        let targetSize = self.activatedImageView.pixelSize
+        // create request
+        var request = ImageRequest(url: encodeURL,
+                                   targetSize: targetSize,
+                                   contentMode: .aspectFill)
+        
+        // set cache key
+        request.cacheKey = request.generateCacheKey(url: resourceModel.url, targetSize: targetSize)
+        
+        // load image
         Nuke.loadImage(with: request, into: activatedImageView) { [weak self] (_, _) in
             self?.activityIndicator.stopAnimating()
         }

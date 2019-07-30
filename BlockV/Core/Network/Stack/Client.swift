@@ -14,13 +14,13 @@ import Alamofire
 
 protocol ClientProtocol {
 
-    typealias RawCompletion = (Result<Data, BVError>) -> Void
+    typealias RawCompletion = (Swift.Result<Data, BVError>) -> Void
 
     /// Request that returns raw data.
     func request(_ endpoint: Endpoint<Void>, completion: @escaping RawCompletion)
 
     /// Request that returns native object (must conform to decodable).
-    func request<T>(_ endpoint: Endpoint<T>, completion: @escaping (Result<T, BVError>) -> Void ) where T: Decodable
+    func request<T>(_ endpoint: Endpoint<T>, completion: @escaping (Swift.Result<T, BVError>) -> Void ) where T: Decodable
 
 }
 
@@ -125,7 +125,8 @@ final class Client: ClientProtocol {
             url(path: endpoint.path),
             method: endpoint.method,
             parameters: endpoint.parameters,
-            encoding: endpoint.encoding
+            encoding: endpoint.encoding,
+            headers: endpoint.headers
         )
 
         // configure validation
@@ -153,7 +154,7 @@ final class Client: ClientProtocol {
     }
 
     /// JSON Completion handler.
-    typealias JSONCompletion = (Result<Any, BVError>) -> Void
+    typealias JSONCompletion = (Swift.Result<Any, BVError>) -> Void
 
     func requestJSON(_ endpoint: Endpoint<Void>, completion: @escaping JSONCompletion) {
 
@@ -162,7 +163,8 @@ final class Client: ClientProtocol {
             url(path: endpoint.path),
             method: endpoint.method,
             parameters: endpoint.parameters,
-            encoding: endpoint.encoding
+            encoding: endpoint.encoding,
+            headers: endpoint.headers
         )
 
         // configure validation
@@ -186,14 +188,15 @@ final class Client: ClientProtocol {
     ///   - endpoint: Endpoint for the request
     ///   - completion: The completion handler to call when the request is completed.
     func request<Response>(_ endpoint: Endpoint<Response>,
-                           completion: @escaping (Result<Response, BVError>) -> Void ) where Response: Decodable {
+                           completion: @escaping (Swift.Result<Response, BVError>) -> Void ) where Response: Decodable {
 
         // create request (starts immediately)
         let request = self.sessionManager.request(
             url(path: endpoint.path),
             method: endpoint.method,
             parameters: endpoint.parameters,
-            encoding: endpoint.encoding
+            encoding: endpoint.encoding,
+            headers: endpoint.headers
         )
 
         // configure validation - will cause an error to be generated for unacceptable status code or MIME type.
@@ -203,31 +206,24 @@ final class Client: ClientProtocol {
         request.validate().responseJSONDecodable(queue: self.queue,
                                                  decoder: blockvJSONDecoder) { (dataResponse: DataResponse<Response>) in
 
-            // DEBUG
-            //            let json = try? JSONSerialization.jsonObject(with: dataResponse.data!, options: [])
-            //            dump(json)
-
             switch dataResponse.result {
             case let .success(val):
 
                 /*
-                 Not all responses (even in the 200 range) are wrapped in the `BaseModel`. Endpoints must be treated
-                 on a per-endpoint basis.
+                 Certain endpoints return session tokens which need to be persisted (currently further up the chain)
+                 and injected into the oauth session handler.
                  */
 
                 // extract auth tokens if available
                 if let model = val as? BaseModel<AuthModel> {
+                    // inject token into session's oauth handler
                     self.oauthHandler.set(accessToken: model.payload.accessToken.token,
                                           refreshToken: model.payload.refreshToken.token)
+                } else if let model = val as? OAuthTokenExchangeModel {
+                    // inject token into session's oauth handler
+                    self.oauthHandler.set(accessToken: model.accessToken,
+                                          refreshToken: model.refreshToken)
                 }
-
-                // ensure the payload was parsed correctly
-                // on success, the payload should alway have a value
-                //                guard let payload = val.payload else {
-                //                    let error = BVError.modelDecoding(reason: "Payload model not parsed correctly.")
-                //                    completion(nil, error)
-                //                    return
-                //                }
 
                 completion(.success(val))
 
@@ -239,13 +235,7 @@ final class Client: ClientProtocol {
 
             case let .failure(err):
 
-                // DEBUG
-                //                if let data = dataResponse.data {
-                //                    let json = String(data: data, encoding: String.Encoding.utf8)
-                //                    print("Failure Response: \(json)")
-                //                }
-
-                //FIXME: Can this error casting be done away with?
+                //TODO: Can this error casting be done away with?
                 if let err = err as? BVError {
                     completion(.failure(err))
                 } else {
@@ -285,7 +275,6 @@ final class Client: ClientProtocol {
 
             switch encodingResult {
             case .success(let upload, _, _):
-                //print("Upload response: \(upload.response.debugDescription)")
 
                 // upload progress
                 upload.uploadProgress { progress in
@@ -294,12 +283,10 @@ final class Client: ClientProtocol {
                 upload.validate()
 
                 // parse out a native model (within the base model)
-                //TODO: If is fine to capture self here?
                 upload.responseJSONDecodable(queue: self.queue,
                                              decoder: self.blockvJSONDecoder) { (dataResponse: DataResponse<Response>)
                                                 in
 
-                    ///
                     switch dataResponse.result {
                     case let .success(val):
                         completion(val, nil)
@@ -318,8 +305,6 @@ final class Client: ClientProtocol {
                 }
 
             case .failure(let encodingError):
-                //print(encodingError)
-
                 let error = BVError.networking(error: encodingError)
                 completion(nil, error)
             }

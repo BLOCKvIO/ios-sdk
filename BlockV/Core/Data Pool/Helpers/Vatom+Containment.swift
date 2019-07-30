@@ -25,7 +25,7 @@ extension VatomModel {
     /// - important:
     /// This method will inspect the 'inventory' and 'children' regions, if the regions are synchronized the vatoms
     /// are returned, if not, the regions are first synchronized. This means the method is potentially slow.
-    public func listChildren(completion: @escaping (Result<[VatomModel], BVError>) -> Void) {
+    public func listChildren(completion: @escaping (Swift.Result<[VatomModel], BVError>) -> Void) {
 
         // check if the vatom is in the owner's inventory region (and stabalized)
         DataPool.inventory().getStable(id: self.id).map { inventoryVatom -> Guarantee<[VatomModel]> in
@@ -112,7 +112,10 @@ extension VatomModel {
             // check if there is a maximum number of children
             if policy.creationPolicy.enforcePolicyCountMax {
                 // check if current child count is less then policy max
-                if policy.creationPolicy.policyCountMax > self.listCachedChildren().count {
+                let children = self.listCachedChildren().filter {
+                    $0.props.templateVariationID ==  policy.templateVariationID
+                }
+                if policy.creationPolicy.policyCountMax > children.count {
                     return true
                 }
             } else {
@@ -140,13 +143,13 @@ extension VatomModel {
         if self.props.rootType == "vAtom::vAtomType" {
             return .standard
         } else {
-            if self.props.rootType.hasSuffix("FolderContainerType") {
+            if self.props.rootType.hasSuffix("::FolderContainerType") {
                 return .container(.folder)
-            } else if self.props.rootType.hasSuffix("PackageContainerType") {
+            } else if self.props.rootType.hasSuffix("::PackageContainerType") {
                 return .container(.package)
-            } else if self.props.rootType.hasSuffix("DiscoverContainerType") {
+            } else if self.props.rootType.hasSuffix("::DiscoverContainerType") {
                 return .container(.discover)
-            } else if self.props.rootType.hasSuffix("DefinedFolderContainerType") {
+            } else if self.props.rootType.hasSuffix("::DefinedFolderContainerType") {
                 return .container(.defined)
             } else {
                 return .unknown

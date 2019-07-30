@@ -175,12 +175,15 @@ class GeoPosRegion: BLOCKvRegion {
         // - Look at state update
         
         // get info
-        guard let msgType = msg["msg_type"] as? String else { return }
-        guard let payload = msg["payload"] as? [String: Any] else { return }
-        guard let newData = payload["new_object"] as? [String: Any] else { return }
-        guard let vatomID = payload["id"] as? String else { return }
+        guard
+            let msgType = msg["msg_type"] as? String,
+            let payload = msg["payload"] as? [String: Any] else { return }
         
         if msgType == "state_update" {
+            
+            guard
+                let newData = payload["new_object"] as? [String: Any],
+                let vatomID = payload["id"] as? String else { return }
             
             // check update is related to drop
             guard let properties = newData["vAtom::vAtomType"] as? [String: Any],
@@ -232,13 +235,13 @@ class GeoPosRegion: BLOCKvRegion {
                 
             }
             
-        }
-        
-        // inspect inventory events
-        guard let oldOwner = payload["old_owner"] as? String else { return }
-        guard let newOwner = payload["new_owner"] as? String else { return }
-        
-        if msgType == "inventory" {
+        } else if msgType == "inventory" {
+            
+            // inspect inventory events
+            guard
+                let vatomID = payload["id"] as? String,
+                let oldOwner = payload["old_owner"] as? String,
+                let newOwner = payload["new_owner"] as? String else { return }
             
             /*
              Iventory events indicate a vatom has entered or exited the user's inventory. It is unlikely that dropped vatoms
@@ -252,6 +255,47 @@ class GeoPosRegion: BLOCKvRegion {
             // check if this is an incoming or outgoing vatom
             if oldOwner == self.currentUserID && newOwner != self.currentUserID {
                 // vatom is no longer owned by us
+                self.remove(ids: [vatomID])
+            }
+            
+        } else if msgType == "map" {
+            
+            guard let operation = payload["op"] as? String,
+                let vatomID = payload["vatom_id"] as? String,
+                let actionName = payload["action_name"] as? String,
+                let lat = payload["lat"] as? Double,
+                let lon = payload["lon"] as? Double else {
+                    return
+            }
+            
+            // check operation typw
+            if operation == "add" {
+                
+                // create endpoint over void
+                let endpoint: Endpoint<Void> = API.Generic.getVatoms(withIDs: [vatomID])
+                BLOCKv.client.request(endpoint).done { data in
+                    
+                    // convert
+                    guard
+                        let object = try? JSONSerialization.jsonObject(with: data),
+                        let json = object as? [String: Any],
+                        let payload = json["payload"] as? [String: Any] else {
+                            throw RegionError.failedParsingResponse
+                    }
+                    
+                    // parse out objects
+                    guard let items = self.parseDataObject(from: payload) else {
+                        throw RegionError.failedParsingObject
+                    }
+                    
+                    // add new objects
+                    self.add(objects: items)
+                    
+                    }.catch { error in
+                        printBV(error: "[GeoPosRegion] Unable to vatom. \(error.localizedDescription)")
+                }
+                
+            } else if operation == "remove" {
                 self.remove(ids: [vatomID])
             }
             

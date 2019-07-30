@@ -11,6 +11,8 @@
 
 import Foundation
 
+//swiftlint:disable identifier_name
+
 extension ActionModel: Descriptable {
     
     init(from descriptor: [String: Any]) throws {

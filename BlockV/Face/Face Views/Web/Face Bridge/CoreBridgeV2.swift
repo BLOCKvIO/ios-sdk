@@ -12,10 +12,12 @@
 import Foundation
 import GenericJSON
 
+//FIXME: Remove temporary disable type_body_length
+
 /// Core Bridge (Version 2.0.0)
 ///
 /// Bridges into the Core module.
-class CoreBridgeV2: CoreBridge {
+class CoreBridgeV2: CoreBridge { //swiftlint:disable:this type_body_length
 
     // MARK: - Enums
 
@@ -31,6 +33,7 @@ class CoreBridgeV2: CoreBridge {
         // 2.1
         case setVatomParent         = "core.vatom.parent.set"
         case observeVatomChildren   = "core.vatom.children.observe"
+        case getCurrentUser         = "core.user.current.get"
     }
 
     /// Represents the Native Bridge Request contract.
@@ -246,6 +249,23 @@ class CoreBridgeV2: CoreBridge {
                 }
 
             }
+            
+        case .getCurrentUser:
+            self.getCurrentUser { result in
+                switch result {
+                case .success(let payload):
+                    // json dance
+                    guard let payload = try? JSON.init(encodable: ["user": payload]) else {
+                        let error = BridgeError.viewer("Unable to encode data.")
+                        completion(.failure(error))
+                        return
+                    }
+                    completion(.success(payload))
+                    
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            }
 
         case .performAction:
             // ensure caller supplied params
@@ -418,6 +438,27 @@ class CoreBridgeV2: CoreBridge {
 
     }
 
+    private struct BRCurrentUser: Encodable {
+
+        struct Properties: Encodable {
+            let firstName: String
+            let lastName: String
+            let avatarURI: String
+            let isGuest: Bool
+
+            enum CodingKeys: String, CodingKey { //swiftlint:disable:this nesting
+                case firstName = "first_name"
+                case lastName  = "last_name"
+                case avatarURI = "avatar_uri"
+                case isGuest   = "is_guest"
+            }
+        }
+
+        let id: String
+        let properties: Properties
+
+    }
+
     // MARK: - Message Handling
 
     /// Invoked when a face would like to create the web bridge.
@@ -551,6 +592,29 @@ class CoreBridgeV2: CoreBridge {
                 completion(.failure(bridgeError))
             }
 
+        }
+
+    }
+
+    /// Fetches the bridge-available properties of the current user.
+    private func getCurrentUser(completion: @escaping (Result<BRCurrentUser, BridgeError>) -> Void) {
+
+        BLOCKv.getCurrentUser { result in
+
+            switch result {
+            case .success(let user):
+                // build response
+                let properties = BRCurrentUser.Properties(firstName: user.firstName,
+                                                          lastName: user.lastName,
+                                                          avatarURI: user.avatarURL?.absoluteString ?? "",
+                                                          isGuest: user.guestID.isEmpty ? false : true)
+                let response = BRCurrentUser(id: user.id, properties: properties)
+                completion(.success(response))
+
+            case .failure:
+                let bridgeError = BridgeError.viewer("Unable to fetch current user.")
+                completion(.failure(bridgeError))
+            }
         }
 
     }

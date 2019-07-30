@@ -17,34 +17,34 @@ public extension FileManager {
     /// directories, hard links, ...).
     public func allocatedSizeOfDirectory(at directoryURL: URL) throws -> UInt64 {
         
-        // The error handler simply stores the error and stops traversal
+        // error handler simply stores the error and stops traversal
         var enumeratorError: Error? = nil
         func errorHandler(_: URL, error: Error) -> Bool {
             enumeratorError = error
             return false
         }
         
-        // We have to enumerate all directory contents, including subdirectories.
+        // enumerate all directory contents, including subdirectories
         let enumerator = self.enumerator(at: directoryURL,
                                          includingPropertiesForKeys: Array(allocatedSizeResourceKeys),
                                          options: [],
                                          errorHandler: errorHandler)!
         
-        // We'll sum up content size here:
+        // sum up content size here:
         var accumulatedSize: UInt64 = 0
         
-        // Perform the traversal.
+        // perform the traversal
         for item in enumerator {
             
-            // Bail out on errors from the errorHandler.
+            // bail out on errors from the errorHandler
             if enumeratorError != nil { break }
             
-            // Add up individual file sizes.
+            // add up individual file sizes
             let contentItemURL = item as! URL
             accumulatedSize += try contentItemURL.regularFileAllocatedSize()
         }
         
-        // Rethrow errors from errorHandler.
+        // rethrow errors from errorHandler
         if let error = enumeratorError { throw error }
         
         return accumulatedSize
@@ -64,7 +64,7 @@ fileprivate extension URL {
     func regularFileAllocatedSize() throws -> UInt64 {
         let resourceValues = try self.resourceValues(forKeys: allocatedSizeResourceKeys)
         
-        // We only look at regular files.
+        // only look at regular files
         guard resourceValues.isRegularFile ?? false else {
             return 0
         }

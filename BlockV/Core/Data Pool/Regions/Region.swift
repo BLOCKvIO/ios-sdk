@@ -433,6 +433,17 @@ public class Region {
         return mapped
 
     }
+    
+    /// Directory containing all region caches.
+    static var recommendedCacheDirectory = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("regions")
+    
+    /// Cache filename.
+    lazy var cacheFilename = self.stateKey.replacingOccurrences(of: ":", with: "_")
+    
+    /// File where cache will be stored.
+    lazy var cacheFile = Region.recommendedCacheDirectory
+        .appendingPathComponent(cacheFilename)
+        .appendingPathExtension("json")
 
     /// Load objects from local storage.
     func loadFromCache() -> Promise<Void> {
@@ -443,14 +454,9 @@ public class Region {
                 
                 // get filename
                 let startTime = Date.timeIntervalSinceReferenceDate
-                let filename = self.stateKey.replacingOccurrences(of: ":", with: "_")
-                
-                // get temporary file location
-                let file = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(filename)
-                    .appendingPathExtension("json")
                 
                 // read data
-                guard let data = try? Data(contentsOf: file) else {
+                guard let data = try? Data(contentsOf: self.cacheFile) else {
                     printBV(error: ("[DataPool > Region] Unable to read cached data"))
                     resolver.fulfill_()
                     return
@@ -527,20 +533,13 @@ public class Region {
                 return
             }
 
-            // get filename
-            let filename = self.stateKey.replacingOccurrences(of: ":", with: "_")
-
-            // get temporary file location
-            let file = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(filename)
-                .appendingPathExtension("json")
-
             // make sure folder exists
-            try? FileManager.default.createDirectory(at: file.deletingLastPathComponent(),
+            try? FileManager.default.createDirectory(at: self.cacheFile.deletingLastPathComponent(),
                                                      withIntermediateDirectories: true, attributes: nil)
 
             // write file
             do {
-                try data.write(to: file)
+                try data.write(to: self.cacheFile)
             } catch let err {
                 printBV(error: ("[DataPool > Region] Unable to save data to disk: " + err.localizedDescription))
                 return

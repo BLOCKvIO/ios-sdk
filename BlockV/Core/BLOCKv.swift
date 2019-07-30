@@ -12,6 +12,7 @@
 import Foundation
 import Alamofire
 import JWTDecode
+import Nuke
 
 /*
  Goal:
@@ -98,6 +99,13 @@ public final class BLOCKv {
                                                selector: #selector(handleUserAuthorisationRequired),
                                                name: Notification.Name.BVInternal.UserAuthorizationRequried,
                                                object: nil)
+
+        // configure in-memory cache (store processed images ready for display)
+        ImageCache.shared.costLimit = ImageCache.defaultCostLimit()
+
+        // configure http cache (store unprocessed image data at the http level)
+        DataLoader.sharedUrlCache.memoryCapacity = 80 * 1024 * 1024  // 80 MB
+        DataLoader.sharedUrlCache.diskCapacity = 180  // 180 MB
 
         // handle session launch
         if self.isLoggedIn {
@@ -291,8 +299,9 @@ public final class BLOCKv {
             fatalError("Invalid cliam")
         }
 
-        // standup the client
+        // standup the client & socket
         _ = client
+        _ = socket.connect()
 
         // standup data pool
         DataPool.sessionInfo = ["userID": userId]
@@ -340,4 +349,30 @@ func printBV(info string: String) {
 
 func printBV(error string: String) {
     print("\nBV SDK >>> Error: \(string)")
+}
+
+extension BLOCKv {
+
+    public enum Debug {
+
+        //// Returns the cache size of the face data resource disk caches.
+        public static var faceDataResourceCacheSize: UInt64? {
+            return try? FileManager.default.allocatedSizeOfDirectory(at: DataDownloader.recommendedCacheDirectory)
+        }
+
+        /// Returns the cache size of all data pool region disk caches.
+        public static var regionCacheSize: UInt64? {
+            return try? FileManager.default.allocatedSizeOfDirectory(at: Region.recommendedCacheDirectory)
+        }
+
+        /// Clears all disk caches.
+        public static func clearCache() {
+            ImageCache.shared.removeAll()
+            DataLoader.sharedUrlCache.removeAllCachedResponses()
+            try? FileManager.default.removeItem(at: DataDownloader.recommendedCacheDirectory)
+            try? FileManager.default.removeItem(at: Region.recommendedCacheDirectory)
+        }
+
+    }
+
 }

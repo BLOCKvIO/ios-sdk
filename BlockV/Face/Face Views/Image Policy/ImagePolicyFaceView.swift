@@ -60,7 +60,7 @@ open class ImagePolicyFaceView: FaceView {
         }
 
         super.init(vatom: vatom, faceModel: faceModel)
-        
+
         // enable animated images
         ImagePipeline.Configuration.isAnimatedImageDataEnabled = true
 
@@ -134,7 +134,7 @@ open class ImagePolicyFaceView: FaceView {
         if self.vatom.id == vatom.id {
             // replace vatom, update UI
             self.vatom = vatom
-            
+
         } else {
             // replace vatom, reset and update UI
             self.vatom = vatom
@@ -194,15 +194,25 @@ open class ImagePolicyFaceView: FaceView {
             } else if let policy = policy as? Config.FieldLookup {
 
                 // create key path and split into head and tail
-                guard let component = KeyPath(policy.field).headAndTail(),
-                    // only private section lookups are allowed
-                    component.head == "private",
+                guard let component = KeyPath(policy.field).headAndTail() else { continue }
+                
+                var vatomValue: JSON?
+                // check container
+                if component.head == "private" {
                     // current value on the vatom
-                    let vatomValue = self.vatom.private?[keyPath: component.tail.path] else {
-                        continue
+                    let vatomValue = self.vatom.private?[keyPath: component.tail.path]
+                } else if component.head == "vAtom::vAtomType" {
+                    //TODO: Create a keypath-to-keypath look up
+                    if component.tail.path == "cloning_score" {
+                        vatomValue = try? JSON(self.vatom.props.cloningScore)
+                    } else if component.tail.path == "num_direct_clones" {
+                        vatomValue = try? JSON(self.vatom.props.numberDirectClones)
+                    }
                 }
-
-                if vatomValue == policy.value {
+                
+                guard let value = vatomValue else { continue }
+                
+                if value == policy.value {
                     // update image
                     //print(">>:: vAtom Value: \(vatomValue) | Policy Value: \(policy.value)\n")
                     return policy.resourceName
@@ -244,8 +254,10 @@ open class ImagePolicyFaceView: FaceView {
             var request = ImageRequest(url: encodeURL,
                                        targetSize: pixelSize,
                                        contentMode: .aspectFit)
-            // use unencoded url as cache key
-            request.cacheKey = resourceModel.url
+
+            // set cache key
+            request.cacheKey = request.generateCacheKey(url: resourceModel.url, targetSize: pixelSize)
+
             // load image (automatically handles reuse)
             Nuke.loadImage(with: request, into: self.animatedImageView) { (_, error) in
                 self.isLoaded = true
@@ -350,7 +362,7 @@ private extension ImagePolicyFaceView {
                 }
 
                 // child count
-                if let countMax = imagePolicyDescriptor["count_max"]?.floatValue {
+                if let countMax = imagePolicyDescriptor["count_max"]?.doubleValue {
                     let childCountPolicy = ChildCount(resourceName: resourceName, countMax: Int(countMax))
                     self.policies.append(childCountPolicy)
                     continue

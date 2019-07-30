@@ -73,21 +73,21 @@ class LoginViewController: UIViewController {
         
         // ask the BV platform to login
         BLOCKv.login(withUserToken: token, type: tokenType, password: password) {
-            [weak self] (userModel, error) in
+            [weak self] result in
             
             // reset nav bar
             self?.hideNavBarActivityRight()
             
-            // handle error
-            guard let model = userModel, error == nil else {
-                print(">>> Error > Viewer: \(error!.localizedDescription)")
-                self?.present(UIAlertController.errorAlert(error!), animated: true)
+            switch result {
+            case .success(let userModel):
+                self?.performSegue(withIdentifier: "seg.login.success", sender: self)
+                print("Viewer > \(userModel)\n")
+                
+            case .failure(let error):
+                print(">>> Error > Viewer: \(error.localizedDescription)")
+                self?.present(UIAlertController.errorAlert(error), animated: true)
                 return
             }
-            
-            // handle success
-            self?.performSegue(withIdentifier: "seg.login.success", sender: self)
-            print("Viewer > \(model)\n")
             
         }
         
@@ -103,24 +103,23 @@ class LoginViewController: UIViewController {
         let token = userTokenTextField.text ?? ""
         
         // ask the BV platform to reset the token
-        BLOCKv.resetToken(token, type: tokenType) {
-            [weak self] (userToken, error) in
+        BLOCKv.resetToken(token, type: tokenType) { [weak self] result in
             
             // hide loader
             self?.hideNavBarActivityRight()
             
-            // handle error
-            guard let model = userToken, error == nil else {
-                print(">>> Error > Viewer: \(error!.localizedDescription)")
-                self?.present(UIAlertController.errorAlert(error!), animated: true)
+            switch result {
+            case .success(let userToken):
+                let message = "An OTP has been sent to your token. Please use the OTP as a password to login."
+                self?.present(UIAlertController.okAlert(title: "Info", message: message), animated: true)
+                
+                print("Viewer > \(userToken)\n")
+
+            case .failure(let error):
+                print(">>> Error > Viewer: \(error.localizedDescription)")
+                self?.present(UIAlertController.errorAlert(error), animated: true)
                 return
             }
-            
-            // handle success
-            self?.present(UIAlertController.okAlert(title: "Info",
-                                              message: "An OTP has been sent to your token. Please use the OTP as a password to login."), animated: true)
-            
-            print("Viewer > \(model)\n")
             
         }
         

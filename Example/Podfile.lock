@@ -1,29 +1,39 @@
 PODS:
-  - Alamofire (4.8.1)
-  - BLOCKv (3.0.0):
-    - BLOCKv/Face (= 3.0.0)
-  - BLOCKv/Core (3.0.0):
+  - Alamofire (4.8.2)
+  - BLOCKv (3.1.0):
+    - BLOCKv/Face (= 3.1.0)
+  - BLOCKv/Core (3.1.0):
     - Alamofire (~> 4.7)
-    - GenericJSON (~> 1.2)
+    - GenericJSON (~> 2.0)
     - JWTDecode (~> 2.1)
+    - PromiseKit (~> 6.8)
     - Signals (~> 6.0)
-    - Starscream (~> 3.0)
+    - Starscream (~> 3.0.6)
     - SwiftLint (~> 0.26)
-  - BLOCKv/Face (3.0.0):
+  - BLOCKv/Face (3.1.0):
     - BLOCKv/Core
     - FLAnimatedImage (~> 1.0)
     - Nuke (~> 7.0)
   - FLAnimatedImage (1.0.12)
-  - GenericJSON (1.2.0)
-  - JWTDecode (2.2.0)
-  - Nuke (7.5.2)
-  - NVActivityIndicatorView (4.6.1):
-    - NVActivityIndicatorView/Presenter (= 4.6.1)
-  - NVActivityIndicatorView/Presenter (4.6.1)
-  - Signals (6.0.0)
+  - GenericJSON (2.0.0)
+  - JWTDecode (2.3.0)
+  - Nuke (7.6.3)
+  - NVActivityIndicatorView (4.7.0):
+    - NVActivityIndicatorView/Presenter (= 4.7.0)
+  - NVActivityIndicatorView/Presenter (4.7.0)
+  - PromiseKit (6.10.0):
+    - PromiseKit/CorePromise (= 6.10.0)
+    - PromiseKit/Foundation (= 6.10.0)
+    - PromiseKit/UIKit (= 6.10.0)
+  - PromiseKit/CorePromise (6.10.0)
+  - PromiseKit/Foundation (6.10.0):
+    - PromiseKit/CorePromise
+  - PromiseKit/UIKit (6.10.0):
+    - PromiseKit/CorePromise
+  - Signals (6.1.0)
   - Starscream (3.0.6)
-  - SwiftLint (0.30.1)
-  - VatomFace3D (2.0.0):
+  - SwiftLint (0.33.1)
+  - VatomFace3D (3.0.2):
     - BLOCKv/Face
     - FLAnimatedImage
     - GenericJSON
@@ -42,6 +52,7 @@ SPEC REPOS:
     - JWTDecode
     - Nuke
     - NVActivityIndicatorView
+    - PromiseKit
     - Signals
     - Starscream
     - SwiftLint
@@ -52,18 +63,19 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  Alamofire: 16ce2c353fb72865124ddae8a57c5942388f4f11
-  BLOCKv: 60d3a98639188c430c00d126669e452c4aac1d73
+  Alamofire: ae5c501addb7afdbb13687d7f2f722c78734c2d3
+  BLOCKv: 6d0675eb6f8802e3864af8ec77e735358e535f90
   FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
-  GenericJSON: 05eb212cd12bf0562b816075090bea3eda2ab2ed
-  JWTDecode: 85a405ab16d5473e99bd89ded1d535090ebd6a0e
-  Nuke: 0350d346a688426e8f2331253ef28dc2fc4f6178
-  NVActivityIndicatorView: 4ca19fccc84595a78957336a086d00a49be6ce61
-  Signals: eca6a9098b40ed5f8d8b60498d0e91168fa7c0cc
+  GenericJSON: a967fb5c199c9aae24063e47a771e04e305dc836
+  JWTDecode: fb77675c8049c1a7e9433c7cf448c3ce33ee4ac7
+  Nuke: 44130e95e09463f8773ae4b96b90de1eba6b3350
+  NVActivityIndicatorView: b19ddab2576f805cbe0fb2306cba3476e09a1dea
+  PromiseKit: 1fdaeb6c0a94a5114fcb814ff3d772b86886ad4e
+  Signals: f8e5c979e93c35273f8dfe55ee7f47213d3e8fe8
   Starscream: ef3ece99d765eeccb67de105bfa143f929026cf5
-  SwiftLint: a54bf1fe12b55c68560eb2a7689dfc81458508f7
-  VatomFace3D: 78d08c503819d5e2d8e1978d953885d596e379cf
+  SwiftLint: 9fc1143bbacec37f94994a7d0d2a85b2154b6294
+  VatomFace3D: aabeb4a3c9d72835fbfd8a4bcac3917151b30e0c
 
-PODFILE CHECKSUM: d63113581b30008d083f82a8a354c17db0a9e801
+PODFILE CHECKSUM: d2ad0cdcd830de687ee1e7475c49221546a727b8
 
-COCOAPODS: 1.6.0
+COCOAPODS: 1.7.4

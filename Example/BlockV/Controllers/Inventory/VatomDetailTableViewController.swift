@@ -102,30 +102,31 @@ class VatomDetailTableViewController: UITableViewController {
     /// Fetches the input vatom's properties from the BLOCKv platform.
     fileprivate func fetchVatom() {
         
-        BLOCKv.getVatoms(withIDs: [vatom.id]) { [weak self] (vatomModels, error) in
+        BLOCKv.getVatoms(withIDs: [vatom.id]) { [weak self] result in
             
             // end refreshing
             self?.refreshControl?.endRefreshing()
             
-            // handle error
-            guard error == nil else {
-                print("\n>>> Error > Viewer: \(error!.localizedDescription)")
-                self?.present(UIAlertController.errorAlert(error!), animated: true)
+            switch result {
+            case .success(let vatomModels):
+                // check for our vatom
+                guard let newVatom = vatomModels.first else {
+                    let message = "Unable to fetch vAtom with id: \(String(describing: self?.vatom.id))."
+                    print("\n>>> Warning > \(message)")
+                    self?.present(UIAlertController.infoAlert(message: message), animated: true)
+                    return
+                }
+                
+                // handle success
+                print("\nViewer > Fetched vAtom:\n\(newVatom)")
+                self?.vatom = newVatom
+                self?.updateUI()
+                
+            case .failure(let error):
+                print("\n>>> Error > Viewer: \(error.localizedDescription)")
+                self?.present(UIAlertController.errorAlert(error), animated: true)
                 return
             }
-            
-            // check for our vatom
-            guard let newVatom = vatomModels.first else {
-                let message = "Unable to fetch vAtom with id: \(String(describing: self?.vatom.id))."
-                print("\n>>> Warning > \(message)")
-                self?.present(UIAlertController.infoAlert(message: message), animated: true)
-                return
-            }
-            
-            // handle success
-            print("\nViewer > Fetched vAtom:\n\(newVatom)")
-            self?.vatom = newVatom
-            self?.updateUI()
             
         }
         

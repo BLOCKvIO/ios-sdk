@@ -36,25 +36,25 @@ extension BLOCKv {
     public static func getInventory(id: String = ".",
                                     page: Int = 0,
                                     limit: Int = 0,
-                                    completion: @escaping (_ vatoms: [VatomModel], _ error: BVError?) -> Void) {
+                                    completion: @escaping (Result<[VatomModel], BVError>) -> Void) {
 
-        let endpoint = API.UserVatom.getInventory(parentID: id, page: page, limit: limit)
+        let endpoint = API.Vatom.getInventory(parentID: id, page: page, limit: limit)
 
-        self.client.request(endpoint) { (baseModel, error) in
+        self.client.request(endpoint) { result in
 
-            // extract model, ensure no error
-            guard let unpackedModel = baseModel?.payload, error == nil else {
+            switch result {
+            case .success(let baseModel):
+                // model is available
+                let unpackedModel = baseModel.payload
+                let packedVatoms = unpackedModel.package()
                 DispatchQueue.main.async {
-                    completion([], error!)
+                    completion(.success(packedVatoms))
                 }
-                return
-            }
-
-            // model is available
-            let packedVatoms = unpackedModel.package()
-
-            DispatchQueue.main.async {
-                completion(packedVatoms, nil)
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
             }
 
         }
@@ -73,25 +73,25 @@ extension BLOCKv {
     ///     action models as populated properties.
     ///   - error: BLOCKv error.
     public static func getVatoms(withIDs ids: [String],
-                                 completion: @escaping (_ vatoms: [VatomModel], _ error: BVError?) -> Void) {
+                                 completion: @escaping (Result<[VatomModel], BVError>) -> Void) {
 
-        let endpoint = API.UserVatom.getVatoms(withIDs: ids)
+        let endpoint = API.Vatom.getVatoms(withIDs: ids)
 
-        self.client.request(endpoint) { (baseModel, error) in
+        self.client.request(endpoint) { result in
 
-            // extract model, ensure no error
-            guard let unpackedModel = baseModel?.payload, error == nil else {
+            switch result {
+            case .success(let baseModel):
+                // model is available
+                let unpackedModel = baseModel.payload
+                let packedVatoms = unpackedModel.package()
                 DispatchQueue.main.async {
-                    completion([], error!)
+                    completion(.success(packedVatoms))
                 }
-                return
-            }
-
-            // model is available
-            let packedVatoms = unpackedModel.package()
-
-            DispatchQueue.main.async {
-                completion(packedVatoms, nil)
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
             }
 
         }
@@ -108,21 +108,78 @@ extension BLOCKv {
     ///                 This handler is executed on the main queue.
     public static func trashVatom(_ id: String, completion: @escaping (BVError?) -> Void) {
 
-        let endpoint = API.UserVatom.trashVatom(id)
+        let endpoint = API.Vatom.trashVatom(id)
 
-        self.client.request(endpoint) { (baseModel, error) in
+        self.client.request(endpoint) { result in
 
-            // extract model, ensure no error
-            guard baseModel?.payload.message != nil, error == nil else {
+            switch result {
+            case .success:
+                // model is available
                 DispatchQueue.main.async {
                     completion(nil)
                 }
-                return
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    completion(error)
+                }
             }
 
-            // model is available
-            DispatchQueue.main.async {
-                completion(error)
+        }
+
+    }
+
+    /// Sets the parent ID of the specified vatom.
+    ///
+    /// - Parameters:
+    ///   - vatom: Vatom whose parent ID must be set.
+    ///   - parentID: Unique identifier of the parent vatom.
+    ///   - completion: The completion hanlder to call when the request is completed.
+    ///                 This handler is executed on the main thread.
+    public static func setParentID(ofVatoms vatoms: [VatomModel], to parentID: String,
+                                   completion: @escaping (Result<VatomUpdateModel, BVError>) -> Void) {
+
+        // perform preemptive action, store undo functions
+        let undos = vatoms.map {
+            // tuple: (vatom id, undo function)
+            (id: $0.id, undo: DataPool.inventory().preemptiveChange(id: $0.id,
+                                                                    keyPath: "vAtom::vAtomType.parent_id",
+                                                                    value: parentID))
+        }
+
+        let ids = vatoms.map { $0.id }
+        let payload: [String: Any] = [
+            "ids": ids,
+            "parent_id": parentID
+        ]
+
+        let endpoint = API.Vatom.updateVatom(payload: payload)
+
+        BLOCKv.client.request(endpoint) { result in
+
+            switch result {
+            case .success(let baseModel):
+
+                /*
+                 # Note
+                 The most likely scenario where there will be partial containment errors is when setting the parent id
+                 to a container vatom of type `DefinedFolderContainerType`. However, as of writting, the server does
+                 not enforce child policy rules so this always succeed (using the current API).
+                 */
+                let updateVatomModel = baseModel.payload
+                DispatchQueue.main.async {
+                    // roll back only those failed containments
+                    let undosToRollback = undos.filter { !updateVatomModel.ids.contains($0.id) }
+                    undosToRollback.forEach { $0.undo() }
+                    completion(.success(updateVatomModel))
+                }
+
+            case .failure(let error):
+                DispatchQueue.main.async {
+                    // roll back all containments
+                    undos.forEach { $0.undo() }
+                    completion(.failure(error))
+                }
             }
 
         }
@@ -140,12 +197,25 @@ extension BLOCKv {
     ///       action models as populated properties.
     ///   - error: BLOCKv error.
     public static func discover(_ builder: DiscoverQueryBuilder,
-                                completion: @escaping(_ vatoms: [VatomModel], _ error: BVError?) -> Void) {
+                                completion: @escaping(Result<[VatomModel], BVError>) -> Void) {
 
         // explicitly set return type to payload
         builder.setReturn(type: .payload)
-        self.discover(payload: builder.toDictionary()) { (result, error) in
-            completion(result?.vatoms ?? [], error)
+        self.discover(payload: builder.toDictionary()) { result in
+
+            switch result {
+            case .success(let discoverResult):
+                // model is available
+                DispatchQueue.main.async {
+                    completion(.success(discoverResult.vatoms))
+                }
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+            }
+
         }
     }
 
@@ -165,27 +235,25 @@ extension BLOCKv {
     ///     - count: Number of discovered vAtoms.
     ///   - error: BLOCKv error.
     public static func discover(payload: [String: Any],
-                                completion: @escaping (_ result: DiscoverResult?, _ error: BVError?) -> Void) {
+                                completion: @escaping (Result<DiscoverResult, BVError>) -> Void) {
 
-        let endpoint = API.VatomDiscover.discover(payload)
+        let endpoint = API.Vatom.discover(payload)
 
-        self.client.request(endpoint) { (baseModel, error) in
+        self.client.request(endpoint) { result in
 
-            // extract model, handle error
-            guard let unpackedModel = baseModel?.payload, error == nil else {
+            switch result {
+            case .success(let baseModel):
+                // model is available
+                let unpackedModel = baseModel.payload
+                let packedVatoms = unpackedModel.package()
                 DispatchQueue.main.async {
-                    print(error!.localizedDescription)
-                    completion(nil, error!)
+                    completion(.success((packedVatoms, packedVatoms.count)))
                 }
-                return
-            }
-
-            // model is available
-            let packedVatoms = unpackedModel.package()
-
-            DispatchQueue.main.async {
-                //print(model)
-                completion((packedVatoms, packedVatoms.count), nil)
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
             }
 
         }
@@ -215,31 +283,29 @@ extension BLOCKv {
                                    topRightLat: Double,
                                    topRightLon: Double,
                                    filter: VatomGeoFilter = .vatoms,
-                                   completion: @escaping (_ vatoms: [VatomModel], _ error: BVError?) -> Void) {
+                                   completion: @escaping (Result<[VatomModel], BVError>) -> Void) {
 
-        let endpoint = API.VatomDiscover.geoDiscover(bottomLeftLat: bottomLeftLat,
+        let endpoint = API.Vatom.geoDiscover(bottomLeftLat: bottomLeftLat,
                                                      bottomLeftLon: bottomLeftLon,
                                                      topRightLat: topRightLat,
                                                      topRightLon: topRightLon,
                                                      filter: filter.rawValue)
 
-        self.client.request(endpoint) { (baseModel, error) in
+        self.client.request(endpoint) { result in
 
-            // extract model, handle error
-            guard let unpackedModel = baseModel?.payload, error == nil else {
+            switch result {
+            case .success(let baseModel):
+                // model is available
+                let unpackedModel = baseModel.payload
+                let packedVatoms = unpackedModel.package()
                 DispatchQueue.main.async {
-                    print(error!.localizedDescription)
-                    completion([], error!)
+                    completion(.success(packedVatoms))
                 }
-                return
-            }
-
-            // model is available
-            let packedVatoms = unpackedModel.package()
-
-            DispatchQueue.main.async {
-                //print(model)
-                completion(packedVatoms, nil)
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
             }
 
         }
@@ -263,30 +329,28 @@ extension BLOCKv {
                                          topRightLon: Double,
                                          precision: Int,
                                          filter: VatomGeoFilter = .vatoms,
-                                         completion: @escaping (GeoModel?, BVError?) -> Void) {
+                                         completion: @escaping (Result<GeoModel, BVError>) -> Void) {
 
-        let endpoint = API.VatomDiscover.geoDiscoverGroups(bottomLeftLat: bottomLeftLat,
+        let endpoint = API.Vatom.geoDiscoverGroups(bottomLeftLat: bottomLeftLat,
                                                            bottomLeftLon: bottomLeftLon,
                                                            topRightLat: topRightLat,
                                                            topRightLon: topRightLon,
                                                            precision: precision,
                                                            filter: filter.rawValue)
 
-        BLOCKv.client.request(endpoint) { (baseModel, error) in
+        BLOCKv.client.request(endpoint) { result in
 
-            // extract model, handle error
-            guard let geoGroupModels = baseModel?.payload, error == nil else {
+            switch result {
+            case .success(let baseModel):
+                // model is available
                 DispatchQueue.main.async {
-                    print(error!.localizedDescription)
-                    completion(nil, error!)
+                    completion(.success(baseModel.payload))
                 }
-                return
-            }
-
-            // model is available
-            DispatchQueue.main.async {
-                //print(model) 
-                completion(geoGroupModels, nil)
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
             }
 
         }
@@ -302,23 +366,23 @@ extension BLOCKv {
     ///   - completion: The completion handler to call when the call is completed.
     ///                 This handler is executed on the main queue.
     public static func getActions(forTemplateID id: String,
-                                  completion: @escaping ([ActionModel]?, BVError?) -> Void) {
+                                  completion: @escaping (Result<[ActionModel], BVError>) -> Void) {
 
         let endpoint = API.UserActions.getActions(forTemplateID: id)
 
-        self.client.request(endpoint) { (baseModel, error) in
+        self.client.request(endpoint) { result in
 
-            // extract array of actions, ensure no error
-            guard let actions = baseModel?.payload, error == nil else {
+            switch result {
+            case .success(let baseModel):
+                // model is available
                 DispatchQueue.main.async {
-                    completion(nil, error!)
+                    completion(.success(baseModel.payload))
                 }
-                return
-            }
-
-            // data is available
-            DispatchQueue.main.async {
-                completion(actions, nil)
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
             }
 
         }
@@ -336,41 +400,45 @@ extension BLOCKv {
     ///                 This handler is executed on the main queue.
     public static func performAction(name: String,
                                      payload: [String: Any],
-                                     completion: @escaping ([String: Any]?, BVError?) -> Void) {
+                                     completion: @escaping (Result<[String: Any], BVError>) -> Void) {
 
         let endpoint = API.VatomAction.custom(name: name, payload: payload)
 
-        self.client.request(endpoint) { (data, error) in
+        self.client.request(endpoint) { result in
 
-            // extract data, ensure no error
-            guard let data = data, error == nil else {
-                DispatchQueue.main.async {
-                    completion(nil, error!)
-                }
-                return
-            }
-            //
-            do {
-                guard
-                    let object = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                    let payload = object["payload"] as? [String: Any] else {
-                        throw BVError.modelDecoding(reason: "Unable to extract payload.")
-                }
-                // json is available
-                DispatchQueue.main.async {
-                    completion(payload, nil)
+            switch result {
+            case .success(let data):
+
+                do {
+                    guard
+                        let object = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                        let payload = object["payload"] as? [String: Any] else {
+                            throw BVError.modelDecoding(reason: "Unable to extract payload.")
+                    }
+                    // model is available
+                    DispatchQueue.main.async {
+                        completion(.success(payload))
+                    }
+
+                } catch {
+                    let error = BVError.modelDecoding(reason: error.localizedDescription)
+                    completion(.failure(error))
                 }
 
-            } catch {
-                let error = BVError.modelDecoding(reason: error.localizedDescription)
-                completion(nil, error)
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
             }
 
         }
 
     }
 
-    /// Performs an acquire action on a vAtom.
+    // MARK: - Common Actions for Unowned vAtoms
+
+    /// Performs an acquire action on the specified vatom id.
     ///
     /// Often, only a vAtom's ID is known, e.g. scanning a QR code with an embeded vAtom
     /// ID. This call is useful is such circumstances.
@@ -380,15 +448,31 @@ extension BLOCKv {
     ///   - completion: The completion handler to call when the action is completed.
     ///                 This handler is executed on the main queue.
     public static func acquireVatom(withID id: String,
-                                    completion: @escaping ([String: Any]?, BVError?) -> Void) {
+                                    completion: @escaping (Result<[String: Any], BVError>) -> Void) {
 
         let body = ["this.id": id]
-
         // perform the action
-        self.performAction(name: "Acquire", payload: body) { (data, error) in
-            completion(data, error)
+        self.performAction(name: "Acquire", payload: body) { result in
+            completion(result)
         }
 
+    }
+    
+    /// Performs an acquire pub variation action on the specified vatom id.
+    ///
+    /// - Parameters:
+    ///   - id: The id of the vAtom to acquire.
+    ///   - completion: The completion handler to call when the action is completed.
+    ///                 This handler is executed on the main queue.
+    public static func acquirePubVariation(withID id: String,
+                                           completion: @escaping (Result<[String: Any], BVError>) -> Void) {
+        
+        let body = ["this.id": id]
+        // perform the action
+        self.performAction(name: "AcquirePubVariation", payload: body) { result in
+            completion(result)
+        }
+        
     }
 
 }

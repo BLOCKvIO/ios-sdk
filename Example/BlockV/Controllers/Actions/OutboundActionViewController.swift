@@ -22,18 +22,19 @@
 //
 
 //
-//  TransferActionViewController.swift
+//  OutboundActionViewController.swift
 //  BlockV_Example
 //
 
 import UIKit
 import BLOCKv
 
-class TransferActionViewController: UIViewController {
+class OutboundActionViewController: UIViewController {
     
     // MARK: - Properties
     
     var vatom: VatomModel!
+    var actionName: String!
     
     /// Type of token selected.
     var tokenType: UserTokenType {
@@ -56,9 +57,10 @@ class TransferActionViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         precondition(vatom != nil, "A vAtom must be passed into this view controller.")
+        precondition(actionName != nil, "An action name must be passed into this view controller.")
         
+        self.title = actionName
     }
     
     // MARK: - Actions
@@ -78,61 +80,37 @@ class TransferActionViewController: UIViewController {
         // create the token
         guard let value = userTokenTextField.text else { return }
         let token = UserToken(value: value, type: tokenType)
-        
-        performTransferManual(token: token)
-        // OR
-        //performTransferConvenience(token: token)
+        // execute the action
+        performAction(token: token)
         
     }
     
-    /// Option 1 - This show the convenience `transfer` method on VatomModel to transfer the vAtom to
-    /// a another user via a phone, email, or user id token.
-    func performTransferConvenience(token: UserToken) {
+    /// Performs the appropriate action using the
+    func performAction(token: UserToken) {
         
-        self.vatom.transfer(toToken: token) { [weak self] (json, error) in
-            
-            // unwrap data, handle error
-            guard let json = json, error == nil else {
-                print(error!.localizedDescription)
+        let resultHandler: ((Result<[String: Any], BVError>) -> Void) = { [weak self] result in
+            switch result {
+            case .success(let json):
+                // success
+                print("Action response: \(json.debugDescription)")
+                self?.hide()
+            case .failure(let error):
+                print(error.localizedDescription)
+
                 return
             }
-            
-            // success
-            print("Action response: \(json.debugDescription)")
-            self?.hide()
         }
         
-    }
-    
-    /// Option 2 - This show the manual, method of performing an action by constructing the
-    /// action body payload.
-    func performTransferManual(token: UserToken) {
-        
-        /*
-         Each action has a defined payload structure.
-        */
-        let body = [
-            "this.id": self.vatom.id,
-            "new.owner.\(token.type.rawValue)": token.value
-        ]
-        
-        BLOCKv.performAction(name: "Transfer", payload: body) { [weak self] (json, error) in
-            
-            // unwrap data, handle error
-            guard let json = json, error == nil else {
-                print(error!.localizedDescription)
-                return
-            }
-            
-            // success
-            print("Action response: \(json.debugDescription)")
-            self?.hide()
-            
+        switch actionName {
+        case "Transfer":    self.vatom.transfer(toToken: token, completion: resultHandler)
+        case "Clone":       self.vatom.clone(toToken: token, completion: resultHandler)
+        case "Redeem":      self.vatom.redeem(toToken: token, completion: resultHandler)
+        default:
+            return
         }
         
     }
 
-    
     // MARK: - Helpers
     
     fileprivate func configureTokenTextField(for type: UserTokenType) {
@@ -141,17 +119,20 @@ class TransferActionViewController: UIViewController {
         case .phone:
             userTokenTextField.keyboardType = .phonePad
             userTokenTextField.placeholder = "Phone number"
+            userTokenTextField.autocorrectionType = .no
         case .email:
             userTokenTextField.keyboardType = .emailAddress
             userTokenTextField.placeholder = "Email address"
+            userTokenTextField.autocorrectionType = .no
         case .id:
             userTokenTextField.keyboardType = .asciiCapable
             userTokenTextField.placeholder = "User ID"
+            userTokenTextField.autocorrectionType = .no
         }
     }
     
     fileprivate func hide() {
-        self.navigationController?.dismiss(animated: true, completion: nil)
+        self.presentingViewController?.presentingViewController?.dismiss(animated: true, completion: nil)
     }
     
 }

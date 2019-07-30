@@ -30,7 +30,7 @@ class BVError_Tests: XCTestCase {
 
         // Top level
 
-        let errorPlatform = BVError.platform(reason: .authenticationLimit(0, "test"))
+        let errorPlatform = BVError.platform(reason: .authenticationFailed(0, "test"))
         let errorWebSocket = BVError.webSocket(error: .connectionFailed)
         let errorModelDecoding = BVError.modelDecoding(reason: "test")
 

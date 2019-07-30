@@ -61,6 +61,8 @@ public class WebSocketManager {
         case stateUpdate = "state_update"
         /// Activity event
         case activity    = "my_events"
+        /// Map event (unowned vatom)
+        case map         = "map"
     }
 
     // MARK: - Signals
@@ -80,6 +82,9 @@ public class WebSocketManager {
 
     /// Fires when the Web socket receives an **activity** update event.
     public let onActivityUpdate = Signal<WSActivityEvent>()
+    
+    /// Fires when the Web socket receives a *map* update event for *unowned* vatoms.
+    public let onMapUpdate = Signal<WSMapEvent>()
 
     // - Lifecycle
 
@@ -101,6 +106,15 @@ public class WebSocketManager {
         decoder.dateDecodingStrategy = .iso8601
         return decoder
     }()
+
+    /// Delay option enum used to create a reconnect interval (measured in seconds).
+    let delayOption = DelayOption.exponential(initial: 1, base: 1.2, maxDelay: 5)
+    
+    /// Tally of the numnber of reconnect attempts.
+    private var reconnectCount: Int = 0
+
+    /// Timer intendend to trigger reconnects.
+    private var reconnectTimer: Timer?
 
     /// Web socket instance
     private var socket: WebSocket?
@@ -217,6 +231,50 @@ public class WebSocketManager {
         self.connect()
     }
 
+    // MARK: - Commands
+
+    /// Writes a raw payload to the socket.
+    func write(_ payload: [String: Any]) {
+
+        DispatchQueue.global(qos: .userInitiated).async {
+            // serialize data
+            guard let data = try? JSONSerialization.data(withJSONObject: payload) else {
+                return
+            }
+            // write
+            self.socket?.write(data: data)
+        }
+
+    }
+
+    /// Writes a region command using the specified payload to the socket.
+    func writeRegionCommand(_ payload: [String: Any]) {
+        // command package
+        let commandPackage: [String: Any] = [
+            "cmd": "monitor",
+            "id": "1",
+            "version": "1",
+            "type": "command",
+            "payload": payload
+        ]
+        print(#function, payload)
+        // write
+        self.write(commandPackage)
+
+    }
+
+    // MARK: Debugging
+    
+    /// Writes a ping frame to the socket.
+    func writePing(data: Data = Data(), completion: @escaping () -> Void) {
+        
+        // write a ping control frame
+        self.socket?.write(ping: data) {
+            completion()
+        }
+        
+    }
+
 }
 
 // MARK: - Extension WebSocket Delegate
@@ -225,6 +283,12 @@ extension WebSocketManager: WebSocketDelegate {
 
     public func websocketDidConnect(socket: WebSocketClient) {
         printBV(info: "Web socket - Connected")
+
+        // invalidate auto-reconnect timer
+        self.reconnectTimer?.invalidate()
+        self.reconnectTimer = nil
+        self.reconnectCount = 0
+
         self.onConnected.fire(())
     }
 
@@ -241,9 +305,22 @@ extension WebSocketManager: WebSocketDelegate {
         // Fire an error informing the observers that the Web socket has disconnected.
         self.onDisconnected.fire((nil))
 
-        //TODO: The Web socket should reconnect here:
-        // The app may fire this message when entering the foreground
-        // (after the Web socket was disconnected after entering the background).
+        /*
+         Note
+         The app may fire this message when entering the foreground (after the Web socket was disconnected after
+         entering the background).
+         */
+
+        if !shouldAutoConnect { return }
+
+        // attempt to reconnect
+        self.connect()
+        // attempt to reconnect in `n` seconds
+        let delay = delayOption.make(reconnectCount)
+        self.reconnectTimer = Timer.scheduledTimer(withTimeInterval: delay, repeats: true, block: { _ in
+            self.reconnectCount += 1
+            self.connect()
+        })
 
     }
 
@@ -324,6 +401,14 @@ extension WebSocketManager: WebSocketDelegate {
                     // FIXME: Allow resources to be encoded.
                     let activityEvent = try blockvJSONDecoder.decode(WSActivityEvent.self, from: data)
                     self.onActivityUpdate.fire(activityEvent)
+                } catch {
+                    printBV(error: error.localizedDescription)
+                }
+                
+            case .map:
+                do {
+                    let mapEvent = try blockvJSONDecoder.decode(WSMapEvent.self, from: data)
+                    self.onMapUpdate.fire(mapEvent)
                 } catch {
                     printBV(error: error.localizedDescription)
                 }

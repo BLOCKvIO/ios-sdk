@@ -50,9 +50,9 @@ extension VatomModel {
             rootProperties["in_contract"]?.boolValue.flatMap { vatom.props.isInContract = $0 }
             rootProperties["in_contract_with"]?.stringValue.flatMap { vatom.props.inContractWith = $0 }
             rootProperties["transferred_by"]?.stringValue.flatMap { vatom.props.transferredBy = $0 }
-            rootProperties["num_direct_clones"]?.floatValue.flatMap { vatom.props.numberDirectClones = Int($0) }
+            rootProperties["num_direct_clones"]?.doubleValue.flatMap { vatom.props.numberDirectClones = Int($0) }
             rootProperties["cloned_from"]?.stringValue.flatMap { vatom.props.clonedFrom = $0 }
-            rootProperties["cloning_score"]?.floatValue.flatMap { vatom.props.cloningScore = Double($0) }
+            rootProperties["cloning_score"]?.doubleValue.flatMap { vatom.props.cloningScore = Double($0) }
             rootProperties["acquirable"]?.boolValue.flatMap { vatom.props.isAcquirable = $0 }
             rootProperties["redeemable"]?.boolValue.flatMap { vatom.props.isRedeemable = $0 }
             rootProperties["disabled"]?.boolValue.flatMap { vatom.props.isDisabled = $0 }
@@ -75,11 +75,8 @@ extension VatomModel {
                 .flatMap { vatom.props.commerce.pricing.validThrough = $0 }
             rootProperties["commerce"]?["pricing"]?["value"]?["vat_included"]?.boolValue
                 .flatMap { vatom.props.commerce.pricing.isVatIncluded = $0 }
-
-            //FIXME: There is a data type issue here. [18.68768, -33.824017] is converted to
-            // [18.687679290771484, -33.82401657104492]
             rootProperties["geo_pos"]?["coordinates"]?.arrayValue.flatMap {
-                vatom.props.geoPosition.coordinates = $0.compactMap { $0.floatValue }.map { Double($0) }
+                vatom.props.geoPosition.coordinates = $0.compactMap { $0.doubleValue }
             }
 
             // TODO: Version

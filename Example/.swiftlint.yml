@@ -12,6 +12,7 @@ excluded: # paths to ignore during linting. Takes precedence over `included`.
   - Pods
 
 identifier_name:
+  allowed_symbols: "_"
   excluded: # excluded via string array
     - id
 nesting:

@@ -16,6 +16,7 @@
 		AD0BCC98217A0106001836DE /* LiveVatomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD0BCC97217A0106001836DE /* LiveVatomView.swift */; };
 		AD36A59F215D1CE4009EFD55 /* CustomLoaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD36A59E215D1CE4009EFD55 /* CustomLoaderView.swift */; };
 		AD36A5B0215E3578009EFD55 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = AD36A5AF215E3578009EFD55 /* CHANGELOG.md */; };
+		AD3B591D224CAF0600257EF3 /* OutboundActionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD3B591C224CAF0600257EF3 /* OutboundActionViewController.swift */; };
 		AD3DB5302157FD7200E00B67 /* TappedVatomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD3DB52F2157FD7200E00B67 /* TappedVatomViewController.swift */; };
 		AD61462E213DC88700204E5B /* FaceSelectionProcedure_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD61462A213DC83D00204E5B /* FaceSelectionProcedure_Tests.swift */; };
 		AD61462F213DC88B00204E5B /* MockModelFaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD61462C213DC87100204E5B /* MockModelFaces.swift */; };
@@ -29,6 +30,8 @@
 		ADA07DF921A94068007A6322 /* VatomModelCodable_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA07DF121A94025007A6322 /* VatomModelCodable_Tests.swift */; };
 		ADA07DFA21A94068007A6322 /* ActionModelCodable_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA07DF221A94025007A6322 /* ActionModelCodable_Tests.swift */; };
 		ADA07DFE21A94737007A6322 /* MockModel2.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA07DFC21A9464C007A6322 /* MockModel2.swift */; };
+		ADA36A4322E717140064BB58 /* MockWebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA36A4222E717140064BB58 /* MockWebSocket.swift */; };
+		ADA36A4622E717B70064BB58 /* WebSocketEvent_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA36A4522E717B70064BB58 /* WebSocketEvent_Tests.swift */; };
 		CDC268C7232CDB5AF1386116 /* Pods_BlockV_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DE93FD598C0B61200B996A4 /* Pods_BlockV_Example.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		D519A84B205E83AB006B0D19 /* VatomDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D519A84A205E83AB006B0D19 /* VatomDetailTableViewController.swift */; };
 		D530759C21119E2A00DE7FD0 /* MockModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5307588211199C200DE7FD0 /* MockModel.swift */; };
@@ -44,11 +47,12 @@
 		D55B21F52056745700B6D5C2 /* UIViewController+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B21F42056745700B6D5C2 /* UIViewController+Ext.swift */; };
 		D55B21F92056DE6D00B6D5C2 /* UIColor+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B21F82056DE6D00B6D5C2 /* UIColor+Ext.swift */; };
 		D55B21FB2056E04B00B6D5C2 /* InventoryCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B21FA2056E04B00B6D5C2 /* InventoryCollectionViewController.swift */; };
-		D5728D5C206131980041F4F7 /* TransferActionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5728D5B206131980041F4F7 /* TransferActionViewController.swift */; };
 		D5728D5E206155600041F4F7 /* ActionListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5728D5D206155600041F4F7 /* ActionListTableViewController.swift */; };
 		D597FF272051305A009B2910 /* UIAlertController+Etx.swift in Sources */ = {isa = PBXBuildFile; fileRef = D597FF262051305A009B2910 /* UIAlertController+Etx.swift */; };
 		D59C7DDD206CE1D000FCE1DD /* Actions.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D59C7DDC206CE1D000FCE1DD /* Actions.storyboard */; };
 		D5E3AC9F2049883900CFFEEA /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E3AC9E2049883800CFFEEA /* LoginViewController.swift */; };
+		D9BEC41D22E0C48C0068F280 /* AddressModelCodable_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9BEC41922E0BCDB0068F280 /* AddressModelCodable_Tests.swift */; };
+		D9BEC41E22E0C4A40068F280 /* MockAddressModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9BEC41B22E0BEBD0068F280 /* MockAddressModel.swift */; };
 		FE05FFA026A3E5A0C79B6E20 /* Pods_BLOCKv_Unit_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7956FE101E9335CDDC8248F3 /* Pods_BLOCKv_Unit_Tests.framework */; };
 /* End PBXBuildFile section */
 
@@ -90,6 +94,7 @@
 		AD0BCC97217A0106001836DE /* LiveVatomView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LiveVatomView.swift; sourceTree = "<group>"; };
 		AD36A59E215D1CE4009EFD55 /* CustomLoaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomLoaderView.swift; sourceTree = "<group>"; };
 		AD36A5AF215E3578009EFD55 /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = CHANGELOG.md; path = ../CHANGELOG.md; sourceTree = "<group>"; };
+		AD3B591C224CAF0600257EF3 /* OutboundActionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutboundActionViewController.swift; sourceTree = "<group>"; };
 		AD3DB52F2157FD7200E00B67 /* TappedVatomViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TappedVatomViewController.swift; sourceTree = "<group>"; };
 		AD61462A213DC83D00204E5B /* FaceSelectionProcedure_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceSelectionProcedure_Tests.swift; sourceTree = "<group>"; };
 		AD61462C213DC87100204E5B /* MockModelFaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockModelFaces.swift; sourceTree = "<group>"; };
@@ -103,6 +108,8 @@
 		ADA07DF121A94025007A6322 /* VatomModelCodable_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VatomModelCodable_Tests.swift; sourceTree = "<group>"; };
 		ADA07DF221A94025007A6322 /* ActionModelCodable_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActionModelCodable_Tests.swift; sourceTree = "<group>"; };
 		ADA07DFC21A9464C007A6322 /* MockModel2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockModel2.swift; sourceTree = "<group>"; };
+		ADA36A4222E717140064BB58 /* MockWebSocket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockWebSocket.swift; sourceTree = "<group>"; };
+		ADA36A4522E717B70064BB58 /* WebSocketEvent_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebSocketEvent_Tests.swift; sourceTree = "<group>"; };
 		B5A79A9FDD3524D3628C080E /* Pods-BlockV_Example.dev.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Example.dev.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Example/Pods-BlockV_Example.dev.xcconfig"; sourceTree = "<group>"; };
 		BC27A08D03F2D2401C48F394 /* Pods-BlockV_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockV_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-BlockV_Example/Pods-BlockV_Example.release.xcconfig"; sourceTree = "<group>"; };
 		C55D0BD7FD8ECD417C235202 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
@@ -123,11 +130,12 @@
 		D55B21F42056745700B6D5C2 /* UIViewController+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Ext.swift"; sourceTree = "<group>"; };
 		D55B21F82056DE6D00B6D5C2 /* UIColor+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Ext.swift"; sourceTree = "<group>"; };
 		D55B21FA2056E04B00B6D5C2 /* InventoryCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryCollectionViewController.swift; sourceTree = "<group>"; };
-		D5728D5B206131980041F4F7 /* TransferActionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferActionViewController.swift; sourceTree = "<group>"; };
 		D5728D5D206155600041F4F7 /* ActionListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionListTableViewController.swift; sourceTree = "<group>"; };
 		D597FF262051305A009B2910 /* UIAlertController+Etx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Etx.swift"; sourceTree = "<group>"; };
 		D59C7DDC206CE1D000FCE1DD /* Actions.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Actions.storyboard; sourceTree = "<group>"; };
 		D5E3AC9E2049883800CFFEEA /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		D9BEC41922E0BCDB0068F280 /* AddressModelCodable_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressModelCodable_Tests.swift; sourceTree = "<group>"; };
+		D9BEC41B22E0BEBD0068F280 /* MockAddressModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAddressModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -283,6 +291,7 @@
 				ADA07DF121A94025007A6322 /* VatomModelCodable_Tests.swift */,
 				ADA07DF221A94025007A6322 /* ActionModelCodable_Tests.swift */,
 				AD09ECAE222D5667003F46C0 /* ActivityModelCodable_Tests.swift */,
+				D9BEC41922E0BCDB0068F280 /* AddressModelCodable_Tests.swift */,
 			);
 			path = Codable;
 			sourceTree = "<group>";
@@ -293,8 +302,18 @@
 				AD61462C213DC87100204E5B /* MockModelFaces.swift */,
 				D5307588211199C200DE7FD0 /* MockModel.swift */,
 				ADA07DFC21A9464C007A6322 /* MockModel2.swift */,
+				D9BEC41B22E0BEBD0068F280 /* MockAddressModel.swift */,
 			);
 			path = Mocks;
+			sourceTree = "<group>";
+		};
+		ADA36A4422E7178F0064BB58 /* Web Socket */ = {
+			isa = PBXGroup;
+			children = (
+				ADA36A4222E717140064BB58 /* MockWebSocket.swift */,
+				ADA36A4522E717B70064BB58 /* WebSocketEvent_Tests.swift */,
+			);
+			path = "Web Socket";
 			sourceTree = "<group>";
 		};
 		D519A849205E8360006B0D19 /* Inventory */ = {
@@ -331,6 +350,7 @@
 		D53075A02111DBD600DE7FD0 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				ADA36A4422E7178F0064BB58 /* Web Socket */,
 				ADA07DEF21A94025007A6322 /* Codable */,
 				D53075A32112E9E000DE7FD0 /* FaceModel_Tests.swift */,
 				AD0BCC912178828A001836DE /* VatomModelUpdate_Tests.swift */,
@@ -341,8 +361,8 @@
 		D5728D5A206130E40041F4F7 /* Actions */ = {
 			isa = PBXGroup;
 			children = (
+				AD3B591C224CAF0600257EF3 /* OutboundActionViewController.swift */,
 				D5728D5D206155600041F4F7 /* ActionListTableViewController.swift */,
-				D5728D5B206131980041F4F7 /* TransferActionViewController.swift */,
 			);
 			path = Actions;
 			sourceTree = "<group>";
@@ -453,12 +473,12 @@
 					607FACCF1AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
 						DevelopmentTeam = WA2R22UJPX;
-						LastSwiftMigration = 1010;
+						LastSwiftMigration = 1020;
 						ProvisioningStyle = Automatic;
 					};
 					D530759021119E0E00DE7FD0 = {
 						CreatedOnToolsVersion = 9.4.1;
-						LastSwiftMigration = 1010;
+						LastSwiftMigration = 1020;
 						ProvisioningStyle = Automatic;
 						TestTargetID = 607FACCF1AFB9204008FA782;
 					};
@@ -469,6 +489,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -556,6 +577,7 @@
 				"${BUILT_PRODUCTS_DIR}/JWTDecode/JWTDecode.framework",
 				"${BUILT_PRODUCTS_DIR}/NVActivityIndicatorView/NVActivityIndicatorView.framework",
 				"${BUILT_PRODUCTS_DIR}/Nuke/Nuke.framework",
+				"${BUILT_PRODUCTS_DIR}/PromiseKit/PromiseKit.framework",
 				"${BUILT_PRODUCTS_DIR}/Signals/Signals.framework",
 				"${BUILT_PRODUCTS_DIR}/Starscream/Starscream.framework",
 				"${BUILT_PRODUCTS_DIR}/VatomFace3D/VatomFace3D.framework",
@@ -569,6 +591,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/JWTDecode.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/NVActivityIndicatorView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Nuke.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PromiseKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Signals.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Starscream.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VatomFace3D.framework",
@@ -600,6 +623,7 @@
 			files = (
 				AD0BCC98217A0106001836DE /* LiveVatomView.swift in Sources */,
 				D5475764205D124100E6FE90 /* UIView+Ext.swift in Sources */,
+				AD3B591D224CAF0600257EF3 /* OutboundActionViewController.swift in Sources */,
 				AD920A5C215FB47200CEFC1D /* PasswordTableViewController.swift in Sources */,
 				D547576B205E67AD00E6FE90 /* VatomCell.swift in Sources */,
 				D519A84B205E83AB006B0D19 /* VatomDetailTableViewController.swift in Sources */,
@@ -620,7 +644,6 @@
 				D55B21EA2052E38000B6D5C2 /* RoundedImageView.swift in Sources */,
 				D5728D5E206155600041F4F7 /* ActionListTableViewController.swift in Sources */,
 				AD36A59F215D1CE4009EFD55 /* CustomLoaderView.swift in Sources */,
-				D5728D5C206131980041F4F7 /* TransferActionViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -633,14 +656,18 @@
 				AD61462F213DC88B00204E5B /* MockModelFaces.swift in Sources */,
 				ADA07DF621A94061007A6322 /* BVError_Tests.swift in Sources */,
 				ADA07DF821A94068007A6322 /* FaceModelCodable_Tests.swift in Sources */,
+				ADA36A4622E717B70064BB58 /* WebSocketEvent_Tests.swift in Sources */,
+				D9BEC41D22E0C48C0068F280 /* AddressModelCodable_Tests.swift in Sources */,
 				AD61462E213DC88700204E5B /* FaceSelectionProcedure_Tests.swift in Sources */,
 				D53075A42112E9E000DE7FD0 /* FaceModel_Tests.swift in Sources */,
+				D9BEC41E22E0C4A40068F280 /* MockAddressModel.swift in Sources */,
 				ADA07DF721A94061007A6322 /* KeyPath_Tests.swift in Sources */,
 				AD0BCC922178828A001836DE /* VatomModelUpdate_Tests.swift in Sources */,
 				ADA07DFA21A94068007A6322 /* ActionModelCodable_Tests.swift in Sources */,
 				AD09ECAF222D5667003F46C0 /* ActivityModelCodable_Tests.swift in Sources */,
 				D530759C21119E2A00DE7FD0 /* MockModel.swift in Sources */,
 				ADA07DF921A94068007A6322 /* VatomModelCodable_Tests.swift in Sources */,
+				ADA36A4322E717140064BB58 /* MockWebSocket.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -726,7 +753,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -774,7 +801,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Dev;
@@ -791,14 +818,14 @@
 				DEVELOPMENT_TEAM = WA2R22UJPX;
 				ENVIRONMENT_MAPPING = dev_env;
 				INFOPLIST_FILE = BlockV/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -D DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.blockv.sdk.sample.${CONFIGURATION}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -815,13 +842,13 @@
 				DEVELOPMENT_TEAM = WA2R22UJPX;
 				ENVIRONMENT_MAPPING = dev_env;
 				INFOPLIST_FILE = BlockV/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.blockv.sdk.sample.${CONFIGURATION}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Dev;
@@ -847,7 +874,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "io.blockv.BLOCKv-Unit-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BlockV_Example.app/BlockV_Example";
 			};
@@ -909,7 +936,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BlockV_Example.app/BlockV_Example";
 				VALIDATE_PRODUCT = YES;
@@ -972,7 +999,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BlockV_Example.app/BlockV_Example";
 				VALIDATE_PRODUCT = YES;
@@ -1023,7 +1050,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Prod;
@@ -1040,13 +1067,13 @@
 				DEVELOPMENT_TEAM = WA2R22UJPX;
 				ENVIRONMENT_MAPPING = prod_env;
 				INFOPLIST_FILE = BlockV/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.blockv.sdk.sample.${CONFIGURATION}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Prod;

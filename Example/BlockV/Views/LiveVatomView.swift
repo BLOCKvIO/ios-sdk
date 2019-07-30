@@ -36,8 +36,8 @@ class LiveVatomView: VatomView {
         commonInit()
     }
 
-    override init(vatom: VatomModel, procedure: @escaping FaceSelectionProcedure) {
-        super.init(vatom: vatom, procedure: procedure)
+    override init(vatom: VatomModel, procedure: @escaping FaceSelectionProcedure, delegate: VatomViewDelegate? = nil) {
+        super.init(vatom: vatom, procedure: procedure, delegate: delegate)
         commonInit()
     }
 
@@ -77,16 +77,18 @@ class LiveVatomView: VatomView {
         guard let vatomID = self.vatom?.id else { return }
         
         // fetch vatom model from remote
-        BLOCKv.getVatoms(withIDs: [vatomID], completion: { (vatomModels, error) in
+        BLOCKv.getVatoms(withIDs: [vatomID], completion: { result in
             
-            // ensure no error
-            guard error == nil, let vatom = vatomModels.first else {
+            switch result {
+            case .success(let vatomModels):
+                guard let vatom = vatomModels.first else { return }
+                // update vatom view using the new state of the vatom
+                self.update(usingVatom: vatom)
+                
+            case .failure:
                 print(">>> Viewer: Unable to fetch vAtom.")
                 return
             }
-            
-            // update vatom view using the new state of the vatom
-            self.update(usingVatom: vatom)
             
         })
         

@@ -86,10 +86,10 @@ class ImageProgressFaceView: FaceView {
             self.direction      ?= faceConfig["direction"]?.stringValue
             self.showPercentage ?= faceConfig["show_percentage"]?.boolValue
 
-            if let paddingEnd = faceConfig["padding_end"]?.floatValue {
+            if let paddingEnd = faceConfig["padding_end"]?.doubleValue {
                 self.paddingEnd ?= Double(paddingEnd)
             }
-            if let paddingStart = faceConfig["padding_start"]?.floatValue {
+            if let paddingStart = faceConfig["padding_start"]?.doubleValue {
                 self.paddingStart = Double(paddingStart)
             }
         }

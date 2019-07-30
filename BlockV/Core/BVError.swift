@@ -23,9 +23,9 @@ import Foundation
 /// NB: The BLOCKv platform is in the process of unifying error codes.
 /// BVError is subject to change in future releases.
 public enum BVError: Error {
-
+    
     // MARK: Cases
-
+    
     /// Models a native swift model decoding error.
     case modelDecoding(reason: String)
     /// Models a BLOCKv platform error.
@@ -39,118 +39,122 @@ public enum BVError: Error {
     /// Models a custom error. This should be used in very limited circumstances.
     /// A more defined error is preferred.
     case custom(reason: String)
-
+    
     // MARK: Reasons
-
+    
     public enum SessionErrorReason: Equatable {
-        case invalidAuthoriationCode
+        case invalidAuthorizationCode
         case nonMatchingStates
-        
     }
-
+    
     /// Platform error. Associated values: `code` and `message`.
     public enum PlatformErrorReason: Equatable {
-
+        
+        //TODO: Remove. Temporary until all error responses return a code key-value pair.
+        case unknownWithMissingCode(Int, String)
         case unknownAppId(Int, String)
+        case unhandledAction(Int, String)
         case internalServerIssue(Int, String)
-        //
-        case tokenExpired(Int, String)
+        case unauthorized(Int, String)
+        case tokenExists(Int, String)
+        case rateLimited(Int, String)
+        case invalidAppKey(Int, String)
         case invalidPayload(Int, String)
         case tokenUnavailable(Int, String)
         case invalidDateFormat(Int, String)
-        //
         case malformedRequestBody(Int, String)
-        case invalidDataValidation(Int, String)
-        //
-        case vatomNotFound(Int, String)
-        //
-        case unknownUserToken(Int, String)
-        case authenticationFailed(Int, String)
+        case passwordRequired(Int, String)
         case invalidToken(Int, String)
+        case invalidFormData(Int, String)
+        case usernameNotFound(Int, String)
+        case unverifiedAccount(Int, String)
+        case vatomNotOwned(Int, String)
+        case maxSharesReached(Int, String)
+        case redemptionError(Int, String)
+        case recipientLimit(Int, String)
+        case vatomNotFound(Int, String)
+        case unknownUserToken(Int, String)
+        case insufficientPermission(Int, String)
+        case authenticationFailed(Int, String)
         case avatarUploadFailed(Int, String)
-        case userRefreshTokenInvalid(Int, String)
-        case authenticationLimit(Int, String)
-        //
-        case unknownTokenType(Int, String)
         case unknownTokenId(Int, String)
-        case tokenNotFound(Int, String)
         case cannotDeletePrimaryToken(Int, String)
-        case unableToRetrieveToken(Int, String)
         case tokenAlreadyConfirmed(Int, String)
         case invalidVerificationCode(Int, String)
+        case unknownTokenType(Int, String)
         case invalidPhoneNumber(Int, String)
         case invalidEmailAddress(Int, String)
-        //TODO: Remove. Temporary until all error responses return a code key-value pair.
-        case unknownWithMissingCode(Int, String)
-        case unknown(Int, String) //TODO: Remove. All errors should be mapped.
-
+        
+        case unknown(Int, String)
+        
         /// Init using a BLOCKv platform error code and message.
         init(code: Int, message: String) {
             switch code {
-            case -1:  self = .unknownWithMissingCode(code, message)
-            // App Id is unacceptable.
-            case 2:   self = .unknownAppId(code, message)
-            // Server encountered an error processing the request.
-            case 11:  self = .internalServerIssue(code, message)
-            // App Id is unacceptable.
-            case 17:  self = .unknownAppId(code, message)
-            // Request paylaod is invalid.
-            case 516: self = .invalidPayload(code, message)
-            // Request paylaod is invalid.
-            case 517: self = .invalidPayload(code, message)
-            // User token (phone, email) is already taken.
-            case 521: self = .tokenUnavailable(code, message)
-            // Date format is invalid (e.g. invalid birthday in update user call).
-            case 527: self = .invalidDateFormat(code, message)
-            // Invalid request payload on an action.
+            case -1:   self = .unknownWithMissingCode(code, message)
+            case 2:    self = .unknownAppId(code, message)
+            case 13:   self = .unhandledAction(code, message)
+            case 11:   self = .internalServerIssue(code, message)
+                
+            case 401:  self = .unauthorized(code, message)
+            case 409:  self = .tokenExists(code, message)
+            case 429:  self = .rateLimited(code, message)
+                
+            case 513:  self = .invalidAppKey(code, message)
+            case 516:  self = .invalidPayload(code, message)
+            case 517:  self = .invalidPayload(code, message)
+            case 521:  self = .tokenUnavailable(code, message)
+            case 527:  self = .invalidDateFormat(code, message)
+                
+            case 1001: self = .unauthorized(code, message)
             case 1004: self = .malformedRequestBody(code, message)
-            // vAtom is unrecognized by the platform.
+            case 1006: self = .passwordRequired(code, message)
+            case 1007: self = .invalidPhoneNumber(code, message)
+            case 1008: self = .invalidToken(code, message)
+            case 1010: self = .tokenAlreadyConfirmed(code, message)
+            case 1012: self = .invalidFormData(code, message)
+            case 1014: self = .usernameNotFound(code, message)
+            case 1015: self = .unverifiedAccount(code, message)
+                
+            case 1604: self = .vatomNotOwned(code, message)
+            case 1627: self = .maxSharesReached(code, message)
+            case 1630: self = .redemptionError(code, message)
+            case 1632: self = .redemptionError(code, message)
+            case 1654: self = .recipientLimit(code, message)
+                
             case 1701: self = .vatomNotFound(code, message)
-            // User token (phone, email, id) is unrecognized by the platfrom.
+            case 1702: self = .unknownUserToken(code, message)
+            case 1703: self = .unknownUserToken(code, message)
+            case 1705: self = .unknownUserToken(code, message)
+            case 1708: self = .insufficientPermission(code, message)
+                
             case 2030: self = .unknownUserToken(code, message)
-            // Login phone/email wrong. password
             case 2032: self = .authenticationFailed(code, message)
-            // Uploading the avatar data. failed.
             case 2037: self = .avatarUploadFailed(code, message)
-            // Refresh token is not on the whitelist, or the token has expired.
-            case 2049: self = .userRefreshTokenInvalid(code, message)
-            // Too many login requests.
-            case 2051: self = .authenticationLimit(code, message)
-            //???
-            case 2552: self = .unableToRetrieveToken(code, message)
-            // Token id does not map to a token.
             case 2553: self = .unknownTokenId(code, message)
-            // Primary token cannot be deleted.
             case 2562: self = .cannotDeletePrimaryToken(code, message)
-            // Attempting to verfiy an already verified token.
             case 2566: self = .tokenAlreadyConfirmed(code, message)
-            // Invalid verification code used when attempting to verify an account.
             case 2567: self = .invalidVerificationCode(code, message)
-            // Unrecognized token type (only `phone` and `email` are currently accepted).
             case 2569: self = .unknownTokenType(code, message)
-            // Invalid email address.
             case 2571: self = .invalidEmailAddress(code, message)
-            // Invalid phone number.
             case 2572: self = .invalidPhoneNumber(code, message)
+                
             default:
-                // useful for debugging
-                //assertionFailure("Unhandled error: \(code) \(message)")
                 self = .unknown(code, message)
             }
         }
-
+        
     }
-
+    
     ///
     public enum WebSocketErrorReason: Equatable {
         case connectionFailed
         case connectionDisconnected
     }
-
+    
 }
 
 extension BVError: Equatable {
-
+    
     public static func == (lhs: BVError, rhs: BVError) -> Bool {
         switch (lhs, rhs) {
         case (let .modelDecoding(lhsReason), let .modelDecoding(rhsReason)):
@@ -167,34 +171,34 @@ extension BVError: Equatable {
             return false
         }
     }
-
+    
     /*
      # Example Usage
-
+     
      ## Option 1
-
+     
      if case let BVError.platform(reason) = error, case .unknownAppId = reason {
-         print("App Id Error")
+     print("App Id Error")
      }
-
+     
      ## Option 2
      
      if case let BVError.platform(reason) = error {
-         if case .unknownAppId(_, _) = reason {
-             print("App Id Error")
-         }
+     if case .unknownAppId(_, _) = reason {
+     print("App Id Error")
      }
-
+     }
+     
      ## Option 3
-
+     
      switch error {
      case .platform(reason: .unknownAppId(_, _)):
-         print("App Id Error")
+     print("App Id Error")
      default:
-         return
+     return
      }
      */
-
+    
 }
 
 extension BVError: LocalizedError {
@@ -230,40 +234,48 @@ extension BVError.WebSocketErrorReason {
 extension BVError.PlatformErrorReason {
     var localizedDescription: String {
         switch self {
-
-        //TODO: Is there a better way to do this with pattern matching?
+            
         case let .unknownWithMissingCode(_, message):
             return "Unrecogonized: BLOCKv Platform Error: (Missing Code) - Message: \(message)"
         case let .unknown(code, message):
             return "Unrecogonized: BLOCKv Platform Error: (\(code)) - Message: \(message)"
-
-        case let .malformedRequestBody(code, message),
-             let .invalidDataValidation(code, message),
-             let .vatomNotFound(code, message),
-             let .avatarUploadFailed(code, message),
-             let .unableToRetrieveToken(code, message),
+            
+        case let .unknownWithMissingCode(code, message),
+             let .unknownAppId(code, message),
+             let .unhandledAction(code, message),
+             let .internalServerIssue(code, message),
+             let .unauthorized(code, message),
+             let .tokenExists(code, message),
+             let .rateLimited(code, message),
+             let .invalidAppKey(code, message),
+             let .invalidPayload(code, message),
              let .tokenUnavailable(code, message),
-             let .authenticationLimit(code, message),
+             let .invalidDateFormat(code, message),
+             let .malformedRequestBody(code, message),
+             let .passwordRequired(code, message),
+             let .invalidToken(code, message),
+             let .invalidFormData(code, message),
+             let .usernameNotFound(code, message),
+             let .unverifiedAccount(code, message),
+             let .vatomNotOwned(code, message),
+             let .maxSharesReached(code, message),
+             let .redemptionError(code, message),
+             let .recipientLimit(code, message),
+             let .vatomNotFound(code, message),
+             let .unknownUserToken(code, message),
+             let .insufficientPermission(code, message),
+             let .authenticationFailed(code, message),
+             let .avatarUploadFailed(code, message),
+             let .unknownTokenId(code, message),
+             let .cannotDeletePrimaryToken(code, message),
              let .tokenAlreadyConfirmed(code, message),
              let .invalidVerificationCode(code, message),
-             let .invalidPhoneNumber(code, message),
-             let .invalidEmailAddress(code, message),
-             let .invalidPayload(code, message),
-             let .invalidDateFormat(code, message),
-             let .userRefreshTokenInvalid(code, message),
-             let .tokenNotFound(code, message),
-             let .cannotDeletePrimaryToken(code, message),
-             let .unknownAppId(code, message),
-             let .internalServerIssue(code, message),
-             let .tokenExpired(code, message),
-             let .unknownUserToken(code, message),
-             let .authenticationFailed(code, message),
-             let .invalidToken(code, message),
              let .unknownTokenType(code, message),
-             let .unknownTokenId(code, message):
+             let .invalidPhoneNumber(code, message),
+             let .invalidEmailAddress(code, message):
             return "BLOCKv Platform Error: (\(code)) Message: \(message)"
-
+            
         }
     }
-
+    
 }

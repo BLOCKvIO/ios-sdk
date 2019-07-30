@@ -18,7 +18,7 @@ public enum RegionEvent: String {
     case updated = "region.updated"
 
     /// Triggered when an object is added.
-    case objectAdded = "region.object.addded"
+    case objectAdded = "region.object.added"
 
     /// Triggered when an object is removed.
     case objectRemoved = "region.object.removed"

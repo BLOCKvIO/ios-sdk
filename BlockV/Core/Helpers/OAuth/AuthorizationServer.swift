@@ -108,7 +108,7 @@ public final class AuthorizationServer {
     func getToken(completion: @escaping (Result<OAuthTokenExchangeModel, BVError>) -> Void) {
         // sanity checks
         guard let code = receivedCode else {
-            let error = BVError.session(reason: .invalidAuthoriationCode)
+            let error = BVError.session(reason: .invalidAuthorizationCode)
             completion(.failure(error))
             return
         }

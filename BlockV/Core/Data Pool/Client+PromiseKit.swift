@@ -53,5 +53,21 @@ internal extension Client {
         }
 
     }
+    
+    func request<T: Decodable>(_ endpoint: Endpoint<T>) -> Promise<T>  {
+        
+        return Promise { seal in
+            // convert result type into promise
+            self.request(endpoint) { result in
+                switch result {
+                case .success(let model):
+                    seal.fulfill(model)
+                case .failure(let error):
+                    seal.reject(error)
+                }
+            }
+        }
+        
+    }
 
 }

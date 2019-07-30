@@ -12,6 +12,8 @@
 import Foundation
 import GenericJSON
 
+//swiftlint:disable identifier_name
+
 protocol Descriptable {
     init(from descriptor: [String: Any]) throws
 }
@@ -25,6 +27,7 @@ extension VatomModel: Descriptable {
             let _version        = descriptor["version"] as? String,
             let _whenCreated    = descriptor["when_created"] as? String,
             let _whenModified   = descriptor["when_modified"] as? String,
+            let _sync           = descriptor["sync"] as? UInt,
             let _private        = descriptor["private"] as? [String: Any],
             let _rootDescriptor = descriptor["vAtom::vAtomType"] as? [String: Any]
 
@@ -34,6 +37,7 @@ extension VatomModel: Descriptable {
         self.version = _version
         self.whenCreated = DateFormatter.blockvDateFormatter.date(from: _whenCreated)! //FIXME: force
         self.whenModified = DateFormatter.blockvDateFormatter.date(from: _whenModified)! //FIXME: force
+        self.sync = _sync
         self.private = try? JSON.init(_private)
         self.props = try RootProperties(from: _rootDescriptor)
 
@@ -55,7 +59,7 @@ extension RootProperties: Descriptable {
 
         guard
             let _author                 = descriptor["author"] as? String,
-            let _rootType               = descriptor["category"] as? String,
+            let _rootType               = descriptor["root_type"] as? String,
             let _templateID             = descriptor["template"] as? String,
             let _templateVariationID    = descriptor["template_variation"] as? String,
             let _publisherFQDN          = descriptor["publisher_fqdn"] as? String,

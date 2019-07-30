@@ -37,11 +37,6 @@ public class DiscoverQueryBuilder {
 
     // - Public
 
-    /*
-     Page and limit are not yet documented by the backend.
-     They will be added in a later release.
-     */
-
     /// The page to return.
     ///
     /// Note: This property should only be use in conjunction with a non-zero `limit`
@@ -53,7 +48,7 @@ public class DiscoverQueryBuilder {
     /// "page": 1,
     /// "limit" : 10
     /// ```
-//    public var page: Int = 0
+    public var page: Int = 0
 
     /// Limits the number of vAtoms returned in the response.
     ///
@@ -61,7 +56,7 @@ public class DiscoverQueryBuilder {
     ///
     /// Note that the API will return a maximum of 1000 vAtoms. The `page`
     /// property should be used to traverse the colleciton further.
-//    public var limit: Int = 0
+    public var limit: Int = 0
 
     // - Private
 
@@ -173,6 +168,8 @@ extension DiscoverQueryBuilder: DictionaryCodable {
             payload["filters"] = [["filter_elems": filterElems]] // filters is an array, the first element is
         }
         payload["return"] = self.resultStructure
+        payload["limit"] = self.limit
+        payload["page"] = self.page
 
         return payload
 

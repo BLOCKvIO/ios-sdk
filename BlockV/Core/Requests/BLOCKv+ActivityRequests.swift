@@ -25,23 +25,23 @@ extension BLOCKv {
     ///                 This handler is executed on the main queue.
     public static func getActivityThreads(cursor: String = "",
                                           count: Int = 0,
-                                          completion: @escaping (ThreadListModel?, Error?) -> Void) {
+                                          completion: @escaping (Result<ThreadListModel, BVError>) -> Void) {
 
         let endpoint = API.UserActivity.getThreads(cursor: cursor, count: count)
 
-        self.client.request(endpoint) { (baseModel, error) in
+        self.client.request(endpoint) { result in
 
-            // extract model, ensure no error
-            guard let threadListModel = baseModel?.payload, error == nil else {
+            switch result {
+            case .success(let baseModel):
+                // model is available
                 DispatchQueue.main.async {
-                    completion(nil, error)
+                    completion(.success(baseModel.payload))
                 }
-                return
-            }
-
-            // model is available
-            DispatchQueue.main.async {
-                completion(threadListModel, nil)
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
             }
 
         }
@@ -61,23 +61,23 @@ extension BLOCKv {
     public static func getActivityMessages(forThreadId threadId: String,
                                            cursor: String = "",
                                            count: Int = 0,
-                                           completion: @escaping (MessageListModel?, Error?) -> Void) {
+                                           completion: @escaping (Result<MessageListModel, BVError>) -> Void) {
 
         let endpoint = API.UserActivity.getMessages(forThreadId: threadId, cursor: cursor, count: count)
 
-        self.client.request(endpoint) { (baseModel, error) in
+        self.client.request(endpoint) { result in
 
-            // extract model, ensure no error
-            guard let messageListModel = baseModel?.payload, error == nil else {
+            switch result {
+            case .success(let baseModel):
+                // model is available
                 DispatchQueue.main.async {
-                    completion(nil, error)
+                    completion(.success(baseModel.payload))
                 }
-                return
-            }
-
-            // model is available
-            DispatchQueue.main.async {
-                completion(messageListModel, nil)
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
             }
 
         }
@@ -96,18 +96,19 @@ extension BLOCKv {
 
         let endpoint = API.CurrentUser.sendMessage(message, toUserId: userId)
 
-        self.client.request(endpoint) { (baseModel, error) in
+        self.client.request(endpoint) { result in
 
-            guard baseModel?.payload != nil, error == nil else {
+            switch result {
+            case .success:
+                // model is available
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
+            case .failure(let error):
+                // handle error
                 DispatchQueue.main.async {
                     completion(error)
                 }
-                return
-            }
-
-            // call was successful
-            DispatchQueue.main.async {
-                completion(nil)
             }
 
         }

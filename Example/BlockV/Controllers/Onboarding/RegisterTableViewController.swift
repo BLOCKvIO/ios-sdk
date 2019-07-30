@@ -165,23 +165,22 @@ class RegisterTableViewController: UITableViewController {
         }
         
         /// Register a user with multiple tokens
-        BLOCKv.register(tokens: tokens, userInfo: userInfo) {
-            [weak self] (userModel, error) in
+        BLOCKv.register(tokens: tokens, userInfo: userInfo) { [weak self] result in
             
             // hide loader
             self?.hideNavBarActivityRight()
             self?.navigationItem.setRightBarButton(self!.doneButton, animated: true)
             
-            // handle error
-            guard let model = userModel, error == nil else {
-                print(">>> Error > Viewer: \(error!.localizedDescription)")
-                self?.present(UIAlertController.errorAlert(error!), animated: true)
+            switch result {
+            case .success(let userModel):
+                print("Viewer > \(userModel)\n")
+                self?.performSegue(withIdentifier: "seg.register.done", sender: self)
+                
+            case .failure(let error):
+                print(">>> Error > Viewer: \(error.localizedDescription)")
+                self?.present(UIAlertController.errorAlert(error), animated: true)
                 return
             }
-            
-            // handle success
-            print("Viewer > \(model)\n")
-            self?.performSegue(withIdentifier: "seg.register.done", sender: self)
             
         }
         

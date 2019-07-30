@@ -105,27 +105,28 @@ class TappedVatomViewController: UIViewController {
         print(#function)
 
         // refresh the vatom
-        BLOCKv.getVatoms(withIDs: [vatom!.id]) { [weak self] (responseVatom, error) in
-
-            // handle error
-            guard error == nil else {
-                print("\n>>> Error > Viewer: \(error!.localizedDescription)")
-                self?.present(UIAlertController.errorAlert(error!), animated: true)
+        BLOCKv.getVatoms(withIDs: [vatom!.id]) { [weak self] result in
+            
+            switch result {
+            case .success(let responseVatoms):
+                // ensure a vatom was returned
+                guard let responseVatom = responseVatoms.first else {
+                    print("\n>>> Error > Viewer: No vAtom found")
+                    return
+                }
+                
+                self?.vatom = responseVatom
+                
+                // update the vatom view
+                self?.vatomViewA.update(usingVatom: responseVatom)
+                self?.vatomViewB.update(usingVatom: responseVatom)
+                self?.vatomViewC.update(usingVatom: responseVatom)
+                
+            case .failure(let error):
+                print("\n>>> Error > Viewer: \(error.localizedDescription)")
+                self?.present(UIAlertController.errorAlert(error), animated: true)
                 return
             }
-
-            // ensure a vatom was returned
-            guard let responseVatom = responseVatom.first else {
-                print("\n>>> Error > Viewer: No vAtom found")
-                return
-            }
-            
-            self?.vatom = responseVatom
-            
-            // update the vatom view
-            self?.vatomViewA.update(usingVatom: responseVatom)
-            self?.vatomViewB.update(usingVatom: responseVatom)
-            self?.vatomViewC.update(usingVatom: responseVatom)
 
         }
         
@@ -142,6 +143,11 @@ class TappedVatomViewController: UIViewController {
         if segue.identifier == "seg.vatom.detail" {
             let destination = segue.destination as! VatomDetailTableViewController
             destination.vatom = vatom
+        } else if segue.identifier == "seg.action.storyboard" {
+            let destination = segue.destination as! UINavigationController
+            let vc = destination.viewControllers[0] as! ActionListTableViewController
+            // pass vatom along
+            vc.vatom = self.vatom
         }
     }
 
@@ -150,12 +156,14 @@ class TappedVatomViewController: UIViewController {
 // MARK: - Vatom View Delegate
 
 extension TappedVatomViewController: VatomViewDelegate {
-    
+
     func vatomView(_ vatomView: VatomView,
                    didRecevieFaceMessage message: String,
-                   withObject object: [String : JSON],
-                   completion: ((JSON?, FaceMessageError?) -> Void)?) {
-        print("Message: \(message)")
+                   withObject object: [String: JSON],
+                   completion: ((Result<JSON, FaceMessageError>) -> Void)?) {
+     
+        print("Handle face message: \(message)")
+
     }
-    
+
 }

@@ -61,7 +61,10 @@ extension VatomResourceModel: Codable {
 
 extension VatomResourceModel: Hashable {
 
-    public var hashValue: Int {
-        return name.hashValue ^ type.hashValue ^ url.hashValue
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(name)
+        hasher.combine(type)
+        hasher.combine(url)
     }
+
 }

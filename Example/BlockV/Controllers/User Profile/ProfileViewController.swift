@@ -149,27 +149,28 @@ class ProfileViewController: UITableViewController {
     /// Fetches the user's profile information.
     fileprivate func fetchUserProfile() {
         
-        BLOCKv.getCurrentUser { [weak self] (userModel, error) in
+        BLOCKv.getCurrentUser { [weak self] result in
             
             // end refreshing
             self?.refreshControl?.endRefreshing()
-
-            // handle error
-            guard let model = userModel, error == nil else {
-                print(">>> Error > Viewer: \(error!.localizedDescription)\n")
-                self?.present(UIAlertController.errorAlert(error!), animated: true)
+            
+            switch result {
+            case .success(let userModel):
+                print("\nViewer > Fetched user model:\n\(userModel)")
+                self?.userModel = userModel
+                
+                // update ui
+                self?.displayNameLabel.text = self?.displayName
+                self?.userIdLabel.text = self?.userModel?.id
+                
+                self?.fetchAvatarImage()
+                
+            case .failure(let error):
+                print(">>> Error > Viewer: \(error.localizedDescription)\n")
+                self?.present(UIAlertController.errorAlert(error), animated: true)
                 return
             }
             
-            // handle success
-            print("\nViewer > Fetched user model:\n\(model)")
-            self?.userModel = model
-            
-            // update ui
-            self?.displayNameLabel.text = self?.displayName
-            self?.userIdLabel.text = self?.userModel?.id
-            
-            self?.fetchAvatarImage()
         }
         
     }

@@ -11,43 +11,44 @@
 
 import XCTest
 @testable import BLOCKv
+import GenericJSON
 
 class VatomModelUpdate_Tests: XCTestCase {
-    
+
     // MARK: - Properties
-    
+
     var vatomCurrent: VatomModel!
-    
+
     // MARK: - Lifecycle
-    
+
     override func setUp() {
         do {
             vatomCurrent = try self.require(
                 try? TestUtility.jsonDecoder.decode(VatomModel.self, from: MockModel.VatomModel.stateUpdateVatom)
             )
-        }  catch {
+        } catch {
             XCTFail(error.localizedDescription)
         }
     }
-    
+
     override func tearDown() {
         // clean up
         self.vatomCurrent = nil
     }
-    
+
     // MARK: - Tests
-    
+
     /// Tests the `update(applying:)` method on `VatomModel`.
     ///
     /// Specifically tests the root properties.
     func testRootPropertyUpdate() {
-        
+
         // assert before state
         XCTAssertEqual(vatomCurrent.whenModified, DateFormatter.blockvDateFormatter.date(from: "2018-10-15T21:11:25Z"))
         XCTAssertFalse(vatomCurrent.isUnpublished)
         XCTAssertEqual(vatomCurrent.props.parentID, ".")
         XCTAssertEqual(vatomCurrent.props.owner, "21c527fb-8a8b-485b-b549-61b3857easdf")
-        XCTAssertEqual(vatomCurrent.props.notifyMessage , "")
+        XCTAssertEqual(vatomCurrent.props.notifyMessage, "")
         XCTAssertTrue(vatomCurrent.props.isTransferable)
         XCTAssertTrue(vatomCurrent.props.isTradeable)
         XCTAssertTrue(vatomCurrent.props.isDropped)
@@ -61,7 +62,7 @@ class VatomModelUpdate_Tests: XCTestCase {
         XCTAssertEqual(vatomCurrent.props.cloningScore, 0.5)
         XCTAssertEqual(vatomCurrent.props.isInContract, false)
         XCTAssertEqual(vatomCurrent.props.inContractWith, "")
-        XCTAssertEqual(vatomCurrent.props.geoPosition.coordinates, [0,0])
+        XCTAssertEqual(vatomCurrent.props.geoPosition.coordinates, [0, 0])
         XCTAssertEqual(vatomCurrent.props.visibility.type, "owner")
         XCTAssertEqual(vatomCurrent.props.commerce.pricing.pricingType, "Fixed")
         XCTAssertEqual(vatomCurrent.props.commerce.pricing.currency, "")
@@ -87,7 +88,7 @@ class VatomModelUpdate_Tests: XCTestCase {
                 "acquirable": false,
                 "redeemable": false,
                 "disabled": false,
-                "num_direct_clones" : 3,
+                "num_direct_clones": 3,
                 "tags": ["fun", "sun"],
                 "transferred_by": "BEA77DEB-CDE4-4921-9CD9-5D3B2336BFFD",
                 "cloned_from": "0D1453DE-9495-4ADA-8BFF-A77CEEC3F5A4",
@@ -128,22 +129,22 @@ class VatomModelUpdate_Tests: XCTestCase {
             ],
             "eth": [
                 "wallet": [
-                    "address" : "76FA18D7-0426-4335-9ADE-A59DF3C75613"
+                    "address": "76FA18D7-0426-4335-9ADE-A59DF3C75613"
                 ]
             ]
         ]
-        
+
         // create fake state update event
         let stateUpdate = WSStateUpdateEvent(eventId: "1",
                                              operation: "mock",
                                              vatomId: "49d9229d-a380-40ac-9c22-asdf9664bd63",
                                              vatomProperties: newProperties,
                                              timestamp: Date())
-        
+
         do {
             // ensure the update did not return nil
             let vatomUpdated = try self.require(vatomCurrent.updated(applying: stateUpdate))
-            
+
             // assert after state
             XCTAssertEqual(vatomUpdated.whenModified,
                            DateFormatter.blockvDateFormatter.date(from: "2019-10-15T21:11:25Z"))
@@ -167,25 +168,25 @@ class VatomModelUpdate_Tests: XCTestCase {
             // FIXME: A convertion error is occurring moving from float to double.
             //XCTAssertEqual(vatomUpdated.props.geoPosition.coordinates, [18.68768, -33.824017])
             XCTAssertEqual(vatomUpdated.props.visibility.type, "public")
-            
+
             XCTAssertEqual(vatomUpdated.props.commerce.pricing.pricingType, "Fixed")
             XCTAssertEqual(vatomUpdated.props.commerce.pricing.currency, "ZAR")
             XCTAssertEqual(vatomUpdated.props.commerce.pricing.price, "1.00")
             XCTAssertEqual(vatomUpdated.props.commerce.pricing.validFrom, "2019-10-15T21:11:25Z")
             XCTAssertEqual(vatomUpdated.props.commerce.pricing.validThrough, "2019-19-15T21:11:25Z")
             XCTAssertEqual(vatomUpdated.props.commerce.pricing.isVatIncluded, true)
-           
+
             let privateSection = try self.require(vatomUpdated.private)
             XCTAssertEqual(privateSection["array"], [4, 5, 6])
             XCTAssertEqual(vatomUpdated.eos?["network"], "testnet")
             XCTAssertEqual(vatomUpdated.eos?["fields"]?["lighton"]?["value"], true) // ensure value change
-            
+
             //TODO: Find out if ETH section may be updated after
 
-        }  catch {
+        } catch {
             XCTFail(error.localizedDescription)
         }
-        
+
     }
-    
+
 }

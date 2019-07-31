@@ -14,6 +14,7 @@
 		AD09ECAF222D5667003F46C0 /* ActivityModelCodable_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD09ECAE222D5667003F46C0 /* ActivityModelCodable_Tests.swift */; };
 		AD0BCC922178828A001836DE /* VatomModelUpdate_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD0BCC912178828A001836DE /* VatomModelUpdate_Tests.swift */; };
 		AD0BCC98217A0106001836DE /* LiveVatomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD0BCC97217A0106001836DE /* LiveVatomView.swift */; };
+		AD2F91C522F1AFB700B444AB /* ActivityModel_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD2F91C422F1AFB700B444AB /* ActivityModel_Tests.swift */; };
 		AD36A59F215D1CE4009EFD55 /* CustomLoaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD36A59E215D1CE4009EFD55 /* CustomLoaderView.swift */; };
 		AD36A5B0215E3578009EFD55 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = AD36A5AF215E3578009EFD55 /* CHANGELOG.md */; };
 		AD3B591D224CAF0600257EF3 /* OutboundActionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD3B591C224CAF0600257EF3 /* OutboundActionViewController.swift */; };
@@ -92,6 +93,7 @@
 		AD09ECAE222D5667003F46C0 /* ActivityModelCodable_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityModelCodable_Tests.swift; sourceTree = "<group>"; };
 		AD0BCC912178828A001836DE /* VatomModelUpdate_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VatomModelUpdate_Tests.swift; sourceTree = "<group>"; };
 		AD0BCC97217A0106001836DE /* LiveVatomView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LiveVatomView.swift; sourceTree = "<group>"; };
+		AD2F91C422F1AFB700B444AB /* ActivityModel_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityModel_Tests.swift; sourceTree = "<group>"; };
 		AD36A59E215D1CE4009EFD55 /* CustomLoaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomLoaderView.swift; sourceTree = "<group>"; };
 		AD36A5AF215E3578009EFD55 /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = CHANGELOG.md; path = ../CHANGELOG.md; sourceTree = "<group>"; };
 		AD3B591C224CAF0600257EF3 /* OutboundActionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutboundActionViewController.swift; sourceTree = "<group>"; };
@@ -354,6 +356,7 @@
 				ADA07DEF21A94025007A6322 /* Codable */,
 				D53075A32112E9E000DE7FD0 /* FaceModel_Tests.swift */,
 				AD0BCC912178828A001836DE /* VatomModelUpdate_Tests.swift */,
+				AD2F91C422F1AFB700B444AB /* ActivityModel_Tests.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -661,6 +664,7 @@
 				AD61462E213DC88700204E5B /* FaceSelectionProcedure_Tests.swift in Sources */,
 				D53075A42112E9E000DE7FD0 /* FaceModel_Tests.swift in Sources */,
 				D9BEC41E22E0C4A40068F280 /* MockAddressModel.swift in Sources */,
+				AD2F91C522F1AFB700B444AB /* ActivityModel_Tests.swift in Sources */,
 				ADA07DF721A94061007A6322 /* KeyPath_Tests.swift in Sources */,
 				AD0BCC922178828A001836DE /* VatomModelUpdate_Tests.swift in Sources */,
 				ADA07DFA21A94068007A6322 /* ActionModelCodable_Tests.swift in Sources */,

@@ -12,27 +12,27 @@
 import Foundation
 
 public struct AppUpdateModel: Decodable {
-    
+
     /// Latest supported app version.
     public var supportedVersion: String = "0"
-    
+
     /// Update URL.
     public var updateURL: String
-    
+
     /// Update text.
     public var updateText: String?
-    
+
     enum CodingKeys: String, CodingKey {
         case supportedVersion = "supported_version"
         case updateURL = "update_url"
         case updateText = "update_text"
     }
-    
+
     public init(from decoder: Decoder) throws {
         let items = try decoder.container(keyedBy: CodingKeys.self)
         supportedVersion = try items.decode(String.self, forKey: .supportedVersion)
         updateURL = try items.decode(String.self, forKey: .updateURL)
         updateText = try items.decodeIfPresent(String.self, forKey: .updateText)
     }
-   
+
 }

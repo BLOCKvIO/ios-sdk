@@ -56,7 +56,7 @@ extension API {
         }
 
         // MARK: Vatoms
-        
+
         /// Builds the generic endpoint to get the current user's inventory vatom's sync number.
         ///
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
@@ -66,7 +66,7 @@ extension API {
                             parameters: ["limit": limit, "nextToken": token],
                             encoding: URLEncoding.queryString)
         }
-        
+
         /// Builds the generic endpoint to get the current user's inventory sync hash.
         ///
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.

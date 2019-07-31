@@ -251,8 +251,7 @@ extension WebFaceView {
     private func routeMessageToViewer(_ message: RequestScriptMessage) {
 
         // notify the host's message delegate of the custom message from the web page
-        self.delegate?.faceView(self, didSendMessage: message.name, withObject: message.payload, completion:
-            { result in
+        self.delegate?.faceView(self, didSendMessage: message.name, withObject: message.payload, completion: { result in
                 switch result {
                 case .success(let payload):
 

@@ -121,7 +121,7 @@ extension API {
         static func getTokens() -> Endpoint<BaseModel<[FullTokenModel]>> {
             return Endpoint(path: currentUserPath + "/tokens")
         }
-        
+
         /// Builds the endpoint to get the current user's accounts.
         ///
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
@@ -267,14 +267,14 @@ extension API {
 
     /// Namespace for vatom related endpoints with a typed reponse model.
     enum Vatom {
-        
+
         /// Builds an endpoint to get the current user's inventory sync hash.
         ///
         /// - Returns: Constructed endpoint specialized to parse out a `InventoryHashModel`.
         static func getInventoryHash() -> Endpoint<BaseModel<InventoryHashModel>> {
             return API.Generic.getInventoryHash()
         }
-        
+
         /// Builds an endpoint to get the current user's inventory vatoms' sync number.
         ///
         /// - Returns: Constructed endpoint specialized to parse out a `InventorySyncModel`.

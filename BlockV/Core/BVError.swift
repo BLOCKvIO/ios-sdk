@@ -23,9 +23,9 @@ import Foundation
 /// NB: The BLOCKv platform is in the process of unifying error codes.
 /// BVError is subject to change in future releases.
 public enum BVError: Error {
-    
+
     // MARK: Cases
-    
+
     /// Models a native swift model decoding error.
     case modelDecoding(reason: String)
     /// Models a BLOCKv platform error.
@@ -39,17 +39,17 @@ public enum BVError: Error {
     /// Models a custom error. This should be used in very limited circumstances.
     /// A more defined error is preferred.
     case custom(reason: String)
-    
+
     // MARK: Reasons
-    
+
     public enum SessionErrorReason: Equatable {
         case invalidAuthorizationCode
         case nonMatchingStates
     }
-    
+
     /// Platform error. Associated values: `code` and `message`.
     public enum PlatformErrorReason: Equatable {
-        
+
         //TODO: Remove. Temporary until all error responses return a code key-value pair.
         case unknownWithMissingCode(Int, String)
         case unknownAppId(Int, String)
@@ -84,9 +84,9 @@ public enum BVError: Error {
         case unknownTokenType(Int, String)
         case invalidPhoneNumber(Int, String)
         case invalidEmailAddress(Int, String)
-        
+
         case unknown(Int, String)
-        
+
         /// Init using a BLOCKv platform error code and message.
         init(code: Int, message: String) {
             switch code {
@@ -94,17 +94,17 @@ public enum BVError: Error {
             case 2:    self = .unknownAppId(code, message)
             case 13:   self = .unhandledAction(code, message)
             case 11:   self = .internalServerIssue(code, message)
-                
+
             case 401:  self = .unauthorized(code, message)
             case 409:  self = .tokenExists(code, message)
             case 429:  self = .rateLimited(code, message)
-                
+
             case 513:  self = .invalidAppKey(code, message)
             case 516:  self = .invalidPayload(code, message)
             case 517:  self = .invalidPayload(code, message)
             case 521:  self = .tokenUnavailable(code, message)
             case 527:  self = .invalidDateFormat(code, message)
-                
+
             case 1001: self = .unauthorized(code, message)
             case 1004: self = .malformedRequestBody(code, message)
             case 1006: self = .passwordRequired(code, message)
@@ -114,19 +114,19 @@ public enum BVError: Error {
             case 1012: self = .invalidFormData(code, message)
             case 1014: self = .usernameNotFound(code, message)
             case 1015: self = .unverifiedAccount(code, message)
-                
+
             case 1604: self = .vatomNotOwned(code, message)
             case 1627: self = .maxSharesReached(code, message)
             case 1630: self = .redemptionError(code, message)
             case 1632: self = .redemptionError(code, message)
             case 1654: self = .recipientLimit(code, message)
-                
+
             case 1701: self = .vatomNotFound(code, message)
             case 1702: self = .unknownUserToken(code, message)
             case 1703: self = .unknownUserToken(code, message)
             case 1705: self = .unknownUserToken(code, message)
             case 1708: self = .insufficientPermission(code, message)
-                
+
             case 2030: self = .unknownUserToken(code, message)
             case 2032: self = .authenticationFailed(code, message)
             case 2037: self = .avatarUploadFailed(code, message)
@@ -137,24 +137,24 @@ public enum BVError: Error {
             case 2569: self = .unknownTokenType(code, message)
             case 2571: self = .invalidEmailAddress(code, message)
             case 2572: self = .invalidPhoneNumber(code, message)
-                
+
             default:
                 self = .unknown(code, message)
             }
         }
-        
+
     }
-    
+
     ///
     public enum WebSocketErrorReason: Equatable {
         case connectionFailed
         case connectionDisconnected
     }
-    
+
 }
 
 extension BVError: Equatable {
-    
+
     public static func == (lhs: BVError, rhs: BVError) -> Bool {
         switch (lhs, rhs) {
         case (let .modelDecoding(lhsReason), let .modelDecoding(rhsReason)):
@@ -171,7 +171,7 @@ extension BVError: Equatable {
             return false
         }
     }
-    
+
     /*
      # Example Usage
      
@@ -198,7 +198,7 @@ extension BVError: Equatable {
      return
      }
      */
-    
+
 }
 
 extension BVError: LocalizedError {
@@ -234,12 +234,12 @@ extension BVError.WebSocketErrorReason {
 extension BVError.PlatformErrorReason {
     var localizedDescription: String {
         switch self {
-            
+
         case let .unknownWithMissingCode(_, message):
             return "Unrecogonized: BLOCKv Platform Error: (Missing Code) - Message: \(message)"
         case let .unknown(code, message):
             return "Unrecogonized: BLOCKv Platform Error: (\(code)) - Message: \(message)"
-            
+
         case let .unknownWithMissingCode(code, message),
              let .unknownAppId(code, message),
              let .unhandledAction(code, message),
@@ -274,8 +274,8 @@ extension BVError.PlatformErrorReason {
              let .invalidPhoneNumber(code, message),
              let .invalidEmailAddress(code, message):
             return "BLOCKv Platform Error: (\(code)) Message: \(message)"
-            
+
         }
     }
-    
+
 }

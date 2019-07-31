@@ -34,9 +34,8 @@ extension FLAnimatedImageView {
     }
 }
 
-
 extension ImageRequest {
-    
+
     /// Generates a cache key based on the specified arguments.
     func generateCacheKey(url: URL, targetSize: CGSize? = nil) -> Int {
         // create a hash for the cacheKey
@@ -48,11 +47,11 @@ extension ImageRequest {
         }
         return hasher.finalize()
     }
-    
+
 }
 
 extension UIImageView {
-    
+
     /// Size of the bounds of the view in pixels.
     ///
     /// Be sure to call this property *after* the view has been layed out.
@@ -62,5 +61,5 @@ extension UIImageView {
                           height: self.bounds.size.height * UIScreen.main.scale)
         }
     }
-    
+
 }

@@ -15,7 +15,7 @@ import func CommonCrypto.CC_MD5
 import typealias CommonCrypto.CC_LONG
 
 extension String {
-    
+
     /// Returns md5 hash.
     var md5: String {
         let data = Data(self.utf8)

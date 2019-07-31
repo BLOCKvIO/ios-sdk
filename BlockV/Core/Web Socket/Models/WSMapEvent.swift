@@ -14,9 +14,9 @@ import MapKit
 
 /// Web socket event model - unowned map vatoms.
 public struct WSMapEvent: Decodable {
-    
+
     // MARK: - Properties
-    
+
     /// Unique identifier of this inventory event.
     public let eventId: String
     /// Database operation.
@@ -27,11 +27,11 @@ public struct WSMapEvent: Decodable {
     public let actionName: String
     /// Coordinate of event.
     public let coordinate: CLLocationCoordinate2D
-    
+
     enum CodingKeys: String, CodingKey {
         case payload
     }
-    
+
     enum PayloadCodingKeys: String, CodingKey {
         case eventId             = "event_id"
         case operation           = "op"
@@ -40,9 +40,9 @@ public struct WSMapEvent: Decodable {
         case latitude            = "lat"
         case longitude           = "lon"
     }
-    
+
     public init(from decoder: Decoder) throws {
-        
+
         let items = try decoder.container(keyedBy: CodingKeys.self)
         // de-nest payload to top level
         let payloadContainer = try items.nestedContainer(keyedBy: PayloadCodingKeys.self, forKey: .payload)
@@ -55,5 +55,5 @@ public struct WSMapEvent: Decodable {
         let longitude   = try payloadContainer.decode(Double.self, forKey: .longitude)
         coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
-    
+
 }

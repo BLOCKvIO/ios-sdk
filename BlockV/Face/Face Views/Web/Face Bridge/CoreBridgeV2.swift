@@ -249,7 +249,7 @@ class CoreBridgeV2: CoreBridge { //swiftlint:disable:this type_body_length
                 }
 
             }
-            
+
         case .getCurrentUser:
             self.getCurrentUser { result in
                 switch result {
@@ -261,7 +261,7 @@ class CoreBridgeV2: CoreBridge { //swiftlint:disable:this type_body_length
                         return
                     }
                     completion(.success(payload))
-                    
+
                 case .failure(let error):
                     completion(.failure(error))
                 }

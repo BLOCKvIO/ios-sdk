@@ -82,7 +82,7 @@ public class WebSocketManager {
 
     /// Fires when the Web socket receives an **activity** update event.
     public let onActivityUpdate = Signal<WSActivityEvent>()
-    
+
     /// Fires when the Web socket receives a *map* update event for *unowned* vatoms.
     public let onMapUpdate = Signal<WSMapEvent>()
 
@@ -109,7 +109,7 @@ public class WebSocketManager {
 
     /// Delay option enum used to create a reconnect interval (measured in seconds).
     let delayOption = DelayOption.exponential(initial: 1, base: 1.2, maxDelay: 5)
-    
+
     /// Tally of the numnber of reconnect attempts.
     private var reconnectCount: Int = 0
 
@@ -264,15 +264,15 @@ public class WebSocketManager {
     }
 
     // MARK: Debugging
-    
+
     /// Writes a ping frame to the socket.
     func writePing(data: Data = Data(), completion: @escaping () -> Void) {
-        
+
         // write a ping control frame
         self.socket?.write(ping: data) {
             completion()
         }
-        
+
     }
 
 }
@@ -404,7 +404,7 @@ extension WebSocketManager: WebSocketDelegate {
                 } catch {
                     printBV(error: error.localizedDescription)
                 }
-                
+
             case .map:
                 do {
                     let mapEvent = try blockvJSONDecoder.decode(WSMapEvent.self, from: data)

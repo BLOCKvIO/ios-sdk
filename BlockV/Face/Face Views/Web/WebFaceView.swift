@@ -107,7 +107,7 @@ class WebFaceView: FaceView {
 
     /// Resets the contents of the face view.
     private func reset() {
-        
+
     }
 
     func unload() {

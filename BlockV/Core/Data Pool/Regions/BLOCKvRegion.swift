@@ -216,7 +216,7 @@ class BLOCKvRegion: Region {
         let actions = objects.values.filter { $0.type == "action" && ($0.data?["name"] as? String)?
             .starts(with: actionNamePrefix) == true }
         objectData["actions"] = actions.map { $0.data }
-        
+
         // create vatoms, face, anf actions using member-wise initilializer
         do {
             let faces = faces.compactMap { $0.data }.compactMap { try? FaceModel(from: $0) }

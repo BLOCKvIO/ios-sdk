@@ -165,7 +165,7 @@ class ImagePolicyFaceView: FaceView {
 
                 // create key path and split into head and tail
                 guard let component = KeyPath(policy.field).headAndTail() else { continue }
-                
+
                 var vatomValue: JSON?
                 // check container
                 if component.head == "private" {
@@ -179,9 +179,9 @@ class ImagePolicyFaceView: FaceView {
                         vatomValue = try? JSON(self.vatom.props.numberDirectClones)
                     }
                 }
-                
+
                 guard let value = vatomValue else { continue }
-                
+
                 if value == policy.value {
                     // update image
                     //print(">>:: vAtom Value: \(vatomValue) | Policy Value: \(policy.value)\n")

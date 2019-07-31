@@ -53,9 +53,9 @@ internal extension Client {
         }
 
     }
-    
-    func request<T: Decodable>(_ endpoint: Endpoint<T>) -> Promise<T>  {
-        
+
+    func request<T: Decodable>(_ endpoint: Endpoint<T>) -> Promise<T> {
+
         return Promise { seal in
             // convert result type into promise
             self.request(endpoint) { result in
@@ -67,7 +67,7 @@ internal extension Client {
                 }
             }
         }
-        
+
     }
 
 }

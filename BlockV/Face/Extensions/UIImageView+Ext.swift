@@ -23,7 +23,7 @@ extension UIImageView {
 }
 
 extension BaseFaceView {
-    
+
     /// Size of the bounds of the view in pixels.
     public var pixelSize: CGSize {
         get {
@@ -31,5 +31,5 @@ extension BaseFaceView {
                           height: self.bounds.size.height * UIScreen.main.scale)
         }
     }
-    
+
 }

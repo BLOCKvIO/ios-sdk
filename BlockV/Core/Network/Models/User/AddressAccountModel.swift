@@ -13,13 +13,13 @@ import Foundation
 
 /// Eth address response model.
 public struct AddressAccountModel: Codable, Equatable {
-    
+
     public let id: String
     public let userId: String
     public let address: String
     public let type: String
     public let createdAt: Date
-    
+
     enum CodingKeys: String, CodingKey {
         case id
         case userId    = "user_id"
@@ -27,6 +27,5 @@ public struct AddressAccountModel: Codable, Equatable {
         case type
         case createdAt = "created_at"
     }
-    
-}
 
+}

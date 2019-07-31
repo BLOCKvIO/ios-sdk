@@ -457,7 +457,7 @@ extension BLOCKv {
         }
 
     }
-    
+
     /// Performs an acquire pub variation action on the specified vatom id.
     ///
     /// - Parameters:
@@ -466,13 +466,13 @@ extension BLOCKv {
     ///                 This handler is executed on the main queue.
     public static func acquirePubVariation(withID id: String,
                                            completion: @escaping (Result<[String: Any], BVError>) -> Void) {
-        
+
         let body = ["this.id": id]
         // perform the action
         self.performAction(name: "AcquirePubVariation", payload: body) { result in
             completion(result)
         }
-        
+
     }
 
 }

@@ -25,10 +25,10 @@ public struct VatomSyncModel: Codable {
 }
 
 public struct InventorySyncModel: Codable {
-    
+
     let vatoms: [VatomSyncModel]
     let nextToken: String
-    
+
     enum CodingKeys: String, CodingKey {
         case vatoms
         case nextToken = "next_token"

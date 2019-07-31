@@ -41,10 +41,10 @@ class InventoryRegion: BLOCKvRegion {
         }
 
     }
-    
+
     var lastHash: String? {
         didSet {
-            print("lastHash \(String(describing:lastHash))")
+            print("lastHash \(String(describing: lastHash))")
         }
     }
 
@@ -75,26 +75,26 @@ class InventoryRegion: BLOCKvRegion {
 
         // pause websocket events
         self.pauseMessages()
-        
+
         return self.fetchInventoryHash().then { newHash -> Promise<[String]?> in
-            
+
             // replace current hash
             let oldHash = self.lastHash
             self.lastHash = newHash
-            
+
             if oldHash == newHash {
                 // nothing has changes
                 self.resumeMessages()
                 // return nil(no-op)
                 return Promise.value(nil)
             }
-            
+
             // fetch all pages recursively
             return self.fetchBatched().ensure {
                 // resume websocket events
                 self.resumeMessages()
             }
-            
+
         }
 
     }
@@ -113,12 +113,12 @@ class InventoryRegion: BLOCKvRegion {
         guard let oldOwner = payload["old_owner"] as? String else { return }
         guard let newOwner = payload["new_owner"] as? String else { return }
         guard let vatomID = payload["id"] as? String else { return }
-        
+
         // nil out the hash if something has changed
         if msgType == "inventory" || msgType == "state_update" {
             self.lastHash = nil
         }
-        
+
         if msgType != "inventory" { return }
 
         // check if this is an incoming or outgoing vatom
@@ -234,7 +234,7 @@ extension InventoryRegion {
                         if (items.count == 0) || (self.proccessedPageCount > self.maxReasonablePages) {
                             shouldRecurse = false
                         }
-                        
+
                         // increment page count
                         self.proccessedPageCount += 1
 
@@ -278,15 +278,15 @@ extension InventoryRegion {
 }
 
 extension InventoryRegion {
-    
+
     /// Fetches the remote inventory's hash value.
     func fetchInventoryHash() -> Promise<String> {
-        
+
         let endpoint = API.Vatom.getInventoryHash()
         return BLOCKv.client.request(endpoint).map { result -> String in
             return result.payload.hash
         }
-        
+
     }
-    
+
 }

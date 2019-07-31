@@ -52,14 +52,16 @@ private let activityMessageData = """
 }
 """.data(using: .utf8)!
 
+// MARK: - Control Model
+
 // create resources to be used in `messageControl`
 private let resourcesControl = try! TestUtility.jsonDecoder.decode([VatomResourceModel].self, from: resourcesModelData)
-
+private let whenCreatedControl = DateFormatter.blockvDateFormatter.date(from: "2019-06-08T10:17:20Z")!
 // construct a model manually to act as the control
 private let messageControl = MessageModel.init(id: 1234,
                                                message: "<b>ydangle Prototyping</b> sent you a <b>Pepsi</b> vAtom.",
                                                actionName: "Transfer",
-                                               whenCreated: DateFormatter.blockvDateFormatter.date(from: "2019-06-08T10:17:20Z")!,
+                                               whenCreated: whenCreatedControl,
                                                triggerUserID: "12348f8-ffcd-4e91-aa81-ccfc74ae1234",
                                                targetUserID: "21c527fb-1234-485b-b549-61b3857e1234",
                                                vatomIdentifiers: ["1234781-139c-48e3-b311-e177af61234"],
@@ -71,7 +73,8 @@ class ActivityModel_Tests: XCTestCase {
 
     // MARK: - Test Methods
     
-    /// 
+    /// Tests the decoding of server data to a native message model.
+    /// Tests the decoded model matches a manually created model.
     func testMessageModelDecoding() {
         
         do {

@@ -13,12 +13,12 @@ import Foundation
 
 public struct MockModelFaces {
 
-    /// Two native generic faces, one icon and one 3d.
+    /// Two native generic faces, one icon and one 3D.
     public static let genericIconAnd3D = """
         [
           {
             "id": "aaaa",
-            "template": "vatomic.prototyping::UntiTest::v1",
+            "template": "fun.proto::UntiTest::v1",
             "meta": {
               "created_by": "BLOCKv Backend",
               "when_created": "2018-08-14T12:16:05Z",
@@ -51,7 +51,7 @@ public struct MockModelFaces {
           },
           {
             "id": "bbbb",
-            "template": "vatomic.prototyping::UntiTest::v1",
+            "template": "fun.proto::UntiTest::v1",
             "meta": {
               "created_by": "BLOCKv Backend",
               "when_created": "2018-08-14T12:16:04Z",

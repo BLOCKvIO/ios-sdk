@@ -170,7 +170,7 @@ class ImagePolicyFaceView: FaceView {
                 // check container
                 if component.head == "private" {
                     // current value on the vatom
-                    let vatomValue = self.vatom.private?[keyPath: component.tail.path]
+                    vatomValue = self.vatom.private?[keyPath: component.tail.path]
                 } else if component.head == "vAtom::vAtomType" {
                     //TODO: Create a keypath-to-keypath look up
                     if component.tail.path == "cloning_score" {

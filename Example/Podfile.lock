@@ -36,13 +36,12 @@ PODS:
   - VatomFace3D (3.0.2):
     - BLOCKv/Face
     - FLAnimatedImage
-    - GenericJSON
     - Nuke
     - NVActivityIndicatorView
 
 DEPENDENCIES:
   - BLOCKv (from `../`)
-  - VatomFace3D
+  - VatomFace3D (from `../../../faces/3D-Face`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -56,11 +55,12 @@ SPEC REPOS:
     - Signals
     - Starscream
     - SwiftLint
-    - VatomFace3D
 
 EXTERNAL SOURCES:
   BLOCKv:
     :path: "../"
+  VatomFace3D:
+    :path: "../../../faces/3D-Face"
 
 SPEC CHECKSUMS:
   Alamofire: ae5c501addb7afdbb13687d7f2f722c78734c2d3
@@ -74,8 +74,8 @@ SPEC CHECKSUMS:
   Signals: f8e5c979e93c35273f8dfe55ee7f47213d3e8fe8
   Starscream: ef3ece99d765eeccb67de105bfa143f929026cf5
   SwiftLint: 9fc1143bbacec37f94994a7d0d2a85b2154b6294
-  VatomFace3D: aabeb4a3c9d72835fbfd8a4bcac3917151b30e0c
+  VatomFace3D: a473280725a6c6b08cb44c49fdf062449aef2522
 
-PODFILE CHECKSUM: d2ad0cdcd830de687ee1e7475c49221546a727b8
+PODFILE CHECKSUM: dc2a30cb34f09f775e72fddc37ffa43360f879b7
 
 COCOAPODS: 1.7.4

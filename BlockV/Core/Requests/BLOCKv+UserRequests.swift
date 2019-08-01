@@ -291,7 +291,8 @@ extension BLOCKv {
     ///
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
-    public static func getCurrentUserBlockchainAccounts(completion: @escaping (Result<[AddressAccountModel], BVError>) -> Void) {
+    public static func getCurrentUserBlockchainAccounts(
+        completion: @escaping (Result<[AddressAccountModel], BVError>) -> Void) {
 
         let endpoint = API.CurrentUser.getAccounts()
 

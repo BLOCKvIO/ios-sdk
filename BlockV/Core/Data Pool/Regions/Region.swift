@@ -12,23 +12,6 @@
 import Foundation
 import PromiseKit
 
-/*
- # Notes:
- 
- ## Filter & Sort
- 
- Both of these should become classes (which do not inherit from Region). They provide a 'view into' a region.
- 
- Caller:
- 
- DataPool.region(id: "inventory", descriptor: [:]).filter { $0.dateModified > a }
- DataPool.region(id: "inventory", descriptor: [:]).sort { $0.title }
- 
- Adding sort directly to Region is hard beacuse multiple callers may use use the same regions - all with different
- sorting predicates. So sorting must be cofigurable (isolated) per caller.
- 
- */
-
 /// An abstract class that manages a complete collection of objects (a.k.a Regions).
 ///
 /// Regions are generally "id-complete". That is, the local region should have a complete copy of all remote objects.
@@ -222,10 +205,6 @@ public class Region {
                 self.did(add: obj)
 
             }
-
-            // emit event
-            //FIXME: Why was this being broadcast?
-//            self.emit(.objectUpdated, userInfo: ["id": obj.id])
 
         }
 
@@ -435,7 +414,8 @@ public class Region {
     }
 
     /// Directory containing all region caches.
-    static var recommendedCacheDirectory = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("regions")
+    static var recommendedCacheDirectory = URL(fileURLWithPath: NSTemporaryDirectory())
+        .appendingPathComponent("regions")
 
     /// Cache filename.
     lazy var cacheFilename = self.stateKey.replacingOccurrences(of: ":", with: "_")

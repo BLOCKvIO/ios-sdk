@@ -163,7 +163,11 @@ class InventoryRegion: BLOCKvRegion {
         } else {
 
             // logic error, old owner and new owner cannot be the same
-            printBV(error: "[InventoryRegion] Logic error in WebSocket message, old_owner and new_owner shouldn't be the same: \(vatomID)")
+            let errorMessage = """
+            [InventoryRegion] Logic error in WebSocket message, old_owner and new_owner shouldn't be the same:
+            \(vatomID)
+            """
+            printBV(error: errorMessage)
 
         }
 
@@ -208,40 +212,41 @@ extension InventoryRegion {
             let endpoint: Endpoint<Void> = API.Generic.getInventory(parentID: "*", page: page, limit: pageSize)
 
             // exectute request
-            let promise = BLOCKv.client.requestJSON(endpoint).then(on: .global(qos: .userInitiated)) { json -> Promise<[String]?> in
+            let promise = BLOCKv.client.requestJSON(endpoint)
+                .then(on: .global(qos: .userInitiated)) { json -> Promise<[String]?> in
 
-                guard let json = json as? [String: Any],
-                    let payload = json["payload"] as? [String: Any] else {
-                        throw RegionError.failedParsingResponse
-                }
-
-                // parse out data objects
-                guard let items = self.parseDataObject(from: payload) else {
-                    return Promise.value([])
-                }
-                let newIds = items.map { $0.id }
-
-                return Promise { (resolver: Resolver) in
-
-                    DispatchQueue.main.async {
-
-                        // append new ids
-                        self.cummulativeIds.append(contentsOf: newIds)
-
-                        // add data objects
-                        self.add(objects: items)
-
-                        if (items.count == 0) || (self.proccessedPageCount > self.maxReasonablePages) {
-                            shouldRecurse = false
-                        }
-
-                        // increment page count
-                        self.proccessedPageCount += 1
-
-                        return resolver.fulfill(newIds)
-
+                    guard let json = json as? [String: Any],
+                        let payload = json["payload"] as? [String: Any] else {
+                            throw RegionError.failedParsingResponse
                     }
-                }
+
+                    // parse out data objects
+                    guard let items = self.parseDataObject(from: payload) else {
+                        return Promise.value([])
+                    }
+                    let newIds = items.map { $0.id }
+
+                    return Promise { (resolver: Resolver) in
+
+                        DispatchQueue.main.async {
+
+                            // append new ids
+                            self.cummulativeIds.append(contentsOf: newIds)
+
+                            // add data objects
+                            self.add(objects: items)
+
+                            if (items.count == 0) || (self.proccessedPageCount > self.maxReasonablePages) {
+                                shouldRecurse = false
+                            }
+
+                            // increment page count
+                            self.proccessedPageCount += 1
+
+                            return resolver.fulfill(newIds)
+
+                        }
+                    }
 
             }
 

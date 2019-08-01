@@ -18,3 +18,10 @@ identifier_name:
 nesting:
   type_level:
     warning: 2
+function_body_length:
+  60
+type_body_length:
+  - 300 # wanring
+  - 400 # error
+file_length:
+  600

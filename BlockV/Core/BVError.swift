@@ -240,8 +240,7 @@ extension BVError.PlatformErrorReason {
         case let .unknown(code, message):
             return "Unrecogonized: BLOCKv Platform Error: (\(code)) - Message: \(message)"
 
-        case let .unknownWithMissingCode(code, message),
-             let .unknownAppId(code, message),
+        case let .unknownAppId(code, message),
              let .unhandledAction(code, message),
              let .internalServerIssue(code, message),
              let .unauthorized(code, message),

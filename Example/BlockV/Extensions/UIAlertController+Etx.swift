@@ -25,70 +25,70 @@ import UIKit
 import BLOCKv
 
 extension UIAlertController {
-    
+
     /// Returns an alert view titled `title` with `message` and single "OK" action
     /// with no handler.
     ///
     /// This should not be used in production apps as-is. It is merely to surface
     /// the underlying platform error for this example app.
     static func errorAlert(_ error: BVError) -> UIAlertController {
-        
+
         let alertController = UIAlertController.init(title: "Error",
                                                      message: error.localizedDescription,
                                                      preferredStyle: .alert)
-        
+
         let dismissAction = UIAlertAction.init(title: "OK", style: .default, handler: nil)
         alertController.addAction(dismissAction)
-        
+
         alertController.preferredAction = dismissAction
-        
+
         return alertController
     }
-    
+
     /// Returns an alert view titled `title` with `message` and single "OK" action with no handler.
     static func okAlert(title: String, message: String) -> UIAlertController {
         let alertController = UIAlertController.init(title: title,
                                                      message: message,
                                                      preferredStyle: .alert)
-        
+
         let dismissAction = UIAlertAction.init(title: "OK", style: .default, handler: nil)
         alertController.addAction(dismissAction)
-        
+
         alertController.preferredAction = dismissAction
-        
+
         return alertController
     }
-    
+
     /// Returns an alert view titled `title` with `message` and single "OK" action with no handler.
     static func infoAlert(message: String, handler: ((UIAlertAction) -> Void)? = nil) -> UIAlertController {
         let alertController = UIAlertController.init(title: "Info",
                                                      message: message,
                                                      preferredStyle: .alert)
-        
+
         let dismissAction = UIAlertAction.init(title: "OK", style: .default, handler: handler)
         alertController.addAction(dismissAction)
-        
+
         alertController.preferredAction = dismissAction
-        
+
         return alertController
     }
-    
+
     static func confirmAlert(title: String,
                              message: String,
                              confirmed: @escaping (Bool) -> Void) -> UIAlertController {
         let alertController = UIAlertController.init(title: title,
                                                      message: message,
                                                      preferredStyle: .alert)
-        
-        let okAction = UIAlertAction.init(title: "OK", style: .default) { action in
+
+        let okAction = UIAlertAction.init(title: "OK", style: .default) { _ in
             confirmed(true)
         }
-        let cancelAction = UIAlertAction.init(title: "Cancel", style: .destructive) { action in
+        let cancelAction = UIAlertAction.init(title: "Cancel", style: .destructive) { _ in
             confirmed(false)
         }
         alertController.addAction(okAction)
         alertController.addAction(cancelAction)
         return alertController
     }
-    
+
 }

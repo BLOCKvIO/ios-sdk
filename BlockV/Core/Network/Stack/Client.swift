@@ -20,7 +20,8 @@ protocol ClientProtocol {
     func request(_ endpoint: Endpoint<Void>, completion: @escaping RawCompletion)
 
     /// Request that returns native object (must conform to decodable).
-    func request<T>(_ endpoint: Endpoint<T>, completion: @escaping (Swift.Result<T, BVError>) -> Void ) where T: Decodable
+    func request<T>(_ endpoint: Endpoint<T>, completion: @escaping (Swift.Result<T, BVError>) -> Void )
+        where T: Decodable
 
 }
 

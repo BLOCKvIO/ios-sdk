@@ -10,12 +10,11 @@
 //
 
 import UIKit
-import BLOCKv
 
 /// UIWindow subclass which is designed to be set at the top-level window.
 ///
-/// All events are passed through to underlying windows expect if the view conforms the `FloatingView` protocol. In this
-/// case, the touch events will forwarded to the view itself.
+/// All events are passed through to underlying windows expect if the view conforms the `FloatingView` protocol. In
+/// this case, the touch events will forwarded to the view itself.
 class FloatingHUDWindow: UIWindow {
 
     init() {

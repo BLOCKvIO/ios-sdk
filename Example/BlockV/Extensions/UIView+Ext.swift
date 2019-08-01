@@ -24,19 +24,19 @@
 import UIKit
 
 extension UIView {
-    
+
     /// Animates the view's alpha to zero.
     func alphaOut() {
         UIView.animate(withDuration: 0.2) {
             self.alpha = 0
         }
     }
-    
+
     /// Animates the view's alpha to one.
     func alphaIn() {
         UIView.animate(withDuration: 0.3) {
             self.alpha = 1
         }
     }
-    
+
 }

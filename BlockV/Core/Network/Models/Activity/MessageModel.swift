@@ -55,10 +55,10 @@ public struct MessageModel: Equatable {
         case resources                      = "generic"
         case geoPosition                    = "geo_pos"
     }
-
+    
     public init(id: Double, message: String, actionName: String, whenCreated: Date, triggerUserID: String,
-                targetUserID: String, vatomIdentifiers: [String], templateVariationIdentifiers: [String],
-                resources: [VatomResourceModel], geoPosition: [Double]?) {
+         targetUserID: String, vatomIdentifiers: [String], templateVariationIdentifiers: [String],
+         resources: [VatomResourceModel], geoPosition: [Double]?) {
         self.id = id
         self.message = message
         self.actionName = actionName

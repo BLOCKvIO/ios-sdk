@@ -12,7 +12,7 @@
 import Foundation
 
 struct MockWebSocket {
-
+    
     static let mapEvent = """
     {
       "msg_type": "map",
@@ -26,5 +26,5 @@ struct MockWebSocket {
       }
     }
     """.data(using: .utf8)!
-
+    
 }

@@ -4,7 +4,7 @@ platform :ios, '11.0'
 target 'BlockV_Example' do
     
   pod 'BLOCKv', :path => '../'
-  pod 'VatomFace3D', :path => '../../../faces/3D-Face'
+  pod 'VatomFace3D'
 
   target 'BLOCKv_Unit_Tests' do
     inherit! :search_paths

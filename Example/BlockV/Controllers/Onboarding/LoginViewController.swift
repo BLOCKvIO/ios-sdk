@@ -30,15 +30,15 @@ import UIKit
 import BLOCKv
 
 class LoginViewController: UIViewController {
-
+    
     // MARK: - Outlets
-
+    
     @IBOutlet weak var tokenTypeSegmentedControl: UISegmentedControl!
     @IBOutlet weak var userTokenTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
-
+    
     // MARK: - Properties
-
+    
     /// Type of token selected.
     var tokenType: UserTokenType {
         get {
@@ -49,9 +49,9 @@ class LoginViewController: UIViewController {
             }
         }
     }
-
+    
     // MARK: - Actions
-
+    
     @IBAction func tokenTypeSegmentChanged(_ sender: UISegmentedControl) {
         switch sender.selectedSegmentIndex {
         case 0: configureTokenTextField(for: .phone)
@@ -61,58 +61,58 @@ class LoginViewController: UIViewController {
         self.userTokenTextField.becomeFirstResponder()
         self.userTokenTextField.reloadInputViews()
     }
-
+    
     /// This function performs the login operation.
     @IBAction func nextButton(_ sender: UIButton) {
-
+        
         // show loader
         self.showNavBarActivityRight()
-
+        
         let token = userTokenTextField.text ?? ""
         let password = passwordTextField.text ?? ""
-
+        
         // ask the BV platform to login
         BLOCKv.login(withUserToken: token, type: tokenType, password: password) {
             [weak self] result in
-
+            
             // reset nav bar
             self?.hideNavBarActivityRight()
-
+            
             switch result {
             case .success(let userModel):
                 self?.performSegue(withIdentifier: "seg.login.success", sender: self)
                 print("Viewer > \(userModel)\n")
-
+                
             case .failure(let error):
                 print(">>> Error > Viewer: \(error.localizedDescription)")
                 self?.present(UIAlertController.errorAlert(error), animated: true)
                 return
             }
-
+            
         }
-
+        
     }
-
+    
     /// This function performs the reset password operation.
     @IBAction func resetPasswordButton(_ sender: UIButton) {
-
+        
         // show loader
         self.showNavBarActivityRight()
-
+        
         // ensure form is valid
         let token = userTokenTextField.text ?? ""
-
+        
         // ask the BV platform to reset the token
         BLOCKv.resetToken(token, type: tokenType) { [weak self] result in
-
+            
             // hide loader
             self?.hideNavBarActivityRight()
-
+            
             switch result {
             case .success(let userToken):
                 let message = "An OTP has been sent to your token. Please use the OTP as a password to login."
                 self?.present(UIAlertController.okAlert(title: "Info", message: message), animated: true)
-
+                
                 print("Viewer > \(userToken)\n")
 
             case .failure(let error):
@@ -120,27 +120,27 @@ class LoginViewController: UIViewController {
                 self?.present(UIAlertController.errorAlert(error), animated: true)
                 return
             }
-
+            
         }
-
+        
     }
-
+    
     // MARK: - Lifecycle
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         // ui setup
         configureTokenTextField(for: .phone)
         userTokenTextField.autocorrectionType = .no
         self.userTokenTextField.becomeFirstResponder()
-
+    
     }
-
+    
     // MARK: - Methods
-
+    
     fileprivate func configureTokenTextField(for type: UserTokenType) {
-
+        
         switch type {
         case .phone:
             userTokenTextField.keyboardType = .phonePad
@@ -152,18 +152,18 @@ class LoginViewController: UIViewController {
             assertionFailure("Unhandled Type.")
         }
     }
-
+    
     // MARK: - Navigation
-
+    
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
     }
-
+    
     override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
         // prevent the segue - we will do it programatically
         return false
     }
-
+    
 }

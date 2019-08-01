@@ -15,13 +15,13 @@ import XCTest
 class WebSocketEvent_Tests: XCTestCase {
 
     func testMapEventDecoding() {
-
+        
         do {
             _ = try TestUtility.jsonDecoder.decode(WSMapEvent.self, from: MockWebSocket.mapEvent)
         } catch {
             XCTFail("Decoding failed: \(error.localizedDescription)")
         }
-
+        
     }
 
 }

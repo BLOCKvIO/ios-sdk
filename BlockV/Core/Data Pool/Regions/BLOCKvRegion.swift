@@ -292,21 +292,20 @@ class BLOCKvRegion: Region {
     // - Add
 
     /// Called when an object is about to be added.
-    //    override func will(add object: DataObject) {
-    //
-    //        // Notify parent as well
-    //        guard let parentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
-    //            return
-    //        }
-    //        DispatchQueue.main.async {
-    //            // broadcast update the vatom's parent
-    //FIXME: Does this make sense? If the parent calls list children at this point it will not have updated yet
-    //            self.emit(.objectUpdated, userInfo: ["id": parentID])
-    ////            // broadbast the add
-    //            self.emit(.objectAdded, userInfo: ["id": object.id])
-    //        }
-    //
-    //    }
+//    override func will(add object: DataObject) {
+//
+//        // Notify parent as well
+//        guard let parentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
+//            return
+//        }
+//        DispatchQueue.main.async {
+//            // broadcast update the vatom's parent
+//            self.emit(.objectUpdated, userInfo: ["id": parentID]) //FIXME: Does this make sense? If the parent calls list children at this point it will not have updated yet
+////            // broadbast the add
+//            self.emit(.objectAdded, userInfo: ["id": object.id])
+//        }
+//
+//    }
 
     override func did(add object: DataObject) {
         // Notify parent as well

@@ -30,12 +30,12 @@ import UIKit
 import BLOCKv
 
 class OutboundActionViewController: UIViewController {
-
+    
     // MARK: - Properties
-
+    
     var vatom: VatomModel!
     var actionName: String!
-
+    
     /// Type of token selected.
     var tokenType: UserTokenType {
         get {
@@ -47,24 +47,24 @@ class OutboundActionViewController: UIViewController {
             }
         }
     }
-
+    
     // MARK: - Outlets
-
+    
     @IBOutlet weak var tokenTypeSegmentedControl: UISegmentedControl!
     @IBOutlet weak var userTokenTextField: UITextField!
-
+    
     // MARK: - Lifecycle
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         precondition(vatom != nil, "A vAtom must be passed into this view controller.")
         precondition(actionName != nil, "An action name must be passed into this view controller.")
-
+        
         self.title = actionName
     }
-
+    
     // MARK: - Actions
-
+    
     @IBAction func tokenTypeSegmentChanged(_ sender: UISegmentedControl) {
         switch sender.selectedSegmentIndex {
         case 0: configureTokenTextField(for: .phone)
@@ -74,20 +74,20 @@ class OutboundActionViewController: UIViewController {
         }
         self.userTokenTextField.becomeFirstResponder()
     }
-
+    
     @IBAction func performActionTapped(_ sender: Any) {
-
+        
         // create the token
         guard let value = userTokenTextField.text else { return }
         let token = UserToken(value: value, type: tokenType)
         // execute the action
         performAction(token: token)
-
+        
     }
-
+    
     /// Performs the appropriate action using the
     func performAction(token: UserToken) {
-
+        
         let resultHandler: ((Result<[String: Any], BVError>) -> Void) = { [weak self] result in
             switch result {
             case .success(let json):
@@ -100,7 +100,7 @@ class OutboundActionViewController: UIViewController {
                 return
             }
         }
-
+        
         switch actionName {
         case "Transfer":    self.vatom.transfer(toToken: token, completion: resultHandler)
         case "Clone":       self.vatom.clone(toToken: token, completion: resultHandler)
@@ -108,13 +108,13 @@ class OutboundActionViewController: UIViewController {
         default:
             return
         }
-
+        
     }
 
     // MARK: - Helpers
-
+    
     fileprivate func configureTokenTextField(for type: UserTokenType) {
-
+        
         switch type {
         case .phone:
             userTokenTextField.keyboardType = .phonePad
@@ -130,9 +130,9 @@ class OutboundActionViewController: UIViewController {
             userTokenTextField.autocorrectionType = .no
         }
     }
-
+    
     fileprivate func hide() {
         self.presentingViewController?.presentingViewController?.dismiss(animated: true, completion: nil)
     }
-
+    
 }

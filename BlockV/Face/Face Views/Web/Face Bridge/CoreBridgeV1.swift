@@ -81,6 +81,8 @@ class CoreBridgeV1: CoreBridge {
         return true
     }
 
+    // swiftlint:disable cyclomatic_complexity
+    // swiftlint:disable function_body_length
     /// Processes the face script message and calls the completion handler with the result for encoding.
     func processMessage(_ scriptMessage: RequestScriptMessage, completion: @escaping Completion) {
 

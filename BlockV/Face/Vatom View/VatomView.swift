@@ -492,10 +492,10 @@ open class VatomView: UIView {
 
                 /*
                  Important:
-                 - Since vatom view may be in a reuse pool, and load is async, we must check the underlying vatom has
-                 not changed.
-                 - As the vatom-view comes out of the reuse pool, `update(usingVatom:procedure:)` is called. Since
-                 `load` is async, by the time load's closure executes the underlying vatom may have changed.
+                 - Since vatom view may be in a reuse pool, and load is async, we must check the underlying vatom has not
+                 changed.
+                 - As the vatom-view comes out of the reuse pool, `update(usingVatom:procedure:)` is called. Since `load` is
+                 async, by the time load's closure executes the underlying vatom may have changed.
                  */
                 guard self.vatom!.id == contextID else {
                     // vatom-view is no longer displaying the original vatom

@@ -21,7 +21,7 @@ extension VatomModel {
     /// applied.
     ///
     /// This method should be called when a state update event is received from the Web socket.
-    public func updated(applying stateUpdate: WSStateUpdateEvent) -> VatomModel? {
+    public func updated(applying stateUpdate: WSStateUpdateEvent) -> VatomModel? { // swiftlint:disable:this function_body_length
 
         // ensure vatom ids match
         guard self.id == stateUpdate.vatomId else {

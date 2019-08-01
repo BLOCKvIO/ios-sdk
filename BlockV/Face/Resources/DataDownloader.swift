@@ -90,8 +90,7 @@ public class DataDownloader: DataDownloading {
     init(configuration: URLSessionConfiguration = DataDownloader.defaultConfiguration,
          validate: @escaping (URLResponse) -> Swift.Error? = DataDownloader.validate ) {
         _impl = _DataDownloader()
-        //FIXME: Nuke uses a separate queue
-        self.session = URLSession(configuration: configuration, delegate: _impl, delegateQueue: _impl.queue)
+        self.session = URLSession(configuration: configuration, delegate: _impl, delegateQueue: _impl.queue) //FIXME: Nuke uses a separate queue
         self._impl.session = self.session
         self._impl.validate = validate
     }
@@ -133,10 +132,7 @@ private final class _DataDownloader: NSObject, URLSessionDelegate, URLSessionDow
 
     // MARK: - Methods
 
-    public func downloadData(url: URL,
-                             destination: @escaping DataDownloader.Destination,
-                             progress: @escaping (NSNumber) -> Void,
-                             completion: @escaping (Result<URL, Error>) -> Void) -> Cancellable {
+    public func downloadData(url: URL, destination: @escaping DataDownloader.Destination, progress: @escaping (NSNumber) -> Void, completion: @escaping (Result<URL, Error>) -> Void) -> Cancellable {
 
         let downloadTask = session.downloadTask(with: url)
         let handler = _Handler(url: url, destination: destination, progress: progress, completion: completion)
@@ -159,23 +155,24 @@ private final class _DataDownloader: NSObject, URLSessionDelegate, URLSessionDow
 
     // MARK: - URLSessionDownload Delegate
 
-    //TODO: Implement
-    //    func urlSession(_ session: URLSession,
-    //                    downloadTask: URLSessionDownloadTask,
-    //                    didWriteData bytesWritten: Int64,
-    //                    totalBytesWritten: Int64,
-    //                    totalBytesExpectedToWrite: Int64) {
-    //
-    //
-    //        guard let handler = handlers[downloadTask] else { return }
-    //
-    //        // compute progress
-    //        let calculatedProgress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
-    //        DispatchQueue.main.async {
-    //            NSNumber(value: calculatedProgress)
-    //        }
-    //
-    //    }
+    func urlSession(_ session: URLSession,
+                    downloadTask: URLSessionDownloadTask,
+                    didWriteData bytesWritten: Int64,
+                    totalBytesWritten: Int64,
+                    totalBytesExpectedToWrite: Int64) {
+
+        guard let handler = handlers[downloadTask] else { return }
+
+        // compute progress
+        let calculatedProgress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
+        DispatchQueue.main.async {
+            NSNumber(value: calculatedProgress)
+
+            //TODO: Implement
+
+        }
+
+    }
 
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
 
@@ -195,9 +192,7 @@ private final class _DataDownloader: NSObject, URLSessionDelegate, URLSessionDow
                 handler.completion(.success(destinationURL))
             } else {
                 // create directory
-                try FileManager.default.createDirectory(at: destinationURL.deletingLastPathComponent(),
-                                                        withIntermediateDirectories: true,
-                                                        attributes: nil)
+                try FileManager.default.createDirectory(at: destinationURL.deletingLastPathComponent(), withIntermediateDirectories: true, attributes: nil)
                 // move from temp to final url
                 try FileManager.default.moveItem(at: location, to: destinationURL)
                 handler.completion(.success(destinationURL))

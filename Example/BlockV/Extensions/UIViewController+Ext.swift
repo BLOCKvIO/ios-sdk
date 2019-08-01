@@ -24,33 +24,33 @@
 import UIKit
 
 extension UIViewController {
-
+    
     /// Shows activity indicator on the right.
     func showNavBarActivityRight() {
         let indicator = UIActivityIndicatorView(style: .gray)
         indicator.startAnimating()
         let item = UIBarButtonItem(customView: indicator)
-
+        
         self.navigationItem.rightBarButtonItem = item
     }
-
+    
     /// Hides activity indicator on the right.
     func hideNavBarActivityRight() {
         self.navigationItem.rightBarButtonItem = nil
     }
-
+    
     /// Shows activty indicator on the left.
     func showNavBarActivityLeft() {
         let indicator = UIActivityIndicatorView(style: .gray)
         indicator.startAnimating()
         let item = UIBarButtonItem(customView: indicator)
-
+        
         self.navigationItem.leftBarButtonItem = item
     }
-
+    
     /// Hides activity indicator on the left.
     func hideNavBarActivityLeft() {
         self.navigationItem.leftBarButtonItem = nil
     }
-
+    
 }

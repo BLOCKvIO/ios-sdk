@@ -37,8 +37,7 @@ public class DataPipeline {
             completion(.success(finalURL))
             return nil
         } else {
-            return self.dataDownloader.downloadData(url: url, destination: destination, progress: progress,
-                                                    completion: completion)
+            return self.dataDownloader.downloadData(url: url, destination: destination, progress: progress, completion: completion)
         }
 
     }

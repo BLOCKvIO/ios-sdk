@@ -29,7 +29,7 @@ import VatomFace3D
 struct CustomProcedure {
 
     /// This face selection procedure filters out "heavy" faces (e.g. 3D)
-    static let noHeavyIcons: FaceSelectionProcedure = { vatom, urls -> FaceModel? in
+    static let noHeavyIcons : FaceSelectionProcedure = { vatom, urls -> FaceModel? in
 
         // run standard Icon face selection
         let result = EmbeddedProcedure.icon.procedure(vatom, urls)

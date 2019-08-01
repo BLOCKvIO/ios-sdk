@@ -33,32 +33,32 @@ import UIKit
 import BLOCKv
 
 class PasswordTableViewController: UITableViewController {
-
+    
     // MARK: - Enums
-
+    
     /// Represents a table section
     fileprivate enum TableSection: Int {
         case password = 0
     }
-
+    
     // MARK: - Outlets
-
+    
     @IBOutlet var doneButton: UIBarButtonItem!
-
+    
     // MARK: - Actions
-
+    
     @IBAction func doneButtonTapped(_ sender: UIBarButtonItem) {
         updateProfile()
     }
-
+    
     // MARK: - Properties
-
+    
     fileprivate let titleValueCellId = "cell.profile.id"
-
+    
     /// Dictionary of table view cells for display. Since the number of cells is known and
     /// the count small, we needn't worry about efficiently deque-ing from a reuse pool.
     fileprivate var tableViewCells: [TableSection: [TitleValueCell]] = [:]
-
+    
     // MARK: - Lifecycle
 
     override func viewDidLoad() {
@@ -67,54 +67,54 @@ class PasswordTableViewController: UITableViewController {
         // add cells to tableview
         createCells()
     }
-
+    
     // MARK: - Helpers
-
+    
     /// Creates table view cellls.
     fileprivate func createCells() {
-
+        
         let passwordCell = TitleValueCell()
         passwordCell.titleLabel.text = "Password"
         passwordCell.valueTextField.placeholder = "******"
         passwordCell.valueTextField.keyboardType = .default
         passwordCell.valueTextField.autocorrectionType = .no
         passwordCell.valueTextField.autocapitalizationType = .none
-
+        
         // add cells
         tableViewCells[.password] = [passwordCell]
-
+        
     }
 
     /// Capture data from table view cells.
     fileprivate func buildForm() -> UserInfo {
 
         let passwordCell = tableViewCells[.password]![0]
-
+        
         return UserInfo(password: passwordCell.valueTextField.text)
-
+        
     }
-
+    
     /// Performs the network request to update the user's profile information.
     fileprivate func updateProfile() {
         print(#function)
-
+        
         self.showNavBarActivityRight()
-
+        
         let userInfo = buildForm()
-
+        
         BLOCKv.updateCurrentUser(userInfo) { [weak self] result in
-
+            
             // reset nav bar
             self?.hideNavBarActivityRight()
             self?.navigationItem.setRightBarButton(self!.doneButton, animated: true)
-
+            
             switch result {
             case .success(let userModel):
                 print("Viewer > \(userModel)\n")
-
+                
                 // update the model
                 self?.tableView.reloadData()
-
+                
                 // pop back
                 self?.navigationController?.popViewController(animated: true)
             case .failure(let error):
@@ -122,35 +122,35 @@ class PasswordTableViewController: UITableViewController {
                 self?.present(UIAlertController.errorAlert(error), animated: true)
                 return
             }
-
+            
         }
-
+        
     }
-
+    
 }
 
 // MARK: - Table view data source
 
 extension PasswordTableViewController {
-
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
-
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch TableSection(rawValue: section)! {
         case .password: return tableViewCells[.password]!.count
         }
     }
-
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> TitleValueCell {
         let section = TableSection(rawValue: indexPath.section)!
         return tableViewCells[section]![indexPath.row]
     }
-
+    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let cell = tableView.cellForRow(at: indexPath) as! TitleValueCell
         cell.valueTextField.becomeFirstResponder()
     }
-
+    
 }

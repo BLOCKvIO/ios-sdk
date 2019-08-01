@@ -34,22 +34,20 @@ import VatomFace3D
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
+    
     internal var webSocketManager: WebSocketManager?
-
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-
+        
         //: ## Setup
-
-        let MyAppID = "bb671748-9661-47de-9dc0-f56d00837da8"
-
+        
         BLOCKv.configure(appID: MyAppID)
         FaceViewRoster.shared.register(Face3D.self)
-
+        
         //: ## Control Flow
 
         print("\nViewer > isLoggedIn - \(BLOCKv.isLoggedIn)")
-
+        
         func showWelcome() {
             // show 'welcome' view controller
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
@@ -58,7 +56,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             nc.viewControllers = [rootVC]
             self.window?.rootViewController = nc
         }
-
+        
         func showInventory() {
             // show 'inventory' view controller
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
@@ -67,25 +65,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             nc.viewControllers = [rootVC]
             self.window?.rootViewController = nc
         }
-
+        
         // Set window's vc based on the login state
         if BLOCKv.isLoggedIn {
             showInventory()
         } else {
             showWelcome()
         }
-
+        
         //: ## Handle logout
-
+        
         // This closure will be called when the BLOCKv SDK requires re-authorization.
         BLOCKv.onLogout = {
             // store a closure in the `onLogout` variable.
             showWelcome()
         }
-
+        
         // Theme
         window?.tintColor = UIColor.seafoamBlue
-
+        
         return true
     }
 

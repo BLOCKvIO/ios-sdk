@@ -92,8 +92,10 @@ internal class DataObjectAnimator {
 
         // fetch earliest time
         var earliestTime = updates[0].time
-        for update in updates where earliestTime > update.time {
-            earliestTime = update.time
+        for update in updates {
+            if earliestTime > update.time {
+                earliestTime = update.time
+            }
         }
 
         // remove all pending changes for this object that are before our earliest time

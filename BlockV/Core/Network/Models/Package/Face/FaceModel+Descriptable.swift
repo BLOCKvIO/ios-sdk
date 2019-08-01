@@ -51,7 +51,7 @@ extension FaceModel.Properties: Descriptable {
         self.displayURL = _displayURL
         self.constraints = try FaceModel.Properties.Constraints(from: _constraintsDescriptor)
         self.resources = _resources
-        self.config = try? JSON(_config as Any)
+        self.config = try? JSON(_config)
 
     }
 

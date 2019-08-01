@@ -27,6 +27,7 @@ private let resourcesModelData = """
 ]
 """.data(using: .utf8)!
 
+
 private let activityMessageData = """
 {
   "msg_id": 1234,
@@ -71,11 +72,11 @@ private let messageControl = MessageModel.init(id: 1234,
 class ActivityModel_Tests: XCTestCase {
 
     // MARK: - Test Methods
-
+    
     /// Tests the decoding of server data to a native message model.
     /// Tests the decoded model matches a manually created model.
     func testMessageModelDecoding() {
-
+        
         do {
             // ensure model is parsed
             let value = try TestUtility.jsonDecoder.decode(MessageModel.self, from: activityMessageData)
@@ -85,9 +86,9 @@ class ActivityModel_Tests: XCTestCase {
         } catch {
             XCTFail("Decoding failed: \(error.localizedDescription)")
         }
-
+        
     }
-
+    
     func testMessageModelCodable() {
         self.decodeEncodeCompare(type: MessageModel.self, from: activityMessageData)
     }

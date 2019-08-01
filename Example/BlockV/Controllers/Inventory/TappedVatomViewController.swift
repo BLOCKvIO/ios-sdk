@@ -36,68 +36,68 @@ import GenericJSON
 class TappedVatomViewController: UIViewController {
 
     // MARK: - Outlets
-
+    
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var descriptionLabel: UILabel!
-
+    
     @IBOutlet weak var vatomViewA: LiveVatomView! // using storyboards
     @IBOutlet weak var vatomViewB: LiveVatomView! // using storyboards
     @IBOutlet weak var containerView: UIView! // using code (container view)
-
+    
     // MARK: - Properties
-
+    
     /// Backing vAtom for display.
     var vatom: VatomModel?
-
+    
     var iconFSP = EmbeddedProcedure.icon.procedure
     var engagedFSP = EmbeddedProcedure.engaged.procedure
     var cardFSP = EmbeddedProcedure.card.procedure
-
+    
     /// VatomView (constructed programmatically)
     let vatomViewC: LiveVatomView = {
         let vatomView = LiveVatomView()
         vatomView.loaderView = CustomLoaderView()
         return vatomView
     }()
-
+    
     // MARK: - Lifecycle
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         self.titleLabel.text = vatom?.props.title ?? "--"
         self.descriptionLabel.text = vatom?.props.description ?? "--"
-
+        
         // setup
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneTapped))
 
         // A - VatomView (via storyboard)
-
+        
         vatomViewA.vatomViewDelegate = self
         vatomViewB.vatomViewDelegate = self
         vatomViewC.vatomViewDelegate = self
-
+        
         /*
          Here we call `update` in order to pass the vatom and the procedure to the Vatom View.
          This will trigger the Vatom View Life Cycle (VVLC).
          */
         vatomViewA.update(usingVatom: vatom!, procedure: iconFSP)
-
+        
         // B - VatomView (via storyboard)
-
+        
         // Shows passing in a custom loader to this instance of vatom view.
         vatomViewB.loaderView = CustomLoaderView()
         vatomViewB.update(usingVatom: vatom!, procedure: engagedFSP)
-
+        
         // C - VatomView (programmatically)
-
+        
         vatomViewC.update(usingVatom: vatom!, procedure: cardFSP)
         containerView.addSubview(vatomViewC)
         vatomViewC.frame = containerView.bounds
         vatomViewC.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-
+        
     }
-
+    
     // MARK: - Actions
 
     /// Refresh the vAtom's state. Go out to network to fetch the lastest vAtoms state.
@@ -106,7 +106,7 @@ class TappedVatomViewController: UIViewController {
 
         // refresh the vatom
         BLOCKv.getVatoms(withIDs: [vatom!.id]) { [weak self] result in
-
+            
             switch result {
             case .success(let responseVatoms):
                 // ensure a vatom was returned
@@ -114,14 +114,14 @@ class TappedVatomViewController: UIViewController {
                     print("\n>>> Error > Viewer: No vAtom found")
                     return
                 }
-
+                
                 self?.vatom = responseVatom
-
+                
                 // update the vatom view
                 self?.vatomViewA.update(usingVatom: responseVatom)
                 self?.vatomViewB.update(usingVatom: responseVatom)
                 self?.vatomViewC.update(usingVatom: responseVatom)
-
+                
             case .failure(let error):
                 print("\n>>> Error > Viewer: \(error.localizedDescription)")
                 self?.present(UIAlertController.errorAlert(error), animated: true)
@@ -129,13 +129,13 @@ class TappedVatomViewController: UIViewController {
             }
 
         }
-
+        
     }
-
+    
     @objc private func doneTapped() {
         self.navigationController?.dismiss(animated: true, completion: nil)
     }
-
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
@@ -161,7 +161,7 @@ extension TappedVatomViewController: VatomViewDelegate {
                    didRecevieFaceMessage message: String,
                    withObject object: [String: JSON],
                    completion: ((Result<JSON, FaceMessageError>) -> Void)?) {
-
+     
         print("Handle face message: \(message)")
 
     }

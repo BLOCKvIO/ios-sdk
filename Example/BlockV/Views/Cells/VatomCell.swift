@@ -25,35 +25,35 @@ import UIKit
 import BLOCKv
 
 class VatomCell: UICollectionViewCell {
-
+    
     // MARK: - Properties
-
+    
     static let reuseIdentifier = "com.blockv.vatom-cell"
-
+        
     // MARK: - Outlets
-
+    
     @IBOutlet weak var vatomView: VatomView!
-
+    
     // MARK: - Lifecycle
-
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
     }
-
+    
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
-
+    
     override func prepareForReuse() {
         super.prepareForReuse()
-
+        
         /*
          At this point, nothing has been *set* for the new cell. The properties are still of the cell's old data model.
          */
-
+        
         // reset
         self.vatomView.unLoad()
-
+        
     }
-
+    
 }

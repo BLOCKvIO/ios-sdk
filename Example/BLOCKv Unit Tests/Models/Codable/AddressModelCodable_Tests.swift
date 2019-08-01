@@ -13,23 +13,23 @@ import XCTest
 @testable import BLOCKv
 
 class AddressModelCodable_Tests: XCTestCase {
-
+    
     // MARK: - Test Methods
-
+    
     func testActionDecoding() {
-
+        
         do {
             _ = try TestUtility.jsonDecoder.decode(AddressAccountModel.self, from: MockAddressModel.ethAddress)
         } catch {
             XCTFail("Decoding failed: \(error.localizedDescription)")
         }
-
+        
     }
-
+    
     func testModelCodable() {
-
-        self.decodeEncodeCompare(type: AddressAccountModel.self, from: MockAddressModel.ethAddress)
-
+        
+        self.decodeEncodeCompare(type: AddressAccountModel.self, from:MockAddressModel.ethAddress)
+        
     }
-
+    
 }

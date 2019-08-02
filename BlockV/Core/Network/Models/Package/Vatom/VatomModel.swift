@@ -20,6 +20,7 @@ public struct VatomModel: Equatable {
     public let id: String
     public let version: String
     public let whenCreated: Date
+    public let whenAdded: Date
     // variables
     public var whenModified: Date
     public var isUnpublished: Bool
@@ -53,6 +54,7 @@ public struct VatomModel: Equatable {
         case isUnpublished     = "unpublished"
         case whenCreated       = "when_created"
         case whenModified      = "when_modified"
+        case whenAdded         = "when_added"
         case props             = "vAtom::vAtomType"
         case `private`         = "private"
         case faceModels        = "faces"
@@ -73,6 +75,7 @@ extension VatomModel: Codable {
         version           = try items.decode(String.self, forKey: .version)
         whenCreated       = try items.decode(Date.self, forKey: .whenCreated)
         whenModified      = try items.decode(Date.self, forKey: .whenModified)
+        whenAdded         = try items.decode(Date.self, forKey: .whenAdded)
         sync              = try items.decode(UInt.self, forKey: .sync)
         props             = try items.decode(RootProperties.self, forKey: .props)
 
@@ -91,6 +94,7 @@ extension VatomModel: Codable {
         try container.encode(isUnpublished, forKey: .isUnpublished)
         try container.encode(whenCreated, forKey: .whenCreated)
         try container.encode(whenModified, forKey: .whenModified)
+        try container.encode(whenAdded, forKey: .whenAdded)
         try container.encode(props, forKey: .props)
         try container.encode(`private`, forKey: .`private`)
         try container.encode(eos, forKey: .eos)

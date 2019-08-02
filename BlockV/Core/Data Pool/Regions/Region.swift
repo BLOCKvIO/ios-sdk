@@ -566,6 +566,8 @@ public class Region {
         object.data![keyPath: KeyPath(keyPath)] = value
         object.cached = nil
         self.emit(.willUpdateObject, userInfo: ["id": id])
+        
+        self.did(update: object, keyPath: keyPath, oldValue: oldValue, newValue: value)
         self.emit(.updated)
         self.save()
 
@@ -579,6 +581,8 @@ public class Region {
             object.data![keyPath: KeyPath(keyPath)] = oldValue
             object.cached = nil
             self.emit(.willUpdateObject, userInfo: ["id": id])
+            self.did(update: object, keyPath: keyPath, oldValue: oldValue, newValue: value)
+
             self.emit(.updated)
             self.save()
 
@@ -630,7 +634,7 @@ public class Region {
 
     func did(add: DataObject) {}
     func did(update: DataObject, withFields: [String: Any]) {}
-//    func did(update: DataObject, keyPath: String, oldValue: Any?, newValue: Any?) {}
+    func did(update: DataObject, keyPath: String, oldValue: Any?, newValue: Any?) {}
     func did(remove object: DataObject) {}
 
 }

@@ -35,10 +35,10 @@ extension VatomModel {
 
         // prempt reactor outcome
         // remove vatom from inventory region
-        let undo = DataPool.inventory().preemptiveRemove(id: self.id)
+        let undoRemove = DataPool.inventory().preemptiveRemove(id: self.id)
 
         // perform the action
-        self.performAction("Transfer", payload: body, undos: [undo], completion: completion)
+        self.performAction("Transfer", payload: body, undos: [undoRemove], completion: completion)
 
     }
 
@@ -184,6 +184,12 @@ extension VatomModel {
             completion(.failure(error))
             return
         }
+        
+        // update 'when_modified' date
+        let nowDate = DateFormatter.blockvDateFormatter.string(from: Date())
+        let undoModified = DataPool.inventory().preemptiveChange(id: self.id, keyPath: "when_modified", value: nowDate)
+        var allUndos = undos
+        allUndos.append(undoModified)
 
         // perform the action
         BLOCKv.performAction(name: name, payload: payload) { result in
@@ -194,7 +200,7 @@ extension VatomModel {
 
             case .failure(let error):
                 // run undo closures
-                undos.forEach { $0() }
+                allUndos.forEach { $0() }
                 completion(.failure(error))
             }
 

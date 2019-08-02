@@ -20,7 +20,7 @@ public enum RegionEvent: String {
     // will change
 
     /// Triggered when an object is added.
-    case willAddObject = "region.object.will_adde"
+    case willAddObject = "region.object.will_add"
 
     /// Triggered when an object will be removed.
     case willRemoveObject = "region.object.will_remove"

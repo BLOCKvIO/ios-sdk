@@ -294,7 +294,7 @@ class BLOCKvRegion: Region {
     /// Called when an object is about to be added.
     override func will(add object: DataObject) {
         
-        // notify parent as well
+        // notify parent
         guard let parentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
             return
         }
@@ -309,7 +309,7 @@ class BLOCKvRegion: Region {
 
     override func did(add object: DataObject) {
         
-        // notify parent as well
+        // notify parent
         guard let parentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
             return
         }
@@ -326,16 +326,17 @@ class BLOCKvRegion: Region {
     /// Called when an object is about to be updated.
     override func will(update object: DataObject, withFields: [String: Any]) {
 
-        // notify parent as well
-        guard let oldParentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
-            return
+        if let oldParentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String,
+            let newParentID = (withFields["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String {
+            // notify parents
+            DispatchQueue.main.async {
+                self.emit(.willUpdateObject, userInfo: ["id": oldParentID])
+                self.emit(.willUpdateObject, userInfo: ["id": newParentID])
+            }
         }
-        guard let newParentID = (withFields["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
-            return
-        }
+        // notify object
         DispatchQueue.main.async {
-            self.emit(.willUpdateObject, userInfo: ["id": oldParentID])
-            self.emit(.willUpdateObject, userInfo: ["id": newParentID])
+            self.emit(.willUpdateObject, userInfo: ["id": object.id])
         }
 
     }
@@ -343,36 +344,54 @@ class BLOCKvRegion: Region {
     /// Called when an object is about to be updated.
     override func did(update object: DataObject, withFields: [String: Any]) {
 
-        // notify parent as well
-        guard let oldParentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
-            return
+        // notify parents
+        if let oldParentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String,
+            let newParentID = (withFields["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String {
+            DispatchQueue.main.async {
+                self.emit(.didUpdateObject, userInfo: ["id": oldParentID])
+                self.emit(.didUpdateObject, userInfo: ["id": newParentID])
+            }
         }
-        guard let newParentID = (withFields["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
-            return
-        }
+        // notify object
         DispatchQueue.main.async {
-            self.emit(.willUpdateObject, userInfo: ["id": oldParentID])
-            self.emit(.willUpdateObject, userInfo: ["id": newParentID])
+            self.emit(.didUpdateObject, userInfo: ["id": object.id])
         }
-
     }
 
     /// Called when an object is about to be updated.
     override func will(update: DataObject, keyPath: String, oldValue: Any?, newValue: Any?) {
 
         // check if parent ID is changing
-        if keyPath != "vAtom::vAtomType.parent_id" {
-            return
+        if keyPath == "vAtom::vAtomType.parent_id" {
+            // notify parents
+            guard let oldParentID = oldValue as? String else { return }
+            guard let newParentID = newValue as? String else { return }
+            DispatchQueue.main.async {
+                self.emit(.willUpdateObject, userInfo: ["id": oldParentID])
+                self.emit(.willUpdateObject, userInfo: ["id": newParentID])
+            }
         }
+        
+        self.emit(.willUpdateObject, userInfo: ["id": update.id])
 
-        // notify parent as well
-        guard let oldParentID = oldValue as? String else { return }
-        guard let newParentID = newValue as? String else { return }
-        DispatchQueue.main.async {
-            self.emit(.willUpdateObject, userInfo: ["id": oldParentID])
-            self.emit(.willUpdateObject, userInfo: ["id": newParentID])
+    }
+    
+    /// Called when an object is about to be updated.
+    override func did(update: DataObject, keyPath: String, oldValue: Any?, newValue: Any?) {
+        
+        // check if parent ID is changing
+        if keyPath == "vAtom::vAtomType.parent_id" {
+            // notify parents
+            guard let oldParentID = oldValue as? String else { return }
+            guard let newParentID = newValue as? String else { return }
+            DispatchQueue.main.async {
+                self.emit(.didUpdateObject, userInfo: ["id": oldParentID])
+                self.emit(.didUpdateObject, userInfo: ["id": newParentID])
+            }
         }
-
+        
+        self.emit(.didUpdateObject, userInfo: ["id": update.id])
+        
     }
 
     // - Remove

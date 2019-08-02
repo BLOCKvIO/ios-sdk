@@ -152,6 +152,7 @@ class InventoryRegion: BLOCKvRegion {
 
                 // add new objects
                 self.add(objects: items)
+                
 
             }.catch { error in
                 printBV(error: "[InventoryRegion] Unable to fetch inventory. \(error.localizedDescription)")

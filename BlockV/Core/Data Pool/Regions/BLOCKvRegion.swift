@@ -295,7 +295,8 @@ class BLOCKvRegion: Region {
     override func will(add object: DataObject) {
         
         // notify parent
-        guard let parentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
+        guard let vatomType = (object.data?["vAtom::vAtomType"] as? [String: Any]),
+            let parentID = vatomType["parent_id"] as? String else {
             return
         }
         DispatchQueue.main.async {
@@ -310,8 +311,9 @@ class BLOCKvRegion: Region {
     override func did(add object: DataObject) {
         
         // notify parent
-        guard let parentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
-            return
+        guard let vatomType = (object.data?["vAtom::vAtomType"] as? [String: Any]),
+            let parentID = vatomType["parent_id"] as? String else {
+                return
         }
         DispatchQueue.main.async {
             // broadcast update the vatom's parent
@@ -400,8 +402,9 @@ class BLOCKvRegion: Region {
     override func will(remove object: DataObject) {
 
         // notify parent as well
-        guard let parentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
-            return
+        guard let vatomType = (object.data?["vAtom::vAtomType"] as? [String: Any]),
+            let parentID = vatomType["parent_id"] as? String else {
+                return
         }
         DispatchQueue.main.async {
             if parentID != "." {
@@ -416,8 +419,9 @@ class BLOCKvRegion: Region {
     override func did(remove object: DataObject) {
         
         // notify parent as well
-        guard let parentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
-            return
+        guard let vatomType = (object.data?["vAtom::vAtomType"] as? [String: Any]),
+            let parentID = vatomType["parent_id"] as? String else {
+                return
         }
         DispatchQueue.main.async {
             if parentID != "." {

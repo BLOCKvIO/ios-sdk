@@ -197,10 +197,11 @@ public class Region {
                 self.did(update: existingObject, withFields: data)
 
             } else {
-
-                // it does not exist, add it
+                
+                // notify
+                self.will(add: obj)
+                // add it
                 self.objects[obj.id] = obj
-
                 // notify
                 self.did(add: obj)
 
@@ -259,7 +260,7 @@ public class Region {
 
         // notify each item that was updated
         for id in changedIDs {
-            self.emit(.objectUpdated, userInfo: ["id": id, "source": source?.rawValue ?? ""])
+            self.emit(.willUpdateObject, userInfo: ["id": id, "source": source?.rawValue ?? ""])
         }
 
         // notify overall update
@@ -298,14 +299,16 @@ public class Region {
         var didUpdate = false
         for id in ids {
 
+            // get object
+            guard let object = self.objects[id] else { continue }
+            self.will(remove: object)
+            
             // remove it
-            guard let object = self.objects.removeValue(forKey: id) else {
-                continue
-            }
-
+            self.objects.removeValue(forKey: id)
+            self.did(remove: object)
+            
             // notify
             didUpdate = true
-            self.will(remove: object) //FIXME: Should be didRemove?
 
         }
 
@@ -562,7 +565,9 @@ public class Region {
         // update to new value
         object.data![keyPath: KeyPath(keyPath)] = value
         object.cached = nil
-        self.emit(.objectUpdated, userInfo: ["id": id])
+        self.emit(.willUpdateObject, userInfo: ["id": id])
+        
+        self.did(update: object, keyPath: keyPath, oldValue: oldValue, newValue: value)
         self.emit(.updated)
         self.save()
 
@@ -575,7 +580,9 @@ public class Region {
             // update to new value
             object.data![keyPath: KeyPath(keyPath)] = oldValue
             object.cached = nil
-            self.emit(.objectUpdated, userInfo: ["id": id])
+            self.emit(.willUpdateObject, userInfo: ["id": id])
+            self.did(update: object, keyPath: keyPath, oldValue: oldValue, newValue: value)
+
             self.emit(.updated)
             self.save()
 
@@ -589,14 +596,14 @@ public class Region {
     /// - Returns: An undo function
     func preemptiveRemove(id: String) -> UndoFunction {
 
+        // get object
+        guard let removedObject = objects.removeValue(forKey: id) else { return {} }
+        self.will(remove: removedObject)
+        
         // remove object
-        guard let removedObject = objects.removeValue(forKey: id) else {
-            // no object, do nothing
-            return {}
-        }
-
-        // notify
-        self.will(remove: removedObject) //FIXME: should be didRemove
+        objects.removeValue(forKey: id)
+        self.did(remove: removedObject)
+        
         self.emit(.updated)
         self.save()
 
@@ -611,6 +618,7 @@ public class Region {
             // notify
             self.will(add: removedObject)
             self.add(objects: [removedObject])
+            self.did(add: removedObject)
             self.save()
 
         }
@@ -626,7 +634,7 @@ public class Region {
 
     func did(add: DataObject) {}
     func did(update: DataObject, withFields: [String: Any]) {}
-//    func did(update: DataObject, keyPath: String, oldValue: Any?, newValue: Any?) {}
-//    func did(remove object: DataObject) {}
+    func did(update: DataObject, keyPath: String, oldValue: Any?, newValue: Any?) {}
+    func did(remove object: DataObject) {}
 
 }

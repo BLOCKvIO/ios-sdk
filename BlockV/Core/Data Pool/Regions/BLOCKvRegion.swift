@@ -292,32 +292,34 @@ class BLOCKvRegion: Region {
     // - Add
 
     /// Called when an object is about to be added.
-    //    override func will(add object: DataObject) {
-    //
-    //        // Notify parent as well
-    //        guard let parentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
-    //            return
-    //        }
-    //        DispatchQueue.main.async {
-    //            // broadcast update the vatom's parent
-    //FIXME: Does this make sense? If the parent calls list children at this point it will not have updated yet
-    //            self.emit(.objectUpdated, userInfo: ["id": parentID])
-    ////            // broadbast the add
-    //            self.emit(.objectAdded, userInfo: ["id": object.id])
-    //        }
-    //
-    //    }
-
-    override func did(add object: DataObject) {
-        // Notify parent as well
-        guard let parentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
+    override func will(add object: DataObject) {
+        
+        // notify parent
+        guard let vatomType = (object.data?["vAtom::vAtomType"] as? [String: Any]),
+            let parentID = vatomType["parent_id"] as? String else {
             return
         }
         DispatchQueue.main.async {
             // broadcast update the vatom's parent
-            self.emit(.objectUpdated, userInfo: ["id": parentID])
+            self.emit(.willUpdateObject, userInfo: ["id": parentID])
             // broadbast the add
-            self.emit(.objectAdded, userInfo: ["id": object.id])
+            self.emit(.willAddObject, userInfo: ["id": object.id])
+        }
+        
+    }
+
+    override func did(add object: DataObject) {
+        
+        // notify parent
+        guard let vatomType = (object.data?["vAtom::vAtomType"] as? [String: Any]),
+            let parentID = vatomType["parent_id"] as? String else {
+                return
+        }
+        DispatchQueue.main.async {
+            // broadcast update the vatom's parent
+            self.emit(.didUpdateObject, userInfo: ["id": parentID])
+            // broadbast the add
+            self.emit(.didAddObject, userInfo: ["id": object.id])
         }
     }
 
@@ -326,16 +328,17 @@ class BLOCKvRegion: Region {
     /// Called when an object is about to be updated.
     override func will(update object: DataObject, withFields: [String: Any]) {
 
-        // notify parent as well
-        guard let oldParentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
-            return
+        if let oldParentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String,
+            let newParentID = (withFields["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String {
+            // notify parents
+            DispatchQueue.main.async {
+                self.emit(.willUpdateObject, userInfo: ["id": oldParentID])
+                self.emit(.willUpdateObject, userInfo: ["id": newParentID])
+            }
         }
-        guard let newParentID = (withFields["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
-            return
-        }
+        // notify object
         DispatchQueue.main.async {
-            self.emit(.objectUpdated, userInfo: ["id": oldParentID])
-            self.emit(.objectUpdated, userInfo: ["id": newParentID])
+            self.emit(.willUpdateObject, userInfo: ["id": object.id])
         }
 
     }
@@ -343,36 +346,54 @@ class BLOCKvRegion: Region {
     /// Called when an object is about to be updated.
     override func did(update object: DataObject, withFields: [String: Any]) {
 
-        // notify parent as well
-        guard let oldParentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
-            return
+        // notify parents
+        if let oldParentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String,
+            let newParentID = (withFields["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String {
+            DispatchQueue.main.async {
+                self.emit(.didUpdateObject, userInfo: ["id": oldParentID])
+                self.emit(.didUpdateObject, userInfo: ["id": newParentID])
+            }
         }
-        guard let newParentID = (withFields["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
-            return
-        }
+        // notify object
         DispatchQueue.main.async {
-            self.emit(.objectUpdated, userInfo: ["id": oldParentID])
-            self.emit(.objectUpdated, userInfo: ["id": newParentID])
+            self.emit(.didUpdateObject, userInfo: ["id": object.id])
         }
-
     }
 
     /// Called when an object is about to be updated.
     override func will(update: DataObject, keyPath: String, oldValue: Any?, newValue: Any?) {
 
         // check if parent ID is changing
-        if keyPath != "vAtom::vAtomType.parent_id" {
-            return
+        if keyPath == "vAtom::vAtomType.parent_id" {
+            // notify parents
+            guard let oldParentID = oldValue as? String else { return }
+            guard let newParentID = newValue as? String else { return }
+            DispatchQueue.main.async {
+                self.emit(.willUpdateObject, userInfo: ["id": oldParentID])
+                self.emit(.willUpdateObject, userInfo: ["id": newParentID])
+            }
         }
+        
+        self.emit(.willUpdateObject, userInfo: ["id": update.id])
 
-        // notify parent as well
-        guard let oldParentID = oldValue as? String else { return }
-        guard let newParentID = newValue as? String else { return }
-        DispatchQueue.main.async {
-            self.emit(.objectUpdated, userInfo: ["id": oldParentID])
-            self.emit(.objectUpdated, userInfo: ["id": newParentID])
+    }
+    
+    /// Called when an object is about to be updated.
+    override func did(update: DataObject, keyPath: String, oldValue: Any?, newValue: Any?) {
+        
+        // check if parent ID is changing
+        if keyPath == "vAtom::vAtomType.parent_id" {
+            // notify parents
+            guard let oldParentID = oldValue as? String else { return }
+            guard let newParentID = newValue as? String else { return }
+            DispatchQueue.main.async {
+                self.emit(.didUpdateObject, userInfo: ["id": oldParentID])
+                self.emit(.didUpdateObject, userInfo: ["id": newParentID])
+            }
         }
-
+        
+        self.emit(.didUpdateObject, userInfo: ["id": update.id])
+        
     }
 
     // - Remove
@@ -381,16 +402,34 @@ class BLOCKvRegion: Region {
     override func will(remove object: DataObject) {
 
         // notify parent as well
-        guard let parentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String else {
-            return
+        guard let vatomType = (object.data?["vAtom::vAtomType"] as? [String: Any]),
+            let parentID = vatomType["parent_id"] as? String else {
+                return
         }
         DispatchQueue.main.async {
             if parentID != "." {
-                self.emit(.objectUpdated, userInfo: ["id": parentID])
+                self.emit(.willUpdateObject, userInfo: ["id": parentID])
             }
-            self.emit(.objectRemoved, userInfo: ["id": object.id])
+            self.emit(.willRemoveObject, userInfo: ["id": object.id])
         }
 
+    }
+    
+    /// Called when an object has been removed.
+    override func did(remove object: DataObject) {
+        
+        // notify parent as well
+        guard let vatomType = (object.data?["vAtom::vAtomType"] as? [String: Any]),
+            let parentID = vatomType["parent_id"] as? String else {
+                return
+        }
+        DispatchQueue.main.async {
+            if parentID != "." {
+                self.emit(.didUpdateObject, userInfo: ["id": parentID])
+            }
+            self.emit(.didRemoveObject, userInfo: ["id": object.id])
+        }
+        
     }
 
 }

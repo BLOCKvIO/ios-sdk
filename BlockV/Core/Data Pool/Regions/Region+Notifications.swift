@@ -16,15 +16,29 @@ public enum RegionEvent: String {
 
     /// Triggered when any data in the region changes. This also indicates that there is no longer an error.
     case updated = "region.updated"
+    
+    // will change
 
     /// Triggered when an object is added.
-    case objectAdded = "region.object.added"
+    case willAddObject = "region.object.will_add"
 
-    /// Triggered when an object is removed.
-    case objectRemoved = "region.object.removed"
+    /// Triggered when an object will be removed.
+    case willRemoveObject = "region.object.will_remove"
 
     /// When a data object changes. userInfo["id"] is the ID of the changed object.
-    case objectUpdated = "region.object.updated"
+    case willUpdateObject = "region.object.will_update"
+    
+    // did change
+    
+    /// Triggered after an object was added.
+    case didAddObject = "region.object.did_add"
+    
+    /// Triggered after an object was removed.
+    case didRemoveObject = "region.object.did_remove"
+    
+    /// Triggered after an object was updated.
+    case didUpdateObject = "region.object.did_update"
+    
 
     /// When an error occurs. userInfo["error"] is the error. You can also access `region.error` to get the error.
     case error = "region.error"

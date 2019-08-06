@@ -11,13 +11,47 @@
 
 import Foundation
 
-/// A struct that holds **unpackaged** vAtoms.
+/// A struct that holds a single **unpacked** vatom.
+public struct SingelModel: Decodable, Equatable {
+    
+    public var vatom: VatomModel
+    public var faces: [FaceModel]
+    public var actions: [ActionModel]
+    
+    func package() -> VatomModel {
+        var vat = self.vatom
+        vat.faceModels = faces
+        vat.actionModels = actions
+        return vat
+    }
+    
+}
+
+extension UnpackedModel {
+    
+    /// Converts an unpacked-model into a single-model.
+    ///
+    /// - Returns: A single model.
+    /// - Throws: Throws an error is the unpacked-model does not contain exactly one vatom.
+    func convertToSingle() throws -> SingelModel {
+        guard self.vatoms.count == 1 else {
+            throw BVError.modelDecoding(reason: "UnpackedModel does not contain exactly one vatom.")
+        }
+        let vatom = self.vatoms.first!
+        let faces = self.faces.filter { $0.templateID == vatom.props.templateID }
+        let actions = self.actions.filter { $0.templateID == vatom.props.templateID }
+        return SingelModel(vatom: vatom, faces: faces, actions: actions)
+    }
+    
+}
+
+/// A struct that holds **unpackaged** vatoms.
 ///
-/// - Array of unpackaged vAtoms
+/// - Array of unpackaged vatoms
 /// - Array of faces for each of the present templates.
-///   - Technically, a consolidated array of all the faces linked to the parent templates of the present vAtoms.
+///   - Technically, a consolidated array of all the faces linked to the parent templates of the present vatoms.
 /// - Array of actions for each of the present templates.
-///   - Technically, a consolidated array of all the actions linked to the parent templates of the present vAtoms.
+///   - Technically, a consolidated array of all the actions linked to the parent templates of the present vatoms.
 public struct UnpackedModel: Decodable, Equatable {
 
     public var vatoms: [VatomModel]
@@ -84,7 +118,7 @@ public struct UnpackedModel: Decodable, Equatable {
     /// The resulting vatoms have their template's face and action models directly attached.
     ///
     /// - note:
-    /// Actions and Faces are associated at the template level. The BLOCKv API returns vAtoms, Action, and Faces as
+    /// Actions and Faces are associated at the template level. The BLOCKv API returns vatoms, Action, and Faces as
     /// three separate arrays (i.e. unpacked). This methods 'packages' the actions and faces onto associated vatoms.
     func package() -> [VatomModel] {
 

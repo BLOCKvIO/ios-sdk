@@ -60,7 +60,7 @@ extension BLOCKv {
         }
 
     }
-    
+
     /// Fetches a vatom by its identifier. The completion handler passes in a `VatomModel` that has been *packaged*.
     /// Packaged vAtoms have their template's configured Faces and Actions as properties.
     ///
@@ -69,18 +69,17 @@ extension BLOCKv {
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
     public static func getVatom(withID id: String, completion: @escaping (Result<VatomModel, BVError>) -> Void) {
-    
+
         let endpoint = API.Vatom.getVatoms(withIDs: [id])
-        
+
         self.client.request(endpoint) { result in
-            
+
             switch result {
             case .success(let baseModel):
-                // model is available
-                let unpackedModel = baseModel.payload
                 do {
-                    let single = try unpackedModel.convertToSingle()
-                    let vatom = single.package()
+                    // model is available
+                    let unpackedModel = baseModel.payload
+                    let vatom = try unpackedModel.packagedSingle()
                     DispatchQueue.main.async {
                         completion(.success(vatom))
                     }
@@ -90,16 +89,16 @@ extension BLOCKv {
                         completion(.failure(error as! BVError)) // this is safe
                     }
                 }
-                
+
             case .failure(let error):
                 // handle error
                 DispatchQueue.main.async {
                     completion(.failure(error))
                 }
             }
-            
+
         }
-    
+
     }
 
     /// Fetches vAtoms by providing an array of vAtom IDs. The completion handler passes in an array of

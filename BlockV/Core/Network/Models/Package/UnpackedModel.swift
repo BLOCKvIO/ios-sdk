@@ -11,40 +11,6 @@
 
 import Foundation
 
-/// A struct that holds a single **unpacked** vatom.
-public struct SingleModel: Decodable, Equatable {
-    
-    public var vatom: VatomModel
-    public var faces: [FaceModel]
-    public var actions: [ActionModel]
-    
-    func package() -> VatomModel {
-        var vat = self.vatom
-        vat.faceModels = faces
-        vat.actionModels = actions
-        return vat
-    }
-    
-}
-
-extension UnpackedModel {
-    
-    /// Converts an unpacked-model into a single-model.
-    ///
-    /// - Returns: A single model.
-    /// - Throws: Throws an error if the unpacked-model does not contain exactly one vatom.
-    func convertToSingle() throws -> SingleModel {
-        guard self.vatoms.count == 1 else {
-            throw BVError.modelDecoding(reason: "UnpackedModel does not contain exactly one vatom.")
-        }
-        let vatom = self.vatoms.first!
-        let faces = self.faces.filter { $0.templateID == vatom.props.templateID }
-        let actions = self.actions.filter { $0.templateID == vatom.props.templateID }
-        return SingleModel(vatom: vatom, faces: faces, actions: actions)
-    }
-    
-}
-
 /// A struct that holds **unpackaged** vatoms.
 ///
 /// - Array of unpackaged vatoms
@@ -136,6 +102,22 @@ public struct UnpackedModel: Decodable, Equatable {
 
         // return the packed vatoms
         return packedVatoms
+
+    }
+
+    /// Converts an unpacked-model into a `VatomModel` if the package contains only one vatom.
+    ///
+    /// - Returns: A single model.
+    /// - Throws: Throws an error if the unpacked-model does not contain exactly one vatom.
+    func packagedSingle() throws -> VatomModel {
+
+        guard self.vatoms.count == 1 else {
+            throw BVError.modelDecoding(reason: "UnpackedModel must contain exactly one vatom.")
+        }
+        var first = self.vatoms.first!
+        first.faceModels = faces
+        first.actionModels = actions
+        return first
 
     }
 

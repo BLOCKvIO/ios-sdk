@@ -295,10 +295,23 @@ extension API {
             return API.Generic.getInventory(parentID: parentID, page: page, limit: limit)
 
         }
-
-        /// Builds an endpoint to get a vAtom by its unique identifier.
+        
+        /// Builds an endpoint to get a vatom paylaod by its unique identifier.
         ///
-        /// - Parameter ids: Unique identifier of the vatom.
+        /// This endpoint may optionally be used to fetch unowned public vatom payloaded without requiring
+        /// authorization. For owned-private and owned-public vatom authorization is required.
+        ///
+        /// Only the vatom payload is returned. The `faces` and and `actions` array on the vatom will be empty.
+        ///
+        /// - Parameter id: Unique identifier.
+        /// - Returns: Constructed endpoint specialized to parse out a `UnpackedModel`.
+        static func getVatomPayload(withID id: String) -> Endpoint<BaseModel<VatomModel>> {
+            return API.Generic.getVatomPayload(withID: id)
+        }
+
+        /// Builds an endpoint to get Vatoms by their unique identifiers.
+        ///
+        /// - Parameter ids: Unique identifier.
         /// - Returns: Constructed endpoint specialized to parse out a `UnpackedModel`.
         static func getVatoms(withIDs ids: [String]) -> Endpoint<BaseModel<UnpackedModel>> {
             return API.Generic.getVatoms(withIDs: ids)

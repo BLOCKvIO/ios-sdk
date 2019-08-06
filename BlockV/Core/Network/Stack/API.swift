@@ -89,9 +89,19 @@ extension API {
             )
         }
 
-        /// Builds a generic endpoint to get a vAtom by its unique identifier.
+        /// Builds a generic endpoint to get a vatom payload by its unique identifier.
         ///
-        /// - Parameter ids: Unique identifier of the vatom.
+        /// Exlcudes Faces & Actions.
+        ///
+        /// - Parameter id: Unique identifier of the vatom.
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        static func getVatomPayload<T>(withID id: String) -> Endpoint<T> {
+            return Endpoint(method: .get, path: "/v1/vatoms/\(id)")
+        }
+
+        /// Builds a generic endpoint to get vAtoms by their unique identifiers.
+        ///
+        /// - Parameter ids: Array of unique identifiers.
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func getVatoms<T>(withIDs ids: [String]) -> Endpoint<T> {
             return Endpoint(method: .post,

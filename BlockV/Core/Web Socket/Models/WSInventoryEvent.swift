@@ -46,6 +46,8 @@ public struct WSInventoryEvent: WSEvent, Equatable {
     /// Unique identifier of the vAtom's parent.
     /// "." indicates the vAtom is at the root level.
     public let parentId: String
+    /// Name of the triggering action.
+    public let actionName: String
 
     // Client-side
 
@@ -94,6 +96,7 @@ extension WSInventoryEvent: Decodable {
         case oldOwnerId          = "old_owner"
         case templateVariationId = "template_variation"
         case parentId            = "parent_id"
+        case actionName          = "action_name"
     }
 
     public init(from decoder: Decoder) throws {
@@ -108,6 +111,7 @@ extension WSInventoryEvent: Decodable {
         oldOwnerId          = try payloadContainer.decode(String.self, forKey: .oldOwnerId)
         templateVariationId = try payloadContainer.decode(String.self, forKey: .templateVariationId)
         parentId            = try payloadContainer.decode(String.self, forKey: .parentId)
+        actionName          = try payloadContainer.decode(String.self, forKey: .actionName)
 
         // stamp this event with the current time
         timestamp = Date()

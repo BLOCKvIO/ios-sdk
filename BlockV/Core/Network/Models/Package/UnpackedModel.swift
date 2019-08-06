@@ -12,7 +12,7 @@
 import Foundation
 
 /// A struct that holds a single **unpacked** vatom.
-public struct SingelModel: Decodable, Equatable {
+public struct SingleModel: Decodable, Equatable {
     
     public var vatom: VatomModel
     public var faces: [FaceModel]
@@ -32,15 +32,15 @@ extension UnpackedModel {
     /// Converts an unpacked-model into a single-model.
     ///
     /// - Returns: A single model.
-    /// - Throws: Throws an error is the unpacked-model does not contain exactly one vatom.
-    func convertToSingle() throws -> SingelModel {
+    /// - Throws: Throws an error if the unpacked-model does not contain exactly one vatom.
+    func convertToSingle() throws -> SingleModel {
         guard self.vatoms.count == 1 else {
             throw BVError.modelDecoding(reason: "UnpackedModel does not contain exactly one vatom.")
         }
         let vatom = self.vatoms.first!
         let faces = self.faces.filter { $0.templateID == vatom.props.templateID }
         let actions = self.actions.filter { $0.templateID == vatom.props.templateID }
-        return SingelModel(vatom: vatom, faces: faces, actions: actions)
+        return SingleModel(vatom: vatom, faces: faces, actions: actions)
     }
     
 }

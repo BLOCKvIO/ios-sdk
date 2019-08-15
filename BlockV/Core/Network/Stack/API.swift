@@ -63,7 +63,7 @@ extension API {
         static func getInventoryVatomSyncNumbers<T>(limit: Int = 1000, token: String) -> Endpoint<T> {
             return Endpoint(method: .get,
                             path: userVatomPath + "/inventory/index",
-                            parameters: ["limit": limit, "nextToken": token],
+                            parameters: ["limit": limit, "next_token": token],
                             encoding: URLEncoding.queryString)
         }
 
@@ -104,6 +104,7 @@ extension API {
         /// - Parameter ids: Array of unique identifiers.
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func getVatoms<T>(withIDs ids: [String]) -> Endpoint<T> {
+            assert(ids.count <= 100, "This call can retrive a maximum of 100 vatoms.")
             return Endpoint(method: .post,
                             path: userVatomPath + "/get",
                             parameters: ["ids": ids]

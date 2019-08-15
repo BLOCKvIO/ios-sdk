@@ -71,6 +71,14 @@ class InventoryRegion: BLOCKvRegion {
     }
 
     /// Load current state from the server.
+    ///
+    /// 1. Call /hash API to get the current hash, if unchanged, stop.
+    /// 2. Call /sync API to fetch all vatom sync numbers.
+    /// 2.1 For all vatoms in the db not returned by /sync, remove.
+    /// 2.2 For all vatoms present in /sync, but not in the db, add.
+    /// 2.3 For all vatoms present in /sync and db, fetch the vatom and update.
+    ///
+    /// If at any point the sync APIs fail, fallback on fetching the entire inventory.
     override func load() -> Promise<[String]?> {
 
         // pause websocket events
@@ -89,13 +97,23 @@ class InventoryRegion: BLOCKvRegion {
                 return Promise.value(nil)
             }
 
-            // fetch all pages recursively
-            return self.fetchBatched().ensure {
+            // fetch changes recursively
+            return self.fetchChanges().ensure {
                 // resume websocket events
                 self.resumeMessages()
             }
 
-        }
+        }.recover({ error -> Promise<[String]?> in
+            
+            printBV(error: "[InventoryRegion] Unable to fetch inventory hash. \(error.localizedDescription)")
+            printBV(error: "[InventoryRegion] Fallling back on full inventory fetch.")
+
+            // fetch all pages recursively
+            return self.fetchAllBatched().ensure {
+                // resume websocket events
+                self.resumeMessages()
+            }
+        })
 
     }
 
@@ -188,8 +206,77 @@ class InventoryRegion: BLOCKvRegion {
 }
 
 extension InventoryRegion {
+    
+    /// Fetches only changed items (based on sync state).
+    func fetchChanges() -> Promise<[String]?> {
+        
+        // fetch sync numbers for *all* vatoms
+        return self.fetchVatomSyncNumbers().then { newSyncModels -> Promise<[String]?> in
+            // printBV(info: "[InventoryRegion] Sync models: \n\(syncModels)")
+            
+            let currentIds = Set(self.vatomObjects.keys)
+            let syncIds = Set(newSyncModels.map { $0.id })
+            
+            let idsToRemove = currentIds.subtracting(syncIds)
+            printBV(info: "[InventoryRegion] Sync will remove:")
+            idsToRemove.forEach { print(" - " + $0) }
 
-    func fetchBatched(maxConcurrent: Int = 4) -> Promise<[String]?> {
+            let idsToAdd = syncIds.subtracting(currentIds)
+            printBV(info: "[InventoryRegion] Sync will add:")
+            idsToAdd.forEach { print(" - " + $0) }
+
+            let idsInCommon = currentIds.union(syncIds)
+            var idsToFetch: Set<String> = idsToAdd
+            
+            // sync of zero mean no change, ignore
+            let filteredNewSyncModels = newSyncModels.filter { $0.sync != 0 }
+            // find the vatoms whose sync numbers have changed
+            let idsToUpdate = filteredNewSyncModels.filter { newSyncModel -> Bool in
+                return self.vatomSyncObjects.contains(where: {
+                    $0.id == newSyncModel.id && $0.sync != newSyncModel.sync
+                })
+            }
+   
+            // fetch all added + updated ids
+            idsToFetch.formUnion(idsToUpdate.map { $0.id })
+            // printBV(info: "[InventoryRegion] Sync will fetch:")
+            // idsToFetch.forEach { print(" - " + $0) }
+
+            if idsToFetch.isEmpty {
+                // nothing to fetch, so just remove
+                return Promise { (resolver: Resolver) in
+                    DispatchQueue.main.async {
+                        // remove
+                        self.remove(ids: Array(idsToRemove))
+                        printBV(info: "[InventoryRegion] Sync did remove:")
+                        idsToRemove.forEach { print(" - " + $0) }
+                        resolver.fulfill(nil)
+                    }
+                }
+            }
+            
+            // fetch
+            return self.fetchObjects(ids: Array(idsToFetch)).then { objects -> Promise<[String]?> in
+                
+                // remove
+                self.remove(ids: Array(idsToRemove))
+                printBV(info: "[InventoryRegion] Sync did remove:")
+                idsToRemove.forEach { print(" - " + $0) }
+                // add
+                self.add(objects: objects)
+                printBV(info: "[InventoryRegion] Sync did add/update:")
+                objects.forEach { print(" - " + $0.type + " " + $0.id) }
+
+                return Promise.value(nil)
+                
+            }
+            
+        }
+        
+    }
+
+    /// Fetches all items (irrespective of sync state).
+    func fetchAllBatched(maxConcurrent: Int = 4) -> Promise<[String]?> {
 
         let intialRange: CountableClosedRange<Int> = 1...maxConcurrent
         return fetchRange(intialRange)
@@ -199,8 +286,7 @@ extension InventoryRegion {
     private func fetchRange(_ range: CountableClosedRange<Int>) -> Promise<[String]?> {
 
         iteration += 1
-
-        print("[Pager] fetching range \(range) in iteration \(iteration).")
+        print("[InventoryRegion][Pager] fetching range \(range) in iteration \(iteration).")
 
         var promises: [Promise<[String]?>] = []
 
@@ -259,8 +345,7 @@ extension InventoryRegion {
 
             // check stopping condition
             if shouldRecurse {
-
-                print("[Pager] recursing.")
+                print("[InventoryRegion][Pager] recursing.")
 
                 // create the next range (with equal width)
                 let nextLower = range.upperBound.advanced(by: 1)
@@ -270,8 +355,7 @@ extension InventoryRegion {
                 return self.fetchRange(nextRange)
 
             } else {
-
-                print("[Pager] stopping condition hit.")
+                print("[InventoryRegion][Pager] stopping condition hit.")
 
                 return Promise.value(self.cummulativeIds)
 
@@ -293,6 +377,84 @@ extension InventoryRegion {
             return result.payload.hash
         }
 
+    }
+    
+    /// Fetches all remote inventory vatom sync numbers.
+    ///
+    /// This function recurses through server pages.
+    func fetchVatomSyncNumbers() -> Promise<[VatomSyncModel]> {
+        
+        var cummulativeSyncModels: [VatomSyncModel] = []
+        
+        func fetchInventoryVatomSyncNumbers(limit: Int = 1000, token: String = "") -> Promise<[VatomSyncModel]> {
+
+            let endpoint = API.Vatom.getInventoryVatomSyncNumbers(limit: limit, token: token)
+            return BLOCKv.client.request(endpoint).then { result -> Promise<[VatomSyncModel]> in
+                
+                // printBV(info: "[InventoryRegion] Sync result: token: \(token)")
+                // result.payload.vatoms.forEach { print(" - " + $0.id + " sync: " + String($0.sync)) }
+
+                // accumulate
+                cummulativeSyncModels += result.payload.vatoms
+                
+                // check stopping codintion (base case)
+                if result.payload.nextToken == "" || result.payload.vatoms.isEmpty {
+                    return Promise.value(cummulativeSyncModels)
+                }
+                // prepare for next iteration
+                let nextToken = result.payload.nextToken
+                return fetchInventoryVatomSyncNumbers(limit: limit, token: nextToken)
+            }
+
+        }
+        
+        return fetchInventoryVatomSyncNumbers()
+        
+    }
+    
+    /// Fetch data objects for the specified vatom ids.
+    ///
+    /// Splits large (> 100) into multipe network requests.
+    func fetchObjects(ids: [String]) -> Promise<[DataObject]> {
+        
+        //TODO: Could benefit from parallelelization
+        
+        if ids.isEmpty { return Promise.value([]) }
+        let chunks = ids.chunked(into: 100)
+        
+        var cummulativeObjects: [DataObject] = []
+        
+        func fetchChunk(index: Int) -> Promise<[DataObject]> {
+            
+            let endpoint: Endpoint<Void> = API.Generic.getVatoms(withIDs: chunks[index])
+            return BLOCKv.client.requestJSON(endpoint)
+                .then(on: .global(qos: .userInitiated)) { json -> Promise<[DataObject]> in
+                    // parse
+                    guard let json = json as? [String: Any],
+                        let payload = json["payload"] as? [String: Any] else {
+                            throw RegionError.failedParsingResponse
+                    }
+                    // parse out data objects
+                    guard let items = self.parseDataObject(from: payload) else {
+                        throw RegionError.failedParsingResponse
+                    }
+                    
+                    // accumulate
+                    cummulativeObjects += items
+                    
+                    // prepare for next iteration
+                    let nextIndex = index + 1
+                    if nextIndex < chunks.count {
+                        return fetchChunk(index: nextIndex)
+                    } else {
+                        return Promise.value(cummulativeObjects)
+                    }
+                    
+            }
+        }
+        
+        return fetchChunk(index: 0)
+        
     }
 
 }

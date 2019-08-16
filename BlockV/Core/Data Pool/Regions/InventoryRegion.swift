@@ -9,6 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import Foundation
 import PromiseKit
 
@@ -37,16 +38,13 @@ class InventoryRegion: BLOCKvRegion {
 
         // make sure we have a valid current user
         guard let userID = DataPool.sessionInfo["userID"] as? String, !userID.isEmpty else {
+            os_log("[InventoryRegion] Accessed prior to valid user session.", log: .dataPool, type: .error)
             throw NSError("You cannot query the inventory region without being logged in.")
         }
 
     }
 
-    var lastHash: String? {
-        didSet {
-            print("lastHash \(String(describing: lastHash))")
-        }
-    }
+    var lastHash: String?
 
     /// Current user ID.
     let currentUserID = DataPool.sessionInfo["userID"] as? String ?? ""
@@ -86,6 +84,8 @@ class InventoryRegion: BLOCKvRegion {
 
         return self.fetchInventoryHash().then { newHash -> Promise<[String]?> in
 
+            os_log("[InventoryRegion] Fetched hash: %@", log: .dataPool, type: .debug, newHash)
+
             // replace current hash
             let oldHash = self.lastHash
             self.lastHash = newHash
@@ -105,8 +105,8 @@ class InventoryRegion: BLOCKvRegion {
 
         }.recover({ error -> Promise<[String]?> in
             
-            printBV(error: "[InventoryRegion] Unable to fetch inventory hash. \(error.localizedDescription)")
-            printBV(error: "[InventoryRegion] Fallling back on full inventory fetch.")
+            os_log("[InventoryRegion] Unable to fetch inventory hash: %@", log: .dataPool, type: .error,
+                   error.localizedDescription)
 
             // fetch all pages recursively
             return self.fetchAllBatched().ensure {
@@ -173,7 +173,7 @@ class InventoryRegion: BLOCKvRegion {
                 
 
             }.catch { error in
-                printBV(error: "[InventoryRegion] Unable to fetch inventory. \(error.localizedDescription)")
+                os_log("[InventoryRegion] Unable to fetch vatom: %@", log: .dataPool, type: .error, vatomID)
             }.finally {
                 // resume WebSocket processing
                 self.resumeMessages()
@@ -218,12 +218,11 @@ extension InventoryRegion {
             let syncIds = Set(newSyncModels.map { $0.id })
             
             let idsToRemove = currentIds.subtracting(syncIds)
-            printBV(info: "[InventoryRegion] Sync will remove:")
-            idsToRemove.forEach { print(" - " + $0) }
+            os_log("[InventoryRegion] Diff Sync: Will remove: %@", log: .dataPool, type: .debug, idsToRemove.debugDescription)
 
             let idsToAdd = syncIds.subtracting(currentIds)
-            printBV(info: "[InventoryRegion] Sync will add:")
-            idsToAdd.forEach { print(" - " + $0) }
+            os_log("[InventoryRegion] Diff Sync: Will add: %@", log: .dataPool, type: .debug, idsToAdd.debugDescription)
+
 
             let idsInCommon = currentIds.union(syncIds)
             var idsToFetch: Set<String> = idsToAdd
@@ -248,8 +247,7 @@ extension InventoryRegion {
                     DispatchQueue.main.async {
                         // remove
                         self.remove(ids: Array(idsToRemove))
-                        printBV(info: "[InventoryRegion] Sync did remove:")
-                        idsToRemove.forEach { print(" - " + $0) }
+                        os_log("[InventoryRegion] Diff Sync: Did remove: %@", log: .dataPool, type: .debug, idsToRemove.debugDescription)
                         resolver.fulfill(nil)
                     }
                 }
@@ -260,12 +258,10 @@ extension InventoryRegion {
                 
                 // remove
                 self.remove(ids: Array(idsToRemove))
-                printBV(info: "[InventoryRegion] Sync did remove:")
-                idsToRemove.forEach { print(" - " + $0) }
+                os_log("[InventoryRegion] Diff Sync: Did remove: %@", log: .dataPool, type: .debug, idsToRemove.debugDescription)
                 // add
                 self.add(objects: objects)
-                printBV(info: "[InventoryRegion] Sync did add/update:")
-                objects.forEach { print(" - " + $0.type + " " + $0.id) }
+                os_log("[InventoryRegion] Diff Sync: did add/update: %@", log: .dataPool, type: .debug, objects.debugDescription)
 
                 return Promise.value(nil)
                 
@@ -275,6 +271,7 @@ extension InventoryRegion {
         
     }
 
+    
     /// Fetches all items (irrespective of sync state).
     func fetchAllBatched(maxConcurrent: Int = 4) -> Promise<[String]?> {
 
@@ -286,7 +283,7 @@ extension InventoryRegion {
     private func fetchRange(_ range: CountableClosedRange<Int>) -> Promise<[String]?> {
 
         iteration += 1
-        print("[InventoryRegion][Pager] fetching range \(range) in iteration \(iteration).")
+        os_log("[InventoryRegion] Full Sync: Fetcing Range: %@, Iteration: %d", log: .dataPool, type: .debug, range.debugDescription, iteration)
 
         var promises: [Promise<[String]?>] = []
 
@@ -345,7 +342,6 @@ extension InventoryRegion {
 
             // check stopping condition
             if shouldRecurse {
-                print("[InventoryRegion][Pager] recursing.")
 
                 // create the next range (with equal width)
                 let nextLower = range.upperBound.advanced(by: 1)
@@ -355,10 +351,8 @@ extension InventoryRegion {
                 return self.fetchRange(nextRange)
 
             } else {
-                print("[InventoryRegion][Pager] stopping condition hit.")
-
+                os_log("[InventoryRegion] Full Sync: Stopped on page %d", log: .dataPool, type: .debug, self.proccessedPageCount)
                 return Promise.value(self.cummulativeIds)
-
             }
 
         }

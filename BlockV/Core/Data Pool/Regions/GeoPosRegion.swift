@@ -9,6 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import Foundation
 import PromiseKit
 import CoreLocation
@@ -238,7 +239,8 @@ class GeoPosRegion: BLOCKvRegion {
                 self.add(objects: items)
 
                 }.catch { error in
-                    printBV(error: "[InventoryRegion] Unable to fetch vatom. \(error.localizedDescription)")
+                    os_log("[%@] Failed to fetch vatom: %@ error: %@", log: .dataPool, type: .error, typeName(self),
+                           vatomID, error.localizedDescription)
                 }.finally {
                     // resume WebSocket processing
                     self.resumeMessages()
@@ -304,8 +306,9 @@ class GeoPosRegion: BLOCKvRegion {
                 // add new objects
                 self.add(objects: items)
 
-                }.catch { error in
-                    printBV(error: "[GeoPosRegion] Unable to vatom. \(error.localizedDescription)")
+            }.catch { error in
+                os_log("[%@] Failed to fetch vatom: %@ error: %@", log: .dataPool, type: .error, typeName(self),
+                       vatomID, error.localizedDescription)
             }
 
         } else if operation == "remove" {

@@ -9,6 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import Foundation
 
 /// Abstract subclass of `Region`. This intermediate class handles updates from the BLOCKv Web socket. Regions should
@@ -226,7 +227,8 @@ class BLOCKvRegion: Region {
             vatom.actionModels = actions
             return vatom
         } catch {
-            printBV(error: error.localizedDescription)
+            os_log("[%@] Package intialization failure: %@", log: .dataPool, type: .error, typeName(self),
+                   error.localizedDescription)
             return nil
         }
 

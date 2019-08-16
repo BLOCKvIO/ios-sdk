@@ -12,7 +12,8 @@
 import Foundation
 
 /// Models the BLOCKv platform environments.
-public enum BVEnvironment: String {
+public enum BVEnvironment: String, CustomDebugStringConvertible {
+    
     /// Stable production environment.
     case production = "prod_env"
     /// Unstable development environement (DO NOT USE).
@@ -39,6 +40,15 @@ public enum BVEnvironment: String {
         case .production: return "https://login.blockv.io"
         case .development: return "https:/login.blockv.net"
         }
+    }
+    
+    public var debugDescription: String {
+        return """
+        Environment: \(self.rawValue)
+          - API Server: \(self.apiServerURLString)
+          - Socket Server: \(self.webSocketURLString)
+          - OAuth Server: \(self.oauthWebApp)
+        """
     }
 
 }

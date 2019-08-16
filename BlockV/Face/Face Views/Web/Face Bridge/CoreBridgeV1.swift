@@ -89,7 +89,6 @@ class CoreBridgeV1: CoreBridge {
          Explict force unwrap - the program is in an invalid state if the message cannot be created.
          */
         let message = MessageName(rawValue: scriptMessage.name)!
-        printBV(info: "CoreBride_1: \(message)")
 
         // switch and route message
         switch message {

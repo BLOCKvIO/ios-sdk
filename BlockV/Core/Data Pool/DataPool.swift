@@ -9,6 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import Foundation
 import PromiseKit
 import MapKit
@@ -79,7 +80,8 @@ public final class DataPool {
         region.loadFromCache().recover { err -> Void in
 
             // unable to load from disk
-            printBV(error: "[DataPool] Unable to load region state from disk. " + err.localizedDescription)
+            os_log("[%@] Unable to load region state from disk: %@", log: .dataPool, type: .error,
+                   typeName(self) ,err.localizedDescription)
 
         }.then { _ -> Guarantee<Void> in
 
@@ -89,7 +91,8 @@ public final class DataPool {
         }.catch { err in
 
             // unable to load from network either!
-            printBV(error: "[DataPool] Unable to load region state from network. " + err.localizedDescription)
+            os_log("[%@] Unable to load region state from network: %@", log: .dataPool, type: .error,
+                   typeName(self) ,err.localizedDescription)
 
         }
 

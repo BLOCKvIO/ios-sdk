@@ -9,6 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import Foundation
 import Alamofire
 
@@ -105,7 +106,7 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
                 let errorDictionary = json as? [String: String],
                 // Important to check for both "token expired" and "Unauthorized" messages.
                 (errorDictionary["exp"] == "token expired" || errorDictionary["message"] == "Unauthorized") else {
-                    //printBV(info: "401 received. Unrelated to access token. Access token refresh declined.")
+                    os_log("User authentication required. 401", log: .authentication, type: .debug)
                     // don't retry the request
                     completion(false, 0.0)
                     return
@@ -146,13 +147,13 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
             strongSelf.lock.lock() ; defer { strongSelf.lock.unlock() }
 
             if !succeeded {
-                printBV(error: "Access token - Not Updated")
+                os_log("Access token refresh: Failed", log: .authentication, type: .error)
             }
 
             // store the new access token
             if let accessToken = accessToken {
                 strongSelf.accessToken = accessToken
-                printBV(info: "Access token - Updated")
+                os_log("Access token refresh: Failed - Missing token", log: .authentication, type: .error)
             }
 
             // call completions to retry request
@@ -172,7 +173,7 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
     /// - Parameter completion: The completion closure to call once the token refresh completes.
     private func refreshTokens(completion: @escaping RefreshCompletion) {
 
-        printBV(info: "Access token - Attempting refresh")
+        os_log("Access token - Attempting refresh", log: .authentication, type: .default)
 
         guard !isRefreshing else {
             assertionFailure("Calling functions should ensure a refresh isn't triggered while one is in flight.")
@@ -196,13 +197,12 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
 
             switch dataResponse.result {
             case let .success(val):
-                printBV(info: "Access token - Refresh successful")
+                os_log("Access token - Refresh successful", log: .authentication, type: .default)
                 // invoke with success
                 completion(true, val.payload.accessToken.token, nil)
 
             case let .failure(err):
-                printBV(error: "Access token - Refresh failed")
-                printBV(error: err.localizedDescription)
+                os_log("Access token - Refresh failed: %@", log: .authentication, type: .error, err.localizedDescription)
 
                 // check if the error payload indicates the refresh token is invlaid
                 if let statusCode = dataResponse.response?.statusCode, (400...499) ~= statusCode {

@@ -433,3 +433,25 @@ class BLOCKvRegion: Region {
     }
 
 }
+
+/// Convenience computed properties.
+extension BLOCKvRegion {
+    
+    /// Returns a dictionary of objects where type is 'vatom'.
+    var vatomObjects: [String: DataObject] {
+        return self.objects.filter { $0.value.type == "vatom" }
+    }
+    /// Returns a dictionary of objects where type is 'face'.
+    var faceObject: [String: DataObject] {
+        return self.objects.filter { $0.value.type == "face"}
+    }
+    /// Returns a dictionary of objects where type is 'action'.
+    var actionObject: [String: DataObject] {
+        return self.objects.filter { $0.value.type == "action"}
+    }
+    
+    var vatomSyncObjects: [VatomSyncModel] {
+        return self.vatomObjects.map { VatomSyncModel(id: $0.value.id, sync: ($0.value.data?["sync"] as? UInt) ?? 0) }
+    }
+    
+}

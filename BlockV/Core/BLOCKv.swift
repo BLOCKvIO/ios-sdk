@@ -343,16 +343,6 @@ public final class BLOCKv {
 
 }
 
-// MARK: - Print Helpers
-
-func printBV(info string: String) {
-    print("\nBV SDK > \(string)")
-}
-
-func printBV(error string: String) {
-    print("\nBV SDK >>> Error: \(string)")
-}
-
 extension BLOCKv {
 
     public enum Debug {
@@ -377,6 +367,16 @@ extension BLOCKv {
 
     }
 
+}
+
+// MARK: - Logging Helpers
+
+func printBV(info string: String) {
+    print("\nBV SDK > \(string)")
+}
+
+func printBV(error string: String) {
+    print("\nBV SDK >>> Error: \(string)")
 }
 
 extension OSLog {

@@ -9,6 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import Foundation
 import GenericJSON
 
@@ -386,8 +387,7 @@ open class VatomView: UIView {
         if (self.selectedFaceView != nil) &&
             (newFaceModel == self.selectedFaceModel) &&
             (vatom.props.templateVariationID == oldVatom?.props.templateVariationID) {
-
-            //printBV(info: "Face model unchanged - Updating face view.")
+            // os_log("Face model unchanged - Updating face view", log: .vatomView, type: .debug)
 
             /*
              Although the selected face model has not changed, other items in the vatom may have, these updates
@@ -403,8 +403,7 @@ open class VatomView: UIView {
             self.vatomViewDelegate?.vatomView(self, didSelectFaceView: .success(self.selectedFaceView!))
 
         } else {
-
-            //printBV(info: "Face model changed - Creating new face view.")
+            // os_log("Face model changed - Creating new face view.", log: .vatomView, type: .debug)
 
             do {
                 let faceView = try createFaceView(forModel: newFaceModel, onVatom: vatom)
@@ -499,7 +498,7 @@ open class VatomView: UIView {
                  */
                 guard self.vatom!.id == contextID else {
                     // vatom-view is no longer displaying the original vatom
-                    //                    printBV(info: "Load completed, but original vatom has changed.")
+                    // os_log("Load completed, but original vatom has changed.", log: .vatomView, type: .debug)
                     return
                 }
 

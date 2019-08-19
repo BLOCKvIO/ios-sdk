@@ -9,6 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import Foundation
 import PromiseKit
 
@@ -79,7 +80,8 @@ class VatomChildrenRegion: BLOCKvRegion {
         builder.page = page
         builder.limit = 1000
 
-        printBV(info: "[DataPool > VatomChildrenRegion] Loading page \(page), got \(previousItems.count) items so far.")
+        os_log("[%@] Fetching page %d, received %d items thus far.", log: .dataPool, type: .debug, typeName(self),
+               page, previousItems.count)
 
         // create endpoint over void
         let endpoint: Endpoint<Void> = API.Generic.discover(builder.toDictionary())

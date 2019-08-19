@@ -9,6 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import Foundation
 import PromiseKit
 
@@ -105,7 +106,7 @@ public class Region {
         }
 
         // ask the subclass to load it's data
-        printBV(info: "[DataPool > Region] Starting synchronization for region \(self.stateKey)")
+        os_log("[%@] Starting synchronization for %@", log: .dataPool, type: .debug, typeName(self), self.stateKey)
 
         // load objects
         _syncPromise = self.load().map { ids -> Void in
@@ -124,13 +125,13 @@ public class Region {
             // data is up to date
             self.synchronized = true
             self._syncPromise = nil
-            printBV(info: "[DataPool > Region] Region '\(self.stateKey)' is now in sync!")
+            os_log("[%@] %@ is now in sync!", log: .dataPool, type: .debug, typeName(self), self.stateKey)
 
         }.recover { err in
             // error handling, notify listeners of an error
             self._syncPromise = nil
             self.error = err
-            printBV(error: "[DataPool > Region] Unable to load: " + err.localizedDescription)
+            os_log("[%@] Unable to synchronize: %@", log: .dataPool, type: .error, typeName(self), err.localizedDescription)
             self.emit(.error, userInfo: ["error": err])
         }
 
@@ -440,14 +441,14 @@ public class Region {
 
                 // read data
                 guard let data = try? Data(contentsOf: self.cacheFile) else {
-                    printBV(error: ("[DataPool > Region] Unable to read cached data"))
+                    os_log("[%@] Unable to read cached data", log: .dataPool, type: .error, typeName(self))
                     resolver.fulfill_()
                     return
                 }
 
                 // parse JSON
                 guard let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [[Any]] else {
-                    printBV(error: "[DataPool > Region] Unable to parse cached JSON")
+                    os_log("[@] Unable to parse cached JSON", log: .dataPool, type: .error, typeName(self))
                     resolver.fulfill_()
                     return
                 }
@@ -480,7 +481,8 @@ public class Region {
 
                 // done
                 let delay = (Date.timeIntervalSinceReferenceDate - startTime) * 1000
-                printBV(info: ("[DataPool > Region] Loaded \(cleanObjects.count) from cache in \(Int(delay))ms"))
+                os_log("[%@] Loaded %d objects from cache in %dms", log: .dataPool, type: .info,
+                       typeName(self), cleanObjects.count, Int(delay))
                 resolver.fulfill_()
 
             }
@@ -512,7 +514,7 @@ public class Region {
 
             // convert to JSON
             guard let data = try? JSONSerialization.data(withJSONObject: json, options: []) else {
-                printBV(error: ("[DataPool > Region] Unable to convert data objects to JSON"))
+                os_log("[%@] Unable to convert data objects to JSON", log: .dataPool, type: .error, typeName(self))
                 return
             }
 
@@ -524,13 +526,14 @@ public class Region {
             do {
                 try data.write(to: self.cacheFile)
             } catch let err {
-                printBV(error: ("[DataPool > Region] Unable to save data to disk: " + err.localizedDescription))
+                os_log("[%@] Unable to save data to disk: %@", log: .dataPool, type: .error,
+                       typeName(self), err.localizedDescription)
                 return
             }
 
             // done
             let delay = (Date.timeIntervalSinceReferenceDate - startTime) * 1000
-            printBV(info: ("[DataPool > Region] Saved \(self.objects.count) objects to disk in \(Int(delay))ms"))
+            os_log("[%@] Saved %d objects in %dms", log: .dataPool, type: .info, typeName(self), self.objects.count, Int(delay))
 
         }
 

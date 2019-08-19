@@ -9,6 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import Foundation
 import Alamofire
 import JWTDecode
@@ -36,6 +37,7 @@ public final class BLOCKv {
                 assertionFailure("The App ID may be set only once.")
             }
         }
+        
     }
 
     //TODO: Detect an environment switch, e.g. dev to prod, reset the client.
@@ -47,7 +49,9 @@ public final class BLOCKv {
         willSet {
             if environment != nil { reset() }
         }
-        didSet { printBV(info: "Environment updated - \(environment!)") }
+        didSet {
+            os_log("Environment updated:\n%@", log: .lifecycle, type: .debug, environment!.debugDescription)
+        }
     }
 
     // MARK: - Configuration
@@ -211,7 +215,7 @@ public final class BLOCKv {
         // clear data pool
         DataPool.clear()
 
-        printBV(info: "Reseting SDK")
+        os_log("Resetting SDK", log: .lifecycle, type: .debug)
     }
 
     // - Public Lifecycle
@@ -248,8 +252,6 @@ public final class BLOCKv {
     /// multiple requests fail due to the refresh token being invalid.
     @objc
     private static func handleUserAuthorisationRequired() {
-
-        printBV(info: "Authorization - User is unauthorized.")
 
         // only notify the viewer if the user is currently authorized
         if isLoggedIn {
@@ -341,16 +343,6 @@ public final class BLOCKv {
 
 }
 
-// MARK: - Print Helpers
-
-func printBV(info string: String) {
-    print("\nBV SDK > \(string)")
-}
-
-func printBV(error string: String) {
-    print("\nBV SDK >>> Error: \(string)")
-}
-
 extension BLOCKv {
 
     public enum Debug {
@@ -375,4 +367,27 @@ extension BLOCKv {
 
     }
 
+}
+
+// MARK: - Logging Helpers
+
+func printBV(info string: String) {
+    print("\nBV SDK > \(string)")
+}
+
+func printBV(error string: String) {
+    print("\nBV SDK >>> Error: \(string)")
+}
+
+extension OSLog {
+    private static var subsystem = "io.blockv.sdk.core"
+    static let lifecycle = OSLog(subsystem: subsystem, category: "lifecycle")
+    static let dataPool =  OSLog(subsystem: subsystem, category: "dataPool")
+    static let authentication = OSLog(subsystem: subsystem, category: "authentication")
+    static let socket = OSLog(subsystem: subsystem, category: "socket")
+}
+
+/// Returns type name.
+func typeName(_ some: Any) -> String {
+    return (some is Any.Type) ? "\(some)" : "\(type(of: some))"
 }

@@ -9,6 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import Foundation
 import Starscream
 import Signals
@@ -164,6 +165,8 @@ public class WebSocketManager {
     /// - important: A connection can only be established if the user has an **authenticated** session.
     public func connect() {
 
+        os_log("[%@] Connection requested.", log: .socket, type: .debug, typeName(self))
+
         /*
          There are 2 challenges to solve here (if needed):
          
@@ -187,7 +190,7 @@ public class WebSocketManager {
         if self.isRefreshingAccessToken == true { return }
         isRefreshingAccessToken = true
 
-        printBV(info: "[WebSocketManager] Establishing a connection.")
+        os_log("[WebSocketManager] Fetching access token.", log: .socket, type: .debug)
 
         // fetch a refreshed access token
         self.oauthHandler.forceAccessTokenRefresh { (success, accessToken) in
@@ -196,10 +199,11 @@ public class WebSocketManager {
 
             // ensure no error
             guard success, let token = accessToken else {
-                printBV(error: "[WebSocketManager] Cannot fetch access token. Socket connection cannot be established.")
+                os_log("[WebSocketManager] Fetching access token failed.", log: .socket, type: .error)
                 return
             }
 
+            os_log("[WebSocketManager] Opening connection with token: %{private}@", log: .socket, type: .debug, token)
             // initialise an instance of a web socket
             self.socket = WebSocket(url: URL(string: self.baseURLString + "?app_id=\(self.appID)" + "&token=\(token)")!)
             self.socket?.delegate = self
@@ -257,7 +261,6 @@ public class WebSocketManager {
             "type": "command",
             "payload": payload
         ]
-        print(#function, payload)
         // write
         self.write(commandPackage)
 
@@ -282,7 +285,7 @@ public class WebSocketManager {
 extension WebSocketManager: WebSocketDelegate {
 
     public func websocketDidConnect(socket: WebSocketClient) {
-        printBV(info: "[WebSocketManager] Connected")
+        os_log("[WebSocketManager] Delegate: Did Connect", log: .socket, type: .debug)
 
         // invalidate auto-reconnect timer
         self.reconnectTimer?.invalidate()
@@ -295,11 +298,11 @@ extension WebSocketManager: WebSocketDelegate {
     public func websocketDidDisconnect(socket: WebSocketClient, error: Error?) {
 
         if let err = error as? WSError {
-            printBV(info: "[WebSocketManager] Disconnected: \(err.message)")
+            os_log("[WebSocketManager] Delegate: Did Disconnect: %@", log: .socket, type: .error, err.message)
         } else if let err = error {
-            printBV(info: "[WebSocketManager] Disconnected: \(err.localizedDescription)")
+            os_log("[WebSocketManager] Delegate: Did Disconnect: %@", log: .socket, type: .error, err.localizedDescription)
         } else {
-            printBV(info: "[WebSocketManager] Disconnected")
+            os_log("[WebSocketManager] Delegate: Did Disconnect: No Error.", log: .socket, type: .error)
         }
 
         // Fire an error informing the observers that the Web socket has disconnected.
@@ -385,7 +388,8 @@ extension WebSocketManager: WebSocketDelegate {
                     //TODO: Set an enum `event` = .added or .removed - this will require the user id (decode the jwt).
                     self.onInventoryUpdate.fire(inventoryEvent)
                 } catch {
-                    printBV(error: "[WebSocketManager] \(error.localizedDescription)")
+                    os_log("[%@] Decode error: %@", log: .socket, type: .error, typeName(self),
+                           error.localizedDescription)
                 }
 
             case .stateUpdate:
@@ -393,7 +397,8 @@ extension WebSocketManager: WebSocketDelegate {
                     let stateUpdateEvent = try blockvJSONDecoder.decode(WSStateUpdateEvent.self, from: data)
                     self.onVatomStateUpdate.fire(stateUpdateEvent)
                 } catch {
-                    printBV(error: "[WebSocketManager] \(error.localizedDescription)")
+                    os_log("[%@] Decode error: %@", log: .socket, type: .error, typeName(self),
+                           error.localizedDescription)
                 }
 
             case .activity:
@@ -402,7 +407,8 @@ extension WebSocketManager: WebSocketDelegate {
                     let activityEvent = try blockvJSONDecoder.decode(WSActivityEvent.self, from: data)
                     self.onActivityUpdate.fire(activityEvent)
                 } catch {
-                    printBV(error: "[WebSocketManager] \(error.localizedDescription)")
+                    os_log("[%@] Decode error: %@", log: .socket, type: .error, typeName(self),
+                           error.localizedDescription)
                 }
 
             case .map:
@@ -410,12 +416,14 @@ extension WebSocketManager: WebSocketDelegate {
                     let mapEvent = try blockvJSONDecoder.decode(WSMapEvent.self, from: data)
                     self.onMapUpdate.fire(mapEvent)
                 } catch {
-                    printBV(error: "[WebSocketManager] \(error.localizedDescription)")
+                    os_log("[%@] Decode error: %@", log: .socket, type: .error, typeName(self),
+                           error.localizedDescription)
                 }
 
             }
         default:
-            printBV(error: "[WebSocketManager] Unrecognised message type: \(typeString).")
+            os_log("[%@] Unrecognized message type: %@", log: .socket, type: .error, typeName(self),
+                   typeName(self), typeString)
             return
         }
 

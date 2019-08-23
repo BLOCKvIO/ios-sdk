@@ -117,24 +117,13 @@ internal final class DefaultErrorView: BoundedView & VatomViewError {
         guard let resourceModel = vatom.props.resources.first(where: { $0.name == "ActivatedImage" }) else {
             return
         }
-
-        // encode url
-        guard let encodeURL = try? BLOCKv.encodeURL(resourceModel.url) else {
-            return
-        }
-
-        let targetSize = self.activatedImageView.pixelSize
-        // create request
-        var request = ImageRequest(url: encodeURL,
-                                   targetSize: targetSize,
-                                   contentMode: .aspectFill)
-
-        // set cache key
-        request.cacheKey = request.generateCacheKey(url: resourceModel.url, targetSize: targetSize)
-
+        
         // load image
-        Nuke.loadImage(with: request, into: activatedImageView) { [weak self] (_, _) in
-            self?.activityIndicator.stopAnimating()
+        let resize = ImageProcessor.Resize(size: self.bounds.size, contentMode: .aspectFit)
+        let request = BVImageRequest(url: resourceModel.url, processors: [resize])
+        // load iamge
+        ImageDownloader.loadImage(with: request, into: self.activatedImageView) { result in
+            self.activityIndicator.stopAnimating()
         }
 
     }

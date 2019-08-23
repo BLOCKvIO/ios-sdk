@@ -277,41 +277,24 @@ class ImageProgressFaceView: FaceView {
                 completion(FaceError.missingVatomResource)
                 return
         }
-
-        // ensure encoding passes
-        do {
-
-            let encodedEmptyURL = try BLOCKv.encodeURL(emptyImageResource.url)
-            let encodedFullURL = try BLOCKv.encodeURL(fullImageResource.url)
-
-            dispatchGroup.enter()
-            dispatchGroup.enter()
-
-            var requestEmpty = ImageRequest(url: encodedEmptyURL)
-            // set cache key
-            requestEmpty.cacheKey = requestEmpty.generateCacheKey(url: emptyImageResource.url, targetSize: pixelSize)
-
-            // load image (automatically handles reuse)
-            Nuke.loadImage(with: requestEmpty, into: self.emptyImageView) { (_, _) in
-                self.dispatchGroup.leave()
-            }
-
-            var requestFull = ImageRequest(url: encodedFullURL)
-            // set cache key
-            requestFull.cacheKey = requestFull.generateCacheKey(url: fullImageResource.url, targetSize: pixelSize)
-
-            // load image (automatically handles reuse)
-            Nuke.loadImage(with: requestFull, into: self.fullImageView) { (_, _) in
-                self.dispatchGroup.leave()
-            }
-
-            dispatchGroup.notify(queue: .main) {
-                self.isLoaded = true
-                completion(nil)
-            }
-
-        } catch {
-            completion(error)
+        
+        let resize = ImageProcessor.Resize(size: self.bounds.size, contentMode: .aspectFit)
+        let emptyRequest = BVImageRequest(url: emptyImageResource.url, processors: [resize])
+        let fullRequest = BVImageRequest(url: fullImageResource.url, processors: [resize])
+        
+        dispatchGroup.enter()
+        dispatchGroup.enter()
+        // load images
+        ImageDownloader.loadImage(with: emptyRequest, into: self.emptyImageView) { result in
+            self.dispatchGroup.leave()
+        }
+        ImageDownloader.loadImage(with: fullRequest, into: self.fullImageView) { result in
+            self.dispatchGroup.leave()
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            self.isLoaded = true
+            completion(nil)
         }
 
     }

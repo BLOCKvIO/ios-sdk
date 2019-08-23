@@ -190,29 +190,27 @@ class ImageLayeredFaceView: FaceView {
 
 		// extract resource model
 		guard let resourceModel = vatom.props.resources.first(where: { $0.name == config.imageName }) else {
-			printBV(error: "Could not find child vAtom resource model.")
+			printBV(error: "[ImageLayeredFace] Could not find child vAtom resource model.")
 			return layer
 		}
 
-		// encode url
-		guard let encodeURL = try? BLOCKv.encodeURL(resourceModel.url) else {
-			printBV(error: "Could not encode child vAtom resource.")
-			return layer
-		}
+        let resize = ImageProcessor.Resize(size: self.bounds.size, contentMode: .aspectFit)
+        let request = BVImageRequest(url: resourceModel.url, processors: [resize])
+        // load iamge
+        ImagePipeline.shared.loadBLOCKvImage(with: request) { result in
+            do {
+                let image = try result.get().image.cgImage
+                self.layer.contents = image
+            } catch {
+                printBV(error: "[ImageLayeredFace] Error loading resource: \(error.localizedDescription).")
+            }
+        }
 
-        var request = ImageRequest(url: encodeURL,
-                                   targetSize: pixelSize,
-                                   contentMode: .aspectFit)
-        // use unencoded url as cache key
-        request.cacheKey = resourceModel.url
-        // load image (automatically handles reuse)
-		Nuke.loadImage(with: request, into: layer)
+        layer.frame = self.bounds
+        self.baseLayer.addSubview(layer)
+        self.childLayers.append(layer)
 
-		layer.frame = self.bounds
-		self.baseLayer.addSubview(layer)
-		self.childLayers.append(layer)
-
-		return layer
+        return layer
 
 	}
 
@@ -263,22 +261,19 @@ class ImageLayeredFaceView: FaceView {
             completion(FaceError.missingVatomResource)
             return
         }
-
+        
         do {
-            // encode url
-            let encodeURL = try BLOCKv.encodeURL(resourceModel.url)
-
-            var request = ImageRequest(url: encodeURL,
-                                       targetSize: pixelSize,
-                                       contentMode: .aspectFit)
-
-            // set cache key
-            request.cacheKey = request.generateCacheKey(url: resourceModel.url, targetSize: pixelSize)
-
-            // load image (auto cancel previous)
-            Nuke.loadImage(with: request, into: self.baseLayer) { (_, error) in
+            let resize = ImageProcessor.Resize(size: self.bounds.size, contentMode: .aspectFit)
+            let request = BVImageRequest(url: resourceModel.url, processors: [resize])
+            // load iamge
+            ImageDownloader.loadImage(with: request, into: self.baseLayer) { result in
                 self.isLoaded = true
-                completion(error)
+                do {
+                    try result.get()
+                    completion(nil)
+                } catch {
+                    completion(error)
+                }
             }
         } catch {
             completion(error)

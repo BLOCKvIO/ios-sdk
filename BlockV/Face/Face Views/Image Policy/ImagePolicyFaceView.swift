@@ -216,25 +216,18 @@ class ImagePolicyFaceView: FaceView {
             completion?(FaceError.missingVatomResource)
             return
         }
-
-        do {
-            // encode url
-            let encodeURL = try BLOCKv.encodeURL(resourceModel.url)
-
-            var request = ImageRequest(url: encodeURL,
-                                       targetSize: pixelSize,
-                                       contentMode: .aspectFit)
-
-            // set cache key
-            request.cacheKey = request.generateCacheKey(url: resourceModel.url, targetSize: pixelSize)
-
-            // load image (automatically handles reuse)
-            Nuke.loadImage(with: request, into: self.animatedImageView) { (_, error) in
-                self.isLoaded = true
+        
+        let resize = ImageProcessor.Resize(size: self.bounds.size, contentMode: .aspectFit)
+        let request = BVImageRequest(url: resourceModel.url, processors: [resize])
+        // load iamge
+        ImageDownloader.loadImage(with: request, into: self.animatedImageView) { result in
+            self.isLoaded = true
+            do {
+                try result.get()
+                completion?(nil)
+            } catch {
                 completion?(error)
             }
-        } catch {
-            completion?(error)
         }
 
     }

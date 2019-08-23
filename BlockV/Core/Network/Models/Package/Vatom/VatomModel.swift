@@ -378,3 +378,18 @@ public struct VatomChildPolicy: Codable, Equatable {
     }
 
 }
+
+extension VatomModel: CustomDebugStringConvertible {
+
+    public var debugDescription: String {
+        return """
+        ID: \(self.id)
+        Template ID: \(self.props.templateID)
+        Template Var ID: \(self.props.templateVariationID)
+        Publisher FQDN: \(self.props.publisherFQDN)
+        Title: \(self.props.title)
+        Description: \(self.props.description)
+        """
+    }
+
+}

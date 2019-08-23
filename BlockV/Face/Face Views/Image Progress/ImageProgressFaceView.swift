@@ -9,6 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import UIKit
 import Nuke
 import GenericJSON
@@ -278,18 +279,28 @@ class ImageProgressFaceView: FaceView {
                 return
         }
         
-        let resize = ImageProcessor.Resize(size: self.bounds.size, contentMode: .aspectFit)
-        let emptyRequest = BVImageRequest(url: emptyImageResource.url, processors: [resize])
-        let fullRequest = BVImageRequest(url: fullImageResource.url, processors: [resize])
+        // NB: Do not resize due to brittle pixel offsets in face config.
+        let emptyRequest = BVImageRequest(url: emptyImageResource.url)
+        let fullRequest = BVImageRequest(url: fullImageResource.url)
         
         dispatchGroup.enter()
         dispatchGroup.enter()
         // load images
         ImageDownloader.loadImage(with: emptyRequest, into: self.emptyImageView) { result in
             self.dispatchGroup.leave()
+            do {
+                try result.get()
+            } catch {
+                os_log("Failed to load: %@", log: .vatomView, type: .error, emptyImageResource.url.description)
+            }
         }
         ImageDownloader.loadImage(with: fullRequest, into: self.fullImageView) { result in
             self.dispatchGroup.leave()
+            do {
+                try result.get()
+            } catch {
+                os_log("Failed to load: %@", log: .vatomView, type: .error, fullImageResource.url.description)
+            }
         }
         
         dispatchGroup.notify(queue: .main) {

@@ -9,6 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import UIKit
 import FLAnimatedImage
 import Nuke
@@ -229,6 +230,7 @@ class ImageFaceView: FaceView {
                 try result.get()
                 completion?(nil)
             } catch {
+                os_log("Failed to load: %@", log: .vatomView, type: .error, resourceModel.url.description)
                 completion?(error)
             }
         }

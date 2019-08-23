@@ -9,6 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import Foundation
 import Nuke
 
@@ -202,7 +203,7 @@ class ImageLayeredFaceView: FaceView {
                 let image = try result.get().image.cgImage
                 self.layer.contents = image
             } catch {
-                printBV(error: "[ImageLayeredFace] Error loading resource: \(error.localizedDescription).")
+                os_log("Failed to load: %@", log: .vatomView, type: .error, resourceModel.url.description)
             }
         }
 
@@ -272,6 +273,7 @@ class ImageLayeredFaceView: FaceView {
                     try result.get()
                     completion(nil)
                 } catch {
+                    os_log("Failed to load: %@", log: .vatomView, type: .error, resourceModel.url.description)
                     completion(error)
                 }
             }

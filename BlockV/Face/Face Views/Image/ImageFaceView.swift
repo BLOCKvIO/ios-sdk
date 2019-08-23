@@ -147,7 +147,7 @@ class ImageFaceView: FaceView {
         self.reset()
         // store the completion
         self.storedCompletion = completion
-        //
+        // flag a known-bounds layout
         self.requiresBoundsBasedSetup = true
 
     }

@@ -11,10 +11,6 @@
 
 import Foundation
 
-public protocol Cancellable: class {
-    func cancel()
-}
-
 public protocol DataDownloading {
 
     /// - Parameters:

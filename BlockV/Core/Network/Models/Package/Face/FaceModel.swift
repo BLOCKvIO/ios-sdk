@@ -105,3 +105,18 @@ extension FaceModel: Hashable {
     }
 
 }
+
+extension FaceModel: CustomDebugStringConvertible {
+
+    public var debugDescription: String {
+        return """
+        ID: \(self.id)
+        Template: \(self.templateID)
+        Display URL: \(self.properties.displayURL)
+        View Mode: \(self.properties.constraints.viewMode)
+        Config: \(self.properties.config?.debugDescription)
+        Resources: \(self.properties.resources.debugDescription)
+        """
+    }
+
+}

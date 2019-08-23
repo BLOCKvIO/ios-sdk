@@ -136,10 +136,12 @@ class VatomModelUpdate_Tests: XCTestCase {
 
         // create fake state update event
         let stateUpdate = WSStateUpdateEvent(eventId: "1",
-                                             operation: "mock",
-                                             vatomId: "49d9229d-a380-40ac-9c22-asdf9664bd63",
-                                             vatomProperties: newProperties,
-                                             timestamp: Date())
+                                    operation: "mock",
+                                    vatomId: "49d9229d-a380-40ac-9c22-asdf9664bd63",
+                                    actionName: "Acquire",
+                                    sync: 1234,
+                                    vatomProperties: newProperties,
+                                    timestamp: Date())
 
         do {
             // ensure the update did not return nil

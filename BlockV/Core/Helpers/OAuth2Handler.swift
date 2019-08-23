@@ -153,7 +153,7 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
             // store the new access token
             if let accessToken = accessToken {
                 strongSelf.accessToken = accessToken
-                os_log("Access token refresh: Failed - Missing token", log: .authentication, type: .error)
+                os_log("Access token refresh: Success", log: .authentication, type: .debug)
             }
 
             // call completions to retry request

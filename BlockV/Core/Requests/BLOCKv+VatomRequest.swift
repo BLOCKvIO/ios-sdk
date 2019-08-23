@@ -86,7 +86,7 @@ extension BLOCKv {
                 } catch {
                     // handle error
                     DispatchQueue.main.async {
-                        completion(.failure(error as! BVError)) // this is safe
+                        completion(.failure(error as! BVError)) // swiftlint:disable:this force_cast
                     }
                 }
 

@@ -232,6 +232,7 @@ public class WebSocketManager {
         //        _retryTimeInterval = 1
         //        _retryCount = 0
         // connect (if not already connected)
+        os_log("[WebSocketManager] Application did become active. Attempting reconnect.", log: .socket, type: .debug)
         self.connect()
     }
 

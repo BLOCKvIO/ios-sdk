@@ -9,12 +9,30 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import Foundation
 import SafariServices
 
 //TODO: Update for iOS 12 ASWebAuthenticationSession
 
 public final class AuthorizationServer {
+
+    /// Models the user onboarding flow.
+    public enum Flow: String {
+        case unknown
+        case register
+        case login
+        
+        init(value: String) {
+            if value == "register" {
+                self = .register
+            } else if value == "login" {
+                self = .login
+            } else {
+                self = .unknown
+            }
+        }
+    }
 
     // MARK: - Properties
 
@@ -26,6 +44,7 @@ public final class AuthorizationServer {
 
     var receivedCode: String?
     var receivedState: String?
+    var receivedFlow: Flow = .unknown
 
     private var authSession: SFAuthenticationSession?
     private var savedState: String?
@@ -42,8 +61,8 @@ public final class AuthorizationServer {
     // MARK: - Methods
 
     /// Begins delegated authorization.
-    public func authorize(handler: @escaping (Bool) -> Void) {
-
+    public func authorize(handler: @escaping (Result<Flow, BVError>) -> Void) {
+        
         savedState = generateState(withLength: 20)
 
         var urlComp = URLComponents(string: domain)!
@@ -59,14 +78,22 @@ public final class AuthorizationServer {
 
         //TODO: Should the `callbackURLScheme` include more than the redirectURL, e.g. bundle identifier?
         // init an auth session
-        authSession = SFAuthenticationSession(url: urlComp.url!,
-                                              callbackURLScheme: redirectURI,
-                                              completionHandler: { (url, error) in
+        authSession = SFAuthenticationSession(url: urlComp.url!, callbackURLScheme: redirectURI, completionHandler: { (url, error) in
+
             guard error == nil else {
-                return handler(false)
+                os_log("OAuth failed: %@", log: .authentication, type: .error, error!.localizedDescription)
+                let err = BVError.session(reason: .oauthFailed)
+                handler(.failure(err))
+                return
+            }
+            guard let url = url else {
+                os_log("OAuth failed: nil callback url", log: .authentication, type: .error)
+                handler(.failure(.session(reason: .oauthFailed)))
+                return
             }
 
-            handler(url != nil && self.parseAuthorizeRedirectURL(url!))
+            self.parseAuthorizeRedirectURL(url)
+            handler(.success(self.receivedFlow))
 
         })
         // start the authentication session
@@ -80,7 +107,7 @@ public final class AuthorizationServer {
     ///
     /// - Parameter url: Parses out the information in the redirect URL.
     /// - Returns: Boolean value indicating the outcome of parsing the authorize redirect url.
-    func parseAuthorizeRedirectURL(_ url: URL) -> Bool {
+    private func parseAuthorizeRedirectURL(_ url: URL) -> Bool {
 
         // decompose into components
         guard let urlComp = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
@@ -95,6 +122,10 @@ public final class AuthorizationServer {
         // extract code and state
         receivedCode = items.first(where: { $0.name == "code" })?.value
         receivedState = items.first(where: { $0.name == "state" })?.value
+        // blockv params
+        if let value = items.first(where: { $0.name == "flow" })?.value {
+            receivedFlow = Flow(value: value)
+        }
 
         // dismiss
         authSession?.cancel()
@@ -118,7 +149,6 @@ public final class AuthorizationServer {
             completion(.failure(error))
             return
         }
-
         // build token exchange endpoint
         let endpoint = API.Session.tokenExchange(grantType: "authorization_code",
                                                  clientID: self.clientID,

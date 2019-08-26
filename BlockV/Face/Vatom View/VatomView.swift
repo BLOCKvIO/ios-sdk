@@ -174,7 +174,7 @@ open class VatomView: UIView {
         self.roster = FaceViewRoster.shared.roster
         self.loaderView = VatomView.defaultLoaderView.init()
         self.errorView = VatomView.defaultErrorView.init()
-        super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        super.init(frame: .zero)
 
         commonSetup()
     }
@@ -197,7 +197,7 @@ open class VatomView: UIView {
         self.errorView = VatomView.defaultErrorView.init()
         self.vatom = vatom
         self.vatomViewDelegate = delegate
-        super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        super.init(frame: .zero)
 
         commonSetup()
 
@@ -234,7 +234,7 @@ open class VatomView: UIView {
         self.roster = roster
         self.vatom = vatom
         self.vatomViewDelegate = delegate
-        super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        super.init(frame: .zero)
 
         commonSetup()
 
@@ -342,7 +342,7 @@ open class VatomView: UIView {
     ///
     /// - Parameter oldVatom: The previous vAtom being visualized by this VatomView.
     internal func runVVLC(oldVatom: VatomModel? = nil) {
-
+        
         /*
          Note:
          VVLC traps with assertion failure in two cases:

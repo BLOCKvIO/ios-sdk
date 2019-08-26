@@ -9,6 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import UIKit
 import FLAnimatedImage
 import Nuke
@@ -146,7 +147,7 @@ class ImageFaceView: FaceView {
         self.reset()
         // store the completion
         self.storedCompletion = completion
-        //
+        // flag a known-bounds layout
         self.requiresBoundsBasedSetup = true
 
     }
@@ -184,7 +185,7 @@ class ImageFaceView: FaceView {
 
     // MARK: - Resources
 
-    var nukeContentMode: ImageDecompressor.ContentMode {
+    var configContentMode: ImageProcessor.Resize.ContentMode {
         // check face config, convert to nuke content mode
         switch config.scale {
         case .fill: return .aspectFill
@@ -219,32 +220,21 @@ class ImageFaceView: FaceView {
             completion?(FaceError.missingVatomResource)
             return
         }
-
-        do {
-            // encode url
-            let encodeURL = try BLOCKv.encodeURL(resourceModel.url)
-            // create request
-            var request = ImageRequest(url: encodeURL,
-                                       targetSize: pixelSize,
-                                       contentMode: nukeContentMode)
-
-            // set cache key
-            request.cacheKey = request.generateCacheKey(url: resourceModel.url, targetSize: pixelSize)
-
-            /*
-             Nuke's `loadImage` cancels any exisitng requests and nils out the old image. This takes care of the
-             reuse-pool use case where the same face view is used to display a vatom of the same template variation.
-             */
-
-            // load image (auto cancel previous)
-            Nuke.loadImage(with: request, into: self.animatedImageView) { (_, error) in
-                self.isLoaded = true
+        
+        let resize = ImageProcessor.Resize(size: self.bounds.size, contentMode: configContentMode)
+        let request = BVImageRequest(url: resourceModel.url, processors: [resize])
+        // load iamge
+        ImageDownloader.loadImage(with: request, into: self.animatedImageView) { result in
+            self.isLoaded = true
+            do {
+                try result.get()
+                completion?(nil)
+            } catch {
+                os_log("Failed to load: %@", log: .vatomView, type: .error, resourceModel.url.description)
                 completion?(error)
             }
-
-        } catch {
-            completion?(error)
         }
+      
 
     }
 

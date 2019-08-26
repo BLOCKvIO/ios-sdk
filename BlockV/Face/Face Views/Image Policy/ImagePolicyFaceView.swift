@@ -9,6 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import UIKit
 import FLAnimatedImage
 import Nuke
@@ -75,24 +76,16 @@ class ImagePolicyFaceView: FaceView {
 
     // MARK: - Face View Lifecycle
 
+    private var storedCompletion: ((Error?) -> Void)?
+
     /// Begins loading the face view's content.
     func load(completion: ((Error?) -> Void)?) {
         // reset content
         self.reset()
-        // update state
-        self.updateUI { [weak self] error in
-
-            guard let self = self else { return }
-            // inform delegate of load completion
-            if let error = error {
-                self.isLoaded = false
-                completion?(error)
-            } else {
-                self.isLoaded = true
-                completion?(nil)
-            }
-        }
-
+        // store the completion
+        self.storedCompletion = completion
+        // flag a known-bounds layout
+        self.requiresBoundsBasedSetup = true
     }
 
     /// Updates the backing Vatom and loads the new state.
@@ -110,8 +103,8 @@ class ImagePolicyFaceView: FaceView {
             self.vatom = vatom
             self.reset()
         }
-        // update ui
-        self.updateUI(completion: nil)
+        // flag a known-bounds layout
+        self.requiresBoundsBasedSetup = true
 
     }
 
@@ -127,21 +120,34 @@ class ImagePolicyFaceView: FaceView {
         //TODO: Cancel all downloads
     }
 
+    /// Updates interface with local state.
+    override func setupWithBounds() {
+        super.setupWithBounds()
+        
+        // extract resource
+        let resourceName = self.extractImageName()
+        // update state
+        self.updateImageView(withResource: resourceName) { [weak self] error in
+
+            guard let self = self else { return }
+            // inform delegate of load completion
+            if let error = error {
+                self.isLoaded = false
+                self.storedCompletion?(error)
+            } else {
+                self.isLoaded = true
+                self.storedCompletion?(nil)
+            }
+        }
+
+    }
+
     // MARK: - Face Code
 
     /// Current count of child vAtoms.
     private var currentChildCount: Int {
         // inspect cached children
         return self.vatom.listCachedChildren().count
-    }
-
-    /// Updates the interface using local state.
-    ///
-    /// - Extracts the resource name.
-    /// - Starts download of the resource.
-    private func updateUI(completion: ((Error?) -> Void)?) {
-        let resourceName = self.extractImageName()
-        self.updateImageView(withResource: resourceName, completion: completion)
     }
 
     /// Update the face view using *local* data.
@@ -216,25 +222,19 @@ class ImagePolicyFaceView: FaceView {
             completion?(FaceError.missingVatomResource)
             return
         }
-
-        do {
-            // encode url
-            let encodeURL = try BLOCKv.encodeURL(resourceModel.url)
-
-            var request = ImageRequest(url: encodeURL,
-                                       targetSize: pixelSize,
-                                       contentMode: .aspectFit)
-
-            // set cache key
-            request.cacheKey = request.generateCacheKey(url: resourceModel.url, targetSize: pixelSize)
-
-            // load image (automatically handles reuse)
-            Nuke.loadImage(with: request, into: self.animatedImageView) { (_, error) in
-                self.isLoaded = true
+        
+        let resize = ImageProcessor.Resize(size: self.bounds.size, contentMode: .aspectFit)
+        let request = BVImageRequest(url: resourceModel.url, processors: [resize])
+        // load iamge
+        ImageDownloader.loadImage(with: request, into: self.animatedImageView) { result in
+            self.isLoaded = true
+            do {
+                try result.get()
+                completion?(nil)
+            } catch {
+                os_log("Failed to load: %@", log: .vatomView, type: .error, resourceModel.url.description)
                 completion?(error)
             }
-        } catch {
-            completion?(error)
         }
 
     }

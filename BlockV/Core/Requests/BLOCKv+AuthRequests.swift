@@ -17,7 +17,9 @@ extension BLOCKv {
     // MARK: - Register
 
     //FIXME: callbackURLScheme - where does this get set?
-    public static func oauth(scope: String, redirectURI: String, completion: @escaping (BVError?) -> Void) {
+    public static func oauth(scope: String,
+                             redirectURI: String,
+                             completion: @escaping (Result<AuthorizationServer.Flow, BVError>) -> Void) {
 
         // ensure host app has set an app id
         let warning = """
@@ -30,60 +32,61 @@ extension BLOCKv {
         let appID = BLOCKv.appID!
         let webAppDomain = BLOCKv.environment!.oauthWebApp
 
-        let authServer = AuthorizationServer(clientID: appID,
-                                             domain: webAppDomain,
-                                             scope: scope,
+        let authServer = AuthorizationServer(clientID: appID, domain: webAppDomain, scope: scope,
                                              redirectURI: redirectURI)
 
         // start delegated authorization
-        authServer.authorize { success in
+        authServer.authorize { result in
 
-            guard success else {
-                printBV(error: ("OAuth Authorize error."))
+            switch result {
+            case .failure(let error):
+                completion(.failure(error))
                 return
-            }
-            // exchange code for tokens
-            authServer.getToken { result in
 
-                switch result {
-                case .success(let tokens):
-                    /*
-                     At this point, accces and refresh tokens have been injected into the oauthhandler by the client
-                     response inspector.
-                     */
+            case .success(let flowModel):
 
-                    // build endpoint
-                    let endpoint = API.Session.getAssetProviders()
-                    // perform api call
-                    BLOCKv.client.request(endpoint) { result in
-                        switch result {
-                        case .success(let model):
+                // exchange code for tokens
+                authServer.getToken { result in
 
-                            // pull back to main queue
-                            DispatchQueue.main.async {
+                    switch result {
+                    case .success(let tokens):
+                        /*
+                         At this point, accces and refresh tokens have been injected into the oauthhandler by the client
+                         response inspector.
+                         */
 
-                                let refreshToken = BVToken(token: tokens.refreshToken, tokenType: tokens.tokenType)
-                                // persist refresh token and credential
-                                CredentialStore.saveRefreshToken(refreshToken)
-                                CredentialStore.saveAssetProviders(model.payload.assetProviders)
-                                // noifty on login process
-                                self.onLogin()
-                                completion(nil)
+                        // build endpoint
+                        let endpoint = API.Session.getAssetProviders()
+                        // perform api call
+                        BLOCKv.client.request(endpoint) { result in
+                            switch result {
+                            case .success(let model):
+
+                                // pull back to main queue
+                                DispatchQueue.main.async {
+
+                                    let refreshToken = BVToken(token: tokens.refreshToken, tokenType: tokens.tokenType)
+                                    // persist refresh token and credential
+                                    CredentialStore.saveRefreshToken(refreshToken)
+                                    CredentialStore.saveAssetProviders(model.payload.assetProviders)
+                                    // noifty on login process
+                                    self.onLogin()
+                                    completion(.success(flowModel))
+                                }
+
+                            case .failure(let error):
+                                completion(.failure(error))
                             }
-
-                        case .failure(let error):
-                            completion(error)
                         }
+
+                    case .failure(let error):
+                        completion(.failure(error))
                     }
 
-                case .failure(let error):
-                    completion(error)
                 }
 
             }
-
         }
-
     }
 
     /// Registers a user on the BLOCKv platform. Accepts a user token (phone or email).

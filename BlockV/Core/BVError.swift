@@ -43,6 +43,7 @@ public enum BVError: Error {
     // MARK: Reasons
 
     public enum SessionErrorReason: Equatable {
+        case oauthFailed
         case invalidAuthorizationCode
         case nonMatchingStates
     }

@@ -113,8 +113,12 @@ public class ImageDownloader {
             os_log("Failed to load image for URL: %@", log: .default, type: .error, request.url.absoluteString)
             completion?(.failure(error))
             return nil
+        } catch let error as BLOCKv.URLEncodingError {
+            os_log("Failed to encode image for URL: %@", log: .default, type: .error, request.url.absoluteString)
+            completion?(.failure(.credentialEncodingFailed))
+            return nil
         } catch {
-            fatalError("Unknown error type.")
+            fatalError("Unrecognised error.")
         }
 
     }

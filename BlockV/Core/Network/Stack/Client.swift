@@ -137,18 +137,19 @@ final class Client: ClientProtocol {
             switch dataResponse.result {
             case let .success(data):
                 completion(.success(data))
+
             case let .failure(err):
-
-                //TODO: The error should be parsed and a BVError created and passed in.
-
-                // check for a BVError
-                if let err = err as? BVError {
-                    completion(.failure(err))
-                } else {
-                    // create a wrapped networking error
-                    let error = BVError.networking(error: err)
-                    completion(.failure(error))
+                guard let data = dataResponse.data,
+                    let errorModel = try? JSONDecoder.blockv.decode(ErrorModel.self, from: data) else {
+                        let error = BVError.networking(error: err)
+                        completion(.failure(error))
+                        return
                 }
+
+                let reason = BVError.PlatformErrorReason(code: errorModel.code, message: errorModel.message)
+                let error = BVError.platform(reason: reason)
+                completion(.failure(error))
+
             }
         }
 
@@ -176,7 +177,15 @@ final class Client: ClientProtocol {
                 completion(.success(json))
             case let .failure(err):
                 // create a wrapped networking error
-                let error = BVError.networking(error: err)
+                guard let data = dataResponse.data,
+                    let errorModel = try? JSONDecoder.blockv.decode(ErrorModel.self, from: data) else {
+                        let error = BVError.networking(error: err)
+                        completion(.failure(error))
+                        return
+                }
+
+                let reason = BVError.PlatformErrorReason(code: errorModel.code, message: errorModel.message)
+                let error = BVError.platform(reason: reason)
                 completion(.failure(error))
             }
         }
@@ -236,13 +245,16 @@ final class Client: ClientProtocol {
 
             case let .failure(err):
 
-                //TODO: Can this error casting be done away with?
-                if let err = err as? BVError {
-                    completion(.failure(err))
-                } else {
-                    let error = BVError.networking(error: err)
-                    completion(.failure(error))
+                guard let data = dataResponse.data,
+                    let errorModel = try? JSONDecoder.blockv.decode(ErrorModel.self, from: data) else {
+                        let error = BVError.networking(error: err)
+                        completion(.failure(error))
+                        return
                 }
+
+                let reason = BVError.PlatformErrorReason(code: errorModel.code, message: errorModel.message)
+                let error = BVError.platform(reason: reason)
+                completion(.failure(error))
 
             }
 

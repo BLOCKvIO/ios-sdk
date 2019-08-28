@@ -363,6 +363,13 @@ extension BLOCKv {
             DataLoader.sharedUrlCache.removeAllCachedResponses()
             try? FileManager.default.removeItem(at: DataDownloader.recommendedCacheDirectory)
             try? FileManager.default.removeItem(at: Region.recommendedCacheDirectory)
+            os_log("[Debug] Cleared Cache", log: .lifecycle, type: .debug)
+        }
+        
+        /// Clear authoarization credentials.
+        public static func clearAuthCredentials() {
+            CredentialStore.clear()
+            os_log("[Debug] Cleared Authorazation Credentials", log: .lifecycle, type: .debug)
         }
 
     }

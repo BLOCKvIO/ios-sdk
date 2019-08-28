@@ -74,6 +74,8 @@ public enum BVError: Error {
         case redemptionError(Int, String)
         case recipientLimit(Int, String)
         case vatomNotFound(Int, String)
+        case vatomPermissionAlreadyOwned(Int, String)
+        case vatomPermissionCloneToSelf(Int, String)
         case unknownUserToken(Int, String)
         case insufficientPermission(Int, String)
         case authenticationFailed(Int, String)
@@ -117,9 +119,11 @@ public enum BVError: Error {
             case 1015: self = .unverifiedAccount(code, message)
 
             case 1604: self = .vatomNotOwned(code, message)
+            case 1605: self = .vatomPermissionAlreadyOwned(code, message)
             case 1627: self = .maxSharesReached(code, message)
             case 1630: self = .redemptionError(code, message)
             case 1632: self = .redemptionError(code, message)
+            case 1639: self = .vatomPermissionCloneToSelf(code, message)
             case 1654: self = .recipientLimit(code, message)
 
             case 1701: self = .vatomNotFound(code, message)
@@ -262,6 +266,8 @@ extension BVError.PlatformErrorReason {
              let .redemptionError(code, message),
              let .recipientLimit(code, message),
              let .vatomNotFound(code, message),
+             let .vatomPermissionAlreadyOwned(code, message),
+             let .vatomPermissionCloneToSelf(code, message),
              let .unknownUserToken(code, message),
              let .insufficientPermission(code, message),
              let .authenticationFailed(code, message),

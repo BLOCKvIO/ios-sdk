@@ -197,12 +197,14 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
 
             switch dataResponse.result {
             case let .success(val):
-                os_log("Access token - Refresh successful", log: .authentication, type: .default)
+                os_log("Access token - Refresh successful.", log: .authentication, type: .default)
                 // invoke with success
                 completion(true, val.payload.accessToken.token, nil)
 
             case let .failure(err):
-                os_log("Access token - Refresh failed: %@", log: .authentication, type: .error, err.localizedDescription)
+                let code = dataResponse.response?.statusCode.description ?? "-1"
+                os_log("Access token - Refresh failed. Status Code: %@", log: .authentication, type: .error,
+                       code)
 
                 // check if the error payload indicates the refresh token is invlaid
                 if let statusCode = dataResponse.response?.statusCode, (400...499) ~= statusCode {

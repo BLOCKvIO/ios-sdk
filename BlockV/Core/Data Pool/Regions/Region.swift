@@ -502,7 +502,9 @@ public class Region {
         }
 
         // create save task
-        saveTask = DispatchWorkItem { () -> Void in
+        saveTask = DispatchWorkItem { [weak self] () -> Void in
+            
+            guard let self = self else { return }
 
             // create data to save
             let startTime = Date.timeIntervalSinceReferenceDate

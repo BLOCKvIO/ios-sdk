@@ -504,6 +504,7 @@ public class Region {
         // create save task
         saveTask = DispatchWorkItem { [weak self] () -> Void in
             
+            // avoid capture cycle
             guard let self = self else { return }
 
             // create data to save

@@ -146,7 +146,9 @@ public class WebSocketManager {
         // Listen for notifications for when the app becomes active
         NotificationCenter.default.addObserver(self, selector: #selector(handleApplicationDidBecomeActive),
                                                name: UIApplication.didBecomeActiveNotification, object: nil)
-
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(handleApplicationDidEnterBackground),
+                                               name: UIApplication.didEnterBackgroundNotification, object: nil)
     }
 
     // MARK: - Lifecycle
@@ -167,9 +169,10 @@ public class WebSocketManager {
 
         DispatchQueue.mainThreadPrecondition()
 
-        // prevent connection attempt if connected
+        // prevent connection if already connected
+        // BEWARE: This is not reliable. A web socket struggles to know when it's disconnected.
         if socket?.isConnected == true {
-            os_log("[%@] Connection denied. In-flight", log: .socket, type: .debug, typeName(self))
+            os_log("[%@] Connection denied. Already connected.", log: .socket, type: .debug, typeName(self))
             return
         }
 
@@ -244,7 +247,14 @@ public class WebSocketManager {
         //        _retryCount = 0
         // connect (if not already connected)
         os_log("[%@]  Application did become active. Attempting reconnect.", log: .socket, type: .debug, typeName(self))
+        self.shouldAutoConnect = true
         self.connect()
+    }
+    
+    @objc
+    private func handleApplicationDidEnterBackground() {
+        os_log("[%@]  Application did enter background. Attempting disconnect.", log: .socket, type: .debug, typeName(self))
+        self.disconnect()
     }
 
     // MARK: - Commands

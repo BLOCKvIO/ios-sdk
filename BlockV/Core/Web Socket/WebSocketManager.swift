@@ -235,7 +235,7 @@ public class WebSocketManager {
     }
     
     /// Disconnect without setting `shouldAutoConnect` = false
-    func _disconnect() {
+    func _disconnect() { //swiftlint:disable:this identifier_name
         DispatchQueue.mainThreadPrecondition()
         socket?.disconnect(forceTimeout: 2)
     }

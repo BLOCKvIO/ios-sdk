@@ -169,7 +169,7 @@ class ImagePolicyFaceView: FaceView {
 
             } else if let policy = policy as? Config.FieldLookup {
                 
-                if let vatomValue = self.vatom.valueForKeyPath(keypath: policy.field) {
+                if let vatomValue = self.vatom.valueForKeyPath(policy.field) {
                     if vatomValue == policy.value {
                         // update image
                         //print(">>:: vAtom Value: \(vatomValue) | Policy Value: \(policy.value)\n")

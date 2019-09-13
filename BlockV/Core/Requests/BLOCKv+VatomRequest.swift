@@ -521,7 +521,7 @@ extension BLOCKv {
     ///   - id: The id of the vatom to dispense.
     ///   - completion: The completion handler to call when the action is completed.
     ///                 This handler is executed on the main queue.
-    public static func dispenseVatom(vatomID id: String,
+    public static func dispense(vatomID id: String,
                                      completion: @escaping (Result<[String: Any], BVError>) -> Void) {
         
         let body = ["this.id": id]

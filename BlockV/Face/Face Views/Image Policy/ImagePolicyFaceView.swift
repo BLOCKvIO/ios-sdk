@@ -48,7 +48,7 @@ class ImagePolicyFaceView: FaceView {
 
     // MARK: - Initialization
 
-    required init(vatom: VatomModel, faceModel: FaceModel) {
+    required init(vatom: VatomModel, faceModel: FaceModel) throws {
 
         // init face config (or legacy private section) fallback on default values
         if let config = faceModel.properties.config {
@@ -59,7 +59,7 @@ class ImagePolicyFaceView: FaceView {
             self.config = Config() // default values
         }
 
-        super.init(vatom: vatom, faceModel: faceModel)
+        try super.init(vatom: vatom, faceModel: faceModel)
 
         // enable animated images
         ImagePipeline.Configuration.isAnimatedImageDataEnabled = true
@@ -168,30 +168,13 @@ class ImagePolicyFaceView: FaceView {
                 }
 
             } else if let policy = policy as? Config.FieldLookup {
-
-                // create key path and split into head and tail
-                guard let component = KeyPath(policy.field).headAndTail() else { continue }
-
-                var vatomValue: JSON?
-                // check container
-                if component.head == "private" {
-                    // current value on the vatom
-                    vatomValue = self.vatom.private?[keyPath: component.tail.path]
-                } else if component.head == "vAtom::vAtomType" {
-                    //TODO: Create a keypath-to-keypath look up
-                    if component.tail.path == "cloning_score" {
-                        vatomValue = try? JSON(self.vatom.props.cloningScore)
-                    } else if component.tail.path == "num_direct_clones" {
-                        vatomValue = try? JSON(self.vatom.props.numberDirectClones)
+                
+                if let vatomValue = self.vatom.valueForKeyPath(keypath: policy.field) {
+                    if vatomValue == policy.value {
+                        // update image
+                        //print(">>:: vAtom Value: \(vatomValue) | Policy Value: \(policy.value)\n")
+                        return policy.resourceName
                     }
-                }
-
-                guard let value = vatomValue else { continue }
-
-                if value == policy.value {
-                    // update image
-                    //print(">>:: vAtom Value: \(vatomValue) | Policy Value: \(policy.value)\n")
-                    return policy.resourceName
                 }
 
             } else if policy is Config.Fallback {

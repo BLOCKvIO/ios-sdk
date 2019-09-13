@@ -101,7 +101,7 @@ public protocol FaceViewLifecycle: class {
 open class BaseFaceView: BoundedView {
 
     /// Vatom to render.
-    public internal(set) var vatom: VatomModel
+    public var vatom: VatomModel
 
     /// Face model to render.
     public internal(set) var faceModel: FaceModel
@@ -113,7 +113,7 @@ open class BaseFaceView: BoundedView {
     ///
     /// Use the initializer purely to configure the face view. Use the `load` lifecycle method to begin heavy operations
     /// to update the state of the face view, e.g. downloading resources.
-    public required init(vatom: VatomModel, faceModel: FaceModel) {
+    public required init(vatom: VatomModel, faceModel: FaceModel) throws {
         self.vatom = vatom
         self.faceModel = faceModel
         super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))

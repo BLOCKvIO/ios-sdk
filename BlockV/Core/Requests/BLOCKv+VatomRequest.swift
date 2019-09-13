@@ -514,5 +514,21 @@ extension BLOCKv {
         }
 
     }
+    
+    /// Performs an dispense action on the specified vatom id.
+    ///
+    /// - Parameters:
+    ///   - id: The id of the vatom to dispense.
+    ///   - completion: The completion handler to call when the action is completed.
+    ///                 This handler is executed on the main queue.
+    public static func dispenseVatom(withID id: String,
+                                     completion: @escaping (Result<[String: Any], BVError>) -> Void) {
+        
+        let body = ["this.id": id]
+        // perform the action
+        self.performAction(name: "Dispense", payload: body) { result in
+            completion(result)
+        }
+    }
 
 }

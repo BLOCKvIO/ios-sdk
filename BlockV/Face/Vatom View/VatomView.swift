@@ -454,7 +454,7 @@ open class VatomView: UIView {
 
         }
 
-        let newSelectedFaceView: FaceView = viewType.init(vatom: vatom, faceModel: faceModel)
+        let newSelectedFaceView: FaceView = try viewType.init(vatom: vatom, faceModel: faceModel)
         return newSelectedFaceView
 
     }

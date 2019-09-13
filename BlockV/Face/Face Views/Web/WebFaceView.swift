@@ -69,8 +69,8 @@ class WebFaceView: FaceView {
 
     // MARK: - Initialization
 
-    required init(vatom: VatomModel, faceModel: FaceModel) {
-        super.init(vatom: vatom, faceModel: faceModel)
+    required init(vatom: VatomModel, faceModel: FaceModel) throws {
+        try super.init(vatom: vatom, faceModel: faceModel)
 
         self.addSubview(webView)
     }

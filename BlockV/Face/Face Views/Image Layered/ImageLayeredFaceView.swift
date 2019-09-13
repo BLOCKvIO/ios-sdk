@@ -85,11 +85,11 @@ class ImageLayeredFaceView: FaceView {
     private let config: Config
 
     // MARK: - Init
-    required init(vatom: VatomModel, faceModel: FaceModel) {
+    required init(vatom: VatomModel, faceModel: FaceModel) throws {
         // init face config
         self.config = Config(faceModel)
 
-        super.init(vatom: vatom, faceModel: faceModel)
+        try super.init(vatom: vatom, faceModel: faceModel)
 
         self.addSubview(baseLayer)
 

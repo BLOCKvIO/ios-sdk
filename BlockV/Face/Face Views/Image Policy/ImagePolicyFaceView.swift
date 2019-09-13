@@ -48,7 +48,7 @@ class ImagePolicyFaceView: FaceView {
 
     // MARK: - Initialization
 
-    required init(vatom: VatomModel, faceModel: FaceModel) {
+    required init(vatom: VatomModel, faceModel: FaceModel) throws {
 
         // init face config (or legacy private section) fallback on default values
         if let config = faceModel.properties.config {
@@ -59,7 +59,7 @@ class ImagePolicyFaceView: FaceView {
             self.config = Config() // default values
         }
 
-        super.init(vatom: vatom, faceModel: faceModel)
+        try super.init(vatom: vatom, faceModel: faceModel)
 
         // enable animated images
         ImagePipeline.Configuration.isAnimatedImageDataEnabled = true

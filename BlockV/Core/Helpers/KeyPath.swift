@@ -17,7 +17,7 @@ struct KeyPath {
     private(set) var segments: [String]
 
     typealias Separator = (String) -> [String]
-    // default separator uses standard period separation
+    /// Default separator uses standard period separation
     private(set) var separator: Separator = { $0.components(separatedBy: ".") }
 
     var isEmpty: Bool { return segments.isEmpty }
@@ -55,7 +55,7 @@ extension KeyPath {
     }
 }
 
-/// Initializ a KeyPath using a string literal.
+/// Initialize a KeyPath using a string literal.
 extension KeyPath: ExpressibleByStringLiteral {
     init(stringLiteral value: String) {
         self.init(value)
@@ -130,7 +130,7 @@ extension VatomModel {
     public func valueForKeyPath(_ keypath: String) -> JSON? {
 
         /*
-         A custom separator  is needed due to Varius's regrettable property names which contain escaped quotes
+         A custom separator is needed due to Varius's regrettable property names which contain escaped quotes
          around period-separated names. For example:
          "private.state.\"a.b:v.io:countdown-timer-v1\".value"
          */

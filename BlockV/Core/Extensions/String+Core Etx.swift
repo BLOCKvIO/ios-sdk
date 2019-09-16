@@ -13,7 +13,7 @@ import Foundation
 
 extension String {
 
-    /// Returns an array of string split using the specified regular expresion.
+    /// Returns an array of strings split using the specified regular expresion.
     ///
     /// Throws if the regular expression pattern is invalid.
     func split(usingRegex pattern: String) throws -> [String] {

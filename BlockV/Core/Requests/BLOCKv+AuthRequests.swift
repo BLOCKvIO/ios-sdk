@@ -40,7 +40,9 @@ extension BLOCKv {
 
             switch result {
             case .failure(let error):
-                completion(.failure(error))
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
                 return
 
             case .success(let flowModel):
@@ -75,13 +77,15 @@ extension BLOCKv {
                                 }
 
                             case .failure(let error):
-                                completion(.failure(error))
-                            }
+                                DispatchQueue.main.async {
+                                    completion(.failure(error))
+                                }                            }
                         }
 
                     case .failure(let error):
-                        completion(.failure(error))
-                    }
+                        DispatchQueue.main.async {
+                            completion(.failure(error))
+                        }                    }
 
                 }
 

@@ -60,6 +60,20 @@ class FaceModel_Tests: XCTestCase {
         }
 
     }
+    
+    func testSpriteFaceDecoding() {
+        
+        do {
+            let model = try TestUtility.jsonDecoder.decode(FaceModel.self, from: MockModel.FaceModel.nativeSpriteSheet)
+            let faceModel = try self.require(model)
+            //
+            XCTAssertEqual(faceModel.id, "C4A795E4-26B7-43FF-B761-14AC5156BB52")
+            print(faceModel.properties.config)
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+        
+    }
 
     /// Test codable (i.e. encode and decode).
     ///

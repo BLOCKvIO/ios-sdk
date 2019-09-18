@@ -137,17 +137,20 @@ extension VatomModel {
 
         // create separator
         let regularExpression = try! NSRegularExpression(pattern: "\\.(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)")
-        let separator: (String) -> [String] = { $0.split(usingRegex: regularExpression) }
+        let separator: (String) -> [String] = {
+            $0.split(usingRegex: regularExpression).map { $0.replacingOccurrences(of: "\"", with: "") }
+        }
 
         // create keypath and split into head and tail
-        guard let component = KeyPath(keypath, separator: separator).headAndTail() else { return nil }
+        let keyPath = KeyPath(keypath, separator: separator)
+        guard let component = keyPath.headAndTail() else { return nil }
 
         var vatomValue: JSON?
         // extract vatom value
         if component.head == "private" {
-            vatomValue = self.private?[keyPath: component.tail.path]
+            vatomValue = self.private?.queryKeyPath(component.tail.segments)
+            
         } else if component.head == "vAtom::vAtomType" {
-
             if component.tail.path == "cloning_score" {
                 vatomValue = try? JSON(self.props.cloningScore)
             } else if component.tail.path == "num_direct_clones" {

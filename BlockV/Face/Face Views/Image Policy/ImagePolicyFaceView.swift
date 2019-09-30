@@ -51,7 +51,7 @@ class ImagePolicyFaceView: FaceView {
     required init(vatom: VatomModel, faceModel: FaceModel) throws {
 
         // init face config (or legacy private section) fallback on default values
-        if let config = faceModel.properties.config {
+        if let config = faceModel.properties.config, config != .null {
             self.config = Config(config) // face config
         } else if let config = vatom.private {
             self.config = Config(config) // private section

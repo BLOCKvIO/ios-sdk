@@ -157,6 +157,7 @@ extension Nuke.ImagePipeline {
             return nil
         } catch {
             assertionFailure("Unknown error type.")
+            return nil
         }
 
     }

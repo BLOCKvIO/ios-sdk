@@ -15,11 +15,15 @@ import Foundation
 extension BLOCKv {
 
     // MARK: - Register
-
-    //FIXME: callbackURLScheme - where does this get set?
+    
+    /// Begins the OAuth authentication flow.
+    ///
+    /// - Parameter scope: Scope value.
+    /// - Parameter redirectURI: Custom redirect URI.
+    /// - Parameter completion: Completion handler to call once the OAuth process has completed or cancelled.
     public static func oauth(scope: String,
                              redirectURI: String,
-                             completion: @escaping (Result<AuthorizationServer.Flow, BVError>) -> Void) {
+                             completion: @escaping (Result<(AuthorizationServer.Flow, UserModel), BVError>) -> Void) {
 
         // ensure host app has set an app id
         let warning = """
@@ -71,21 +75,30 @@ extension BLOCKv {
                                     // persist refresh token and credential
                                     CredentialStore.saveRefreshToken(refreshToken)
                                     CredentialStore.saveAssetProviders(model.payload.assetProviders)
+
                                     // noifty on login process
                                     self.onLogin()
-                                    completion(.success(flowModel))
-                                }
 
+                                    // fetch current user
+                                    self.getCurrentUser { result in
+                                        do {
+                                            let user = try result.get()
+                                            DispatchQueue.main.async { completion(.success((flowModel, user))) }
+                                        } catch {
+                                            DispatchQueue.main.async { completion( .failure(error as! BVError)) }
+                                        }
+                                    }
+
+                                }
+ 
                             case .failure(let error):
-                                DispatchQueue.main.async {
-                                    completion(.failure(error))
-                                }                            }
+                                DispatchQueue.main.async { completion(.failure(error)) }
+                            }
                         }
 
                     case .failure(let error):
-                        DispatchQueue.main.async {
-                            completion(.failure(error))
-                        }                    }
+                        DispatchQueue.main.async { completion(.failure(error)) }
+                    }
 
                 }
 

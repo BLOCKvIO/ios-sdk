@@ -201,6 +201,13 @@ class ImageProgressFaceView: FaceView {
 
     override func layoutSubviews() {
         super.layoutSubviews()
+        
+        // show/hide progress label based on current size
+        if self.bounds.size.width < 100 {
+            progressLabel.isHidden = true
+        } else {
+            progressLabel.isHidden = false
+        }
 
         // image size
         guard let image = fullImageView.image else { return }

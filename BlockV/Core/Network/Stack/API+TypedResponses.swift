@@ -396,6 +396,16 @@ extension API {
 
         }
 
+        /// Builds the endpoint to alllow merchants to request redemption on a particular vatom.
+        ///
+        /// This endpoint should only be used when logged in as a merchant.
+        ///
+        /// - Parameter vatomID: Uniquie identifier of the vatom for redemption.
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        static func requestRedemption(vatomID: String) -> Endpoint<BaseModel<GeneralModel>> {
+            return API.Generic.requestRedemption(vatomID: vatomID)
+        }
+
     }
 
     /// Namespace for action related endpoints with a typed reponse model.

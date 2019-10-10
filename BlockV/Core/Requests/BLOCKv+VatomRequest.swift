@@ -530,5 +530,37 @@ extension BLOCKv {
             completion(result)
         }
     }
+    
+    // MARK: - Redemption
+    
+    /// Performs a redemption request on the specified vatom id. This will trigger an RPC socket event to the client informing it of the redemption request.
+    ///
+    /// This call is intended for merchant accounts.
+    ///
+    /// - Parameter id: Vatom identifier for redemption.
+    /// - Parameter completion: The completion handler to call when the action is completed.
+    ///                         This handler is executed on the main queue.
+    public static func requestRedemption(vatomID id: String, completion: @escaping (BVError?) -> Void) {
+        
+        let endpoint = API.Vatom.requestRedemption(vatomID: id)
+        
+        self.client.request(endpoint) { result in
+
+            switch result {
+            case .success:
+                // model is available
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    completion(error)
+                }
+            }
+
+        }
+        
+    }
 
 }

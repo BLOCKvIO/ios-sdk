@@ -1,5 +1,5 @@
 PODS:
-  - Alamofire (4.8.2)
+  - Alamofire (4.9.0)
   - BLOCKv (3.1.0):
     - BLOCKv/Face (= 3.1.0)
   - BLOCKv/Core (3.1.0):
@@ -13,26 +13,26 @@ PODS:
   - BLOCKv/Face (3.1.0):
     - BLOCKv/Core
     - FLAnimatedImage (~> 1.0)
-    - Nuke (~> 7.0)
+    - Nuke (~> 8.0)
   - FLAnimatedImage (1.0.12)
   - GenericJSON (2.0.0)
-  - JWTDecode (2.3.0)
-  - Nuke (7.6.3)
-  - NVActivityIndicatorView (4.7.0):
-    - NVActivityIndicatorView/Presenter (= 4.7.0)
-  - NVActivityIndicatorView/Presenter (4.7.0)
-  - PromiseKit (6.10.0):
-    - PromiseKit/CorePromise (= 6.10.0)
-    - PromiseKit/Foundation (= 6.10.0)
-    - PromiseKit/UIKit (= 6.10.0)
-  - PromiseKit/CorePromise (6.10.0)
-  - PromiseKit/Foundation (6.10.0):
+  - JWTDecode (2.3.1)
+  - Nuke (8.3.0)
+  - NVActivityIndicatorView (4.8.0):
+    - NVActivityIndicatorView/Presenter (= 4.8.0)
+  - NVActivityIndicatorView/Presenter (4.8.0)
+  - PromiseKit (6.11.0):
+    - PromiseKit/CorePromise (= 6.11.0)
+    - PromiseKit/Foundation (= 6.11.0)
+    - PromiseKit/UIKit (= 6.11.0)
+  - PromiseKit/CorePromise (6.11.0)
+  - PromiseKit/Foundation (6.11.0):
     - PromiseKit/CorePromise
-  - PromiseKit/UIKit (6.10.0):
+  - PromiseKit/UIKit (6.11.0):
     - PromiseKit/CorePromise
   - Signals (6.1.0)
   - Starscream (3.0.6)
-  - SwiftLint (0.33.1)
+  - SwiftLint (0.35.0)
   - VatomFace3D (3.0.2):
     - BLOCKv/Face
     - FLAnimatedImage
@@ -45,7 +45,7 @@ DEPENDENCIES:
   - VatomFace3D
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  trunk:
     - Alamofire
     - FLAnimatedImage
     - GenericJSON
@@ -63,19 +63,19 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  Alamofire: ae5c501addb7afdbb13687d7f2f722c78734c2d3
-  BLOCKv: 6d0675eb6f8802e3864af8ec77e735358e535f90
+  Alamofire: afc3e7c6db61476cb45cdd23fed06bad03bbc321
+  BLOCKv: 112a18cd7e3c038ba613a755b3ef4e6748ffa13b
   FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
   GenericJSON: a967fb5c199c9aae24063e47a771e04e305dc836
-  JWTDecode: fb77675c8049c1a7e9433c7cf448c3ce33ee4ac7
-  Nuke: 44130e95e09463f8773ae4b96b90de1eba6b3350
-  NVActivityIndicatorView: b19ddab2576f805cbe0fb2306cba3476e09a1dea
-  PromiseKit: 1fdaeb6c0a94a5114fcb814ff3d772b86886ad4e
+  JWTDecode: 222f79e3df85a3b02028822fca950058961460e6
+  Nuke: 775e35cf3c12cde80b3bff5fc7a77abb0cf29d0b
+  NVActivityIndicatorView: d24b7ebcf80af5dcd994adb650e2b6c93379270f
+  PromiseKit: e4863d06976e7dee5e41c04fc7371c16b3600292
   Signals: f8e5c979e93c35273f8dfe55ee7f47213d3e8fe8
   Starscream: ef3ece99d765eeccb67de105bfa143f929026cf5
-  SwiftLint: 9fc1143bbacec37f94994a7d0d2a85b2154b6294
+  SwiftLint: 5553187048b900c91aa03552807681bb6b027846
   VatomFace3D: aabeb4a3c9d72835fbfd8a4bcac3917151b30e0c
 
 PODFILE CHECKSUM: d2ad0cdcd830de687ee1e7475c49221546a727b8
 
-COCOAPODS: 1.7.4
+COCOAPODS: 1.8.3

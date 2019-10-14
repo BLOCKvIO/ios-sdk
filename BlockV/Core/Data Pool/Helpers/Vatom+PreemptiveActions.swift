@@ -144,6 +144,46 @@ extension VatomModel {
         self.performAction("Drop", payload: body, undos: [undoCoords, undoDropped], completion: completion)
 
     }
+    
+    /// Performs the **Drop** action on the current vatom and preeempts the action result.
+    /// Requires AR specific parameters
+    ///
+    /// - Parameters:
+    ///   - longitude: The longitude component of the coordinate.
+    ///   - latitude: The latitude component of the coordinate.
+    ///   - anchorId: The id component of the anchor.
+    ///   - anchorScale: The scale component of the node with the attached anchor.
+    ///   - completion: The completion handler to call when the action is completed.
+    ///                 This handler is executed on the main queue.
+    public func dropAt(longitude: Double,
+                       latitude: Double, 
+                       anchorId: String, 
+                       anchorScale: Float,
+                       completion: @escaping (Result<[String: Any], BVError>) -> Void) {
+
+        let body: [String: Any] = [
+            "this.id": self.id,
+            "geo.pos": [
+                "Lat": latitude,
+                "Lon": longitude
+            ],
+            "ar_anchor_id": anchorId,
+            "ar_scale": anchorScale
+        ]
+
+        // preempt the reactor outcome
+        let undoCoords = DataPool.inventory().preemptiveChange(id: self.id,
+                                                               keyPath: "vAtom::vAtomType.geo_pos.coordinates",
+                                                               value: [longitude, latitude])
+
+        let undoDropped = DataPool.inventory().preemptiveChange(id: self.id,
+                                                                keyPath: "vAtom::vAtomType.dropped",
+                                                                value: true)
+
+        // perform the action
+        self.performAction("Drop", payload: body, undos: [undoCoords, undoDropped], completion: completion)
+
+    }
 
     /// Performs the **Pickup** action on the current vatom and preeempts the action result.
     ///

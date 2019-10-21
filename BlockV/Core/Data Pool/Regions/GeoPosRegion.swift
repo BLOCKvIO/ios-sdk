@@ -173,8 +173,6 @@ class GeoPosRegion: BLOCKvRegion {
     /// be fetched from the server.
     override func processMessage(_ msg: [String: Any]) {
 
-        // - Look at state update
-
         // get info
         guard
             let msgType = msg["msg_type"] as? String,
@@ -200,7 +198,10 @@ class GeoPosRegion: BLOCKvRegion {
         // check update is related to drop
         guard let properties = newData["vAtom::vAtomType"] as? [String: Any],
             let dropped = properties["dropped"] as? Bool
-            else { return }
+            else {
+                super.processMessage(msg)
+                return
+        }
 
         // check if vatom was picked up
         if !dropped {

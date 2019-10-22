@@ -100,12 +100,12 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
             }
 
             // ensure the error payload indicates a token refresh is required
-            if
+            guard
                 let data = request.delegate.data,
                 let json = try? JSONSerialization.jsonObject(with: data, options: []),
                 let errorDictionary = json as? [String: String],
                 // Important to check for both "token expired" and "Unauthorized" messages.
-                (errorDictionary["exp"] == "token expired" || errorDictionary["message"] == "Unauthorized") {
+                (errorDictionary["exp"] == "token expired" || errorDictionary["message"] == "Unauthorized") else {
                     os_log("User authentication required. 401", log: .authentication, type: .debug)
                     // don't retry the request
                     completion(false, 0.0)

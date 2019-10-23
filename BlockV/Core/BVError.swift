@@ -73,6 +73,7 @@ public enum BVError: Error {
         case maxSharesReached(Int, String)
         case redemptionError(Int, String)
         case recipientLimit(Int, String)
+        case vatomFolderEmpty(Int, String)
         case vatomNotFound(Int, String)
         case vatomPermissionAlreadyOwned(Int, String)
         case vatomPermissionCloneToSelf(Int, String)
@@ -125,6 +126,7 @@ public enum BVError: Error {
             case 1632: self = .redemptionError(code, message)
             case 1639: self = .vatomPermissionCloneToSelf(code, message)
             case 1654: self = .recipientLimit(code, message)
+            case 1652: self = .vatomFolderEmpty(code, message)
 
             case 1701: self = .vatomNotFound(code, message)
             case 1702: self = .unknownUserToken(code, message)
@@ -265,6 +267,7 @@ extension BVError.PlatformErrorReason {
              let .maxSharesReached(code, message),
              let .redemptionError(code, message),
              let .recipientLimit(code, message),
+             let .vatomFolderEmpty(code, message),
              let .vatomNotFound(code, message),
              let .vatomPermissionAlreadyOwned(code, message),
              let .vatomPermissionCloneToSelf(code, message),

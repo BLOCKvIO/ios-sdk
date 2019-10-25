@@ -651,8 +651,8 @@ class CoreBridgeV2: CoreBridge { //swiftlint:disable:this type_body_length
                     }
                     completion(.success(json))
 
-                case .failure:
-                    let bridgeError = BridgeError.viewer("Unable to perform action: \(name).")
+                case .failure(let error):
+                    let bridgeError = BridgeError.viewer("Unable to perform action: \(name). \(error.localizedDescription)")
                     completion(.failure(bridgeError))
                 }
 

@@ -31,7 +31,7 @@ public struct UserModel: Equatable {
 
     // Internal
 
-    let systemProperties: SystemProperties
+    public let systemProperties: SystemProperties
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -53,11 +53,11 @@ public struct UserModel: Equatable {
         case isPasswordSet       = "is_password_set"
     }
 
-    struct SystemProperties: Codable, Equatable {
-        let isAdmin: Bool
-        let isMerchant: Bool
-        let lastLogin: Date
-        let isActivated: Bool
+    public struct SystemProperties: Codable, Equatable {
+        public let isAdmin: Bool
+        public let isMerchant: Bool
+        public let lastLogin: Date
+        public let isActivated: Bool
 
         enum CodingKeys: String, CodingKey {
             case isAdmin     = "is_admin"

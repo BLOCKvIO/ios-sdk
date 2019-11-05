@@ -56,6 +56,7 @@ public enum BVError: Error {
         case unknownAppId(Int, String)
         case unhandledAction(Int, String)
         case internalServerIssue(Int, String)
+        case userMoveLimit(Int, String)
         case unauthorized(Int, String)
         case tokenExists(Int, String)
         case rateLimited(Int, String)
@@ -99,6 +100,7 @@ public enum BVError: Error {
             case 2:    self = .unknownAppId(code, message)
             case 13:   self = .unhandledAction(code, message)
             case 11:   self = .internalServerIssue(code, message)
+            case 17:   self = .userMoveLimit(code, message)
 
             case 401:  self = .unauthorized(code, message)
             case 409:  self = .tokenExists(code, message)
@@ -253,6 +255,7 @@ extension BVError.PlatformErrorReason {
         case let .unknownAppId(code, message),
              let .unhandledAction(code, message),
              let .internalServerIssue(code, message),
+             let .userMoveLimit(code, message),
              let .unauthorized(code, message),
              let .tokenExists(code, message),
              let .rateLimited(code, message),

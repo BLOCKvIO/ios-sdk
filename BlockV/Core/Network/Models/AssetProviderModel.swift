@@ -53,7 +53,7 @@ struct AssetProviderModel: Codable, Equatable {
         guard isProviderForURL(url) else { return nil }
 
         var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
-        components?.queryItems = self.queryItems
+        components?.queryItems = self.queryItems.sorted { $0.name > $1.name }
         return components?.url
 
     }

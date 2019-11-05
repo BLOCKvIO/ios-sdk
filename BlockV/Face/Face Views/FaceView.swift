@@ -126,7 +126,7 @@ open class BaseFaceView: BoundedView {
 }
 
 /// Models the errors that may be thrown by face views.
-enum FaceError: Error {
+public enum FaceError: Error {
     case missingVatomResource
     case invalidURL
     case failedToLoadResource

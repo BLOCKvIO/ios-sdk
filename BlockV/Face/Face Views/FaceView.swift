@@ -184,7 +184,7 @@ public extension FacePresenter {
         
     }
     
-    func findAnimationRules(forEvent event: CommonFaceConfig.OnEvent,
+    private func findAnimationRules(forEvent event: CommonFaceConfig.OnEvent,
                             animationRule: CommonFaceConfig.TriggerRule?,
                             actionName: String?) -> [CommonFaceConfig.TriggerRule] {
         
@@ -207,8 +207,14 @@ public extension FacePresenter {
         
     }
     
-    /// Finds valid sound rules for the given event.
-    func findActionRules(forEvent event: CommonFaceConfig.OnEvent,
+    /// Finds the first action rule for the given event.
+    func findFirstActionRule(forEvent event: CommonFaceConfig.OnEvent,
+                        animationRule: CommonFaceConfig.TriggerRule?,
+                        actionName: String) -> CommonFaceConfig.TriggerRule? {
+        return findActionRules(forEvent: event, animationRule: animationRule, actionName: actionName).first ?? nil
+    }
+    
+    private func findActionRules(forEvent event: CommonFaceConfig.OnEvent,
                          animationRule: CommonFaceConfig.TriggerRule?,
                          actionName: String) -> [CommonFaceConfig.TriggerRule] {
         

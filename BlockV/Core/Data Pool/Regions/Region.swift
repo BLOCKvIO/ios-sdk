@@ -13,6 +13,20 @@ import os
 import Foundation
 import PromiseKit
 
+extension Region: CustomStringConvertible {
+    
+    public var description: String {
+        let descrip = """
+        \tobject count:   \(self.objects.count)
+        \tis syncronized: \(self.synchronized)
+        \tis closed:      \(self.closed)
+        \tcache file:     \(self.cacheFile)
+        """
+        return descrip
+    }
+    
+}
+
 /// An abstract class that manages a complete collection of objects (a.k.a Regions).
 ///
 /// Regions are generally "id-complete". That is, the local region should have a complete copy of all remote objects.

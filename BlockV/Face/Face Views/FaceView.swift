@@ -151,6 +151,20 @@ public enum TriggerType {
 
 public extension FacePresenter {
     
+    /// Returns all trigger rules for the speicifed event and constraints.
+    func findAllTriggerRules(forEvent event: CommonFaceConfig.OnEvent,
+                             animationRule: CommonFaceConfig.TriggerRule?,
+                             actionName: String?) -> [CommonFaceConfig.TriggerRule] {
+    
+        var triggers: [CommonFaceConfig.TriggerRule] = []
+        //TODO: Optimize into one loop
+        triggers += self.findAnimationRules(forEvent: event, animationRule: animationRule, actionName: actionName)
+        triggers += self.findSoundRules(forEvent: event, animationRule: animationRule, actionName: actionName)
+        triggers += self.findActionRules(forEvent: event, animationRule: animationRule, actionName: actionName ?? "dev/null")
+        return triggers
+        
+    }
+    
     /// Returns all trigger rules of the specified type.
     func findAllTriggerRules(ofType type: TriggerType) -> [CommonFaceConfig.TriggerRule] {
         
@@ -235,8 +249,10 @@ public extension FacePresenter {
             
         case .start:
             // find valid state rules, fallback on start rule
-            let stateRules = filterRules(candidateRules, forEvent: .state, animationRule: animationRule, actionName: actionName)
-            return stateRules.isEmpty ? candidateRules: stateRules
+            let stateRules = findAllTriggerRules(forEvent: .state, animationRule: animationRule, actionName: actionName)
+            let rulls = stateRules.isEmpty ? candidateRules: stateRules
+            print("[xxx]", rulls)
+            return rulls
         case .state:
             return candidateRules.filter { rule in
                 // ensure both `target` and `value` have been set
@@ -249,11 +265,17 @@ public extension FacePresenter {
             }
         case .click:
             let validRules = candidateRules.filter { rule in
-                if let target = rule.target, !target.isEmpty, let currentRule = animationRule {
-                    // check constraint for a playing animation
-                    return currentRule.play == rule.target
+                if let target = rule.target {
+                    
+                    if target.isEmpty && animationRule == nil {
+                        return true
+                    }
+                    if !target.isEmpty, target == animationRule?.play {
+                        return true
+                    }
+                    return false
                 } else {
-                    return true
+                    return true // target is null
                 }
             }
             return validRules

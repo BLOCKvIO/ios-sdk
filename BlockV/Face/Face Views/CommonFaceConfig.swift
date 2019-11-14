@@ -26,17 +26,10 @@ public enum CommonFaceConfig {
         case animationComplete = "animation-complete"
         case actionComplete = "action-complete"
         case actionFail = "action-fail"
-        
-        /// Returns `true` if the event is an animation trigger.
-        var isAnimationEvent: Bool {
-            switch self {
-            case .animationStart, .animationComplete: return true
-            default: return false
-            }
-        }
     }
     
     public struct TriggerRule: Equatable, Hashable {
+        
         public let on: String
         public let play: String?
         public let target: String?

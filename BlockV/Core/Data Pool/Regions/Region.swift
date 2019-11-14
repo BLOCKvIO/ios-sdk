@@ -112,7 +112,6 @@ public class Region {
 
         // remove pending error
         self.error = nil
-        self.emit(.updated) //FIXME: Why is this update broadcast?
 
         // stop if already in sync
         if synchronized {

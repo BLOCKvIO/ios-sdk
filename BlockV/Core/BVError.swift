@@ -70,6 +70,7 @@ public enum BVError: Error {
         case invalidFormData(Int, String)
         case usernameNotFound(Int, String)
         case unverifiedAccount(Int, String)
+        case reactorTimeout(Int, String)
         case vatomNotOwned(Int, String)
         case maxSharesReached(Int, String)
         case redemptionError(Int, String)
@@ -121,6 +122,8 @@ public enum BVError: Error {
             case 1012: self = .invalidFormData(code, message)
             case 1014: self = .usernameNotFound(code, message)
             case 1015: self = .unverifiedAccount(code, message)
+                
+            case 1508: self = .reactorTimeout(code, message)
 
             case 1604: self = .vatomNotOwned(code, message)
             case 1605: self = .vatomPermissionAlreadyOwned(code, message)
@@ -269,6 +272,7 @@ extension BVError.PlatformErrorReason {
              let .invalidFormData(code, message),
              let .usernameNotFound(code, message),
              let .unverifiedAccount(code, message),
+             let .reactorTimeout(code, message),
              let .vatomNotOwned(code, message),
              let .maxSharesReached(code, message),
              let .redemptionError(code, message),

@@ -35,10 +35,10 @@ extension VatomModel {
 
         // prempt reactor outcome
         // remove vatom from inventory region
-        let undoRemove = DataPool.inventory().preemptiveRemove(id: self.id)
+        let undos = DataPool.regions.map { $0.preemptiveRemove(id: self.id) }
 
         // perform the action
-        self.performAction("Transfer", payload: body, undos: [undoRemove], completion: completion)
+        self.performAction("Transfer", payload: body, undos: undos, completion: completion)
 
     }
 
@@ -58,10 +58,10 @@ extension VatomModel {
 
         // prempt reactor outcome
         // remove vatom from inventory region
-        let undo = DataPool.inventory().preemptiveRemove(id: self.id)
+        let undos = DataPool.regions.map { $0.preemptiveRemove(id: self.id) }
 
         // perform the action
-        self.performAction("Redeem", payload: body, undos: [undo], completion: completion)
+        self.performAction("Redeem", payload: body, undos: undos, completion: completion)
 
     }
 
@@ -76,10 +76,10 @@ extension VatomModel {
 
         // prempt reactor outcome
         // remove vatom from inventory region
-        let undo = DataPool.inventory().preemptiveRemove(id: self.id)
+        let undos = DataPool.regions.map { $0.preemptiveRemove(id: self.id) }
 
         // perform the action
-        self.performAction("Activate", payload: body, undos: [undo], completion: completion)
+        self.performAction("Activate", payload: body, undos: undos, completion: completion)
 
     }
 
@@ -103,12 +103,12 @@ extension VatomModel {
          1. `num_direct_clones` is increased by 1.
          2. `cloning_score` is dependent on the clone gain - which is not know at this point.
          */
-        let undo = DataPool.inventory().preemptiveChange(id: self.id,
-                                                         keyPath: "vAtom::vAtomType.num_direct_clones",
-                                                         value: self.props.numberDirectClones + 1)
+        let undos = DataPool.regions.map { $0.preemptiveChange(id: self.id,
+                                                               keyPath: "vAtom::vAtomType.num_direct_clones",
+                                                               value: self.props.numberDirectClones + 1) }
 
         // perform the action
-        self.performAction("Clone", payload: body, undos: [undo], completion: completion)
+        self.performAction("Clone", payload: body, undos: undos, completion: completion)
 
     }
 
@@ -132,16 +132,16 @@ extension VatomModel {
         ]
 
         // preempt the reactor outcome
-        let undoCoords = DataPool.inventory().preemptiveChange(id: self.id,
-                                                               keyPath: "vAtom::vAtomType.geo_pos.coordinates",
-                                                               value: [longitude, latitude])
-
-        let undoDropped = DataPool.inventory().preemptiveChange(id: self.id,
-                                                                keyPath: "vAtom::vAtomType.dropped",
-                                                                value: true)
+        let undosCoords = DataPool.regions.map { $0.preemptiveChange(id: self.id,
+                                                                     keyPath: "vAtom::vAtomType.geo_pos.coordinates",
+                                                                     value: [longitude, latitude]) }
+        
+        let undosDropped = DataPool.regions.map { $0.preemptiveChange(id: self.id,
+                                                                      keyPath: "vAtom::vAtomType.dropped",
+                                                                      value: true) }
 
         // perform the action
-        self.performAction("Drop", payload: body, undos: [undoCoords, undoDropped], completion: completion)
+        self.performAction("Drop", payload: body, undos: (undosCoords + undosDropped), completion: completion)
 
     }
 
@@ -154,12 +154,12 @@ extension VatomModel {
         let body = ["this.id": self.id]
 
         // preempt the reactor outcome
-        let undo = DataPool.inventory().preemptiveChange(id: self.id,
-                                                         keyPath: "vAtom::vAtomType.dropped",
-                                                         value: false)
+        let undos = DataPool.regions.map { $0.preemptiveChange(id: self.id,
+                                                               keyPath: "vAtom::vAtomType.dropped",
+                                                               value: false) }
 
         // perform the action
-        self.performAction("Pickup", payload: body, undos: [undo], completion: completion)
+        self.performAction("Pickup", payload: body, undos: undos, completion: completion)
 
     }
 
@@ -187,9 +187,9 @@ extension VatomModel {
         
         // update 'when_modified' date
         let nowDate = DateFormatter.blockvDateFormatter.string(from: Date())
-        let undoModified = DataPool.inventory().preemptiveChange(id: self.id, keyPath: "when_modified", value: nowDate)
+        let undosModified = DataPool.regions.map { $0.preemptiveChange(id: self.id, keyPath: "when_modified", value: nowDate) }
         var allUndos = undos
-        allUndos.append(undoModified)
+        allUndos += undosModified
 
         // perform the action
         BLOCKv.performAction(name: name, payload: payload) { result in

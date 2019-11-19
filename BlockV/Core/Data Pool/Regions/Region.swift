@@ -112,7 +112,7 @@ public class Region {
 
         // remove pending error
         self.error = nil
-
+        
         // stop if already in sync
         if synchronized {
             return Guarantee()
@@ -134,6 +134,8 @@ public class Region {
             if let ids = ids {
                 self.diffedRemove(ids: ids)
             }
+
+            self.emit(.updated)
 
             // data is up to date
             self.synchronized = true

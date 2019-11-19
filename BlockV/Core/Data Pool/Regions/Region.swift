@@ -112,7 +112,8 @@ public class Region {
 
         // remove pending error
         self.error = nil
-
+        self.emit(.updated)
+        
         // stop if already in sync
         if synchronized {
             return Guarantee()

@@ -18,7 +18,7 @@ import Foundation
 ///
 /// Actions are *preemptive* where possible. That is, data pool is updated locally before the network request is
 /// made performing the action on the server. Preemptive updates are always applied to the Inventory Region. Pickup and Drop preemtive updates
-/// are also applied to the GeoPos region.
+/// are applied to all regions.
 extension VatomModel {
 
     // MARK: - Common Actions

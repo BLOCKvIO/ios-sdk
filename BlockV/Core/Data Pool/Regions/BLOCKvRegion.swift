@@ -292,8 +292,11 @@ class BLOCKvRegion: Region {
     // called in response to a premtive action
     override func onPreemptiveChange(_ object: DataObject) {
         super.onPreemptiveChange(object)
-        // indicate a re-sync with remote is required
-        object.data![keyPath: KeyPath("vAtom::vAtomType.sync")] = -1
+        
+        if object.type == "vatom" {
+            // indicate a re-sync with remote is required
+            object.data![keyPath: KeyPath("vAtom::vAtomType.sync")] = -1
+        }
     }
 
     // MARK: - Notifications

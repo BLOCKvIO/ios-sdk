@@ -207,6 +207,10 @@ public final class BLOCKv {
     internal static func reset() {
         // remove all credentials
         CredentialStore.clear()
+        // remove region caches
+        try? FileManager.default.removeItem(at: Region.recommendedCacheDirectory)
+        // remove cached responses
+        DataLoader.sharedUrlCache.removeAllCachedResponses()
         // nil out client
         self._client = nil
         // disconnect and nil out socekt

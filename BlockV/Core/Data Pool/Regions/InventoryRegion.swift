@@ -45,6 +45,13 @@ class InventoryRegion: BLOCKvRegion {
     }
 
     var lastHash: String?
+    
+    // called in response to a premtive action
+    override func onPreemptiveChange(_ object: DataObject) {
+        super.onPreemptiveChange(object)
+        // nil out hash
+        self.lastHash = nil
+    }
 
     /// Current user ID.
     let currentUserID = DataPool.sessionInfo["userID"] as? String ?? ""

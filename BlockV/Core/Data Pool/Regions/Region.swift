@@ -588,6 +588,8 @@ public class Region {
         object.cached = nil
         self.emit(.willUpdateObject, userInfo: ["id": id])
         
+        self.onPreemptiveChange(object)
+        
         self.did(update: object, keyPath: keyPath, oldValue: oldValue, newValue: value)
         self.emit(.updated)
         self.save()
@@ -647,6 +649,8 @@ public class Region {
     }
 
     // MARK: - Listener functions, can be overridden by subclasses
+    
+    func onPreemptiveChange(_ object: DataObject) {}
 
     func will(add: DataObject) {}
     func will(update: DataObject, withFields: [String: Any]) {}

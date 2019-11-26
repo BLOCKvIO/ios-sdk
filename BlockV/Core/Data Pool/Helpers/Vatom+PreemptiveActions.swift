@@ -11,10 +11,14 @@
 
 import Foundation
 
+//TODO: 1. Preemptive updates should be distributed to all regions.
+//TODO: 2. Regions' should be able to opt into preemptive updates.
+
 /// Extends VatomModel with common vatom actions available on owned vatoms.
 ///
-/// All actions are *preemptive* where possible. That is, data pool is updated locally before the network request is
-/// made performing the action on the server.
+/// Actions are *preemptive* where possible. That is, data pool is updated locally before the network request is
+/// made performing the action on the server. Preemptive updates are always applied to the Inventory Region. Pickup and Drop preemtive updates
+/// are applied to all regions.
 extension VatomModel {
 
     // MARK: - Common Actions
@@ -131,17 +135,20 @@ extension VatomModel {
             ]
         ]
 
-        // preempt the reactor outcome
-        let undoCoords = DataPool.inventory().preemptiveChange(id: self.id,
-                                                               keyPath: "vAtom::vAtomType.geo_pos.coordinates",
-                                                               value: [longitude, latitude])
-
-        let undoDropped = DataPool.inventory().preemptiveChange(id: self.id,
-                                                                keyPath: "vAtom::vAtomType.dropped",
-                                                                value: true)
+        var undos: [Region.UndoFunction] = []
+        // preempt reactor outcome
+        DataPool.regions.forEach {
+            undos.append($0.preemptiveChange(id: self.id,
+                                             keyPath: "vAtom::vAtomType.geo_pos.coordinates",
+                                             value: [longitude, latitude]))
+            
+            undos.append($0.preemptiveChange(id: self.id,
+                                             keyPath: "vAtom::vAtomType.dropped",
+                                             value: true))
+        }
 
         // perform the action
-        self.performAction("Drop", payload: body, undos: [undoCoords, undoDropped], completion: completion)
+        self.performAction("Drop", payload: body, undos: undos, completion: completion)
 
     }
 
@@ -153,13 +160,14 @@ extension VatomModel {
 
         let body = ["this.id": self.id]
 
-        // preempt the reactor outcome
-        let undo = DataPool.inventory().preemptiveChange(id: self.id,
-                                                         keyPath: "vAtom::vAtomType.dropped",
-                                                         value: false)
+        var undos: [Region.UndoFunction] = []
+        // perform reactor outcome
+        DataPool.regions.forEach {
+            undos.append($0.preemptiveChange(id: self.id, keyPath: "vAtom::vAtomType.dropped", value: false))
+        }
 
         // perform the action
-        self.performAction("Pickup", payload: body, undos: [undo], completion: completion)
+        self.performAction("Pickup", payload: body, undos: undos, completion: completion)
 
     }
 

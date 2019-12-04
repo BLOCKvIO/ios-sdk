@@ -18,7 +18,7 @@ internal func ?=<T> (lhs: inout T, rhs: T?) {
 }
 
 /// Types seeking to present a vatom using a face should conform to this protocol.
-public protocol FacePresenter {
+public protocol FacePresenter: class {
     
     var vatom: VatomModel { get }
     

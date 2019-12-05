@@ -22,7 +22,7 @@ public final class AuthorizationServer {
         case unknown
         case register
         case login
-        
+
         init(value: String) {
             if value == "register" {
                 self = .register
@@ -62,7 +62,7 @@ public final class AuthorizationServer {
 
     /// Begins delegated authorization.
     public func authorize(handler: @escaping (Result<Flow, BVError>) -> Void) {
-        
+
         savedState = generateState(withLength: 20)
 
         var urlComp = URLComponents(string: domain)!
@@ -78,7 +78,9 @@ public final class AuthorizationServer {
 
         //TODO: Should the `callbackURLScheme` include more than the redirectURL, e.g. bundle identifier?
         // init an auth session
-        authSession = SFAuthenticationSession(url: urlComp.url!, callbackURLScheme: redirectURI, completionHandler: { (url, error) in
+        authSession = SFAuthenticationSession(url: urlComp.url!,
+                                              callbackURLScheme: redirectURI,
+                                              completionHandler: { (url, error) in
 
             guard error == nil else {
                 os_log("OAuth failed: %@", log: .authentication, type: .error, error!.localizedDescription)

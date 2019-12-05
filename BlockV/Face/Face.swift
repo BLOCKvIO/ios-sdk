@@ -14,6 +14,6 @@ import Foundation
 
 extension OSLog {
     private static var subsystem = "io.blockv.sdk.face"
-    
+
     static let vatomView = OSLog(subsystem: subsystem, category: "vatomView")
 }

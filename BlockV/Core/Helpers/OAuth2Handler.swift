@@ -88,14 +88,14 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
          This lock ensures exclusive access to `requestsToRetry` and `isRefreshing` variables.
          */
         lock.lock() ; defer { lock.unlock() }
-        
+
         // ensure request are retried only once
         guard request.retryCount == 0 else {
             // don't retry the request
             completion(false, 0.0)
             return
         }
-        
+
         // check for network-level timeouts
         if let error = error as? NSError, error.code == -1001 {
             // retry after a second
@@ -208,7 +208,7 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
                 // invoke with success
                 completion(true, val.payload.accessToken.token, nil)
 
-            case let .failure(err):
+            case .failure:
                 let code = dataResponse.response?.statusCode.description ?? "-1"
                 os_log("Access token - Refresh failed. Status Code: %@", log: .authentication, type: .error,
                        code)

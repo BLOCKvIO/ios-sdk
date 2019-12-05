@@ -19,11 +19,11 @@ internal func ?=<T> (lhs: inout T, rhs: T?) {
 
 /// Types seeking to present a vatom using a face should conform to this protocol.
 public protocol FacePresenter: class {
-    
+
     var vatom: VatomModel { get }
-    
+
     var faceModel: FaceModel { get }
-    
+
 }
 
 /// Composite type that all face views must derive from and conform to.
@@ -150,29 +150,29 @@ public enum TriggerType {
 }
 
 public extension FacePresenter {
-    
+
     /// Returns all trigger rules for the speicifed event and constraints.
     func findAllTriggerRules(forEvent event: CommonFaceConfig.OnEvent,
                              animationRule: CommonFaceConfig.TriggerRule?,
                              actionName: String?) -> [CommonFaceConfig.TriggerRule] {
-    
+
         var triggers: [CommonFaceConfig.TriggerRule] = []
         //TODO: Optimize into one loop
         triggers += self.findAnimationRules(forEvent: event, animationRule: animationRule, actionName: actionName)
         triggers += self.findSoundRules(forEvent: event, animationRule: animationRule, actionName: actionName)
         triggers += self.findActionRules(forEvent: event, animationRule: animationRule, actionName: actionName ?? "dev/null")
         return triggers
-        
+
     }
-    
+
     /// Returns all trigger rules of the specified type.
     func findAllTriggerRules(ofType type: TriggerType) -> [CommonFaceConfig.TriggerRule] {
-        
+
         guard
             let config = self.faceModel.properties.config,
             let triggerRules = config.animation_rules?.arrayValue
             else { return [] }
-        
+
         return triggerRules.compactMap {
             switch type {
             case .animation: if ($0.play?.stringValue).isNilOrEmpty { return nil }
@@ -182,7 +182,7 @@ public extension FacePresenter {
             return try? CommonFaceConfig.TriggerRule(descriptor: $0)
         }
     }
-    
+
     /// Returns the first animation rule for the triggering event.
     ///
     /// - Parameters:
@@ -193,60 +193,60 @@ public extension FacePresenter {
     func findFirstAnimationRule(forEvent event: CommonFaceConfig.OnEvent,
                                 animationRule: CommonFaceConfig.TriggerRule?,
                                 actionName: String?) -> CommonFaceConfig.TriggerRule? {
-        
+
         return findAnimationRules(forEvent: event, animationRule: animationRule, actionName: actionName).first ?? nil
-        
+
     }
-    
+
     private func findAnimationRules(forEvent event: CommonFaceConfig.OnEvent,
-                            animationRule: CommonFaceConfig.TriggerRule?,
-                            actionName: String?) -> [CommonFaceConfig.TriggerRule] {
-        
+                                    animationRule: CommonFaceConfig.TriggerRule?,
+                                    actionName: String?) -> [CommonFaceConfig.TriggerRule] {
+
         // only consider rules matching the event type
         let allAnimationRules = findAllTriggerRules(ofType: .animation)
         let candidateRules = allAnimationRules.filter { ($0.on == event.rawValue) }
         return self.filterRules(candidateRules, forEvent: event, animationRule: animationRule, actionName: actionName)
-        
+
     }
-    
+
     /// Finds valid sound rules for the given event.
     func findSoundRules(forEvent event: CommonFaceConfig.OnEvent,
                         animationRule: CommonFaceConfig.TriggerRule?,
                         actionName: String?) -> [CommonFaceConfig.TriggerRule] {
-        
+
         // only consider rules matching the event type
         let allSoundnRules = findAllTriggerRules(ofType: .sound)
         let candidateRules = allSoundnRules.filter { ($0.on == event.rawValue) }
         return self.filterRules(candidateRules, forEvent: event, animationRule: animationRule, actionName: actionName)
-        
+
     }
-    
+
     /// Finds the first action rule for the given event.
     func findFirstActionRule(forEvent event: CommonFaceConfig.OnEvent,
-                        animationRule: CommonFaceConfig.TriggerRule?,
-                        actionName: String) -> CommonFaceConfig.TriggerRule? {
+                             animationRule: CommonFaceConfig.TriggerRule?,
+                             actionName: String) -> CommonFaceConfig.TriggerRule? {
         return findActionRules(forEvent: event, animationRule: animationRule, actionName: actionName).first ?? nil
     }
-    
+
     private func findActionRules(forEvent event: CommonFaceConfig.OnEvent,
-                         animationRule: CommonFaceConfig.TriggerRule?,
-                         actionName: String) -> [CommonFaceConfig.TriggerRule] {
-        
+                                 animationRule: CommonFaceConfig.TriggerRule?,
+                                 actionName: String) -> [CommonFaceConfig.TriggerRule] {
+
         // only consider rules matching the event type
         let allSoundnRules = findAllTriggerRules(ofType: .action)
         let candidateRules = allSoundnRules.filter { ($0.on == event.rawValue) }
         return filterRules(candidateRules, forEvent: event, animationRule: animationRule, actionName: actionName)
-        
+
     }
-    
+
     private func filterRules(_ candidateRules: [CommonFaceConfig.TriggerRule],
                              forEvent event: CommonFaceConfig.OnEvent,
                              animationRule: CommonFaceConfig.TriggerRule?,
                              actionName: String?) -> [CommonFaceConfig.TriggerRule] {
-        
+
         // loop over animation rules
         switch event {
-            
+
         case .start:
             // find valid state rules, fallback on start rule
             let stateRules = findAllTriggerRules(forEvent: .state, animationRule: animationRule, actionName: actionName)
@@ -266,7 +266,7 @@ public extension FacePresenter {
         case .click:
             let validRules = candidateRules.filter { rule in
                 if let target = rule.target {
-                    
+
                     if target.isEmpty && animationRule == nil {
                         return true
                     }
@@ -292,9 +292,9 @@ public extension FacePresenter {
             // filter in rules whos target matches the event's action
             return candidateRules.filter { $0.target == actionName }
         }
-        
+
     }
-    
+
 }
 
 extension Optional where Wrapped: Collection {

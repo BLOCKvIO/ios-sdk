@@ -14,7 +14,7 @@ import Foundation
 import PromiseKit
 
 extension Region: CustomStringConvertible {
-    
+
     public var description: String {
         let descrip = """
         \tobject count:   \(self.objects.count)
@@ -24,7 +24,7 @@ extension Region: CustomStringConvertible {
         """
         return descrip
     }
-    
+
 }
 
 /// An abstract class that manages a complete collection of objects (a.k.a Regions).
@@ -112,7 +112,7 @@ public class Region {
 
         // remove pending error
         self.error = nil
-        
+
         // stop if already in sync
         if synchronized {
             return Guarantee()
@@ -146,7 +146,8 @@ public class Region {
             // error handling, notify listeners of an error
             self._syncPromise = nil
             self.error = err
-            os_log("[%@] Unable to synchronize: %@", log: .dataPool, type: .error, typeName(self), err.localizedDescription)
+            os_log("[%@] Unable to synchronize: %@", log: .dataPool, type: .error,
+                   typeName(self), err.localizedDescription)
             self.emit(.error, userInfo: ["error": err])
         }
 
@@ -213,7 +214,7 @@ public class Region {
                 self.did(update: existingObject, withFields: data)
 
             } else {
-                
+
                 // notify
                 self.will(add: obj)
                 // add it
@@ -318,11 +319,11 @@ public class Region {
             // get object
             guard let object = self.objects[id] else { continue }
             self.will(remove: object)
-            
+
             // remove it
             self.objects.removeValue(forKey: id)
             self.did(remove: object)
-            
+
             // notify
             didUpdate = true
 
@@ -518,7 +519,7 @@ public class Region {
 
         // create save task
         saveTask = DispatchWorkItem { [weak self] () -> Void in
-            
+
             // avoid capture cycle
             guard let self = self else { return }
 
@@ -551,7 +552,8 @@ public class Region {
 
             // done
             let delay = (Date.timeIntervalSinceReferenceDate - startTime) * 1000
-            os_log("[%@] Saved %d objects in %dms", log: .dataPool, type: .info, typeName(self), self.objects.count, Int(delay))
+            os_log("[%@] Saved %d objects in %dms", log: .dataPool, type: .info,
+                   typeName(self), self.objects.count, Int(delay))
 
         }
 
@@ -587,9 +589,9 @@ public class Region {
         object.data![keyPath: KeyPath(keyPath)] = value
         object.cached = nil
         self.emit(.willUpdateObject, userInfo: ["id": id])
-        
+
         self.onPreemptiveChange(object)
-        
+
         self.did(update: object, keyPath: keyPath, oldValue: oldValue, newValue: value)
         self.emit(.updated)
         self.save()
@@ -622,11 +624,11 @@ public class Region {
         // get object
         guard let removedObject = objects.removeValue(forKey: id) else { return {} }
         self.will(remove: removedObject)
-        
+
         // remove object
         objects.removeValue(forKey: id)
         self.did(remove: removedObject)
-        
+
         self.emit(.updated)
         self.save()
 
@@ -649,7 +651,7 @@ public class Region {
     }
 
     // MARK: - Listener functions, can be overridden by subclasses
-    
+
     func onPreemptiveChange(_ object: DataObject) {}
 
     func will(add: DataObject) {}

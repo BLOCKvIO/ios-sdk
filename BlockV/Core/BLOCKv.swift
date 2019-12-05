@@ -37,7 +37,7 @@ public final class BLOCKv {
                 assertionFailure("The App ID may be set only once.")
             }
         }
-        
+
     }
 
     //TODO: Detect an environment switch, e.g. dev to prod, reset the client.
@@ -369,7 +369,7 @@ extension BLOCKv {
             try? FileManager.default.removeItem(at: Region.recommendedCacheDirectory)
             os_log("[Debug] Cleared Cache", log: .lifecycle, type: .debug)
         }
-        
+
         /// Clear authoarization credentials.
         public static func clearAuthCredentials() {
             CredentialStore.clear()

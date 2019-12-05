@@ -16,7 +16,7 @@ extension FLAnimatedImageView {
         if let data = image?.animatedImageData {
             // Display poster image immediately
             self.image = image
-            
+
             // Prepare FLAnimatedImage object asynchronously (it takes a
             // noticeable amount of time), and start playback.
             DispatchQueue.global().async {

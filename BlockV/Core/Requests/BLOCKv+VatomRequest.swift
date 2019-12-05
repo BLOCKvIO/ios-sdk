@@ -514,7 +514,7 @@ extension BLOCKv {
         }
 
     }
-    
+
     /// Performs an dispense action on the specified vatom id.
     ///
     /// - Parameters:
@@ -523,16 +523,16 @@ extension BLOCKv {
     ///                 This handler is executed on the main queue.
     public static func dispense(vatomID id: String,
                                 completion: @escaping (Result<[String: Any], BVError>) -> Void) {
-        
+
         let body = ["this.id": id]
         // perform the action
         self.performAction(name: "Dispense", payload: body) { result in
             completion(result)
         }
     }
-    
+
     // MARK: - Redemption
-    
+
     /// Performs a redemption request on the specified vatom id. This will trigger an RPC socket event to the client informing it of the redemption request.
     ///
     /// This call is intended for merchant accounts.
@@ -541,9 +541,9 @@ extension BLOCKv {
     /// - Parameter completion: The completion handler to call when the action is completed.
     ///                         This handler is executed on the main queue.
     public static func requestRedemption(vatomID id: String, completion: @escaping (BVError?) -> Void) {
-        
+
         let endpoint = API.Vatom.requestRedemption(vatomID: id)
-        
+
         self.client.request(endpoint) { result in
 
             switch result {
@@ -560,7 +560,7 @@ extension BLOCKv {
             }
 
         }
-        
+
     }
 
 }

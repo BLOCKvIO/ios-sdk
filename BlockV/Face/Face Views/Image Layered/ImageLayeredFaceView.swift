@@ -262,23 +262,19 @@ class ImageLayeredFaceView: FaceView {
             completion(FaceError.missingVatomResource)
             return
         }
-        
-        do {
-            let resize = ImageProcessor.Resize(size: self.bounds.size, contentMode: .aspectFit)
-            let request = BVImageRequest(url: resourceModel.url, processors: [resize])
-            // load iamge
-            ImageDownloader.loadImage(with: request, into: self.baseLayer) { result in
-                self.isLoaded = true
-                do {
-                    try result.get()
-                    completion(nil)
-                } catch {
-                    os_log("Failed to load: %@", log: .vatomView, type: .error, resourceModel.url.description)
-                    completion(error)
-                }
+
+        let resize = ImageProcessor.Resize(size: self.bounds.size, contentMode: .aspectFit)
+        let request = BVImageRequest(url: resourceModel.url, processors: [resize])
+        // load iamge
+        ImageDownloader.loadImage(with: request, into: self.baseLayer) { result in
+            self.isLoaded = true
+            do {
+                try result.get()
+                completion(nil)
+            } catch {
+                os_log("Failed to load: %@", log: .vatomView, type: .error, resourceModel.url.description)
+                completion(error)
             }
-        } catch {
-            completion(error)
         }
 
     }

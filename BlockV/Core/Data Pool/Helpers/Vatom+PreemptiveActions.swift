@@ -141,7 +141,7 @@ extension VatomModel {
             undos.append($0.preemptiveChange(id: self.id,
                                              keyPath: "vAtom::vAtomType.geo_pos.coordinates",
                                              value: [longitude, latitude]))
-            
+
             undos.append($0.preemptiveChange(id: self.id,
                                              keyPath: "vAtom::vAtomType.dropped",
                                              value: true))
@@ -192,7 +192,7 @@ extension VatomModel {
             completion(.failure(error))
             return
         }
-        
+
         // update 'when_modified' date
         let nowDate = DateFormatter.blockvDateFormatter.string(from: Date())
         let undoModified = DataPool.inventory().preemptiveChange(id: self.id, keyPath: "when_modified", value: nowDate)

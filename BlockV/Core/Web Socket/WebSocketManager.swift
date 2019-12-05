@@ -146,7 +146,7 @@ public class WebSocketManager {
         // Listen for notifications for when the app becomes active
         NotificationCenter.default.addObserver(self, selector: #selector(handleApplicationDidBecomeActive),
                                                name: UIApplication.didBecomeActiveNotification, object: nil)
-        
+
         NotificationCenter.default.addObserver(self, selector: #selector(handleApplicationDidEnterBackground),
                                                name: UIApplication.didEnterBackgroundNotification, object: nil)
     }
@@ -203,20 +203,20 @@ public class WebSocketManager {
         }
 
     }
-    
+
     private func scheduleReconnect(initialDelay: TimeInterval = 0) {
-        
+
         self.reconnectTimer = Timer.scheduledTimer(withTimeInterval: initialDelay, repeats: false) { [weak self] _ in
-            
+
             guard let self = self else { return }
-            
+
             if self.isConnected { return } // bail out
             self.reconnectCount += 1
             self.connect()
             let nextDelay = self.delayOption.make(self.reconnectCount)
             self.scheduleReconnect(initialDelay: nextDelay)
         }
-        
+
     }
 
     /// Attempts to disconnect from the Web socket server.
@@ -233,7 +233,7 @@ public class WebSocketManager {
         self.shouldAutoConnect = false
         socket?.disconnect(forceTimeout: 2)
     }
-    
+
     /// Disconnect without setting `shouldAutoConnect` = false
     func _disconnect() { //swiftlint:disable:this identifier_name
         DispatchQueue.mainThreadPrecondition()
@@ -250,7 +250,7 @@ public class WebSocketManager {
         self.shouldAutoConnect = true
         self.connect()
     }
-    
+
     @objc
     private func handleApplicationDidEnterBackground() {
         os_log("[%@]  Application did enter background. Attempting disconnect.", log: .socket, type: .debug, typeName(self))
@@ -318,7 +318,7 @@ extension WebSocketManager: WebSocketDelegate {
     }
 
     public func websocketDidDisconnect(socket: WebSocketClient, error: Error?) {
-        
+
         /*
          Note
          The app may fire this message when entering the foreground (after the Web socket was disconnected after

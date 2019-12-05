@@ -4,13 +4,13 @@
 [![License](https://img.shields.io/cocoapods/l/BLOCKv.svg?style=flat)](http://cocoapods.org/pods/BLOCKv)
 [![Platform](https://img.shields.io/cocoapods/p/BLOCKv.svg?style=flat)](http://cocoapods.org/pods/BLOCKv)
 
-This is the official BLOCKv SDK. It allows you to easily build your own vAtom Viewer app, or integrate your own apps into the BLOCKv platform.
+This is the official BLOCKv SDK. It allows you to easily build your own Vatom Viewer app, or integrate your own apps into the BLOCKv platform.
 
 ## Requirements
 
-- iOS 10.0+
-- Xcode 10.1+
-- Swift 4.1+
+- iOS 11.0+
+- Xcode 11.2+
+- Swift 5.1+
 
 ## Installation
 
@@ -56,12 +56,12 @@ The sample app lets you try out the BLOCKv SDK. It's a great place to start if y
 
 - [x] Authentication (registration & login)
 - [x] Profile management
-- [x] Fetching the user's inventory of vAtoms
-- [x] Fetching individual vAtoms
-- [x] Searching for vAtoms on the BLOCKv platform
+- [x] Fetching the user's inventory of Vatoms
+- [x] Fetching individual Vatoms
+- [x] Searching for Vatoms on the BLOCKv platform
 - [x] Responding to Web socket events
-- [x] Dispalying vAtoms in a `UICollectionView`
-- [x] Visually representing vAtoms using faces (new)
+- [x] Dispalying Vatoms in a `UICollectionView`
+- [x] Visually representing Vatoms using faces (new)
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
@@ -72,14 +72,19 @@ The SDK has two logical modules: Core and Face. The responsibilites are as follo
 ### Core
 
 - API integration
+   - Provides platform endpoints with a strongly typed API.  
 - User token management
+   - Handles platform authentication.
 - Web socket integration
+   - Simplified layer for interacting with the websocket.
+- Data Pool
+   - Vends 'regions' which monitor a collection of Vatoms. Enables real-time synchronization for some regions. 
 
 ### Face
 
 - Face view infrastructure
 - Embedded face views e.g. `ImageFaceView`
-- Convenience classes to assist in displaying vAtoms e.g. `VatomView`
+- Convenience classes to assist in displaying Vatoms e.g. `VatomView`
 
 ## Versioning
 

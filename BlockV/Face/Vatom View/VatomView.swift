@@ -342,7 +342,7 @@ open class VatomView: UIView {
     ///
     /// - Parameter oldVatom: The previous vAtom being visualized by this VatomView.
     internal func runVVLC(oldVatom: VatomModel? = nil) {
-        
+
         /*
          Note:
          VVLC traps with assertion failure in two cases:

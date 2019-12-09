@@ -94,7 +94,7 @@ public class ImageDownloader {
             // encode
             let encodedURL = try BLOCKv.encodeURL(request.url)
             // make request
-            let requestOptions = ImageRequestOptions (filteredURL: request.url.absoluteString)
+            let requestOptions = ImageRequestOptions(filteredURL: request.url.absoluteString)
             let request = ImageRequest(url: encodedURL, processors: request.processors, priority: request.priority,
                                        options: requestOptions)
 
@@ -136,7 +136,7 @@ extension Nuke.ImagePipeline {
             // encode
             let encodedURL = try BLOCKv.encodeURL(request.url)
             // make request
-            let requestOptions = ImageRequestOptions (filteredURL: request.url.absoluteString)
+            let requestOptions = ImageRequestOptions(filteredURL: request.url.absoluteString)
             let request = ImageRequest(url: encodedURL, processors: request.processors, priority: request.priority,
                                        options: requestOptions)
 

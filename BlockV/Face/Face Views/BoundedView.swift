@@ -24,7 +24,7 @@ import Foundation
 
 /// This view class provides a convenient way to know when the bounds of a view have been set.
 open class BoundedView: UIView {
-    
+
     /// Setting this value to `true` will trigger a subview layout and ensure that `layoutWithKnowBounds()` is called
     /// after the layout.
     open var requiresBoundsBasedSetup = false {
@@ -36,26 +36,26 @@ open class BoundedView: UIView {
             }
         }
     }
-    
+
     /// Boolean value indicating whether a layout pass has been completed since `requiresBoundsBasedLayout`
     public private(set) var hasCompletedLayoutSubviews = false
-    
+
     override open func layoutSubviews() {
         super.layoutSubviews()
-        
+
         /*
          A major assumtion here is that once this is called, the view is 'properly' layed out. This does not account
          for view size changes.
          */
-        
+
         if requiresBoundsBasedSetup && !hasCompletedLayoutSubviews {
             setupWithBounds()
             hasCompletedLayoutSubviews = true
             requiresBoundsBasedSetup = false
         }
-        
+
     }
-    
+
     /// Called once after `layoutSubviews` has been called (i.e. bounds are set).
     ///
     /// This function is usefull for cases where the bounds of the view are important, for example, scaling an image
@@ -63,11 +63,9 @@ open class BoundedView: UIView {
     open func setupWithBounds() {
         // subclass should override
     }
-    
-    
+
     open func didSignificantlyLayoutSubviews() {
-        
-        
+
     }
-    
+
 }

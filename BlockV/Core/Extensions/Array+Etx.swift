@@ -12,7 +12,7 @@
 import Foundation
 
 extension Array {
-    
+
     /// Returns and array of array where the inner arrays have a maximum element count of `size`.
     func chunked(into size: Int) -> [[Element]] {
         return stride(from: 0, to: count, by: size).map {

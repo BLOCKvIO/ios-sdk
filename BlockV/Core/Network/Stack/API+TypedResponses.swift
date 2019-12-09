@@ -295,7 +295,7 @@ extension API {
             return API.Generic.getInventory(parentID: parentID, page: page, limit: limit)
 
         }
-        
+
         /// Builds an endpoint to get a vatom paylaod by its unique identifier.
         ///
         /// This endpoint may optionally be used to fetch unowned public vatom payloaded without requiring

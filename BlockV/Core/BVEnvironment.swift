@@ -13,7 +13,7 @@ import Foundation
 
 /// Models the BLOCKv platform environments.
 public enum BVEnvironment: String, CustomDebugStringConvertible {
-    
+
     /// Stable production environment.
     case production = "prod_env"
     /// Unstable development environement (DO NOT USE).
@@ -41,7 +41,7 @@ public enum BVEnvironment: String, CustomDebugStringConvertible {
         case .development: return "https:/login.blockv.net"
         }
     }
-    
+
     public var debugDescription: String {
         return """
         Environment: \(self.rawValue)

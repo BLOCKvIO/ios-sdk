@@ -45,7 +45,7 @@ class InventoryRegion: BLOCKvRegion {
     }
 
     var lastHash: String?
-    
+
     // called in response to a premtive action
     override func onPreemptiveChange(_ object: DataObject) {
         super.onPreemptiveChange(object)
@@ -111,7 +111,7 @@ class InventoryRegion: BLOCKvRegion {
             }
 
         }.recover({ error -> Promise<[String]?> in
-            
+
             os_log("[InventoryRegion] Unable to fetch inventory hash: %@", log: .dataPool, type: .error,
                    error.localizedDescription)
 
@@ -177,7 +177,6 @@ class InventoryRegion: BLOCKvRegion {
 
                 // add new objects
                 self.add(objects: items)
-                
 
             }.catch { error in
                 os_log("[InventoryRegion] Unable to fetch vatom: %@", log: .dataPool, type: .error, vatomID)
@@ -213,27 +212,25 @@ class InventoryRegion: BLOCKvRegion {
 }
 
 extension InventoryRegion {
-    
+
     /// Fetches only changed items (based on sync state).
     func fetchChanges() -> Promise<[String]?> {
-        
+
         // fetch sync numbers for *all* vatoms
         return self.fetchVatomSyncNumbers().then { newSyncModels -> Promise<[String]?> in
             // printBV(info: "[InventoryRegion] Sync models: \n\(syncModels)")
-            
+
             let currentIds = Set(self.vatomObjects.keys)
             let syncIds = Set(newSyncModels.map { $0.id })
-            
+
             let idsToRemove = currentIds.subtracting(syncIds)
             os_log("[InventoryRegion] Diff Sync: Will remove: %@", log: .dataPool, type: .debug, idsToRemove.debugDescription)
 
             let idsToAdd = syncIds.subtracting(currentIds)
             os_log("[InventoryRegion] Diff Sync: Will add: %@", log: .dataPool, type: .debug, idsToAdd.debugDescription)
 
-
-            let idsInCommon = currentIds.union(syncIds)
             var idsToFetch: Set<String> = idsToAdd
-            
+
             // sync of zero mean no change, ignore
             let filteredNewSyncModels = newSyncModels.filter { $0.sync != 0 }
             // find the vatoms whose sync numbers have changed
@@ -242,7 +239,7 @@ extension InventoryRegion {
                     $0.id == newSyncModel.id && $0.sync != newSyncModel.sync
                 })
             }
-   
+
             // fetch all added + updated ids
             idsToFetch.formUnion(idsToUpdate.map { $0.id })
             // printBV(info: "[InventoryRegion] Sync will fetch:")
@@ -254,31 +251,33 @@ extension InventoryRegion {
                     DispatchQueue.main.async {
                         // remove
                         self.remove(ids: Array(idsToRemove))
-                        os_log("[InventoryRegion] Diff Sync: Did remove: %@", log: .dataPool, type: .debug, idsToRemove.debugDescription)
+                        os_log("[InventoryRegion] Diff Sync: Did remove: %@", log: .dataPool, type: .debug,
+                               idsToRemove.debugDescription)
                         resolver.fulfill(nil)
                     }
                 }
             }
-            
+
             // fetch
             return self.fetchObjects(ids: Array(idsToFetch)).then { objects -> Promise<[String]?> in
-                
+
                 // remove
                 self.remove(ids: Array(idsToRemove))
-                os_log("[InventoryRegion] Diff Sync: Did remove: %@", log: .dataPool, type: .debug, idsToRemove.debugDescription)
+                os_log("[InventoryRegion] Diff Sync: Did remove: %@", log: .dataPool, type: .debug,
+                       idsToRemove.debugDescription)
                 // add
                 self.add(objects: objects)
-                os_log("[InventoryRegion] Diff Sync: did add/update: %@", log: .dataPool, type: .debug, objects.debugDescription)
+                os_log("[InventoryRegion] Diff Sync: did add/update: %@", log: .dataPool, type: .debug,
+                       objects.debugDescription)
 
                 return Promise.value(nil)
-                
+
             }
-            
+
         }
-        
+
     }
 
-    
     /// Fetches all items (irrespective of sync state).
     func fetchAllBatched(maxConcurrent: Int = 4) -> Promise<[String]?> {
 
@@ -290,7 +289,8 @@ extension InventoryRegion {
     private func fetchRange(_ range: CountableClosedRange<Int>) -> Promise<[String]?> {
 
         iteration += 1
-        os_log("[InventoryRegion] Full Sync: Fetcing Range: %@, Iteration: %d", log: .dataPool, type: .debug, range.debugDescription, iteration)
+        os_log("[InventoryRegion] Full Sync: Fetcing Range: %@, Iteration: %d", log: .dataPool, type: .debug,
+               range.debugDescription, iteration)
 
         var promises: [Promise<[String]?>] = []
 
@@ -358,7 +358,8 @@ extension InventoryRegion {
                 return self.fetchRange(nextRange)
 
             } else {
-                os_log("[InventoryRegion] Full Sync: Stopped on page %d", log: .dataPool, type: .debug, self.proccessedPageCount)
+                os_log("[InventoryRegion] Full Sync: Stopped on page %d", log: .dataPool, type: .debug,
+                       self.proccessedPageCount)
                 return Promise.value(self.cummulativeIds)
             }
 
@@ -379,25 +380,25 @@ extension InventoryRegion {
         }
 
     }
-    
+
     /// Fetches all remote inventory vatom sync numbers.
     ///
     /// This function recurses through server pages.
     func fetchVatomSyncNumbers() -> Promise<[VatomSyncModel]> {
-        
+
         var cummulativeSyncModels: [VatomSyncModel] = []
-        
+
         func fetchInventoryVatomSyncNumbers(limit: Int = 1000, token: String = "") -> Promise<[VatomSyncModel]> {
 
             let endpoint = API.Vatom.getInventoryVatomSyncNumbers(limit: limit, token: token)
             return BLOCKv.client.request(endpoint).then { result -> Promise<[VatomSyncModel]> in
-                
+
                 // printBV(info: "[InventoryRegion] Sync result: token: \(token)")
                 // result.payload.vatoms.forEach { print(" - " + $0.id + " sync: " + String($0.sync)) }
 
                 // accumulate
                 cummulativeSyncModels += result.payload.vatoms
-                
+
                 // check stopping codintion (base case)
                 if result.payload.nextToken == "" || result.payload.vatoms.isEmpty {
                     return Promise.value(cummulativeSyncModels)
@@ -408,25 +409,25 @@ extension InventoryRegion {
             }
 
         }
-        
+
         return fetchInventoryVatomSyncNumbers()
-        
+
     }
-    
+
     /// Fetch data objects for the specified vatom ids.
     ///
     /// Splits large (> 100) into multipe network requests.
     func fetchObjects(ids: [String]) -> Promise<[DataObject]> {
-        
+
         //TODO: Could benefit from parallelelization
-        
+
         if ids.isEmpty { return Promise.value([]) }
         let chunks = ids.chunked(into: 100)
-        
+
         var cummulativeObjects: [DataObject] = []
-        
+
         func fetchChunk(index: Int) -> Promise<[DataObject]> {
-            
+
             let endpoint: Endpoint<Void> = API.Generic.getVatoms(withIDs: chunks[index])
             return BLOCKv.client.requestJSON(endpoint)
                 .then(on: .global(qos: .userInitiated)) { json -> Promise<[DataObject]> in
@@ -439,10 +440,10 @@ extension InventoryRegion {
                     guard let items = self.parseDataObject(from: payload) else {
                         throw RegionError.failedParsingResponse
                     }
-                    
+
                     // accumulate
                     cummulativeObjects += items
-                    
+
                     // prepare for next iteration
                     let nextIndex = index + 1
                     if nextIndex < chunks.count {
@@ -450,12 +451,12 @@ extension InventoryRegion {
                     } else {
                         return Promise.value(cummulativeObjects)
                     }
-                    
+
             }
         }
-        
+
         return fetchChunk(index: 0)
-        
+
     }
 
 }

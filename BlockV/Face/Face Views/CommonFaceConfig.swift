@@ -16,7 +16,7 @@ import GenericJSON
 
 /// Collection of common types used by face configs.
 public enum CommonFaceConfig {
-    
+
     /// Event triggers.
     public enum OnEvent: String {
         case start
@@ -27,9 +27,9 @@ public enum CommonFaceConfig {
         case actionComplete = "action-complete"
         case actionFail = "action-fail"
     }
-    
+
     public struct TriggerRule: Equatable, Hashable {
-        
+
         public let on: String
         public let play: String?
         public let target: String?
@@ -37,7 +37,7 @@ public enum CommonFaceConfig {
         public let delay: Double
         public let sound: SoundEffect?
         public let action: ActionEffect?
-        
+
         init(descriptor: JSON) throws {
             guard
                 let _on = descriptor["on"]?.stringValue else {
@@ -59,12 +59,12 @@ public enum CommonFaceConfig {
                 self.action = nil
             }
         }
-        
+
         public struct SoundEffect: Equatable, Hashable {
             public let resourceName: String
             public let volume: Float
             public let isPositional: Bool
-            
+
             init(descriptor: JSON) throws {
                 guard let _resourceName = descriptor["resource_name"]?.stringValue else {
                     throw NSError()
@@ -74,12 +74,12 @@ public enum CommonFaceConfig {
                 self.isPositional = descriptor["is_positional"]?.boolValue ?? false
             }
         }
-        
+
         public struct ActionEffect: Equatable, Hashable {
             public let name: String
             public let payload: JSON?
             public let modify: JSON?
-            
+
             init(descriptor: JSON) throws {
                 guard let _name = descriptor["name"]?.stringValue else {
                     throw NSError()
@@ -89,7 +89,7 @@ public enum CommonFaceConfig {
                 self.modify = descriptor["modify"]
             }
         }
-        
+
     }
-    
+
 }

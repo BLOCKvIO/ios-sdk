@@ -220,7 +220,7 @@ class ImageFaceView: FaceView {
             completion?(FaceError.missingVatomResource)
             return
         }
-        
+
         let resize = ImageProcessor.Resize(size: self.bounds.size, contentMode: configContentMode)
         let request = BVImageRequest(url: resourceModel.url, processors: [resize])
         // load iamge
@@ -234,7 +234,6 @@ class ImageFaceView: FaceView {
                 completion?(error)
             }
         }
-      
 
     }
 

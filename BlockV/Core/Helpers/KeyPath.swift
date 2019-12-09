@@ -149,7 +149,7 @@ extension VatomModel {
         // extract vatom value
         if component.head == "private" {
             vatomValue = self.private?.queryKeyPath(component.tail.segments)
-            
+
         } else if component.head == "vAtom::vAtomType" {
             if component.tail.path == "cloning_score" {
                 vatomValue = try? JSON(self.props.cloningScore)

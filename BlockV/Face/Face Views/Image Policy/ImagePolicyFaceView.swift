@@ -123,7 +123,7 @@ class ImagePolicyFaceView: FaceView {
     /// Updates interface with local state.
     override func setupWithBounds() {
         super.setupWithBounds()
-        
+
         // extract resource
         let resourceName = self.extractImageName()
         // update state
@@ -168,7 +168,7 @@ class ImagePolicyFaceView: FaceView {
                 }
 
             } else if let policy = policy as? Config.FieldLookup {
-                
+
                 if let vatomValue = self.vatom.valueForKeyPath(policy.field) {
                     if vatomValue == policy.value {
                         // update image
@@ -205,7 +205,7 @@ class ImagePolicyFaceView: FaceView {
             completion?(FaceError.missingVatomResource)
             return
         }
-        
+
         let resize = ImageProcessor.Resize(size: self.bounds.size, contentMode: .aspectFit)
         let request = BVImageRequest(url: resourceModel.url, processors: [resize])
         // load iamge

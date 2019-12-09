@@ -15,7 +15,7 @@ import Foundation
 extension BLOCKv {
 
     // MARK: - Register
-    
+
     /// Begins the OAuth authentication flow.
     ///
     /// - Parameter scope: Scope value.
@@ -85,12 +85,13 @@ extension BLOCKv {
                                             let user = try result.get()
                                             DispatchQueue.main.async { completion(.success((flowModel, user))) }
                                         } catch {
+                                            //swiftlint:disable:next force_cast
                                             DispatchQueue.main.async { completion( .failure(error as! BVError)) }
                                         }
                                     }
 
                                 }
- 
+
                             case .failure(let error):
                                 DispatchQueue.main.async { completion(.failure(error)) }
                             }

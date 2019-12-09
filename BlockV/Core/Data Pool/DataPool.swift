@@ -81,7 +81,7 @@ public final class DataPool {
 
             // unable to load from disk
             os_log("[%@] Unable to load region state from disk: %@", log: .dataPool, type: .error,
-                   typeName(self) ,err.localizedDescription)
+                   typeName(self), err.localizedDescription)
 
         }.then { _ -> Guarantee<Void> in
 
@@ -92,7 +92,7 @@ public final class DataPool {
 
             // unable to load from network either!
             os_log("[%@] Unable to load region state from network: %@", log: .dataPool, type: .error,
-                   typeName(self) ,err.localizedDescription)
+                   typeName(self), err.localizedDescription)
 
         }
 

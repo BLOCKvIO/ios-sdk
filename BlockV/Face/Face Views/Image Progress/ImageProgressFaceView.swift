@@ -201,7 +201,7 @@ class ImageProgressFaceView: FaceView {
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        
+
         // show/hide progress label based on current size
         if self.bounds.size.width < 100 {
             progressLabel.isHidden = true
@@ -285,11 +285,11 @@ class ImageProgressFaceView: FaceView {
                 completion(FaceError.missingVatomResource)
                 return
         }
-        
+
         // NB: Do not resize due to brittle pixel offsets in face config.
         let emptyRequest = BVImageRequest(url: emptyImageResource.url)
         let fullRequest = BVImageRequest(url: fullImageResource.url)
-        
+
         dispatchGroup.enter()
         dispatchGroup.enter()
         // load images
@@ -309,7 +309,7 @@ class ImageProgressFaceView: FaceView {
                 os_log("Failed to load: %@", log: .vatomView, type: .error, fullImageResource.url.description)
             }
         }
-        
+
         dispatchGroup.notify(queue: .main) {
             self.isLoaded = true
             completion(nil)

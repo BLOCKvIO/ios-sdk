@@ -288,11 +288,11 @@ class BLOCKvRegion: Region {
         return items
 
     }
-    
+
     // called in response to a premtive action
     override func onPreemptiveChange(_ object: DataObject) {
         super.onPreemptiveChange(object)
-        
+
         if object.type == "vatom" {
             // indicate a re-sync with remote is required
             object.data![keyPath: KeyPath("vAtom::vAtomType.sync")] = -1
@@ -305,7 +305,7 @@ class BLOCKvRegion: Region {
 
     /// Called when an object is about to be added.
     override func will(add object: DataObject) {
-        
+
         // notify parent
         guard let vatomType = (object.data?["vAtom::vAtomType"] as? [String: Any]),
             let parentID = vatomType["parent_id"] as? String else {
@@ -317,11 +317,11 @@ class BLOCKvRegion: Region {
             // broadbast the add
             self.emit(.willAddObject, userInfo: ["id": object.id])
         }
-        
+
     }
 
     override func did(add object: DataObject) {
-        
+
         // notify parent
         guard let vatomType = (object.data?["vAtom::vAtomType"] as? [String: Any]),
             let parentID = vatomType["parent_id"] as? String else {
@@ -385,14 +385,14 @@ class BLOCKvRegion: Region {
                 self.emit(.willUpdateObject, userInfo: ["id": newParentID])
             }
         }
-        
+
         self.emit(.willUpdateObject, userInfo: ["id": update.id])
 
     }
-    
+
     /// Called when an object is about to be updated.
     override func did(update: DataObject, keyPath: String, oldValue: Any?, newValue: Any?) {
-        
+
         // check if parent ID is changing
         if keyPath == "vAtom::vAtomType.parent_id" {
             // notify parents
@@ -403,9 +403,9 @@ class BLOCKvRegion: Region {
                 self.emit(.didUpdateObject, userInfo: ["id": newParentID])
             }
         }
-        
+
         self.emit(.didUpdateObject, userInfo: ["id": update.id])
-        
+
     }
 
     // - Remove
@@ -426,10 +426,10 @@ class BLOCKvRegion: Region {
         }
 
     }
-    
+
     /// Called when an object has been removed.
     override func did(remove object: DataObject) {
-        
+
         // notify parent as well
         guard let vatomType = (object.data?["vAtom::vAtomType"] as? [String: Any]),
             let parentID = vatomType["parent_id"] as? String else {
@@ -441,14 +441,14 @@ class BLOCKvRegion: Region {
             }
             self.emit(.didRemoveObject, userInfo: ["id": object.id])
         }
-        
+
     }
 
 }
 
 /// Convenience computed properties.
 extension BLOCKvRegion {
-    
+
     /// Returns a dictionary of objects where type is 'vatom'.
     var vatomObjects: [String: DataObject] {
         return self.objects.filter { $0.value.type == "vatom" }
@@ -461,9 +461,9 @@ extension BLOCKvRegion {
     var actionObject: [String: DataObject] {
         return self.objects.filter { $0.value.type == "action"}
     }
-    
+
     var vatomSyncObjects: [VatomSyncModel] {
         return self.vatomObjects.map { VatomSyncModel(id: $0.value.id, sync: ($0.value.data?["sync"] as? UInt) ?? 0) }
     }
-    
+
 }

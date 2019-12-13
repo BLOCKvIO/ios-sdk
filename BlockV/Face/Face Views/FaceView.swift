@@ -251,7 +251,6 @@ public extension FacePresenter {
             // find valid state rules, fallback on start rule
             let stateRules = findAllTriggerRules(forEvent: .state, animationRule: animationRule, actionName: actionName)
             let rulls = stateRules.isEmpty ? candidateRules: stateRules
-            print("[xxx]", rulls)
             return rulls
         case .state:
             return candidateRules.filter { rule in

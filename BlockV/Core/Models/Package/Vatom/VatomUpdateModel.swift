@@ -13,10 +13,10 @@ import Foundation
 
 public struct VatomUpdateModel: Decodable, Equatable {
 
-    let numberUpdated: Int
-    let numberErrors: Int
-    let errorMessage: [String: String]
-    let ids: [String]
+    public let numberUpdated: Int
+    public let numberErrors: Int
+    public let errorMessage: [String: String]
+    public let ids: [String]
 
     enum CodingKeys: String, CodingKey {
         case numberUpdated = "num_updated"
@@ -31,15 +31,6 @@ public struct VatomUpdateModel: Decodable, Equatable {
         numberErrors = try values.decode(Int.self, forKey: .numberErrors)
         errorMessage = try values.decodeIfPresent([String: String].self, forKey: .errorMessage) ?? [:]
         ids = try values.decode([String].self, forKey: .ids)
-    }
-    
-    var dictionary: [String: Any] {
-        return [
-            "num_updated": numberUpdated,
-            "num_errors": numberErrors,
-            "error_messages": errorMessage,
-            "ids": ids
-        ]
     }
 
 }

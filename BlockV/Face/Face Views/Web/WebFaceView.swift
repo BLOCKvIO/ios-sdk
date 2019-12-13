@@ -9,6 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import Foundation
 import WebKit
 
@@ -53,9 +54,11 @@ class WebFaceView: FaceView {
         webConfiguration.userContentController.add(LeakAvoider(delegate: self), name: "vatomicBridge")
         webConfiguration.userContentController.add(LeakAvoider(delegate: self), name: "blockvBridge")
 
-        // content controller
+        // web view
         let webView = WKWebView(frame: self.bounds, configuration: webConfiguration)
         webView.navigationDelegate = self
+        webView.scrollView.isScrollEnabled = false
+        webView.scrollView.contentInsetAdjustmentBehavior = .never
         webView.autoresizingMask = [ .flexibleWidth, .flexibleHeight ]
         return webView
 
@@ -66,11 +69,10 @@ class WebFaceView: FaceView {
 
     // MARK: - Initialization
 
-    required init(vatom: VatomModel, faceModel: FaceModel) {
-        super.init(vatom: vatom, faceModel: faceModel)
+    required init(vatom: VatomModel, faceModel: FaceModel) throws {
+        try super.init(vatom: vatom, faceModel: faceModel)
 
         self.addSubview(webView)
-        self.webView.backgroundColor = UIColor.red.withAlphaComponent(0.3)
     }
 
     required public init?(coder aDecoder: NSCoder) {
@@ -81,17 +83,17 @@ class WebFaceView: FaceView {
 
     var isLoaded: Bool = false
 
-    var timer: Timer?
-
     /// Holds the completion handler.
     private var completion: ((Error?) -> Void)?
 
+    /// Begins loading the face view's content.
     func load(completion: ((Error?) -> Void)?) {
         // store the completion
         self.completion = completion
         self.loadFace()
     }
 
+    /// Updates the backing Vatom and loads the new state.
     func vatomChanged(_ vatom: VatomModel) {
         // if the vatom has changed, load the face url again
         if vatom.id != self.vatom.id {
@@ -99,6 +101,14 @@ class WebFaceView: FaceView {
             return
         }
         self.coreBridge?.sendVatom(vatom)
+        // fetch first-level children
+        let children = self.vatom.listCachedChildren()
+        self.coreBridge?.sendVatomChildren(children)
+    }
+
+    /// Resets the contents of the face view.
+    private func reset() {
+
     }
 
     func unload() {
@@ -110,10 +120,10 @@ class WebFaceView: FaceView {
     private func loadFace() {
         let faceURL = faceModel.properties.displayURL
         guard let url = URL.init(string: faceURL) else {
-            printBV(error: "Cannot initialise URL from: \(faceURL)")
+            os_log("[%@] Cannot initialise URL from:", log: .vatomView, type: .error, faceURL, typeName(self))
             return
         }
-        let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 20)
+        let request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 20)
         self.webView.load(request)
     }
 
@@ -124,7 +134,6 @@ class WebFaceView: FaceView {
 extension WebFaceView: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        print(#function)
         self.completion?(nil)
     }
 
@@ -136,7 +145,9 @@ extension WebFaceView: WKNavigationDelegate {
         if navigationAction.navigationType == .linkActivated {
             if let url = navigationAction.request.url {
                 // open in Safari.app
-                UIApplication.shared.open(url, options: convertToUIApplicationOpenExternalURLOptionsKeyDictionary([:]), completionHandler: nil)
+                UIApplication.shared.open(url,
+                                          options: convertToUIApplicationOpenExternalURLOptionsKeyDictionary([:]),
+                                          completionHandler: nil)
                 return decisionHandler(.cancel)
             }
         }
@@ -148,6 +159,9 @@ extension WebFaceView: WKNavigationDelegate {
 }
 
 // Helper function inserted by Swift 4.2 migrator.
-fileprivate func convertToUIApplicationOpenExternalURLOptionsKeyDictionary(_ input: [String: Any]) -> [UIApplication.OpenExternalURLOptionsKey: Any] {
-	return Dictionary(uniqueKeysWithValues: input.map { key, value in (UIApplication.OpenExternalURLOptionsKey(rawValue: key), value)})
+private func convertToUIApplicationOpenExternalURLOptionsKeyDictionary(_ input: [String: Any])
+    -> [UIApplication.OpenExternalURLOptionsKey: Any] {
+	return Dictionary(uniqueKeysWithValues: input.map { key, value in
+        (UIApplication.OpenExternalURLOptionsKey(rawValue: key), value)
+    })
 }

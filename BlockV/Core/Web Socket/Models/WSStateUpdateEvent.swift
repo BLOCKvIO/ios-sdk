@@ -77,6 +77,10 @@ public struct WSStateUpdateEvent: WSEvent, Equatable {
     public let operation: String
     /// Unique identifier of the vAtom which generated this event.
     public let vatomId: String
+    /// Name of the triggering action.
+    public let actionName: String
+    /// Synchronization number.
+    public let sync: Int?
     /// JSON object containing the only changed properties of the vAtom.
     ///
     /// In other words, this member contains a *diff* of of the previous version of the vAtom.
@@ -104,6 +108,8 @@ extension WSStateUpdateEvent: Decodable {
         case eventId         = "event_id"
         case operation       = "op"
         case vatomId         = "id"
+        case actionName      = "action_name"
+        case sync            = "sync"
         case vatomProperties = "new_object"
     }
 
@@ -115,6 +121,8 @@ extension WSStateUpdateEvent: Decodable {
         eventId         = try payloadContainer.decode(String.self, forKey: .eventId)
         operation       = try payloadContainer.decode(String.self, forKey: .operation)
         vatomId         = try payloadContainer.decode(String.self, forKey: .vatomId)
+        actionName      = try payloadContainer.decode(String.self, forKey: .actionName)
+        sync            = try payloadContainer.decodeIfPresent(Int.self, forKey: .sync)
         vatomProperties = try payloadContainer.decode(JSON.self, forKey: .vatomProperties)
 
         // stamp this event with the current time

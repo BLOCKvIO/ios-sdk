@@ -57,7 +57,7 @@ extension WebFaceView: WKScriptMessageHandler {
             script += jsonString
         }
         script += ");"
-        printBV(info: "Posting script for evaluation:\n\(script)")
+//        printBV(info: "Posting script for evaluation:\n\(script)")
 
         // return to main queue
         DispatchQueue.main.async {
@@ -76,7 +76,7 @@ extension WebFaceView: WKScriptMessageHandler {
     ///
     /// Ideally, this function should only allow [String: Any] payloads. However, allows primative types, e.g. Bool,
     /// to be passed across as Javascript strings.
-    func sendResponse(forRequestMessage message: RequestScriptMessage, payload: JSON?, error: BridgeError?) {
+    func sendResponse(forRequestMessage message: RequestScriptMessage, result: Result<JSON, BridgeError>) {
 
         /*
          Note: Accepted Viewer Payloads
@@ -87,32 +87,36 @@ extension WebFaceView: WKScriptMessageHandler {
          - V2: Only objects.
          */
 
-        if let payload = payload {
-
+        switch result {
+        case .success(let payload):
             // create response
             var response: JSON?
             if message.version == "1.0.0" {
                 response = payload
             } else {
                 response = [
-                "name": try! JSON(message.name),
-                "response_id": try! JSON(message.requestID),
-                "payload": payload
+                    "name": try! JSON(message.name),
+                    "response_id": try! JSON(message.requestID),
+                    "payload": payload
                 ]
             }
 
             // encode response
-            guard let data = try? JSONEncoder.blockv.encode(response),
-                let jsonString = String.init(data: data, encoding: .utf8) else {
-                    // handle error
-                    let error = BridgeError.viewer("Unable to encode response.")
-                    self.sendResponse(forRequestMessage: message, payload: nil, error: error)
-                    return
+            if let jsonString = response?.stringValue?.json {
+                // corner case: ui.qr.scan return a top-level string which JSONEncoder cannot encode
+                self.postMessage(message.requestID, withJSONString: jsonString)
+            } else {
+                guard let data = try? JSONEncoder.blockv.encode(response),
+                    let jsonString = String.init(data: data, encoding: .utf8) else {
+                        // handle error
+                        let error = BridgeError.viewer("Unable to encode response.")
+                        self.sendResponse(forRequestMessage: message, result: .failure(error))
+                        return
+                }
+                self.postMessage(message.requestID, withJSONString: jsonString)
             }
-            self.postMessage(message.requestID, withJSONString: jsonString)
 
-        } else if let error = error {
-
+        case .failure(let error):
             // create response
             var response: JSON?
             if message.version == "1.0.0" {
@@ -130,13 +134,11 @@ extension WebFaceView: WKScriptMessageHandler {
                 let jsonString = String.init(data: data, encoding: .utf8) else {
                     // handle error
                     let error = BridgeError.viewer("Unable to encode response.")
-                    self.sendResponse(forRequestMessage: message, payload: nil, error: error)
+                    self.sendResponse(forRequestMessage: message, result: .failure(error))
                     return
             }
             self.postMessage(message.requestID, withJSONString: jsonString)
 
-        } else {
-            assertionFailure("Either 'payload' or 'error' must be non nil.")
         }
 
     }
@@ -185,13 +187,20 @@ extension WebFaceView {
 
         // create bridge
         switch message.version {
-        case "1.0.0": // original Face SDK
-            self.coreBridge = CoreBridgeV1(faceView: self)
+        case "1.0.0":
+            // lazily create bridge on first web face request (core.init)
+            if self.coreBridge == nil {
+                self.coreBridge = CoreBridgeV1(faceView: self)
+            }
             // transform V1 to V2
             message = self.transformScriptMessage(message)
 
         case "2.0.0":
-            self.coreBridge = CoreBridgeV2(faceView: self)
+            // lazily create bridge on first web face request (core.init)
+            if self.coreBridge == nil {
+                self.coreBridge = CoreBridgeV2(faceView: self)
+            }
+
         default:
             throw BridgeError.caller("Unsupported Bridge version: \(message.version)")
         }
@@ -217,10 +226,16 @@ extension WebFaceView {
             // determine appropriate responder (core or viewer)
             if coreBridge.canProcessMessage(message.name) {
                 // forward to core bridge
-                coreBridge.processMessage(message) { (payload, error) in
+                coreBridge.processMessage(message) { result in
 
-                    // post response
-                    self.sendResponse(forRequestMessage: message, payload: payload, error: error)
+                    switch result {
+                    case .success(let payload):
+                        // post response
+                        self.sendResponse(forRequestMessage: message, result: .success(payload))
+                    case .failure(let error):
+                        // post response
+                        self.sendResponse(forRequestMessage: message, result: .failure(error))
+                    }
 
                 }
             } else {
@@ -236,28 +251,27 @@ extension WebFaceView {
     private func routeMessageToViewer(_ message: RequestScriptMessage) {
 
         // notify the host's message delegate of the custom message from the web page
-        self.delegate?.faceView(self,
-                                didSendMessage: message.name,
-                                withObject: message.payload,
-                                completion: { (payload, error) in
+        self.delegate?.faceView(self, didSendMessage: message.name, withObject: message.payload, completion: { result in
+                switch result {
+                case .success(let payload):
 
-                                    // transform the bridge error
-                                    let bridgeError = BridgeError.viewer(error?.message ?? "Unknown error occured.")
+                    // v1.0.0 backward compatibility
+                    if message.version == "1.0.0" && message.name == "viewer.qr.scan" {
+                        // transform reponse paylaod from ["data": <text>] to <text>.
+                        if let newPayload = payload["data"] {
+                            self.sendResponse(forRequestMessage: message, result: .success(newPayload))
+                            return
+                        }
+                    }
 
-                                    // V1 Support. Transform the `viewer.qr.scan` reponse paylaod from [String: String]
-                                    // to String.
-                                    if message.version == "1.0.0" && message.name == "viewer.qr.scan" {
-                                        if let newPayload = payload?["data"] {
-                                            self.sendResponse(forRequestMessage: message, payload: newPayload,
-                                                              error: bridgeError)
-                                            return
-                                        }
-                                    }
-
-                                    self.sendResponse(forRequestMessage: message,
-                                                      payload: payload,
-                                                      error: bridgeError)
-
+                    self.sendResponse(forRequestMessage: message, result: .success(payload))
+                    return
+                case .failure(let error):
+                    // transform the bridge error
+                    let bridgeError = BridgeError.viewer(error.message)
+                    self.sendResponse(forRequestMessage: message, result: .failure(bridgeError))
+                    return
+                }
         })
 
     }
@@ -304,6 +318,19 @@ extension WebFaceView {
 
         return message
 
+    }
+
+}
+
+fileprivate extension String {
+
+    /// Returns a JSON compatible version of the string.
+    var json: String {
+        return "\"" + self
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "\r", with: "\\r")
+            .replacingOccurrences(of: "\n", with: "\\n")
+            .replacingOccurrences(of: "\"", with: "\\\"") + "\""
     }
 
 }

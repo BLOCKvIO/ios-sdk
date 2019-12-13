@@ -9,6 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import UIKit
 import FLAnimatedImage
 import Nuke
@@ -45,21 +46,12 @@ class ImagePolicyFaceView: FaceView {
     /// struct immutalbe and is ONLY populated on init.
     private let config: Config
 
-    /*
-     NOTE
-     The `vatomChanged()` method called by `VatomView` does not handle child vatom updates.
-     The `VatomObserver` class is used to receive these events. This is required for the Child Count policy type.
-     */
-
-    /// Class responsible for observing changes related backing vAtom.
-    private var vatomObserver: VatomObserver
-
     // MARK: - Initialization
 
-    required init(vatom: VatomModel, faceModel: FaceModel) {
+    required init(vatom: VatomModel, faceModel: FaceModel) throws {
 
         // init face config (or legacy private section) fallback on default values
-        if let config = faceModel.properties.config {
+        if let config = faceModel.properties.config, config != .null {
             self.config = Config(config) // face config
         } else if let config = vatom.private {
             self.config = Config(config) // private section
@@ -67,11 +59,11 @@ class ImagePolicyFaceView: FaceView {
             self.config = Config() // default values
         }
 
-        // create an observer for the backing vatom
-        self.vatomObserver = VatomObserver(vatomID: vatom.id)
-        super.init(vatom: vatom, faceModel: faceModel)
+        try super.init(vatom: vatom, faceModel: faceModel)
 
-        self.vatomObserver.delegate = self
+        // enable animated images
+        ImagePipeline.Configuration.isAnimatedImageDataEnabled = true
+
         // add image view
         self.addSubview(animatedImageView)
         animatedImageView.frame = self.bounds
@@ -84,59 +76,79 @@ class ImagePolicyFaceView: FaceView {
 
     // MARK: - Face View Lifecycle
 
-    /// Begin loading the face view's content.
+    private var storedCompletion: ((Error?) -> Void)?
+
+    /// Begins loading the face view's content.
     func load(completion: ((Error?) -> Void)?) {
-        // update resources
-        updateUI(completion: completion)
+        // reset content
+        self.reset()
+        // store the completion
+        self.storedCompletion = completion
+        // flag a known-bounds layout
+        self.requiresBoundsBasedSetup = true
     }
 
-    /// Respond to updates or replacement of the current vAtom.
+    /// Updates the backing Vatom and loads the new state.
+    ///
+    /// The VVLC ensures the vatom will share the same template variation. This means the vatom will have the same
+    /// resources but the state of the face (e.g. which recsources it is showing) may be different.
     func vatomChanged(_ vatom: VatomModel) {
 
-        /*
-         NOTE:
-         - Changes to to the backing vAtom must be reflected in the face view.
-         - Specifically, updates to the backing vAtom or it's children may afect the required image policy image.
-         */
+        if self.vatom.id == vatom.id {
+            // replace vatom, update UI
+            self.vatom = vatom
 
-        // replace current vatom
-        self.vatom = vatom
-        self.updateUIDebounced()
+        } else {
+            // replace vatom, reset and update UI
+            self.vatom = vatom
+            self.reset()
+        }
+        // flag a known-bounds layout
+        self.requiresBoundsBasedSetup = true
 
     }
 
-    /// Unload the face view (called when the VatomView must prepare for reuse).
+    /// Resets the contents of the face view.
+    private func reset() {
+        self.animatedImageView.image = nil
+        self.animatedImageView.animatedImage = nil
+    }
+
+    /// Unload face view. Reset all content.
     func unload() {
-        self.vatomObserver.cancel()
+        self.reset()
+        //TODO: Cancel all downloads
+    }
+
+    /// Updates interface with local state.
+    override func setupWithBounds() {
+        super.setupWithBounds()
+
+        // extract resource
+        let resourceName = self.extractImageName()
+        // update state
+        self.updateImageView(withResource: resourceName) { [weak self] error in
+
+            guard let self = self else { return }
+            // inform delegate of load completion
+            if let error = error {
+                self.isLoaded = false
+                self.storedCompletion?(error)
+            } else {
+                self.isLoaded = true
+                self.storedCompletion?(nil)
+            }
+        }
+
     }
 
     // MARK: - Face Code
 
     /// Current count of child vAtoms.
     private var currentChildCount: Int {
-        return vatomObserver.childVatomIDs.count
+        // inspect cached children
+        return self.vatom.listCachedChildren().count
     }
-
-    /// Updates the interface using local state.
-    ///
-    /// - Extracts the resource name.
-    /// - Starts download of the resource.
-    private func updateUI(completion: ((Error?) -> Void)?) {
-        let resourceName = self.extractImageName()
-        self.updateImageView(withResource: resourceName, completion: completion)
-    }
-
-    /// Updates the interface using local state (debounced).
-    ///
-    /// This property debounces the UI update. This avoids the case where numerous parent ID state changes could cause
-    /// unecessary resource downloads. Essentially, it ensure the the vAtom is "settled" before updating the UI.
-    private lazy var updateUIDebounced = {
-        // NOTE: Debounce will cancel work items.
-        return debounce(delay: DispatchTimeInterval.milliseconds(500)) {
-            self.updateUI(completion: nil)
-            //printBV(info: "Debounced: updateUI called")
-        }
-    }()
 
     /// Update the face view using *local* data.
     ///
@@ -157,19 +169,12 @@ class ImagePolicyFaceView: FaceView {
 
             } else if let policy = policy as? Config.FieldLookup {
 
-                // create key path and split into head and tail
-                guard let component = KeyPath(policy.field).headAndTail(),
-                    // only private section lookups are allowed
-                    component.head == "private",
-                    // current value on the vatom
-                    let vatomValue = self.vatom.private?[keyPath: component.tail.path] else {
-                        continue
-                }
-
-                if vatomValue == policy.value {
-                    // update image
-                    //print(">>:: vAtom Value: \(vatomValue) | Policy Value: \(policy.value)\n")
-                    return policy.resourceName
+                if let vatomValue = self.vatom.valueForKeyPath(policy.field) {
+                    if vatomValue == policy.value {
+                        // update image
+                        //print(">>:: vAtom Value: \(vatomValue) | Policy Value: \(policy.value)\n")
+                        return policy.resourceName
+                    }
                 }
 
             } else if policy is Config.Fallback {
@@ -201,36 +206,20 @@ class ImagePolicyFaceView: FaceView {
             return
         }
 
-        do {
-            // encode url
-            let encodeURL = try BLOCKv.encodeURL(resourceModel.url)
-
-            var request = ImageRequest(url: encodeURL)
-            // use unencoded url as cache key
-            request.cacheKey = resourceModel.url
-            // load image (automatically handles reuse)
-            Nuke.loadImage(with: request, into: self.animatedImageView) { (_, error) in
-                self.isLoaded = true
+        let resize = ImageProcessor.Resize(size: self.bounds.size, contentMode: .aspectFit)
+        let request = BVImageRequest(url: resourceModel.url, processors: [resize])
+        // load iamge
+        ImageDownloader.loadImage(with: request, into: self.animatedImageView) { result in
+            self.isLoaded = true
+            do {
+                try result.get()
+                completion?(nil)
+            } catch {
+                os_log("Failed to load: %@", log: .vatomView, type: .error, resourceModel.url.description)
                 completion?(error)
             }
-        } catch {
-            completion?(error)
         }
 
-    }
-
-}
-
-// MARK: - Vatom Observer Delegate
-
-extension ImagePolicyFaceView: VatomObserverDelegate {
-
-    func vatomObserver(_ observer: VatomObserver, didAddChildVatom vatomID: String) {
-        self.updateUIDebounced()
-    }
-
-    func vatomObserver(_ observer: VatomObserver, didRemoveChildVatom vatomID: String) {
-        self.updateUIDebounced()
     }
 
 }
@@ -326,7 +315,7 @@ private extension ImagePolicyFaceView {
                 }
 
                 // child count
-                if let countMax = imagePolicyDescriptor["count_max"]?.floatValue {
+                if let countMax = imagePolicyDescriptor["count_max"]?.doubleValue {
                     let childCountPolicy = ChildCount(resourceName: resourceName, countMax: Int(countMax))
                     self.policies.append(childCountPolicy)
                     continue

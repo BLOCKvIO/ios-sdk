@@ -28,24 +28,24 @@ import BLOCKv
 ///
 ///
 class VatomDetailTableViewController: UITableViewController {
-    
+
     // MARK: - Inputs
-    
+
     /// vAtom passed in by the presenting view controller.
     var vatom: VatomModel!
-    
+
     // MARK: - Properties
-    
+
     fileprivate let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         formatter.timeStyle = .short
         return formatter
     }()
-    
+
     // MARK: - Outlets
     @IBOutlet weak var actionsButton: UIBarButtonItem!
-    
+
     // info
     @IBOutlet weak var titleValueLabel: UILabel!
     @IBOutlet weak var descriptionValueLabel: UILabel!
@@ -66,74 +66,75 @@ class VatomDetailTableViewController: UITableViewController {
     // meta
     @IBOutlet weak var dateCreatedValueLabel: UILabel!
     @IBOutlet weak var dateModifiedValueLabel: UILabel!
-    
+
     // MARK: - Actions
-    
+
     @IBAction func availableActionsTapped(_ sender: UIBarButtonItem) {
         self.performSegue(withIdentifier: "seg.availableActions", sender: self)
     }
-    
+
     // MARK: - Lifecycle
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         /*
         Comment out to reveal the actions button.
         This is not officially supported.
          */
         //self.navigationItem.rightBarButtonItem = nil
-        
+
         self.refreshControl?.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
-        
+
         if vatom != nil {
             updateUI()
         }
-        
+
     }
-    
+
     // MARK: - Helpers
-    
+
     @objc
     fileprivate func handleRefresh() {
         fetchVatom()
     }
-    
+
     /// Fetches the input vatom's properties from the BLOCKv platform.
     fileprivate func fetchVatom() {
-        
-        BLOCKv.getVatoms(withIDs: [vatom.id]) { [weak self] (vatomModels, error) in
-            
+
+        BLOCKv.getVatoms(withIDs: [vatom.id]) { [weak self] result in
+
             // end refreshing
             self?.refreshControl?.endRefreshing()
-            
-            // handle error
-            guard error == nil else {
-                print("\n>>> Error > Viewer: \(error!.localizedDescription)")
-                self?.present(UIAlertController.errorAlert(error!), animated: true)
+
+            switch result {
+            case .success(let vatomModels):
+                // check for our vatom
+                guard let newVatom = vatomModels.first else {
+                    let message = "Unable to fetch vAtom with id: \(String(describing: self?.vatom.id))."
+                    print("\n>>> Warning > \(message)")
+                    self?.present(UIAlertController.infoAlert(message: message), animated: true)
+                    return
+                }
+
+                // handle success
+                print("\nViewer > Fetched vAtom:\n\(newVatom)")
+                self?.vatom = newVatom
+                self?.updateUI()
+
+            case .failure(let error):
+                print("\n>>> Error > Viewer: \(error.localizedDescription)")
+                self?.present(UIAlertController.errorAlert(error), animated: true)
                 return
             }
-            
-            // check for our vatom
-            guard let newVatom = vatomModels.first else {
-                let message = "Unable to fetch vAtom with id: \(String(describing: self?.vatom.id))."
-                print("\n>>> Warning > \(message)")
-                self?.present(UIAlertController.infoAlert(message: message), animated: true)
-                return
-            }
-            
-            // handle success
-            print("\nViewer > Fetched vAtom:\n\(newVatom)")
-            self?.vatom = newVatom
-            self?.updateUI()
-            
+
         }
-        
+
     }
-    
+
     /// Updates the static table view cell properties.
     fileprivate func updateUI() {
-        
+
         // info
         titleValueLabel.text          = vatom.props.title
         descriptionValueLabel.text    = vatom.props.description
@@ -154,31 +155,30 @@ class VatomDetailTableViewController: UITableViewController {
         // meta
         dateCreatedValueLabel.text    = dateFormatter.string(from: vatom.whenCreated)
         dateModifiedValueLabel.text   = dateFormatter.string(from: vatom.whenModified)
-        
+
         self.tableView.reloadData()
-        
+
     }
-    
+
     /// Returns "Yes" for `true`, "No" for `false`.
     fileprivate func prettyBool(_ bool: Bool) -> String {
         return bool ? "Yes" : "No"
     }
-    
+
     // MARK: - Navigation
-    
+
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
+
         let destination = segue.destination as! UINavigationController
         let vc = destination.viewControllers[0] as! ActionListTableViewController
         // pass vatom along
         vc.vatom = self.vatom
-        
-        
+
     }
-    
+
     //    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
     //        // prevent segue - we will programmatical handle it
     //        return false
     //    }
-    
+
 }

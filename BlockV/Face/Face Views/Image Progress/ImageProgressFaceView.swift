@@ -9,6 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import UIKit
 import Nuke
 import GenericJSON
@@ -86,10 +87,10 @@ class ImageProgressFaceView: FaceView {
             self.direction      ?= faceConfig["direction"]?.stringValue
             self.showPercentage ?= faceConfig["show_percentage"]?.boolValue
 
-            if let paddingEnd = faceConfig["padding_end"]?.floatValue {
+            if let paddingEnd = faceConfig["padding_end"]?.doubleValue {
                 self.paddingEnd ?= Double(paddingEnd)
             }
-            if let paddingStart = faceConfig["padding_start"]?.floatValue {
+            if let paddingStart = faceConfig["padding_start"]?.doubleValue {
                 self.paddingStart = Double(paddingStart)
             }
         }
@@ -108,11 +109,11 @@ class ImageProgressFaceView: FaceView {
 
     // MARK: - Initialization
 
-    required init(vatom: VatomModel, faceModel: FaceModel) {
+    required init(vatom: VatomModel, faceModel: FaceModel) throws {
 
         // init face config (or legacy private section) fallback on default values
 
-        if let config = faceModel.properties.config {
+        if let config = faceModel.properties.config, config != .null {
             self.config = Config(config) // face config
         } else if let config = vatom.private {
             self.config = Config(config) // private section
@@ -120,7 +121,7 @@ class ImageProgressFaceView: FaceView {
             self.config = Config() // default values
         }
 
-        super.init(vatom: vatom, faceModel: faceModel)
+        try super.init(vatom: vatom, faceModel: faceModel)
 
         self.addSubview(emptyImageView)
         self.addSubview(fullImageView)
@@ -139,24 +140,52 @@ class ImageProgressFaceView: FaceView {
 
     // MARK: - FaceView Lifecycle
 
+    /// Begins loading the face view's content.
     func load(completion: ((Error?) -> Void)?) {
 
-        self.updateResources { (error) in
-            self.setNeedsLayout()
-            self.updateUI()
-            completion?(error)
+        // reset content
+        self.reset()
+        /// load required resources
+        self.loadResources { [weak self] error in
+
+            guard let self = self else { return }
+            // update state and inform delegate of load completion
+            if let error = error {
+                self.setNeedsLayout()
+                self.updateUI()
+                self.isLoaded = false
+                completion?(error)
+            } else {
+                self.setNeedsLayout()
+                self.updateUI()
+                self.isLoaded = true
+                completion?(nil)
+            }
+
         }
 
     }
 
+    /// Updates the backing Vatom and loads the new state.
     func vatomChanged(_ vatom: VatomModel) {
 
-        // update vatom
         self.vatom = vatom
-        updateUI()
+        // update ui
+        self.setNeedsLayout()
+        self.updateUI()
+
     }
 
-    func unload() { }
+    /// Resets the contents of the face view.
+    private func reset() {
+        emptyImageView.image = nil
+        fullImageView.image = nil
+    }
+
+    func unload() {
+        reset()
+        //TODO: Cancel all downloads
+    }
 
     // MARK: - View Lifecycle
 
@@ -173,6 +202,13 @@ class ImageProgressFaceView: FaceView {
     override func layoutSubviews() {
         super.layoutSubviews()
 
+        // show/hide progress label based on current size
+        if self.bounds.size.width < 100 {
+            progressLabel.isHidden = true
+        } else {
+            progressLabel.isHidden = false
+        }
+
         // image size
         guard let image = fullImageView.image else { return }
 
@@ -187,7 +223,7 @@ class ImageProgressFaceView: FaceView {
         let paddingEnd = contentClippingRect.width * CGFloat(self.config.paddingEnd) / imagePixelSize.width
 
         let innerY = contentClippingRect.height - paddingStart - paddingEnd
-        let innerX = contentClippingRect.width - paddingStart - paddingEnd
+//        let innerX = contentClippingRect.width - paddingStart - paddingEnd
 
         let innerProgressY = (contentClippingRect.height - paddingStart - paddingEnd) * progress
         let innerProgressX = (contentClippingRect.width - paddingStart - paddingEnd) * progress
@@ -239,48 +275,44 @@ class ImageProgressFaceView: FaceView {
 
     /// Fetches required resources and populates the relevant `ImageView`s. The completion handler is called once all
     /// images are downloaded (or an error is encountered).
-    private func updateResources(completion: ((Error?) -> Void)?) {
+    private func loadResources(completion: @escaping (Error?) -> Void) {
 
         // ensure required resources are present
         guard
             let emptyImageResource = vatom.props.resources.first(where: { $0.name == self.config.emptyImageName }),
             let fullImageResource = vatom.props.resources.first(where: { $0.name == self.config.fullImageName })
             else {
-                printBV(error: "\(#file) - failed to extract resources.")
+                completion(FaceError.missingVatomResource)
                 return
         }
 
-        // ensure encoding passes
-        guard
-            let encodedEmptyURL = try? BLOCKv.encodeURL(emptyImageResource.url),
-            let encodedFullURL = try? BLOCKv.encodeURL(fullImageResource.url)
-            else {
-                printBV(error: "\(#file) - failed to encode resources.")
-                return
-        }
+        // NB: Do not resize due to brittle pixel offsets in face config.
+        let emptyRequest = BVImageRequest(url: emptyImageResource.url)
+        let fullRequest = BVImageRequest(url: fullImageResource.url)
 
         dispatchGroup.enter()
         dispatchGroup.enter()
-
-        var requestEmpty = ImageRequest(url: encodedEmptyURL)
-        // use unencoded url as cache key
-        requestEmpty.cacheKey = emptyImageResource.url
-        // load image (automatically handles reuse)
-        Nuke.loadImage(with: requestEmpty, into: self.emptyImageView) { (_, _) in
+        // load images
+        ImageDownloader.loadImage(with: emptyRequest, into: self.emptyImageView) { result in
             self.dispatchGroup.leave()
+            do {
+                try result.get()
+            } catch {
+                os_log("Failed to load: %@", log: .vatomView, type: .error, emptyImageResource.url.description)
+            }
         }
-
-        var requestFull = ImageRequest(url: encodedFullURL)
-        // use unencoded url as cache key
-        requestFull.cacheKey = fullImageResource.url
-        // load image (automatically handles reuse)
-        Nuke.loadImage(with: requestFull, into: self.fullImageView) { (_, _) in
+        ImageDownloader.loadImage(with: fullRequest, into: self.fullImageView) { result in
             self.dispatchGroup.leave()
+            do {
+                try result.get()
+            } catch {
+                os_log("Failed to load: %@", log: .vatomView, type: .error, fullImageResource.url.description)
+            }
         }
 
         dispatchGroup.notify(queue: .main) {
             self.isLoaded = true
-            completion?(nil)
+            completion(nil)
         }
 
     }

@@ -30,14 +30,14 @@ import BLOCKv
 class LiveVatomView: VatomView {
 
     // MARK: - Initialization
-    
+
     override init() {
         super.init()
         commonInit()
     }
 
-    override init(vatom: VatomModel, procedure: @escaping FaceSelectionProcedure) {
-        super.init(vatom: vatom, procedure: procedure)
+    override init(vatom: VatomModel, procedure: @escaping FaceSelectionProcedure, delegate: VatomViewDelegate? = nil) {
+        super.init(vatom: vatom, procedure: procedure, delegate: delegate)
         commonInit()
     }
 
@@ -53,9 +53,9 @@ class LiveVatomView: VatomView {
             // reload from remote on socket reconnect
             self?.reloadFromRemote()
         }
-        
+
         BLOCKv.socket.onVatomStateUpdate.subscribe(with: self) { [weak self] stateUpdateEvent in
-            
+
             // ignore other vatom updates
             guard self?.vatom?.id == stateUpdateEvent.vatomId else { return }
 
@@ -67,29 +67,31 @@ class LiveVatomView: VatomView {
         }
 
     }
-    
+
     // MARK: - Methods
-    
+
     /// Reloads the contents of the vAtom from remote and updates vatom view.
     private func reloadFromRemote() {
-        
+
         // get vatom id
         guard let vatomID = self.vatom?.id else { return }
-        
+
         // fetch vatom model from remote
-        BLOCKv.getVatoms(withIDs: [vatomID], completion: { (vatomModels, error) in
-            
-            // ensure no error
-            guard error == nil, let vatom = vatomModels.first else {
+        BLOCKv.getVatoms(withIDs: [vatomID], completion: { result in
+
+            switch result {
+            case .success(let vatomModels):
+                guard let vatom = vatomModels.first else { return }
+                // update vatom view using the new state of the vatom
+                self.update(usingVatom: vatom)
+
+            case .failure:
                 print(">>> Viewer: Unable to fetch vAtom.")
                 return
             }
-            
-            // update vatom view using the new state of the vatom
-            self.update(usingVatom: vatom)
-            
+
         })
-        
+
     }
 
 }

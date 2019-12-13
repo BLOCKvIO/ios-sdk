@@ -31,37 +31,37 @@ import BLOCKv
 import Alamofire
 
 class ProfileViewController: UITableViewController {
-    
+
     // MARK: - Enums
-    
+
     fileprivate enum TableSection: Int {
         case general = 0
         case logout
     }
-    
+
     /// Models the state of avatar upload activity.
     fileprivate enum UploadNetworkState {
         case none
         case busy
     }
-    
+
     // MARK: - Properties
-    
+
     fileprivate var userModel: UserModel?
-    
+
     fileprivate lazy var picker: UIImagePickerController = {
         let picker = UIImagePickerController()
         picker.delegate = self
         picker.sourceType = .photoLibrary
         return picker
     }()
-    
+
     fileprivate let manager: Alamofire.SessionManager = {
         let configuration = URLSessionConfiguration.default
         //configuration.urlCache = nil // disable cache
         return Alamofire.SessionManager(configuration: configuration)
     }()
-    
+
     /// Computes a nice display name.
     fileprivate var displayName: String {
         get {
@@ -75,7 +75,7 @@ class ProfileViewController: UITableViewController {
             return name.isEmpty ? "First Last Name" : name
         }
     }
-    
+
     fileprivate var uploadState: UploadNetworkState = .none {
         didSet {
             switch uploadState {
@@ -88,185 +88,185 @@ class ProfileViewController: UITableViewController {
             }
         }
     }
-    
+
     // MARK: - Outlets
-    
+
     @IBOutlet weak var avatarContainerView: UIView!
     @IBOutlet weak var avatarImageView: UIImageView!
     @IBOutlet weak var displayNameLabel: UILabel!
     @IBOutlet weak var userIdLabel: UILabel!
     @IBOutlet weak var uploadProgressView: UIProgressView!
     @IBOutlet weak var versionLabel: UILabel!
-    
+
     // MARK: - Actions
-    
+
     @IBAction func doneButtonTapped(_ sender: UIBarButtonItem) {
         self.dismiss(animated: true, completion: nil)
     }
-    
+
     // MARK: - Lifecycle
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         // add tap gestrue
         let tap = UITapGestureRecognizer(target: self, action: #selector(presentImagePicker))
         avatarContainerView.addGestureRecognizer(tap)
-        
+
         refreshControl?.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
 
         // ui polish
         uploadState = .none
         avatarImageView.contentMode = .scaleAspectFill
         versionLabel.text = versionString()
-        
+
         // fetch profile
         fetchUserProfile()
 
     }
-    
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
-        
+
         // this will ensure a refresh each time the vc appears
         fetchUserProfile()
     }
-    
+
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         avatarContainerView.layer.cornerRadius = avatarContainerView.frame.size.height / 2
         avatarContainerView.clipsToBounds = true
     }
-    
+
     // MARK: - Helpers
-    
+
     @objc
     fileprivate func handleRefresh() {
         print(#function)
         fetchUserProfile()
     }
-    
+
     /// Fetches the user's profile information.
     fileprivate func fetchUserProfile() {
-        
-        BLOCKv.getCurrentUser { [weak self] (userModel, error) in
-            
+
+        BLOCKv.getCurrentUser { [weak self] result in
+
             // end refreshing
             self?.refreshControl?.endRefreshing()
 
-            // handle error
-            guard let model = userModel, error == nil else {
-                print(">>> Error > Viewer: \(error!.localizedDescription)\n")
-                self?.present(UIAlertController.errorAlert(error!), animated: true)
+            switch result {
+            case .success(let userModel):
+                print("\nViewer > Fetched user model:\n\(userModel)")
+                self?.userModel = userModel
+
+                // update ui
+                self?.displayNameLabel.text = self?.displayName
+                self?.userIdLabel.text = self?.userModel?.id
+
+                self?.fetchAvatarImage()
+
+            case .failure(let error):
+                print(">>> Error > Viewer: \(error.localizedDescription)\n")
+                self?.present(UIAlertController.errorAlert(error), animated: true)
                 return
             }
-            
-            // handle success
-            print("\nViewer > Fetched user model:\n\(model)")
-            self?.userModel = model
-            
-            // update ui
-            self?.displayNameLabel.text = self?.displayName
-            self?.userIdLabel.text = self?.userModel?.id
-            
-            self?.fetchAvatarImage()
+
         }
-        
+
     }
-    
+
     /// Fetches the avatar image data and loads it into the avatar image view.
     fileprivate func fetchAvatarImage() {
-        
+
         guard let url = self.userModel?.avatarURL else { return }
-        
+
         guard let encodedURL = try? BLOCKv.encodeURL(url) else { return }
-        
+
         // request image data
         manager.request(encodedURL).responseData { [weak self] responseData in
-                        
+
             guard let data = responseData.data else { return }
             print("\nViewer > Avatar download successful.")
-            
+
             self?.avatarImageView.alpha = 0.2
             UIView.animate(withDuration: 2, animations: {
                 self?.avatarImageView.alpha = 1
             })
-            
+
             self?.avatarImageView.image = UIImage(data: data)
             self?.view.setNeedsDisplay()
         }
-        
+
     }
-    
+
     /// Presents the image picker.
     @objc fileprivate func presentImagePicker() {
         present(picker, animated: true, completion: nil) //FIXME: iPad requires popover presentation
     }
-    
+
     /// Uploads an avatar image to the BlockV platform.
     fileprivate func uploadImage(_ image: UIImage) {
-        
+
         // show progress view
         uploadState = .busy
-        
+
         // do avatar upload
         BLOCKv.uploadAvatar(image, progressCompletion: { [weak self] percent in
-            
+
             self?.uploadProgressView.setProgress(percent, animated: true)
             print("Percent complete: \(percent)")
-            
+
         }) { [weak self] error in
-            
+
             // hide progress view
             self?.uploadState = .none
-            
+
             // handle error
             guard error == nil else {
                 print(">>> Error > Viewer: \(error!.localizedDescription)\n")
                 self?.present(UIAlertController.errorAlert(error!), animated: true)
                 return
             }
-            
+
             // handle success
             print("\nViewer > Avatar upload successful.")
-            
+
             // re-fetch the user's profile
             self?.fetchUserProfile()
-            
+
         }
-        
+
     }
-    
+
     /// Logs the user out.
     fileprivate func logout() {
-        
+
         BLOCKv.logout { [weak self] error in
-            
+
             // Immediately pop the user to the onboarding view controller.
-            
+
             // change root view controller
             self?.changeToOnboardingViewController()
-            
+
             // dismiss
             self?.dismiss(animated: true, completion: nil)
-            
+
             // Inspect the network response
-            
+
             // handle error
             guard error == nil else {
                 print(">>> Error > Viewer: \(error!.localizedDescription)\n")
                 self?.present(UIAlertController.errorAlert(error!), animated: true)
                 return
             }
-            
+
             // handle success
             print("\nViewer > Logged Out.")
-            
-            
+
         }
-        
+
     }
-    
+
     /// Returns a description of the apps version and build.
     func versionString() -> String {
         let dictionary = Bundle.main.infoDictionary!
@@ -274,9 +274,9 @@ class ProfileViewController: UITableViewController {
         let build = dictionary["CFBundleVersion"] as! String
         return "Version \(version) (\(build))"
     }
-    
+
     // MARK: - Navigation
-    
+
     /// Prepares for navigation.
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "seg.profile.userInfo" {
@@ -287,17 +287,17 @@ class ProfileViewController: UITableViewController {
             vc.origin = .profile
         }
     }
-    
+
     /// Changes view controller graph to show welcome screen.
     fileprivate func changeToOnboardingViewController() {
         let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
         let viewController = mainStoryboard.instantiateViewController(withIdentifier: "sid.main.nav") as! UINavigationController
         UIApplication.shared.keyWindow?.rootViewController = viewController
     }
-    
+
 }
 
-// MARK: -  UITableViewDelegate, UITableViewDataSource
+// MARK: - UITableViewDelegate, UITableViewDataSource
 
 extension ProfileViewController {
 
@@ -313,29 +313,29 @@ extension ProfileViewController {
 }
 
 extension ProfileViewController: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-    
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
 // Local variable inserted by Swift 4.2 migrator.
 let info = convertFromUIImagePickerControllerInfoKeyDictionary(info)
 
-        guard let pickedImage = info[convertFromUIImagePickerControllerInfoKey(UIImagePickerController.InfoKey.originalImage)] as? UIImage else  {
+        guard let pickedImage = info[convertFromUIImagePickerControllerInfoKey(UIImagePickerController.InfoKey.originalImage)] as? UIImage else {
             print(">>> Error > Viewer: Failed to pick image.\n")
             return
         }
-        
+
         self.uploadImage(pickedImage)
         picker.dismiss(animated: true, completion: nil)
-        
+
     }
-    
+
 }
 
 // Helper function inserted by Swift 4.2 migrator.
-fileprivate func convertFromUIImagePickerControllerInfoKeyDictionary(_ input: [UIImagePickerController.InfoKey: Any]) -> [String: Any] {
+private func convertFromUIImagePickerControllerInfoKeyDictionary(_ input: [UIImagePickerController.InfoKey: Any]) -> [String: Any] {
 	return Dictionary(uniqueKeysWithValues: input.map {key, value in (key.rawValue, value)})
 }
 
 // Helper function inserted by Swift 4.2 migrator.
-fileprivate func convertFromUIImagePickerControllerInfoKey(_ input: UIImagePickerController.InfoKey) -> String {
+private func convertFromUIImagePickerControllerInfoKey(_ input: UIImagePickerController.InfoKey) -> String {
 	return input.rawValue
 }

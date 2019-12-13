@@ -34,19 +34,29 @@ import BLOCKv
 /// The view controller will list all actions configured on the vAtom's
 /// template.
 class ActionListTableViewController: UITableViewController {
-    
+
     // MARK: - Properties
-    
+
     var vatom: VatomModel!
-    
-    // For now, we hardcode to display a single action.
-    //
-    // In a future release, the actions configure for the vAtom's template
-    // will be returned.
-    fileprivate var actions: [String] = ["Transfer"]
-    
+
+    /// Currently selected action.
+    var selectedAction: AvailableAction?
+
+    // table view data model
+    struct AvailableAction {
+        let action: ActionModel
+        /// Flag indicating whether this action is supported by this viewer.
+        let isSupported: Bool
+    }
+
+    /// List of available actions.
+    fileprivate var availableActions: [AvailableAction] = []
+
+    /// List of actions this viewer supports (i.e. knows how to handle).
+    private var supportedActions = ["Transfer", "Clone", "Redeem"]
+
     // MARK: - Actions
-    
+
     @IBAction func cancelButtonTapped(_ sender: UIBarButtonItem) {
         self.dismiss(animated: true, completion: nil)
     }
@@ -57,37 +67,74 @@ class ActionListTableViewController: UITableViewController {
         super.viewDidLoad()
 
         precondition(vatom != nil, "A vAtom must be passed into this view controller.")
-        
+
         fetchActions()
     }
 
     // MARK: - Helpers
-    
+
     /// Fetches all the actions configured / associated with our vAtom's template.
     fileprivate func fetchActions() {
-        
+
+        self.showNavBarActivityRight()
+
         let templateID = self.vatom.props.templateID
-        
-        BLOCKv.getActions(forTemplateID: templateID) { (actions, error) in
-            
-            // unwrap actions, handle error
-            guard let actions = actions, error == nil else {
-                print(error!.localizedDescription)
-                return
+
+        BLOCKv.getActions(forTemplateID: templateID) { result in
+
+            self.hideNavBarActivityRight()
+
+            switch result {
+            case .success(let actions):
+                // success
+                print("Actions: \(actions.debugDescription)")
+                // update data source
+                self.availableActions = actions.map { action -> AvailableAction in
+                    // record
+                    let supported = self.supportedActions.contains(action.name)
+                    return AvailableAction(action: action, isSupported: supported)
+                }
+                self.tableView.reloadData()
+
+            case .failure(let error):
+                print(error.localizedDescription)
             }
-            
-            // success
-            print("Actions: \(actions.debugDescription)")
-            
+
         }
-        
+
+    }
+
+    /// Prompts the user to optionally delete the vatom.
+    fileprivate func deleteVatom() {
+
+        let message = "This vAtom will be deleted from all your devices."
+        let alert = UIAlertController.confirmAlert(title: "Delete vAtom", message: message) { confirmed in
+            if confirmed {
+                BLOCKv.trashVatom(self.vatom.id) { [weak self] _ in
+                    self?.hide()
+                }
+            }
+        }
+
+        self.present(alert, animated: true, completion: nil)
+
+    }
+
+    fileprivate func hide() {
+        self.presentingViewController?.presentingViewController?.dismiss(animated: true, completion: nil)
     }
 
     // MARK: - Navigation
 
+    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
+        return false
+    }
+
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        let destination = segue.destination as! TransferActionViewController
+        // dependecy injection
+        let destination = segue.destination as! OutboundActionViewController
         destination.vatom = self.vatom
+        destination.actionName = self.selectedAction!.action.name
     }
 
 }
@@ -95,20 +142,46 @@ class ActionListTableViewController: UITableViewController {
 // MARK: - Table view data source
 
 extension ActionListTableViewController {
-    
+
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        return 2
     }
-    
+
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if section == 0 {
+            return availableActions.count
+        }
         return 1
     }
-    
+
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell.action.id", for: indexPath)
-        cell.textLabel?.text = actions[indexPath.row]
+
+        if indexPath.section == 0 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "cell.action.id", for: indexPath)
+            let availableAction = availableActions[indexPath.row]
+            cell.textLabel?.text = availableAction.action.name
+            cell.textLabel?.alpha = availableAction.isSupported ? 1 : 0.5
+            cell.accessoryView = nil
+            return cell
+        }
+
+        let cell = UITableViewCell.init(style: .default, reuseIdentifier: "id.cell.delete")
+        cell.textLabel?.textColor = UIColor.destruciveOrange
+        cell.textLabel?.text = "Delete"
         return cell
+
     }
-    
+
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+
+        if indexPath.section == 0 {
+            selectedAction = availableActions[indexPath.row]
+            if selectedAction!.isSupported {
+                self.performSegue(withIdentifier: "seg.action.selection", sender: self)
+            }
+        } else {
+            self.deleteVatom()
+        }
+    }
+
 }

@@ -9,6 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import UIKit
 import FLAnimatedImage
 import Nuke
@@ -51,6 +52,9 @@ class ImageFaceView: FaceView {
         /// The first resource name in the resources array (if present) is used in place of the activate image.
         init(_ faceModel: FaceModel) {
 
+            // enable animated images
+            ImagePipeline.Configuration.isAnimatedImageDataEnabled = true
+
             // legacy: overwrite fallback if needed
             self.imageName ?= faceModel.properties.resources.first
 
@@ -79,12 +83,12 @@ class ImageFaceView: FaceView {
 
     // MARK: - Initialization
 
-    required init(vatom: VatomModel, faceModel: FaceModel) {
+    required init(vatom: VatomModel, faceModel: FaceModel) throws {
 
         // init face config
         self.config = Config(faceModel)
 
-        super.init(vatom: vatom, faceModel: faceModel)
+        try super.init(vatom: vatom, faceModel: faceModel)
 
         // add image view
         self.addSubview(animatedImageView)
@@ -112,23 +116,46 @@ class ImageFaceView: FaceView {
     /// Inspects the face config first and uses the scale if available. If no face config is found, a simple heuristic
     /// is used to choose the best content mode.
     private func updateContentMode() {
+        self.animatedImageView.contentMode = configuredContentMode
+    }
 
+    var configuredContentMode: UIView.ContentMode {
         // check face config
         switch config.scale {
-        case .fill: animatedImageView.contentMode = .scaleAspectFill
-        case .fit:  animatedImageView.contentMode = .scaleAspectFit
+        case .fill: return .scaleAspectFill
+        case .fit:  return .scaleAspectFit
         }
-
     }
 
     // MARK: - Face View Lifecycle
 
-    /// Begin loading the face view's content.
+    private var storedCompletion: ((Error?) -> Void)?
+
+    /// Begins loading the face view's content.
     func load(completion: ((Error?) -> Void)?) {
-        updateResources(completion: completion)
+
+        /*
+         # Pattern
+         1. Call `reset` (which sets `isLoaded` to false)
+         >>> reset content, cancel downloads
+         2. Update face state
+         >>> set `isLoaded` to true
+         >>> call the delegate
+         */
+
+        // reset content
+        self.reset()
+        // store the completion
+        self.storedCompletion = completion
+        // flag a known-bounds layout
+        self.requiresBoundsBasedSetup = true
+
     }
 
-    /// Respond to updates or replacement of the current vAtom.
+    /// Updates the backing Vatom and loads the new state.
+    ///
+    /// The VVLC ensures the vatom will share the same template variation. This means the vatom will have the same
+    /// resources but the state of the face (e.g. which recsources it is showing) may be different.
     func vatomChanged(_ vatom: VatomModel) {
 
         /*
@@ -138,46 +165,74 @@ class ImageFaceView: FaceView {
          - Thus, no meaningful UI update can be made.
          */
 
-        // replace current vatom
         self.vatom = vatom
-        updateResources(completion: nil)
 
     }
 
-    /// Unload the face view.
-    ///
-    /// Also called before reuse (when used inside a reuse pool).
-    func unload() {
+    /// Resets the contents of the face view.
+    private func reset() {
         self.animatedImageView.image = nil
         self.animatedImageView.animatedImage = nil
     }
 
+    /// Unload the face view.
+    ///
+    /// Unload should reset the face view contents *and* stop any expensive operations e.g. downloading resources.
+    func unload() {
+        reset()
+        //TODO: Cancel resource downloading
+    }
+
     // MARK: - Resources
 
-    private func updateResources(completion: ((Error?) -> Void)?) {
+    var configContentMode: ImageProcessor.Resize.ContentMode {
+        // check face config, convert to nuke content mode
+        switch config.scale {
+        case .fill: return .aspectFill
+        case .fit:  return .aspectFit
+        }
+    }
+
+    override func setupWithBounds() {
+        super.setupWithBounds()
+
+        // load required resources
+        self.loadResources { [weak self] error in
+
+            guard let self = self else { return }
+            // update state and inform delegate of load completion
+            if let error = error {
+                self.isLoaded = false
+                self.storedCompletion?(error)
+            } else {
+                self.isLoaded = true
+                self.storedCompletion?(nil)
+            }
+
+        }
+
+    }
+
+    private func loadResources(completion: ((Error?) -> Void)?) {
 
         // extract resource model
         guard let resourceModel = vatom.props.resources.first(where: { $0.name == config.imageName }) else {
+            completion?(FaceError.missingVatomResource)
             return
         }
 
-        // encode url
-        guard let encodeURL = try? BLOCKv.encodeURL(resourceModel.url) else {
-            return
-        }
-
-        //FIXME: Where should this go?
-        ImagePipeline.Configuration.isAnimatedImageDataEnabled = true
-
-        //TODO: Should the size of the VatomView be factoring in and the image be resized?
-
-        var request = ImageRequest(url: encodeURL)
-        // use unencoded url as cache key
-        request.cacheKey = resourceModel.url
-        // load image (automatically handles reuse)
-        Nuke.loadImage(with: request, into: self.animatedImageView) { (_, error) in
+        let resize = ImageProcessor.Resize(size: self.bounds.size, contentMode: configContentMode)
+        let request = BVImageRequest(url: resourceModel.url, processors: [resize])
+        // load iamge
+        ImageDownloader.loadImage(with: request, into: self.animatedImageView) { result in
             self.isLoaded = true
-            completion?(error)
+            do {
+                try result.get()
+                completion?(nil)
+            } catch {
+                os_log("Failed to load: %@", log: .vatomView, type: .error, resourceModel.url.description)
+                completion?(error)
+            }
         }
 
     }

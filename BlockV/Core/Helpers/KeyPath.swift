@@ -10,10 +10,15 @@
 //
 
 import Foundation
+import GenericJSON
 
 /// Simple struct that models a key path.
-public struct KeyPath: Equatable {
+struct KeyPath {
     private(set) var segments: [String]
+
+    typealias Separator = (String) -> [String]
+    /// Default separator uses standard period separation
+    private(set) var separator: Separator = { $0.components(separatedBy: ".") }
 
     var isEmpty: Bool { return segments.isEmpty }
     var path: String {
@@ -26,33 +31,146 @@ public struct KeyPath: Equatable {
         guard !isEmpty else { return nil }
         var tail = segments
         let head = tail.removeFirst()
-        return (head, KeyPath(segments: tail))
+        return (head, KeyPath(tail))
     }
 
+}
+
+extension KeyPath: Equatable {
+    static func == (lhs: KeyPath, rhs: KeyPath) -> Bool {
+        return lhs.segments == rhs.segments
+    }
 }
 
 /// Initializes a KeyPath with a string of the form "this.is.a.keypath"
-public extension KeyPath {
-
-    /// This init is only required for testing - file access is limited to internal to allow for testing export
-    init() {
-        segments = []
+extension KeyPath {
+    init(_ string: String, separator: Separator? = nil) {
+        if let sep = separator { self.separator = sep }
+        segments = self.separator(string)
     }
 
-    init(_ string: String) {
-        segments = string.components(separatedBy: ".")
+    init(_ segments: [String], separator: Separator? = nil) {
+        if let sep = separator { self.separator = sep }
+        self.segments = segments
     }
 }
 
-/// Initializ a KeyPath using a string literal.
+/// Initialize a KeyPath using a string literal.
 extension KeyPath: ExpressibleByStringLiteral {
-    public init(stringLiteral value: String) {
+    init(stringLiteral value: String) {
         self.init(value)
     }
-    public init(unicodeScalarLiteral value: String) {
+    init(unicodeScalarLiteral value: String) {
         self.init(value)
     }
-    public init(extendedGraphemeClusterLiteral value: String) {
+    init(extendedGraphemeClusterLiteral value: String) {
         self.init(value)
     }
+}
+
+// MARK: - Dictionary Keypath
+
+extension Dictionary where Key == String {
+    subscript(keyPath keyPath: KeyPath) -> Any? {
+        get {
+            switch keyPath.headAndTail() {
+            case nil:
+                // key path is empty.
+                return nil
+            case let (head, remainingKeyPath)? where remainingKeyPath.isEmpty:
+                // Reached the end of the key path.
+                let key = Key(stringLiteral: head)
+                return self[key]
+            case let (head, remainingKeyPath)?:
+                // Key path has a tail we need to traverse.
+                let key = Key(stringLiteral: head)
+                switch self[key] {
+                case let nestedDict as [Key: Any]:
+                    // Next nest level is a dictionary.
+                    // Start over with remaining key path.
+                    return nestedDict[keyPath: remainingKeyPath]
+                default:
+                    // Next nest level isn't a dictionary.
+                    // Invalid key path, abort.
+                    return nil
+                }
+            }
+        }
+        set {
+            switch keyPath.headAndTail() {
+            case nil:
+                // key path is empty.
+                return
+            case let (head, remainingKeyPath)? where remainingKeyPath.isEmpty:
+                // Reached the end of the key path.
+                let key = Key(stringLiteral: head)
+                self[key] = newValue as? Value
+            case let (head, remainingKeyPath)?:
+                let key = Key(stringLiteral: head)
+                let value = self[key]
+                switch value {
+                case var nestedDict as [Key: Any]:
+                    // Key path has a tail we need to traverse
+                    nestedDict[keyPath: remainingKeyPath] = newValue
+                    self[key] = nestedDict as? Value
+                default:
+                    // Invalid keyPath
+                    return
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Vatom KeyPath Lookup
+
+extension VatomModel {
+
+    /// Returns the value for the given keypath (or `nil` if the keypath cannot be parsed).
+    public func valueForKeyPath(_ keypath: String) -> JSON? {
+
+        /*
+         A custom separator is needed due to Varius's regrettable property names which contain escaped quotes
+         around period-separated names. For example:
+         "private.state.\"a.b:v.io:countdown-timer-v1\".value"
+         */
+
+        // create separator
+        let regularExpression = try! NSRegularExpression(pattern: "\\.(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)")
+        let separator: (String) -> [String] = {
+            $0.split(usingRegex: regularExpression).map { $0.replacingOccurrences(of: "\"", with: "") }
+        }
+
+        // create keypath and split into head and tail
+        let keyPath = KeyPath(keypath, separator: separator)
+        guard let component = keyPath.headAndTail() else { return nil }
+
+        var vatomValue: JSON?
+        // extract vatom value
+        if component.head == "private" {
+            vatomValue = self.private?.queryKeyPath(component.tail.segments)
+
+        } else if component.head == "vAtom::vAtomType" {
+            if component.tail.path == "cloning_score" {
+                vatomValue = try? JSON(self.props.cloningScore)
+            } else if component.tail.path == "num_direct_clones" {
+                vatomValue = try? JSON(self.props.numberDirectClones)
+            } else if component.tail.path == "parent_id" {
+                vatomValue = try? JSON(self.props.parentID)
+            } else if component.tail.path == "dropped" {
+                vatomValue = try? JSON(self.props.isDropped)
+            } else if component.tail.path == "transferable" {
+                vatomValue = try? JSON(self.props.isTransferable)
+            } else if component.tail.path == "acquirable" {
+                vatomValue = try? JSON(self.props.isAcquirable)
+            } else if component.tail.path == "redeemable" {
+                vatomValue = try? JSON(self.props.isRedeemable)
+            }
+
+        }
+
+        return vatomValue
+
+    }
+
 }

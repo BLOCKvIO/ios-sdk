@@ -34,101 +34,124 @@ public enum BVError: Error {
     case networking(error: Error)
     /// Models a Web socket error.
     case webSocket(error: WebSocketErrorReason)
-
-    //FIXME: REMOVE AT SOME POINT
+    /// Models a session error.
+    case session(reason: SessionErrorReason)
     /// Models a custom error. This should be used in very limited circumstances.
     /// A more defined error is preferred.
     case custom(reason: String)
 
     // MARK: Reasons
 
+    public enum SessionErrorReason: Equatable {
+        case oauthFailed
+        case invalidAuthorizationCode
+        case nonMatchingStates
+    }
+
+    /// Platform errors are mapped to Enum cases. This provides a level of indirection since many platform errors may
+    /// map to single logical error (at least from the Viewer's perspective).
+    ///
     /// Platform error. Associated values: `code` and `message`.
     public enum PlatformErrorReason: Equatable {
+        
+        /*
+        Conforms to error spec v1.0.0
+        https://github.com/BLOCKvIO/error-spec/tree/1.0.0
+        */
 
+        case unknown(Int, String)
         case unknownAppId(Int, String)
-        case internalServerIssue(Int, String)
-        //
-        case tokenExpired(Int, String)
-        case invalidPayload(Int, String)
+        case unhandledAction(Int, String)
+        case internalServerError(Int, String)
+        case userLocationChangeLimit(Int, String)
+        case sessionUnauthorized(Int, String)
         case tokenUnavailable(Int, String)
-        case invalidDateFormat(Int, String)
-        //
-        case malformedRequestBody(Int, String)
-        case invalidDataValidation(Int, String)
-        //
-        case vatomNotFound(Int, String)
-        //
-        case unknownUserToken(Int, String)
-        case authenticationFailed(Int, String)
+        case appIdRateLimited(Int, String)
+        case appKeyInvalid(Int, String)
+        case invalidPayload(Int, String)
+        case dateFormatInvalid(Int, String)
+        case authenticationRequired(Int, String)
         case invalidToken(Int, String)
+        case formDataInvalid(Int, String)
+        case usernameUnrecognized(Int, String)
+        case accountUnverified(Int, String)
+        case reactorTimeout(Int, String)
+        case vatomPermissionUnauthorized(Int, String)
+        case vatomPermissionMaxShares(Int, String)
+        case redemptionError(Int, String)
+        case recipientLimit(Int, String)
+        case vatomFolderEmpty(Int, String)
+        case vatomNotFound(Int, String)
+        case vatomPermissionAlreadyOwned(Int, String)
+        case vatomPermissionCloneToSelf(Int, String)
+        case vatomAlreadyDropped(Int, String)
+        case accountNotFound(Int, String)
         case avatarUploadFailed(Int, String)
-        case userRefreshTokenInvalid(Int, String)
-        case authenticationLimit(Int, String)
-        //
-        case unknownTokenType(Int, String)
-        case unknownTokenId(Int, String)
-        case tokenNotFound(Int, String)
         case cannotDeletePrimaryToken(Int, String)
-        case unableToRetrieveToken(Int, String)
         case tokenAlreadyConfirmed(Int, String)
         case invalidVerificationCode(Int, String)
+        case unknownTokenType(Int, String)
         case invalidPhoneNumber(Int, String)
         case invalidEmailAddress(Int, String)
-        //TODO: Remove. Temporary until all error responses return a code key-value pair.
-        case unknownWithMissingCode(Int, String)
-        case unknown(Int, String) //TODO: Remove. All errors should be mapped.
 
         /// Init using a BLOCKv platform error code and message.
         init(code: Int, message: String) {
             switch code {
-            case -1:  self = .unknownWithMissingCode(code, message)
-            // App Id is unacceptable.
-            case 2:   self = .unknownAppId(code, message)
-            // Server encountered an error processing the request.
-            case 11:  self = .internalServerIssue(code, message)
-            // App Id is unacceptable.
-            case 17:  self = .unknownAppId(code, message)
-            // Request paylaod is invalid.
-            case 516: self = .invalidPayload(code, message)
-            // Request paylaod is invalid.
-            case 517: self = .invalidPayload(code, message)
-            // User token (phone, email) is already taken.
-            case 521: self = .tokenUnavailable(code, message)
-            // Date format is invalid (e.g. invalid birthday in update user call).
-            case 527: self = .invalidDateFormat(code, message)
-            // Invalid request payload on an action.
-            case 1004: self = .malformedRequestBody(code, message)
-            // vAtom is unrecognized by the platform.
+            case 2:    self = .unknownAppId(code, message)
+            case 11:   self = .internalServerError(code, message)
+            case 13:   self = .unhandledAction(code, message)
+            case 17:   self = .userLocationChangeLimit(code, message)
+
+            case 401:  self = .sessionUnauthorized(code, message)
+            case 409:  self = .tokenUnavailable(code, message)
+            case 429:  self = .appIdRateLimited(code, message)
+
+            case 513:  self = .appKeyInvalid(code, message)
+            case 516:  self = .invalidPayload(code, message)
+            case 517:  self = .tokenUnavailable(code, message)
+            case 521:  self = .tokenUnavailable(code, message)
+            case 527:  self = .dateFormatInvalid(code, message)
+
+            case 1001: self = .sessionUnauthorized(code, message)
+            case 1004: self = .invalidPayload(code, message)
+            case 1006: self = .authenticationRequired(code, message)
+            case 1007: self = .invalidPhoneNumber(code, message)
+            case 1008: self = .invalidToken(code, message)
+            case 1010: self = .tokenAlreadyConfirmed(code, message)
+            case 1012: self = .formDataInvalid(code, message)
+            case 1014: self = .usernameUnrecognized(code, message)
+            case 1015: self = .accountUnverified(code, message)
+
+            case 1508: self = .reactorTimeout(code, message)
+
+            case 1604: self = .vatomPermissionUnauthorized(code, message)
+            case 1605: self = .vatomPermissionAlreadyOwned(code, message)
+            case 1627: self = .vatomPermissionMaxShares(code, message)
+            case 1630: self = .redemptionError(code, message)
+            case 1631: self = .redemptionError(code, message)
+            case 1632: self = .redemptionError(code, message)
+            case 1639: self = .vatomPermissionCloneToSelf(code, message)
+            case 1644: self = .vatomAlreadyDropped(code, message)
+            case 1654: self = .recipientLimit(code, message)
+            case 1656: self = .vatomFolderEmpty(code, message)
+
             case 1701: self = .vatomNotFound(code, message)
-            // User token (phone, email, id) is unrecognized by the platfrom.
-            case 2030: self = .unknownUserToken(code, message)
-            // Login phone/email wrong. password
-            case 2032: self = .authenticationFailed(code, message)
-            // Uploading the avatar data. failed.
+            case 1702: self = .accountNotFound(code, message)
+            case 1703: self = .accountNotFound(code, message)
+            case 1705: self = .accountNotFound(code, message)
+            case 1708: self = .vatomPermissionUnauthorized(code, message)
+
+            case 2030: self = .accountNotFound(code, message)
+            case 2032: self = .sessionUnauthorized(code, message)
             case 2037: self = .avatarUploadFailed(code, message)
-            // Refresh token is not on the whitelist, or the token has expired.
-            case 2049: self = .userRefreshTokenInvalid(code, message)
-            // Too many login requests.
-            case 2051: self = .authenticationLimit(code, message)
-            //???
-            case 2552: self = .unableToRetrieveToken(code, message)
-            // Token id does not map to a token.
-            case 2553: self = .unknownTokenId(code, message)
-            // Primary token cannot be deleted.
             case 2562: self = .cannotDeletePrimaryToken(code, message)
-            // Attempting to verfiy an already verified token.
             case 2566: self = .tokenAlreadyConfirmed(code, message)
-            // Invalid verification code used when attempting to verify an account.
             case 2567: self = .invalidVerificationCode(code, message)
-            // Unrecognized token type (only `phone` and `email` are currently accepted).
             case 2569: self = .unknownTokenType(code, message)
-            // Invalid email address.
             case 2571: self = .invalidEmailAddress(code, message)
-            // Invalid phone number.
             case 2572: self = .invalidPhoneNumber(code, message)
+
             default:
-                // useful for debugging
-                //assertionFailure("Unhandled error: \(code) \(message)")
                 self = .unknown(code, message)
             }
         }
@@ -164,28 +187,28 @@ extension BVError: Equatable {
 
     /*
      # Example Usage
-
+     
      ## Option 1
-
+     
      if case let BVError.platform(reason) = error, case .unknownAppId = reason {
-         print("App Id Error")
+     print("App Id Error")
      }
-
+     
      ## Option 2
      
      if case let BVError.platform(reason) = error {
-         if case .unknownAppId(_, _) = reason {
-             print("App Id Error")
-         }
+     if case .unknownAppId(_, _) = reason {
+     print("App Id Error")
      }
-
+     }
+     
      ## Option 3
-
+     
      switch error {
      case .platform(reason: .unknownAppId(_, _)):
-         print("App Id Error")
+     print("App Id Error")
      default:
-         return
+     return
      }
      */
 
@@ -202,6 +225,8 @@ extension BVError: LocalizedError {
             return reason.localizedDescription
         case .modelDecoding(let reason):
             return "Model decoding failed with error: \(reason)"
+        case .session(let reason):
+            return "Session error: \(reason)"
         case .custom(reason: let reason):
             return reason
         }
@@ -220,41 +245,128 @@ extension BVError.WebSocketErrorReason {
 }
 
 extension BVError.PlatformErrorReason {
+    
     var localizedDescription: String {
-        switch self {
-
-        //TODO: Is there a better way to do this with pattern matching?
-        case let .unknownWithMissingCode(_, message):
-            return "Unrecogonized: BLOCKv Platform Error: (Missing Code) - Message: \(message)"
-        case let .unknown(code, message):
+        if case let .unknown(code, message) = self {
             return "Unrecogonized: BLOCKv Platform Error: (\(code)) - Message: \(message)"
-
-        case let .malformedRequestBody(code, message),
-             let .invalidDataValidation(code, message),
-             let .vatomNotFound(code, message),
-             let .avatarUploadFailed(code, message),
-             let .unableToRetrieveToken(code, message),
-             let .tokenUnavailable(code, message),
-             let .authenticationLimit(code, message),
-             let .tokenAlreadyConfirmed(code, message),
-             let .invalidVerificationCode(code, message),
-             let .invalidPhoneNumber(code, message),
-             let .invalidEmailAddress(code, message),
-             let .invalidPayload(code, message),
-             let .invalidDateFormat(code, message),
-             let .userRefreshTokenInvalid(code, message),
-             let .tokenNotFound(code, message),
-             let .cannotDeletePrimaryToken(code, message),
-             let .unknownAppId(code, message),
-             let .internalServerIssue(code, message),
-             let .tokenExpired(code, message),
-             let .unknownUserToken(code, message),
-             let .authenticationFailed(code, message),
-             let .invalidToken(code, message),
-             let .unknownTokenType(code, message),
-             let .unknownTokenId(code, message):
-            return "BLOCKv Platform Error: (\(code)) Message: \(message)"
-
+        } else {
+            return "BLOCKv Platform Error: (\(associatedValue.code)) Message: \(associatedValue.message)"
+        }
+    }
+    
+    /// Returns the associated code and message.
+    public var associatedValue: (code: Int, message: String) {
+        switch self {
+        case let .unknown(code, message):
+            return (code, message)
+        case let .unknownAppId(code, message):
+            return (code, message)
+        case let .unhandledAction(code, message):
+            return (code, message)
+        case let .internalServerError(code, message):
+            return (code, message)
+        case let .userLocationChangeLimit(code, message):
+            return (code, message)
+        case let .sessionUnauthorized(code, message):
+            return (code, message)
+        case let .tokenUnavailable(code, message):
+            return (code, message)
+        case let .appIdRateLimited(code, message):
+            return (code, message)
+        case let .appKeyInvalid(code, message):
+            return (code, message)
+        case let .invalidPayload(code, message):
+            return (code, message)
+        case let .dateFormatInvalid(code, message):
+            return (code, message)
+        case let .authenticationRequired(code, message):
+            return (code, message)
+        case let .invalidToken(code, message):
+            return (code, message)
+        case let .formDataInvalid(code, message):
+            return (code, message)
+        case let .usernameUnrecognized(code, message):
+            return (code, message)
+        case let .accountUnverified(code, message):
+            return (code, message)
+        case let .reactorTimeout(code, message):
+            return (code, message)
+        case let .vatomPermissionUnauthorized(code, message):
+            return (code, message)
+        case let .vatomPermissionMaxShares(code, message):
+            return (code, message)
+        case let .redemptionError(code, message):
+            return (code, message)
+        case let .recipientLimit(code, message):
+            return (code, message)
+        case let .vatomFolderEmpty(code, message):
+            return (code, message)
+        case let .vatomNotFound(code, message):
+            return (code, message)
+        case let .vatomPermissionAlreadyOwned(code, message):
+            return (code, message)
+        case let .vatomPermissionCloneToSelf(code, message):
+            return (code, message)
+        case let .vatomAlreadyDropped(code, message):
+            return (code, message)
+        case let .accountNotFound(code, message):
+            return (code, message)
+        case let .avatarUploadFailed(code, message):
+            return (code, message)
+        case let .cannotDeletePrimaryToken(code, message):
+            return (code, message)
+        case let .tokenAlreadyConfirmed(code, message):
+            return (code, message)
+        case let .invalidVerificationCode(code, message):
+            return (code, message)
+        case let .unknownTokenType(code, message):
+            return (code, message)
+        case let .invalidPhoneNumber(code, message):
+            return (code, message)
+        case let .invalidEmailAddress(code, message):
+            return (code, message)
+        }
+    }
+    
+    /// Unique handle by which to identity the error.
+    var handleString: String {
+        switch self {
+            
+        case .unknown:                      return "unknown"
+        case .unknownAppId:                 return "app_id_unknown"
+        case .unhandledAction:              return "action_unhandled"
+        case .internalServerError:          return "internal_server_error"
+        case .userLocationChangeLimit:      return "user_location_change_limit"
+        case .sessionUnauthorized:          return "session_unauthorized"
+        case .tokenUnavailable:             return "token_unavailable"
+        case .appIdRateLimited:             return "app_id_rate_limited"
+        case .appKeyInvalid:                return "app_key_invalid"
+        case .invalidPayload:               return "payload_invalid"
+        case .dateFormatInvalid:            return "date_format_invalid"
+        case .authenticationRequired:       return "authentication_required"
+        case .invalidToken:                 return "token_invalid"
+        case .formDataInvalid:              return "form_data_invalid"
+        case .usernameUnrecognized:         return "username_unrecognized"
+        case .accountUnverified:            return "account_unverified"
+        case .reactorTimeout:               return "reactor_timeout"
+        case .vatomPermissionUnauthorized:  return "vatom_permission_unauthorized"
+        case .vatomPermissionMaxShares:     return "vatom_permission_max_shares"
+        case .redemptionError:              return "vatom_redemption_failed"
+        case .recipientLimit:               return "vatom_permission_recipient_limit"
+        case .vatomFolderEmpty:             return "vatom_folder_empty"
+        case .vatomNotFound:                return "vatom_not_found"
+        case .vatomPermissionAlreadyOwned:  return "vatom_permission_already_owned"
+        case .vatomPermissionCloneToSelf:   return "vatom_permission_clone_to_self"
+        case .vatomAlreadyDropped:          return "vatom_already_dropped"
+        case .accountNotFound:              return "account_not_found"
+        case .avatarUploadFailed:           return "avatar_upload_failed"
+        case .cannotDeletePrimaryToken:     return "primary_token_deletion_not_permitted"
+        case .tokenAlreadyConfirmed:        return "token_already_confirmed"
+        case .invalidVerificationCode:      return "token_verification_code_invalid"
+        case .unknownTokenType:             return "token_type_unrecognized"
+        case .invalidPhoneNumber:           return "token_phone_invalid"
+        case .invalidEmailAddress:          return "token_email_invalid"
+                
         }
     }
 

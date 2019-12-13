@@ -9,7 +9,9 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import Foundation
+import GenericJSON
 
 // MARK: - Protocols
 
@@ -27,12 +29,6 @@ public protocol VatomViewError where Self: UIView {
     var vatom: VatomModel? { get set }
 }
 
-/// Types that manage a `VatomView` should conform to this delegate to know when the face has completed loading.
-protocol VatomViewLifecycleDelegate: class {
-    /// Called when the vatom view's selected face view has loaded successful or with an error.
-    func faceViewDidCompleteLoad(error: Error?)
-}
-
 /*
  Design Goals:
  1. Vatom View will ask for the best face (default routine for each view context).
@@ -42,6 +38,8 @@ protocol VatomViewLifecycleDelegate: class {
  prepareForReuse by calling `unLoad`.
  4. Viewers must be able to use embedded FSPs.
  5. Viewers must be able supply a custom FSP (defaults to the icon).
+ 6. Viewers must be informed of the selected face view (or any errors in selected the face view).
+ 7. Viewers must be informed of the completion of loading the face view (or any error encountered).
  */
 
 /// Visualizes a vAtom by attempting to display one of the vAtom's face views.
@@ -77,6 +75,8 @@ open class VatomView: UIView {
                 self.loaderView.startAnimating()
                 self.errorView.isHidden = true
             case .error:
+                self.selectedFaceView?.removeFromSuperview()
+                self.selectedFaceView = nil
                 self.loaderView.isHidden = true
                 self.loaderView.stopAnimating()
                 self.errorView.isHidden = false
@@ -107,7 +107,7 @@ open class VatomView: UIView {
     ///
     /// The roster is a consolidated list of the face views registered by both the SDK and Viewer.
     /// This list represents the face views that are *capable* of being rendered.
-    public private(set) var roster: Roster
+    public internal(set) var roster: Roster
 
     /// Face model selected by the specifed face selection procedure (FSP).
     public private(set) var selectedFaceModel: FaceModel?
@@ -174,7 +174,9 @@ open class VatomView: UIView {
         self.roster = FaceViewRoster.shared.roster
         self.loaderView = VatomView.defaultLoaderView.init()
         self.errorView = VatomView.defaultErrorView.init()
-        super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        super.init(frame: .zero)
+
+        commonSetup()
     }
 
     /// Intializes using a vatom and optional procedure.
@@ -186,14 +188,16 @@ open class VatomView: UIView {
     ///   - procedure: The Face Selection Procedure (FSP) that determines which face view to display.
     ///     Defaults to `.icon`.
     public init(vatom: VatomModel,
-                procedure: @escaping FaceSelectionProcedure = EmbeddedProcedure.icon.procedure) {
+                procedure: @escaping FaceSelectionProcedure = EmbeddedProcedure.icon.procedure,
+                delegate: VatomViewDelegate? = nil) {
 
         self.procedure = procedure
         self.roster = FaceViewRoster.shared.roster
         self.loaderView = VatomView.defaultLoaderView.init()
         self.errorView = VatomView.defaultErrorView.init()
         self.vatom = vatom
-        super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        self.vatomViewDelegate = delegate
+        super.init(frame: .zero)
 
         commonSetup()
 
@@ -221,14 +225,16 @@ open class VatomView: UIView {
                 procedure: @escaping FaceSelectionProcedure = EmbeddedProcedure.icon.procedure,
                 loadingView: VVLoaderView = VatomView.defaultLoaderView.init(),
                 errorView: VVErrorView = VatomView.defaultErrorView.init(),
-                roster: Roster = FaceViewRoster.shared.roster) {
+                roster: Roster = FaceViewRoster.shared.roster,
+                delegate: VatomViewDelegate? = nil) {
 
         self.procedure = procedure
         self.loaderView = loadingView
         self.errorView = errorView
         self.roster = roster
         self.vatom = vatom
-        super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        self.vatomViewDelegate = delegate
+        super.init(frame: .zero)
 
         commonSetup()
 
@@ -270,6 +276,7 @@ open class VatomView: UIView {
         errorView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
 
         self.state = .loading
+
     }
 
     // MARK: - State Management
@@ -315,74 +322,72 @@ open class VatomView: UIView {
         self.selectedFaceView?.unload()
     }
 
-    /// Vatom View Life Cycle error
-    public enum VVLCError: Error, CustomStringConvertible {
-
-        case selectionFailed
-        case unregisteredFaceViewSelected(_ displayURL: String)
-
-        public var description: String {
-            switch self {
-            case .selectionFailed:
-                return "Face Selection Procedure (FSP) did not to select a face view."
-            case .unregisteredFaceViewSelected(let url):
-                return """
-                Face selection procedure (FSP) selected a face view '\(url)' without the face view being registered.
-                """
-            }
-        }
-
-    }
-
     // MARK: - Vatom View Life Cycle
 
     /// Exectues the Vatom View Lifecycle (VVLC) on the current vAtom.
     ///
+    /// Two important cases must be handled:
+    /// A) New instance: selected-face-model, selected-face-view are nil.
+    /// B) Re-use: selected-face-view not nil.
+    ///
     /// 1. Run face selection procedure
-    /// > Compare the selected face to the current face
-    /// 2. Create face view
-    /// 3. Inform the face view to load it's content
-    /// 4. Display the face view
+    /// > Compare the selected face view to the current face view
+    ///
+    /// New instance (or re-use criteria don't match):
+    /// A.1. Create face view
+    /// A.2. Inform the face view to load it's content
+    /// A.3. Display the face view
+    /// Re-use:
+    /// B.1 Update current face view
     ///
     /// - Parameter oldVatom: The previous vAtom being visualized by this VatomView.
     internal func runVVLC(oldVatom: VatomModel? = nil) {
 
+        /*
+         Note:
+         VVLC traps with assertion failure in two cases:
+         1. Backing vatom is nil.
+         2. The supplied FSP selected a Face Model and no eligilbe Face View was installed.
+         Both of these cases indicated developer error.
+         */
+
+        // ensure a vatom has been set
         guard let vatom = vatom else {
-            assertionFailure("Developer error: vatom must not be nil.")
+            self.state = .error
+            let reason = "Developer error: vatom must not be nil."
+            self.vatomViewDelegate?.vatomView(self, didSelectFaceView:
+                .failure(VVLCError.faceViewSelectionFailed(reason: reason)))
+            assertionFailure(reason)
             return
         }
-
-        //TODO: Offload FSP to a background queue.
 
         // 1. select the best face model
-        guard let selectedFaceModel = procedure(vatom, Set(roster.keys)) else {
+        guard let newFaceModel = procedure(vatom, Set(roster.keys)) else {
 
-            /*
-             Error - Case 1 - Show the error view if the FSP fails to select a face view.
-             */
-
-            //printBV(error: "Face Selection Procedure (FSP) returned without selecting a face model.")
+            // error - case 1 - show the error view if the FSP fails to select a face view
             self.state = .error
+            let reason = "Face Selection Procedure (FSP) returned without selecting a face model."
+            self.vatomViewDelegate?.vatomView(self, didSelectFaceView:
+                .failure(VVLCError.faceViewSelectionFailed(reason: reason)))
             return
         }
 
-        //printBV(info: "Face Selection Procedure (FSP) selected face model: \(selectedFaceModel)")
-
         /*
-         Here we check:
+         Here we check the re-use criteria.
          
-         A. If selected face model is still equal to the current. This is necessary since the face may
+         A. A face view has previously been selected (i.e. we are in a re-use flow).
+         
+         B. The newly selected face model is still equal to the previous. This is necessary since the face may
          change as a result of the publisher modifying the face (typically via a delete/add operation).
          
-         B. If the new vatom and the previous vatom share a template variation. This is needed since resources are
+         C. The new vatom and the previous vatom share a common template variation. This is needed since resources are
          defined at the template variation level.
          */
 
-        // 2. check if the face model has not changed
-        if (vatom.props.templateVariationID == oldVatom?.props.templateVariationID) &&
-            (selectedFaceModel == self.selectedFaceModel) {
-
-            //printBV(info: "Face model unchanged - Updating face view.")
+        if (self.selectedFaceView != nil) &&
+            (newFaceModel == self.selectedFaceModel) &&
+            (vatom.props.templateVariationID == oldVatom?.props.templateVariationID) {
+            // os_log("Face model unchanged - Updating face view", log: .vatomView, type: .debug)
 
             /*
              Although the selected face model has not changed, other items in the vatom may have, these updates
@@ -390,52 +395,77 @@ open class VatomView: UIView {
              (since the selected face view does not need replacing).
              */
 
-            self.state = .completed
             // update currently selected face view (without replacement)
             self.selectedFaceView?.vatomChanged(vatom)
+            // complete
+            self.state = .completed
+            // inform delegate the face view is unchanged
+            self.vatomViewDelegate?.vatomView(self, didSelectFaceView: .success(self.selectedFaceView!))
 
         } else {
+            // os_log("Face model changed - Creating new face view.", log: .vatomView, type: .debug)
 
-            //printBV(info: "Face model changed - Replacing face view.")
+            do {
+                let faceView = try createFaceView(forModel: newFaceModel, onVatom: vatom)
+                faceView.delegate = self
 
-            // replace currently selected face model
-            self.selectedFaceModel = selectedFaceModel
+                // replace the selected face model
+                self.selectedFaceModel = newFaceModel
+                // replace currently selected face view with newly selected
+                self.replaceFaceView(with: faceView)
+                // inform delegate
+                self.vatomViewDelegate?.vatomView(self, didSelectFaceView: .success(faceView))
 
-            // 3. find face view type
-            var faceViewType: FaceView.Type?
-
-            if selectedFaceModel.isWeb {
-                faceViewType = roster["https://*"]
-            } else {
-                faceViewType = roster[selectedFaceModel.properties.displayURL]
+            } catch {
+                self.state = .error
+                let reason = "Unable to create face view."
+                self.vatomViewDelegate?.vatomView(self, didSelectFaceView:
+                    .failure(.faceViewSelectionFailed(reason: reason)))
             }
-
-            guard let viewType = faceViewType else {
-                // viewer developer MUST have registered the face view with the face registry
-                assertionFailure(
-                    """
-                    Developer error: Face selection procedure (FSP) selected a face without the face view being
-                    installed. Your FSP MUST check if the face view has been registered with the FaceRegistry.
-                    """)
-                return
-            }
-
-            //printBV(info: "Face view for face model: \(faceViewType)")
-
-            //let selectedFaceView: FaceView = ImageFaceView(vatom: vatom, faceModel: selectedFace, host: self)
-            let selectedFaceView: FaceView = viewType.init(vatom: vatom,
-                                                           faceModel: selectedFaceModel)
-            selectedFaceView.delegate = self
-
-            // replace currently selected face view with newly selected
-            self.replaceFaceView(with: selectedFaceView)
 
         }
 
     }
 
+    /// Finds the face view for the specidfied face model.
+    private func createFaceView(forModel faceModel: FaceModel, onVatom vatom: VatomModel) throws -> FaceView {
+
+        //TODO: Check the face model is present on the vatom.
+
+        var faceViewType: FaceView.Type?
+
+        if faceModel.isWeb {
+            // find web face type
+            faceViewType = roster["https://*"]
+        } else {
+            // find native face type
+            faceViewType = roster[faceModel.properties.displayURL]
+        }
+
+        guard let viewType = faceViewType else {
+
+            // viewer developer MUST have registered the face view with the face registry
+            let reason = """
+                    Developer error: Face Selection Procedure (FSP) selected a face model without an eligible face view
+                    being registered. Your FSP MUST check if the face view has been registered with the FaceRegistry.
+                    """
+
+            throw VVLCError.faceViewSelectionFailed(reason: reason)
+
+        }
+
+        let newSelectedFaceView: FaceView = try viewType.init(vatom: vatom, faceModel: faceModel)
+        return newSelectedFaceView
+
+    }
+
     /// Replaces the current face view (if any) with the specified face view and starts the FVLC.
     private func replaceFaceView(with newFaceView: (FaceView)) {
+
+        DispatchQueue.mainThreadPrecondition()
+
+        // vatom id currectly associated with the vatom view (important for reuse pool)
+        guard let contextID = self.vatom?.id else { return }
 
         // update current state
         self.state = .loading
@@ -444,8 +474,9 @@ open class VatomView: UIView {
         self.selectedFaceView?.unload()
         self.selectedFaceView?.removeFromSuperview()
         self.selectedFaceView = nil
-        self.selectedFaceView = newFaceView
 
+        // replace with new
+        self.selectedFaceView = newFaceView
         // insert face view into the view hierarcy
         newFaceView.frame = self.bounds
         newFaceView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -454,23 +485,64 @@ open class VatomView: UIView {
         // 1. instruct face view to load its content (must be able to handle being called multiple times).
         newFaceView.load { [weak self] (error) in
 
-            ///printBV(info: "Face view load completion called.")
+            guard let self = self else { return }
 
-            // Error - Case 2 -  Display error view if the face view encounters an error during its load operation.
+            DispatchQueue.main.async {
 
-            // ensure no error
-            guard error == nil else {
-                // face view encountered an error
-                self?.selectedFaceView?.removeFromSuperview()
-                self?.state = .error
-                return
+                /*
+                 Important:
+                 - Since vatom view may be in a reuse pool, and load is async, we must check the underlying vatom has
+                 not changed.
+                 - As the vatom-view comes out of the reuse pool, `update(usingVatom:procedure:)` is called. Since
+                 `load` is async, by the time load's closure executes the underlying vatom may have changed.
+                 */
+                guard self.vatom!.id == contextID else {
+                    // vatom-view is no longer displaying the original vatom
+                    // os_log("Load completed, but original vatom has changed.", log: .vatomView, type: .debug)
+                    return
+                }
+
+                // Error - Case 2 -  Display error view if the face view encounters an error during its load operation.
+
+                // ensure no error
+                guard error == nil else {
+
+                    // face view encountered an error
+                    self.selectedFaceView?.unload()
+                    self.selectedFaceView?.removeFromSuperview()
+                    self.selectedFaceView = nil
+                    self.state = .error
+                    self.vatomViewDelegate?.vatomView(self, didLoadFaceView: .failure(VVLCError.faceViewLoadFailed) )
+                    return
+                }
+
+                // show face
+                self.state = .completed
+                // inform delegate
+                self.vatomViewDelegate?.vatomView(self, didLoadFaceView: .success(self.selectedFaceView!))
+
             }
-
-            // show face
-            self?.state = .completed
-
         }
 
+    }
+
+}
+
+/// Extend VatomView to conform to `FaceViewDelegate`.
+///
+/// This is the conduit of communication between the VatomView and it's Face View.
+extension VatomView: FaceViewDelegate {
+
+    public func faceView(_ faceView: FaceView,
+                         didSendMessage message: String,
+                         withObject object: [String: JSON],
+                         completion: ((Result<JSON, FaceMessageError>) -> Void)?) {
+
+        // forward the message to the vatom view delegate
+        self.vatomViewDelegate?.vatomView(self,
+                                          didRecevieFaceMessage: message,
+                                          withObject: object,
+                                          completion: completion)
     }
 
 }

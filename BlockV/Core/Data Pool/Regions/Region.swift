@@ -406,6 +406,41 @@ public class Region {
         }
 
     }
+    
+    /// Returns any objects within this region with the given ids.
+    public func get(ids: [String]) -> [Any?] {
+        
+        var mappedArray: [Any?] = []
+        
+        for id in ids {
+            // get object
+            guard let object = objects[id] else {
+                mappedArray.append(nil)
+                continue
+            }
+            
+            // check for cached concrete type
+            if let cached = object.cached {
+                mappedArray.append(cached)
+            } else {
+                // map to the plugin's intended type
+                if let mapped = self.map(object) {
+                    // cache it
+                    object.cached = mapped
+                    // store it
+                    mappedArray.append(mapped)
+                } else {
+                    mappedArray.append(nil)
+                    continue
+                }
+                
+            }
+            
+        }
+        
+        return mappedArray
+        
+    }
 
     /// Returns an object within this region by it's ID.
     public func get(id: String) -> Any? {

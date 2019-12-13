@@ -32,5 +32,14 @@ public struct VatomUpdateModel: Decodable, Equatable {
         errorMessage = try values.decodeIfPresent([String: String].self, forKey: .errorMessage) ?? [:]
         ids = try values.decode([String].self, forKey: .ids)
     }
+    
+    var dictionary: [String: Any] {
+        return [
+            "num_updated": numberUpdated,
+            "num_errors": numberErrors,
+            "error_messages": errorMessage,
+            "ids": ids
+        ]
+    }
 
 }

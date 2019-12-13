@@ -24,10 +24,10 @@
 import UIKit
 
 class RoundedImageView: UIImageView {
-    
+
     override func layoutSubviews() {
         self.layer.cornerRadius = self.frame.size.height / 2
         self.clipsToBounds = true
     }
-    
+
 }

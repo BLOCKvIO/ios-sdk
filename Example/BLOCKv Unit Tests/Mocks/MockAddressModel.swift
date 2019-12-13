@@ -12,9 +12,9 @@
 import Foundation
 
 public struct MockAddressModel {
-    
+
     public static let ethAddress = """
             {"id": "aaaa","user_id": "bbbb","address": "0x4bbbb","type": "system","created_at": "2018-04-09T12:31:36Z"}
             """.data(using: .utf8)!
-    
+
 }

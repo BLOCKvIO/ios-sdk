@@ -11,22 +11,12 @@
 
 import Foundation
 
-/// Eth address response model.
-public struct AddressAccountModel: Codable, Equatable {
-    
-    public let id: String
-    public let userId: String
-    public let address: String
-    public let type: String
-    public let createdAt: Date
-    
-    enum CodingKeys: String, CodingKey {
-        case id
-        case userId    = "user_id"
-        case address
-        case type
-        case createdAt = "created_at"
-    }
-    
-}
+extension Array {
 
+    /// Returns and array of array where the inner arrays have a maximum element count of `size`.
+    func chunked(into size: Int) -> [[Element]] {
+        return stride(from: 0, to: count, by: size).map {
+            Array(self[$0 ..< Swift.min($0 + size, count)])
+        }
+    }
+}

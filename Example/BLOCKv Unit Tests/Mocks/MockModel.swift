@@ -14,6 +14,244 @@ import Foundation
 public enum MockModel {
 
     public enum FaceModel {
+        
+        public static let nativeSpriteSheet = """
+        {
+                "id": "C4A795E4-26B7-43FF-B761-14AC5156BB52",
+                "template": "vatomic.prototyping::test_vatom",
+                "meta": {
+                    "created_by": "BLOCKv Backend",
+                    "when_created": "2019-09-11T19:26:38Z",
+                    "modified_by": "BLOCKv Backend",
+                    "when_modified": "2019-09-12T10:31:29Z",
+                    "data_type": "v1::FaceType"
+                },
+                "properties": {
+                    "display_url": "native://sprite-sheet",
+                    "package_url": ".",
+                    "constraints": {
+                        "bluetooth_le": false,
+                        "contact_list": false,
+                        "gps": false,
+                        "three_d": false,
+                        "view_mode": "icon",
+                        "platform": "generic",
+                        "quality": "high"
+                    },
+                    "resources": [],
+                    "config": {
+                        "animation_rules": [
+                            {
+                                "on": "start",
+                                "play": "cheer"
+                            },
+                            {
+                                "on": "state",
+                                "play": "run",
+                                "target": "private.state.value",
+                                "value": 1
+                            },
+                            {
+                                "on": "state",
+                                "play": "punch",
+                                "target": "private.state.value",
+                                "value": 2
+                            },
+                            {
+                                "on": "state",
+                                "play": "look_around",
+                                "target": "private.state.value",
+                                "value": 3
+                            },
+                            {
+                                "on": "state",
+                                "play": "fall",
+                                "target": "private.state.value",
+                                "value": 4
+                            },
+                            {
+                                "on": "state",
+                                "play": "get_up",
+                                "target": "private.state.value",
+                                "value": 5
+                            },
+                            {
+                                "on": "state",
+                                "play": "kick",
+                                "target": "private.state.value",
+                                "value": 6
+                            },
+                            {
+                                "on": "state",
+                                "play": "shrug",
+                                "target": "private.state.value",
+                                "value": 7
+                            },
+                            {
+                                "on": "state",
+                                "play": "jump",
+                                "target": "private.state.value",
+                                "value": 8
+                            },
+                            {
+                                "on": "state",
+                                "play": "cheer",
+                                "target": "private.state.value",
+                                "value": 9
+                            },
+                            {
+                                "on": "state",
+                                "play": "run_backwards",
+                                "target": "private.state.value",
+                                "value": 10
+                            },
+                            {
+                                "on": "state",
+                                "play": "run_loop",
+                                "target": "private.state.value",
+                                "value": 11
+                            },
+                            {
+                                "on": "state",
+                                "play": "fall_backwards_loop",
+                                "target": "private.state.value",
+                                "value": 12
+                            },
+                            {
+                                "on": "state",
+                                "play": "freeze_start",
+                                "target": "private.state.value",
+                                "value": 13
+                            },
+                            {
+                                "on": "state",
+                                "play": "freeze_run",
+                                "target": "private.state.value",
+                                "value": 14
+                            },
+                            {
+                                "on": "state",
+                                "play": "freeze_end",
+                                "target": "private.state.value",
+                                "value": 15
+                            },
+                            {
+                                "on": "state",
+                                "play": "out_of_bounds",
+                                "target": "private.state.value",
+                                "value": 16
+                            },
+                            {
+                                "on": "click",
+                                "play": "run",
+                                "target": ""
+                            },
+                            {
+                                "on": "click",
+                                "play": "jump",
+                                "target": "run"
+                            },
+                            {
+                                "on": "animation-complete",
+                                "play": "cheer",
+                                "target": "kick"
+                            }
+                        ],
+                        "sprite_animations": {
+                            "animations": [
+                                {
+                                    "frame_end": 12,
+                                    "frame_start": 0,
+                                    "name": "run"
+                                },
+                                {
+                                    "frame_end": 20,
+                                    "frame_start": 12,
+                                    "name": "punch"
+                                },
+                                {
+                                    "frame_end": 27,
+                                    "frame_start": 20,
+                                    "name": "look_around"
+                                },
+                                {
+                                    "frame_end": 34,
+                                    "frame_start": 27,
+                                    "name": "fall"
+                                },
+                                {
+                                    "frame_end": 41,
+                                    "frame_start": 34,
+                                    "name": "get_up"
+                                },
+                                {
+                                    "frame_end": 48,
+                                    "frame_start": 41,
+                                    "name": "kick"
+                                },
+                                {
+                                    "frame_end": 56,
+                                    "frame_start": 48,
+                                    "name": "shrug"
+                                },
+                                {
+                                    "frame_end": 68,
+                                    "frame_start": 56,
+                                    "name": "jump"
+                                },
+                                {
+                                    "frame_end": 75,
+                                    "frame_start": 68,
+                                    "name": "cheer"
+                                },
+                                {
+                                    "backwards": true,
+                                    "frame_end": 12,
+                                    "frame_start": 0,
+                                    "name": "run_backwards"
+                                },
+                                {
+                                    "frame_end": 12,
+                                    "frame_start": 0,
+                                    "loop": true,
+                                    "name": "run_loop"
+                                },
+                                {
+                                    "backwards": true,
+                                    "frame_end": 34,
+                                    "frame_start": 27,
+                                    "loop": true,
+                                    "name": "fall_backwards_loop"
+                                },
+                                {
+                                    "frame_start": 0,
+                                    "name": "freeze_start"
+                                },
+                                {
+                                    "frame_start": 12,
+                                    "name": "freeze_run",
+                                    "slide_in": true
+                                },
+                                {
+                                    "frame_start": 75,
+                                    "name": "freeze_end",
+                                    "slide_in": true
+                                },
+                                {
+                                    "frame_end": 100,
+                                    "frame_start": -1,
+                                    "name": "out_of_bounds"
+                                }
+                            ],
+                            "frame_count": 76,
+                            "frame_height": 360,
+                            "frame_rate": 8,
+                            "frame_width": 331
+                        }
+                    }
+                }
+            }
+        """.data(using: .utf8)!
 
         public static let nativeGenericIcon = """
             {"id":"48476b21-a4cf-45b6-a2f3-9a9c7b491237","template":"vatomic.prototyping::Drone2","meta":{"created_by":"BLOCKv Backend","when_created":"2018-07-25T12:58:24Z","modified_by":"","when_modified":"2018-07-25T12:58:24Z","data_type":"v1::FaceType","in_sync":false,"when_synced":"","is_syncing":false},"properties":{"display_url":"native://generic-3d","package_url":".","constraints":{"bluetooth_le":false,"contact_list":false,"gps":false,"three_d":false,"view_mode":"icon","platform":"generic","quality":"high"},"resources":[]}}
@@ -28,11 +266,11 @@ public enum MockModel {
     public enum VatomModel {
 
         public static let basicVatom = """
-            {"id":"7a85bf21-1cad-4909-b9a6-706e570e2341","when_created":"2018-07-26T11:56:40Z","when_modified":"2018-07-26T12:07:29Z","vAtom::vAtomType":{"parent_id":".","publisher_fqdn":"vatomic.prototyping","root_type":"vAtom::vAtomType","owner":"bb161234-bfef-401e-ad89-3edf8388e01c","author":"2e101324-ffcd-4e91-aa81-ccfc74ae9d79","template":"vatomic.prototyping::v1::vAtom::UnitTest","template_variation":"vatomic.prototyping::UnitTest::V1","notify_msg":"","title":"Unit Test vAtom","description":"A vAtom for unit testing.","disabled":false,"category":"Test","tags":[],"transferable":true,"acquirable":false,"tradeable":false,"transferred_by":"2e1123f8-ffcd-4e91-aa81-ccfc74ae9d79","cloned_from":"","cloning_score":0,"in_contract":false,"redeemable":false,"in_contract_with":"","commerce":{"pricing":{"pricingType":"Fixed","value":{"currency":"","price":"0","valid_from":"*","valid_through":"*","vat_included":false}}},"states":[{"name":"Activated","value":{"type":"boolean","value":"true"},"on_state_change":{"reactor":""}}],"resources":[{"name":"ActivatedImage","resourceType":"ResourceTypes::Image::JPEG","value":{"resourceValueType":"ResourceValueType::URI","value":"https://cdndevsec.blockv.net/N2E4NWJmMjEtMWNhZC00OTA5LWI5YTYtNzA2ZTU3MGnByb3RvdHlwaW5nOjp2MTU9iamVjdC9ybmVha2VyX2NhcmQuanBn"}},{"name":"Scene","resourceType":"ResourceTypes::3D::Scene","value":{"resourceValueType":"ResourceValueType::URI","value":"https://cdndevsec.blockv.net/N2E4NWJmMjEtMWNhZC00OTA5LWI5YTYtNzA2ZTU3MGU4YWQxOjovdwaW5nOjp2MTo6dkF0b206OjNELmVha2VyLnYzZA=="}}],"visibility":{"type":"public","value":"*"},"num_direct_clones":0,"geo_pos":{"$reql_type$":"GEOMETRY","coordinates":[0,0],"type":"Point"},"dropped":false},"private":{"allows_user_rotation":true,"allows_user_zoom":true,"auto_rotate_x":0,"auto_rotate_y":0,"auto_rotate_z":0,"play_animation":true,"resources":[],"scene_resource_name":""},"unpublished":false,"version":"v1::vAtomType"}
+            {"id":"DD46C2D0-8596-4EEC-8F48-8987542E26A9","when_created":"2018-12-10T12:55:08Z","when_modified":"2019-05-21T07:21:06Z","when_added":"2019-05-21T07:21:06Z","vAtom::vAtomType":{"parent_id":".","publisher_fqdn":"fun.proto","root_type":"vAtom::vAtomType::DefinedFolderContainerType","owner":"D4D80A22-27F2-4F58-9A40-DC083F3B5437","author":"02A49EDC-9870-4634-8EAF-ADCD784C4156","template":"fun.proto::AnimatedCrate::v1","template_variation":"fun.proto::AnimatedCrate::v1::AvatarCrate::v1","notify_msg":"","title":"Avatar Crate","description":"Male Avatar","disabled":false,"category":"Gifts","tags":[],"transferable":true,"acquirable":true,"tradeable":false,"transferred_by":"8D987258-2853-4936-AF83-B29502874E14","cloned_from":"","cloning_score":0,"in_contract":false,"redeemable":false,"in_contract_with":"","commerce":{"pricing":{"pricingType":"Fixed","value":{"currency":"","price":"","valid_from":"*","valid_through":"*","vat_included":false}}},"states":[{"name":"Activated","value":{"type":"boolean","value":"true"},"on_state_change":{"reactor":""}}],"resources":[{"name":"ActivatedImage","resourceType":"ResourceTypes::Image::PNG","value":{"resourceValueType":"ResourceValueType::URI","value":"http://somedomain/resources/a.png"}},{"name":"CoverImage","resourceType":"ResourceTypes::Image::PNG","value":{"resourceValueType":"ResourceValueType::URI","value":"http://somedomain/resources/b.mp4"}},{"name":"Video","resourceType":"ResourceTypes::Video::MP4","value":{"resourceValueType":"ResourceValueType::URI","value":"http://somedomain/resources/c.glb"}}],"visibility":{"type":"owner","value":"*"},"num_direct_clones":0,"geo_pos":{"type":"Point","coordinates":[0,0]},"dropped":false,"age":0,"child_policy":[{"template_variation":"fun.proto::CombineCard::v1::Avatar::v1","creation_policy":{"auto_create":"create_new","auto_create_count":1,"auto_create_count_random":false,"weighted_choices":null,"policy_count_min":0,"policy_count_max":1,"enforce_policy_count_min":false,"enforce_policy_count_max":true},"count":0},{"template_variation":"fun.proto::Image::v1::AvatarHairIcon::v1","creation_policy":{"auto_create":"create_new","auto_create_count":1,"auto_create_count_random":false,"weighted_choices":null,"policy_count_min":0,"policy_count_max":1,"enforce_policy_count_min":false,"enforce_policy_count_max":true},"count":0},{"template_variation":"fun.proto::Image::v1::AvatarMaskIcon::v1","creation_policy":{"auto_create":"create_new","auto_create_count":1,"auto_create_count_random":false,"weighted_choices":null,"policy_count_min":0,"policy_count_max":1,"enforce_policy_count_min":false,"enforce_policy_count_max":true},"count":0},{"template_variation":"fun.proto::Image::v1::AvatarSuitIcon::v1","creation_policy":{"auto_create":"create_new","auto_create_count":1,"auto_create_count_random":false,"weighted_choices":null,"policy_count_min":0,"policy_count_max":1,"enforce_policy_count_min":false,"enforce_policy_count_max":true},"count":0}],"child_return_policy":null},"private":{"array":[1,2,3],"boolean":true,"color":"#82b92c","null":null,"number":123,"object":{"a":"b","c":"d","e":"f"},"string":"Hello World"},"unpublished":false,"version":"v1::vAtomType","sync":5}
             """.data(using: .utf8)!
 
         public static let stateUpdateVatom = """
-            {"id":"49d9229d-a380-40ac-9c22-asdf9664bd63","when_created":"2018-10-05T07:36:30Z","when_modified":"2018-10-15T21:11:25Z","vAtom::vAtomType":{"parent_id":".","publisher_fqdn":"vatomic.prototyping","root_type":"vAtom::vAtomType","owner":"21c527fb-8a8b-485b-b549-61b3857easdf","author":"715e0e66-3b18-4719-a927-3e06221easdf","template":"vatomic.prototyping::HeinekenProgress::v1","template_variation":"vatomic.prototyping::HeinekenProgress::v1::HeinekenProgressVatom::v2","notify_msg":"","title":"Heineken Progress Vatom","description":"A beer that must be shared 4 times before being redeemable","disabled":true,"category":"Food & Drink","tags":[],"transferable":true,"acquirable":true,"tradeable":true,"transferred_by":"68103f27-b8e8-490d-8678-c045812easdf","cloned_from":"2c2b5435-210b-41d1-abab-1e9510b5asdf","cloning_score":0.5,"in_contract":false,"redeemable":true,"in_contract_with":"","commerce":{"pricing":{"pricingType":"Fixed","value":{"currency":"","price":"","valid_from":"*","valid_through":"*","vat_included":false}}},"states":[{"name":"Activated","value":{"type":"boolean","value":"true"},"on_state_change":{"reactor":""}}],"resources":[{"name":"ActivatedImage","resourceType":"ResourceTypes::Image::PNG","value":{"resourceValueType":"ResourceValueType::URI","value":"https://cdn.blockv.io/templates/vatomic.prototyping/HeinekenProgress/v1/HeinekenProgressVatom/v2/ActivatedImage.png"}},{"name":"BaseImage","resourceType":"ResourceTypes::Image::PNG","value":{"resourceValueType":"ResourceValueType::URI","value":"https://cdn.blockv.io/templates/vatomic.prototyping/HeinekenProgress/v1/HeinekenProgressVatom/v2/BaseImage.png"}},{"name":"ZeroShareCard","resourceType":"ResourceTypes::Image::PNG","value":{"resourceValueType":"ResourceValueType::URI","value":"https://cdn.blockv.io/templates/vatomic.prototyping/HeinekenProgress/v1/HeinekenProgressVatom/v2/ZeroShareCard.png"}},{"name":"OneShareCard","resourceType":"ResourceTypes::Image::PNG","value":{"resourceValueType":"ResourceValueType::URI","value":"https://cdn.blockv.io/templates/vatomic.prototyping/HeinekenProgress/v1/HeinekenProgressVatom/v2/OneShareCard.png"}}],"visibility":{"type":"owner","value":"*"},"num_direct_clones":2,"geo_pos":{"$reql_type$":"GEOMETRY","coordinates":[0,0],"type":"Point"},"location":{"uri":""},"dropped":true},"private":{"array":[1,2,3],"boolean":true,"color":"#82b92c","null":null,"number":123,"object":{"a":"b","c":"d","e":{"foo":"bar"}},"string":"Hello World"},"eos":{"symbol":"","network":"testnet","fields":{"lighton":{"type":"bool","value":false}}},"unpublished":false,"version":"v1::vAtomType","sync":0}
+            {"id":"49d9229d-a380-40ac-9c22-asdf9664bd63","when_created":"2018-10-05T07:36:30Z","when_added":"2018-10-15T21:11:25Z","when_modified":"2018-10-15T21:11:25Z","vAtom::vAtomType":{"parent_id":".","publisher_fqdn":"vatomic.prototyping","root_type":"vAtom::vAtomType","owner":"21c527fb-8a8b-485b-b549-61b3857easdf","author":"715e0e66-3b18-4719-a927-3e06221easdf","template":"vatomic.prototyping::HeinekenProgress::v1","template_variation":"vatomic.prototyping::HeinekenProgress::v1::HeinekenProgressVatom::v2","notify_msg":"","title":"Heineken Progress Vatom","description":"A beer that must be shared 4 times before being redeemable","disabled":true,"category":"Food & Drink","tags":[],"transferable":true,"acquirable":true,"tradeable":true,"transferred_by":"68103f27-b8e8-490d-8678-c045812easdf","cloned_from":"2c2b5435-210b-41d1-abab-1e9510b5asdf","cloning_score":0.5,"in_contract":false,"redeemable":true,"in_contract_with":"","commerce":{"pricing":{"pricingType":"Fixed","value":{"currency":"","price":"","valid_from":"*","valid_through":"*","vat_included":false}}},"states":[{"name":"Activated","value":{"type":"boolean","value":"true"},"on_state_change":{"reactor":""}}],"resources":[{"name":"ActivatedImage","resourceType":"ResourceTypes::Image::PNG","value":{"resourceValueType":"ResourceValueType::URI","value":"https://cdn.blockv.io/templates/vatomic.prototyping/HeinekenProgress/v1/HeinekenProgressVatom/v2/ActivatedImage.png"}},{"name":"BaseImage","resourceType":"ResourceTypes::Image::PNG","value":{"resourceValueType":"ResourceValueType::URI","value":"https://cdn.blockv.io/templates/vatomic.prototyping/HeinekenProgress/v1/HeinekenProgressVatom/v2/BaseImage.png"}},{"name":"ZeroShareCard","resourceType":"ResourceTypes::Image::PNG","value":{"resourceValueType":"ResourceValueType::URI","value":"https://cdn.blockv.io/templates/vatomic.prototyping/HeinekenProgress/v1/HeinekenProgressVatom/v2/ZeroShareCard.png"}},{"name":"OneShareCard","resourceType":"ResourceTypes::Image::PNG","value":{"resourceValueType":"ResourceValueType::URI","value":"https://cdn.blockv.io/templates/vatomic.prototyping/HeinekenProgress/v1/HeinekenProgressVatom/v2/OneShareCard.png"}}],"visibility":{"type":"owner","value":"*"},"num_direct_clones":2,"geo_pos":{"$reql_type$":"GEOMETRY","coordinates":[0,0],"type":"Point"},"location":{"uri":""},"dropped":true},"private":{"array":[1,2,3],"boolean":true,"color":"#82b92c","null":null,"number":123,"object":{"a":"b","c":"d","e":{"foo":"bar"}},"string":"Hello World"},"eos":{"symbol":"","network":"testnet","fields":{"lighton":{"type":"bool","value":false}}},"unpublished":false,"version":"v1::vAtomType","sync":0}
             """.data(using: .utf8)!
 
     }

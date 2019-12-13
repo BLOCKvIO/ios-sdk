@@ -9,25 +9,23 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import Foundation
 import PromiseKit
 
-/*
- # Notes:
- 
- ## Filter & Sort
- 
- Both of these should become classes (which do not inherit from Region). They provide a 'view into' a region.
- 
- Caller:
- 
- DataPool.region(id: "inventory", descriptor: [:]).filter { $0.dateModified > a }
- DataPool.region(id: "inventory", descriptor: [:]).sort { $0.title }
- 
- Adding sort directly to Region is hard beacuse multiple callers may use use the same regions - all with different
- sorting predicates. So sorting must be cofigurable (isolated) per caller.
- 
- */
+extension Region: CustomStringConvertible {
+
+    public var description: String {
+        let descrip = """
+        \tobject count:   \(self.objects.count)
+        \tis syncronized: \(self.synchronized)
+        \tis closed:      \(self.closed)
+        \tcache file:     \(self.cacheFile)
+        """
+        return descrip
+    }
+
+}
 
 /// An abstract class that manages a complete collection of objects (a.k.a Regions).
 ///
@@ -46,7 +44,7 @@ public class Region {
         case failedParsingResponse
         case failedParsingObject
     }
-    
+
     /// Serial io queue.
     ///
     /// Each subclass with have it's own io queue (the label does not dictate uniqueness).
@@ -114,7 +112,6 @@ public class Region {
 
         // remove pending error
         self.error = nil
-        self.emit(.updated) //FIXME: Why is this update broadcast?
 
         // stop if already in sync
         if synchronized {
@@ -122,7 +119,7 @@ public class Region {
         }
 
         // ask the subclass to load it's data
-        printBV(info: "[DataPool > Region] Starting synchronization for region \(self.stateKey)")
+        os_log("[%@] Starting synchronization for %@", log: .dataPool, type: .debug, typeName(self), self.stateKey)
 
         // load objects
         _syncPromise = self.load().map { ids -> Void in
@@ -138,16 +135,19 @@ public class Region {
                 self.diffedRemove(ids: ids)
             }
 
+            self.emit(.updated)
+
             // data is up to date
             self.synchronized = true
             self._syncPromise = nil
-            printBV(info: "[DataPool > Region] Region '\(self.stateKey)' is now in sync!")
+            os_log("[%@] %@ is now in sync!", log: .dataPool, type: .debug, typeName(self), self.stateKey)
 
         }.recover { err in
             // error handling, notify listeners of an error
             self._syncPromise = nil
             self.error = err
-            printBV(error: "[DataPool > Region] Unable to load: " + err.localizedDescription)
+            os_log("[%@] Unable to synchronize: %@", log: .dataPool, type: .error,
+                   typeName(self), err.localizedDescription)
             self.emit(.error, userInfo: ["error": err])
         }
 
@@ -215,17 +215,14 @@ public class Region {
 
             } else {
 
-                // it does not exist, add it
+                // notify
+                self.will(add: obj)
+                // add it
                 self.objects[obj.id] = obj
-
                 // notify
                 self.did(add: obj)
 
             }
-
-            // emit event
-            //FIXME: Why was this being broadcast?
-//            self.emit(.objectUpdated, userInfo: ["id": obj.id])
 
         }
 
@@ -236,7 +233,7 @@ public class Region {
         }
 
     }
-    
+
     enum Source: String {
         case brain
     }
@@ -280,7 +277,7 @@ public class Region {
 
         // notify each item that was updated
         for id in changedIDs {
-            self.emit(.objectUpdated, userInfo: ["id": id, "source": source?.rawValue ?? ""])
+            self.emit(.willUpdateObject, userInfo: ["id": id, "source": source?.rawValue ?? ""])
         }
 
         // notify overall update
@@ -290,24 +287,24 @@ public class Region {
         }
 
     }
-    
+
     /// Computes a diff between the supplied ids and the current object ids. Removes the stale ids.
     func diffedRemove(ids: [String]) {
-        
+
         // create a diff of keys to remove
         var keysToRemove: [String] = []
         for id in self.objects.keys {
-            
+
             // check if it's in our list
             if !ids.contains(id) {
                 keysToRemove.append(id)
             }
-            
+
         }
-        
+
         // remove objects
         self.remove(ids: keysToRemove)
-        
+
     }
 
     /// Removes the specified objects from our pool.
@@ -319,14 +316,16 @@ public class Region {
         var didUpdate = false
         for id in ids {
 
+            // get object
+            guard let object = self.objects[id] else { continue }
+            self.will(remove: object)
+
             // remove it
-            guard let object = self.objects.removeValue(forKey: id) else {
-                continue
-            }
+            self.objects.removeValue(forKey: id)
+            self.did(remove: object)
 
             // notify
             didUpdate = true
-            self.will(remove: object) //FIXME: Should be didRemove?
 
         }
 
@@ -433,13 +432,14 @@ public class Region {
         return mapped
 
     }
-    
+
     /// Directory containing all region caches.
-    static var recommendedCacheDirectory = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("regions")
-    
+    static var recommendedCacheDirectory = URL(fileURLWithPath: NSTemporaryDirectory())
+        .appendingPathComponent("regions")
+
     /// Cache filename.
     lazy var cacheFilename = self.stateKey.replacingOccurrences(of: ":", with: "_")
-    
+
     /// File where cache will be stored.
     lazy var cacheFile = Region.recommendedCacheDirectory
         .appendingPathComponent(cacheFilename)
@@ -447,67 +447,68 @@ public class Region {
 
     /// Load objects from local storage.
     func loadFromCache() -> Promise<Void> {
-        
+
         return Promise { (resolver: Resolver) in
-            
+
             ioQueue.async {
-                
+
                 // get filename
                 let startTime = Date.timeIntervalSinceReferenceDate
-                
+
                 // read data
                 guard let data = try? Data(contentsOf: self.cacheFile) else {
-                    printBV(error: ("[DataPool > Region] Unable to read cached data"))
+                    os_log("[%@] Unable to read cached data", log: .dataPool, type: .error, typeName(self))
                     resolver.fulfill_()
                     return
                 }
-                
+
                 // parse JSON
                 guard let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [[Any]] else {
-                    printBV(error: "[DataPool > Region] Unable to parse cached JSON")
+                    os_log("[@] Unable to parse cached JSON", log: .dataPool, type: .error, typeName(self))
                     resolver.fulfill_()
                     return
                 }
-                
+
                 // create objects
                 let objects = json.map { fields -> DataObject? in
-                    
+
                     // get fields
                     guard let id = fields[0] as? String, let type = fields[1] as? String,
                         let data = fields[2] as? [String: Any] else {
                             return nil
                     }
-                    
+
                     // create DataObject
                     let obj = DataObject()
                     obj.id = id
                     obj.type = type
                     obj.data = data
                     return obj
-                    
+
                 }
-                
+
                 // Strip out nils
                 let cleanObjects = objects.compactMap { $0 }
-                
+
                 DispatchQueue.main.async {
                     // add objects
                     self.add(objects: cleanObjects)
                 }
-                
+
                 // done
                 let delay = (Date.timeIntervalSinceReferenceDate - startTime) * 1000
-                printBV(info: ("[DataPool > Region] Loaded \(cleanObjects.count) from cache in \(Int(delay))ms"))
+                os_log("[%@] Loaded %d objects from cache in %dms", log: .dataPool, type: .info,
+                       typeName(self), cleanObjects.count, Int(delay))
                 resolver.fulfill_()
-                
+
             }
-            
+
         }
 
     }
 
     var saveTask: DispatchWorkItem?
-    
+
     /// Saves the region to local storage.
     func save() {
 
@@ -517,7 +518,10 @@ public class Region {
         }
 
         // create save task
-        saveTask = DispatchWorkItem { () -> Void in
+        saveTask = DispatchWorkItem { [weak self] () -> Void in
+
+            // avoid capture cycle
+            guard let self = self else { return }
 
             // create data to save
             let startTime = Date.timeIntervalSinceReferenceDate
@@ -529,7 +533,7 @@ public class Region {
 
             // convert to JSON
             guard let data = try? JSONSerialization.data(withJSONObject: json, options: []) else {
-                printBV(error: ("[DataPool > Region] Unable to convert data objects to JSON"))
+                os_log("[%@] Unable to convert data objects to JSON", log: .dataPool, type: .error, typeName(self))
                 return
             }
 
@@ -541,13 +545,15 @@ public class Region {
             do {
                 try data.write(to: self.cacheFile)
             } catch let err {
-                printBV(error: ("[DataPool > Region] Unable to save data to disk: " + err.localizedDescription))
+                os_log("[%@] Unable to save data to disk: %@", log: .dataPool, type: .error,
+                       typeName(self), err.localizedDescription)
                 return
             }
 
             // done
             let delay = (Date.timeIntervalSinceReferenceDate - startTime) * 1000
-            printBV(info: ("[DataPool > Region] Saved \(self.objects.count) objects to disk in \(Int(delay))ms"))
+            os_log("[%@] Saved %d objects in %dms", log: .dataPool, type: .info,
+                   typeName(self), self.objects.count, Int(delay))
 
         }
 
@@ -582,7 +588,11 @@ public class Region {
         // update to new value
         object.data![keyPath: KeyPath(keyPath)] = value
         object.cached = nil
-        self.emit(.objectUpdated, userInfo: ["id": id])
+        self.emit(.willUpdateObject, userInfo: ["id": id])
+
+        self.onPreemptiveChange(object)
+
+        self.did(update: object, keyPath: keyPath, oldValue: oldValue, newValue: value)
         self.emit(.updated)
         self.save()
 
@@ -595,7 +605,9 @@ public class Region {
             // update to new value
             object.data![keyPath: KeyPath(keyPath)] = oldValue
             object.cached = nil
-            self.emit(.objectUpdated, userInfo: ["id": id])
+            self.emit(.willUpdateObject, userInfo: ["id": id])
+            self.did(update: object, keyPath: keyPath, oldValue: oldValue, newValue: value)
+
             self.emit(.updated)
             self.save()
 
@@ -609,14 +621,14 @@ public class Region {
     /// - Returns: An undo function
     func preemptiveRemove(id: String) -> UndoFunction {
 
-        // remove object
-        guard let removedObject = objects.removeValue(forKey: id) else {
-            // no object, do nothing
-            return {}
-        }
+        // get object
+        guard let removedObject = objects.removeValue(forKey: id) else { return {} }
+        self.will(remove: removedObject)
 
-        // notify
-        self.will(remove: removedObject) //FIXME: should be didRemove
+        // remove object
+        objects.removeValue(forKey: id)
+        self.did(remove: removedObject)
+
         self.emit(.updated)
         self.save()
 
@@ -631,6 +643,7 @@ public class Region {
             // notify
             self.will(add: removedObject)
             self.add(objects: [removedObject])
+            self.did(add: removedObject)
             self.save()
 
         }
@@ -639,6 +652,8 @@ public class Region {
 
     // MARK: - Listener functions, can be overridden by subclasses
 
+    func onPreemptiveChange(_ object: DataObject) {}
+
     func will(add: DataObject) {}
     func will(update: DataObject, withFields: [String: Any]) {}
     func will(update: DataObject, keyPath: String, oldValue: Any?, newValue: Any?) {}
@@ -646,7 +661,7 @@ public class Region {
 
     func did(add: DataObject) {}
     func did(update: DataObject, withFields: [String: Any]) {}
-//    func did(update: DataObject, keyPath: String, oldValue: Any?, newValue: Any?) {}
-//    func did(remove object: DataObject) {}
+    func did(update: DataObject, keyPath: String, oldValue: Any?, newValue: Any?) {}
+    func did(remove object: DataObject) {}
 
 }

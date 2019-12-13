@@ -16,34 +16,35 @@ import Foundation
  - Rate limiting
 */
 public class DataPipeline {
-    
+
     public static let shared = DataPipeline()
-    
+
     /// Data loader used by the pipeline.
     public var dataDownloader: DataDownloader
-    
+
     init(dataDownloader: DataDownloader = DataDownloader()) {
         self.dataDownloader = dataDownloader
     }
-    
+
     public func downloadData(url: URL,
                              destination: @escaping DataDownloader.Destination = DataDownloader.recommenedDestination,
                              progress: @escaping (NSNumber) -> Void,
                              completion: @escaping (Result<URL, Error>) -> Void) -> Cancellable? {
-        
+
         let finalURL = destination(url)
         if self.checkDiskCache(for: finalURL) {
             progress(1)
             completion(.success(finalURL))
             return nil
         } else {
-            return self.dataDownloader.downloadData(url: url, destination: destination, progress: progress, completion: completion)
+            return self.dataDownloader.downloadData(url: url, destination: destination, progress: progress,
+                                                    completion: completion)
         }
-        
+
     }
-    
+
     private func checkDiskCache(for url: URL) -> Bool {
         return FileManager.default.fileExists(atPath: url.path)
     }
-    
+
 }

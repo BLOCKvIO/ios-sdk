@@ -14,37 +14,37 @@ import Foundation
 //swiftlint:disable identifier_name
 
 extension ActionModel: Descriptable {
-    
+
     init(from descriptor: [String: Any]) throws {
-        
+
         guard
             let _compoundName = descriptor["name"] as?  String,
             let _metaDescriptor = descriptor["meta"] as? [String: Any],
             let _propertiesDescriptor = descriptor["properties"] as? [String: Any]
             else { throw BVError.modelDecoding(reason: "Model decoding failed.") }
-        
+
         let (templateID, actionName) = try ActionModel.splitCompoundName(_compoundName)
         let meta = try MetaModel(from: _metaDescriptor)
         let properties = try Properties(from: _propertiesDescriptor)
-        
+
         self.init(compoundName: _compoundName,
                   name: actionName,
                   templateID: templateID,
                   meta: meta,
                   properties: properties)
-        
+
     }
-    
+
 }
 
 extension ActionModel.Properties: Descriptable {
-    
+
     init(from descriptor: [String: Any]) throws {
         guard
             let _reactor = descriptor["reactor"] as? String
             else { throw BVError.modelDecoding(reason: "Model decoding failed.") }
-        
+
         self.init(reactor: _reactor)
     }
-    
+
 }

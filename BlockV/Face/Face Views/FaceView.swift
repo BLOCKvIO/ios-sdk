@@ -17,6 +17,15 @@ internal func ?=<T> (lhs: inout T, rhs: T?) {
     lhs = rhs ?? lhs
 }
 
+/// Types seeking to present a vatom using a face should conform to this protocol.
+public protocol FacePresenter: class {
+
+    var vatom: VatomModel { get }
+
+    var faceModel: FaceModel { get }
+
+}
+
 /// Composite type that all face views must derive from and conform to.
 ///
 /// A face view is responsile for rendering a single face of a vAtom.
@@ -98,10 +107,10 @@ public protocol FaceViewLifecycle: class {
 }
 
 /// Abstract class all face views must derive from.
-open class BaseFaceView: BoundedView {
+open class BaseFaceView: BoundedView, FacePresenter {
 
     /// Vatom to render.
-    public internal(set) var vatom: VatomModel
+    public var vatom: VatomModel
 
     /// Face model to render.
     public internal(set) var faceModel: FaceModel
@@ -113,7 +122,7 @@ open class BaseFaceView: BoundedView {
     ///
     /// Use the initializer purely to configure the face view. Use the `load` lifecycle method to begin heavy operations
     /// to update the state of the face view, e.g. downloading resources.
-    public required init(vatom: VatomModel, faceModel: FaceModel) {
+    public required init(vatom: VatomModel, faceModel: FaceModel) throws {
         self.vatom = vatom
         self.faceModel = faceModel
         super.init(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
@@ -126,47 +135,169 @@ open class BaseFaceView: BoundedView {
 }
 
 /// Models the errors that may be thrown by face views.
-enum FaceError: Error {
+public enum FaceError: Error {
     case missingVatomResource
     case invalidURL
+    case failedToLoadResource
 }
 
+// MARK: - Triggers
 
-/// This view class provides a convenient way to know when the bounds of a view have been set.
-open class BoundedView: UIView {
-    
-    /// Setting this value to `true` will trigger a subview layout and ensure that `layoutWithKnowBounds()` is called
-    /// after the layout.
-    open var requiresBoundsBasedSetup = false {
-        didSet {
-            if requiresBoundsBasedSetup {
-                // trigger a new layout cycle
-                hasCompletedLayoutSubviews = false
-                self.setNeedsLayout()
+public enum TriggerType {
+    case animation
+    case sound
+    case action
+}
+
+public extension FacePresenter {
+
+    /// Returns all trigger rules for the speicifed event and constraints.
+    func findAllTriggerRules(forEvent event: CommonFaceConfig.OnEvent,
+                             animationRule: CommonFaceConfig.TriggerRule?,
+                             actionName: String?) -> [CommonFaceConfig.TriggerRule] {
+
+        var triggers: [CommonFaceConfig.TriggerRule] = []
+        //TODO: Optimize into one loop
+        triggers += self.findAnimationRules(forEvent: event, animationRule: animationRule, actionName: actionName)
+        triggers += self.findSoundRules(forEvent: event, animationRule: animationRule, actionName: actionName)
+        triggers += self.findActionRules(forEvent: event, animationRule: animationRule, actionName: actionName ?? "dev/null")
+        return triggers
+
+    }
+
+    /// Returns all trigger rules of the specified type.
+    func findAllTriggerRules(ofType type: TriggerType) -> [CommonFaceConfig.TriggerRule] {
+
+        guard
+            let config = self.faceModel.properties.config,
+            let triggerRules = config.animation_rules?.arrayValue
+            else { return [] }
+
+        return triggerRules.compactMap {
+            switch type {
+            case .animation: if ($0.play?.stringValue).isNilOrEmpty { return nil }
+            case .sound: if ($0.sound?.objectValue).isNilOrEmpty { return nil }
+            case .action: if ($0.action?.objectValue).isNilOrEmpty { return nil }
             }
+            return try? CommonFaceConfig.TriggerRule(descriptor: $0)
         }
     }
-    
-    /// Boolean value indicating whether a layout pass has been completed since `requiresBoundsBasedLayout`
-    private var hasCompletedLayoutSubviews = false
-    
-    override open func layoutSubviews() {
-        super.layoutSubviews()
-        
-        if requiresBoundsBasedSetup && !hasCompletedLayoutSubviews {
-            setupWithBounds()
-            hasCompletedLayoutSubviews = true
-            requiresBoundsBasedSetup = false
-        }
-        
-    }
-    
-    /// Called only after `layoutSubviews` has been called (i.e. bounds are set).
+
+    /// Returns the first animation rule for the triggering event.
     ///
-    /// This function is usefull for cases where the bounds of the view are important, for example, scaling an image
-    /// to the correct size.
-    open func setupWithBounds() {
-        // subclass should override
+    /// - Parameters:
+    ///   - event: Triggering event.
+    ///   - currentAnimation: Currently playing animation. Pass in `nil` to indicate no anmiation is currently playing.
+    ///                       For `animationComplete`, pass in the now completed animation as the `currentAnimation`.
+    /// - Returns: Animation name, or `nil` if none of the rules match the criteria.
+    func findFirstAnimationRule(forEvent event: CommonFaceConfig.OnEvent,
+                                animationRule: CommonFaceConfig.TriggerRule?,
+                                actionName: String?) -> CommonFaceConfig.TriggerRule? {
+
+        return findAnimationRules(forEvent: event, animationRule: animationRule, actionName: actionName).first ?? nil
+
     }
-    
+
+    private func findAnimationRules(forEvent event: CommonFaceConfig.OnEvent,
+                                    animationRule: CommonFaceConfig.TriggerRule?,
+                                    actionName: String?) -> [CommonFaceConfig.TriggerRule] {
+
+        // only consider rules matching the event type
+        let allAnimationRules = findAllTriggerRules(ofType: .animation)
+        let candidateRules = allAnimationRules.filter { ($0.on == event.rawValue) }
+        return self.filterRules(candidateRules, forEvent: event, animationRule: animationRule, actionName: actionName)
+
+    }
+
+    /// Finds valid sound rules for the given event.
+    func findSoundRules(forEvent event: CommonFaceConfig.OnEvent,
+                        animationRule: CommonFaceConfig.TriggerRule?,
+                        actionName: String?) -> [CommonFaceConfig.TriggerRule] {
+
+        // only consider rules matching the event type
+        let allSoundnRules = findAllTriggerRules(ofType: .sound)
+        let candidateRules = allSoundnRules.filter { ($0.on == event.rawValue) }
+        return self.filterRules(candidateRules, forEvent: event, animationRule: animationRule, actionName: actionName)
+
+    }
+
+    /// Finds the first action rule for the given event.
+    func findFirstActionRule(forEvent event: CommonFaceConfig.OnEvent,
+                             animationRule: CommonFaceConfig.TriggerRule?,
+                             actionName: String) -> CommonFaceConfig.TriggerRule? {
+        return findActionRules(forEvent: event, animationRule: animationRule, actionName: actionName).first ?? nil
+    }
+
+    private func findActionRules(forEvent event: CommonFaceConfig.OnEvent,
+                                 animationRule: CommonFaceConfig.TriggerRule?,
+                                 actionName: String) -> [CommonFaceConfig.TriggerRule] {
+
+        // only consider rules matching the event type
+        let allSoundnRules = findAllTriggerRules(ofType: .action)
+        let candidateRules = allSoundnRules.filter { ($0.on == event.rawValue) }
+        return filterRules(candidateRules, forEvent: event, animationRule: animationRule, actionName: actionName)
+
+    }
+
+    private func filterRules(_ candidateRules: [CommonFaceConfig.TriggerRule],
+                             forEvent event: CommonFaceConfig.OnEvent,
+                             animationRule: CommonFaceConfig.TriggerRule?,
+                             actionName: String?) -> [CommonFaceConfig.TriggerRule] {
+
+        // loop over animation rules
+        switch event {
+
+        case .start:
+            // find valid state rules, fallback on start rule
+            let stateRules = findAllTriggerRules(forEvent: .state, animationRule: animationRule, actionName: actionName)
+            let rulls = stateRules.isEmpty ? candidateRules: stateRules
+            return rulls
+        case .state:
+            return candidateRules.filter { rule in
+                // ensure both `target` and `value` have been set
+                guard let value = rule.value, let target = rule.target else { return false }
+                // filter in rules where the vatom's value matches the animation rules value
+                if let vatomValue = self.vatom.valueForKeyPath(target), vatomValue == value {
+                    return true
+                }
+                return false
+            }
+        case .click:
+            let validRules = candidateRules.filter { rule in
+                if let target = rule.target {
+
+                    if target.isEmpty && animationRule == nil {
+                        return true
+                    }
+                    if !target.isEmpty, target == animationRule?.play {
+                        return true
+                    }
+                    return false
+                } else {
+                    return true // target is null
+                }
+            }
+            return validRules
+        case .animationStart:
+            // filter in rules whos target matches to be played animation rule.
+            return candidateRules.filter { $0.target == animationRule?.play }
+        case .animationComplete:
+            // filter in rules whos target matches the completed animation rule.
+            return candidateRules.filter { $0.target == animationRule?.play }
+        case .actionComplete:
+            // filter in rules whos target matches the event's action
+            return candidateRules.filter { $0.target == actionName }
+        case .actionFail:
+            // filter in rules whos target matches the event's action
+            return candidateRules.filter { $0.target == actionName }
+        }
+
+    }
+
+}
+
+extension Optional where Wrapped: Collection {
+    var isNilOrEmpty: Bool {
+        return self?.isEmpty ?? true
+    }
 }

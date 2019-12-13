@@ -9,6 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import Foundation
 import Starscream
 import Signals
@@ -28,8 +29,6 @@ import Signals
  */
 
 /// Responsible for communitating with the BLOCKv Web socket server.
-///
-/// - important: There should only ever be a single instance within the BLOCKv SDK.
 ///
 /// ## Features
 ///
@@ -61,7 +60,7 @@ public class WebSocketManager {
         case stateUpdate = "state_update"
         /// Activity event
         case activity    = "my_events"
-        /// Map event (unowned vatom)
+        /// Map event
         case map         = "map"
     }
 
@@ -82,7 +81,7 @@ public class WebSocketManager {
 
     /// Fires when the Web socket receives an **activity** update event.
     public let onActivityUpdate = Signal<WSActivityEvent>()
-    
+
     /// Fires when the Web socket receives a *map* update event for *unowned* vatoms.
     public let onMapUpdate = Signal<WSMapEvent>()
 
@@ -107,9 +106,12 @@ public class WebSocketManager {
         return decoder
     }()
 
-    /// Delay option enum used to create a reconnect interval (measured in seconds).
-    let delayOption = DelayOption.exponential(initial: 1, base: 1.2, maxDelay: 5)
-    
+    /// Delay option used to determined a reconnect interval (measured in seconds).
+    let delayOption = DelayOption.custom(closure: { attempt -> Double in
+        // first attemp should reconnect immediately, thereafter consistently every `n` seconds.
+        return attempt == 1 ? 0 : 5
+    })
+
     /// Tally of the numnber of reconnect attempts.
     private var reconnectCount: Int = 0
 
@@ -126,13 +128,10 @@ public class WebSocketManager {
     /// attempt to re-establish a connection. For example, after the app receives a
     /// `UIApplicationDidBecomeActive` event.
     ///
-    /// This is in an attempt to improve the reliability of the Web socket by attempting
-    /// to ensure the Web socket is connected (if the Viewer expects it to be).
-    ///
-    /// Logic:
-    /// Should be set to `true` when the viewer calls `connect()`.
-    /// Should be set to `false` when the viewer calls `disconnect()`
-    private var shouldAutoConnect: Bool = false
+    /// - important:
+    /// Calling `disconnect()` will set this property to false. At a later point, if you would like to opt into
+    /// auto-connect behaviour set `shouldAutoConnect` to `true` before calling `connect()`.
+    private var shouldAutoConnect: Bool = true
 
     /// Boolean indicating whether the access token is beign refreshed.
     private var isRefreshingAccessToken: Bool = false
@@ -148,6 +147,8 @@ public class WebSocketManager {
         NotificationCenter.default.addObserver(self, selector: #selector(handleApplicationDidBecomeActive),
                                                name: UIApplication.didBecomeActiveNotification, object: nil)
 
+        NotificationCenter.default.addObserver(self, selector: #selector(handleApplicationDidEnterBackground),
+                                               name: UIApplication.didEnterBackgroundNotification, object: nil)
     }
 
     // MARK: - Lifecycle
@@ -164,30 +165,22 @@ public class WebSocketManager {
     /// - important: A connection can only be established if the user has an **authenticated** session.
     public func connect() {
 
-        /*
-         There are 2 challenges to solve here (if needed):
-         
-         1. The connect method is syncronous - this means the caller does not know when the socket
-         actually connects. For this, they need to listen for `onConnected()` - I am happy with this.
-         2. Retrying the connection in the event the connection drops
-         - Should the connection be retired if there is a problem with the auth (i.e. a 400 range error)?
-         ... - This may cause an infinte loop.
-         ... - The caller should rather be informed of a problem (e.g. user must be authenticated).
-         - Maybe the connection should only be retried on 500s (i.e. the server is offline).
-         */
+        os_log("[%@] Connection requested.", log: .socket, type: .debug, typeName(self))
 
         DispatchQueue.mainThreadPrecondition()
 
-        // raise the flag that the viewer has requested a connection
-        self.shouldAutoConnect = true
-        // prevent connection attempt if connected
-        if socket?.isConnected == true { return }
+        // prevent connection if already connected
+        // BEWARE: This is not reliable. A web socket struggles to know when it's disconnected.
+        if socket?.isConnected == true {
+            os_log("[%@] Connection denied. Already connected.", log: .socket, type: .debug, typeName(self))
+            return
+        }
 
         // prevent connection attempt if connection is in progress
         if self.isRefreshingAccessToken == true { return }
         isRefreshingAccessToken = true
 
-        printBV(info: "Web socket - Establishing a connection.")
+        os_log("[%@] Fetching access token.", log: .socket, type: .debug, typeName(self))
 
         // fetch a refreshed access token
         self.oauthHandler.forceAccessTokenRefresh { (success, accessToken) in
@@ -196,10 +189,12 @@ public class WebSocketManager {
 
             // ensure no error
             guard success, let token = accessToken else {
-                printBV(error: "Web socket - Cannot fetch access token. Socket connection cannot be established.")
+                os_log("[%@]  Fetching access token failed.", log: .socket, type: .error, typeName(self))
                 return
             }
 
+            os_log("[%@] Opening connection (%d) with token: %{private}@", log: .socket, type: .debug,
+                   typeName(self), self.reconnectCount, token)
             // initialise an instance of a web socket
             self.socket = WebSocket(url: URL(string: self.baseURLString + "?app_id=\(self.appID)" + "&token=\(token)")!)
             self.socket?.delegate = self
@@ -209,7 +204,24 @@ public class WebSocketManager {
 
     }
 
+    private func scheduleReconnect(initialDelay: TimeInterval = 0) {
+
+        self.reconnectTimer = Timer.scheduledTimer(withTimeInterval: initialDelay, repeats: false) { [weak self] _ in
+
+            guard let self = self else { return }
+
+            if self.isConnected { return } // bail out
+            self.reconnectCount += 1
+            self.connect()
+            let nextDelay = self.delayOption.make(self.reconnectCount)
+            self.scheduleReconnect(initialDelay: nextDelay)
+        }
+
+    }
+
     /// Attempts to disconnect from the Web socket server.
+    ///
+    /// Disconnect will timeout of 2 seconds ensuring `onDisconnected()` gets called.
     ///
     /// - note: Disconnecting a network connection is an asynchronous task — typically in the order of
     /// seconds, but is of course, network dependent. Subscribe to `onDisconnected()` to receive a signal
@@ -219,7 +231,13 @@ public class WebSocketManager {
         DispatchQueue.mainThreadPrecondition()
 
         self.shouldAutoConnect = false
-        socket?.disconnect()
+        socket?.disconnect(forceTimeout: 2)
+    }
+
+    /// Disconnect without setting `shouldAutoConnect` = false
+    func _disconnect() { //swiftlint:disable:this identifier_name
+        DispatchQueue.mainThreadPrecondition()
+        socket?.disconnect(forceTimeout: 2)
     }
 
     @objc
@@ -228,7 +246,15 @@ public class WebSocketManager {
         //        _retryTimeInterval = 1
         //        _retryCount = 0
         // connect (if not already connected)
+        os_log("[%@]  Application did become active. Attempting reconnect.", log: .socket, type: .debug, typeName(self))
+        self.shouldAutoConnect = true
         self.connect()
+    }
+
+    @objc
+    private func handleApplicationDidEnterBackground() {
+        os_log("[%@]  Application did enter background. Attempting disconnect.", log: .socket, type: .debug, typeName(self))
+        self.disconnect()
     }
 
     // MARK: - Commands
@@ -257,22 +283,21 @@ public class WebSocketManager {
             "type": "command",
             "payload": payload
         ]
-        print(#function, payload)
         // write
         self.write(commandPackage)
 
     }
 
     // MARK: Debugging
-    
+
     /// Writes a ping frame to the socket.
     func writePing(data: Data = Data(), completion: @escaping () -> Void) {
-        
+
         // write a ping control frame
         self.socket?.write(ping: data) {
             completion()
         }
-        
+
     }
 
 }
@@ -282,7 +307,7 @@ public class WebSocketManager {
 extension WebSocketManager: WebSocketDelegate {
 
     public func websocketDidConnect(socket: WebSocketClient) {
-        printBV(info: "Web socket - Connected")
+        os_log("[%@] Delegate: Did Connect", log: .socket, type: .debug, typeName(self))
 
         // invalidate auto-reconnect timer
         self.reconnectTimer?.invalidate()
@@ -294,34 +319,25 @@ extension WebSocketManager: WebSocketDelegate {
 
     public func websocketDidDisconnect(socket: WebSocketClient, error: Error?) {
 
-        if let err = error as? WSError {
-            printBV(info: "Web socket - Disconnected: \(err.message)")
-        } else if let err = error {
-            printBV(info: "Web socket - Disconnected: \(err.localizedDescription)")
-        } else {
-            printBV(info: "Web socket - Disconnected")
-        }
-
-        // Fire an error informing the observers that the Web socket has disconnected.
-        self.onDisconnected.fire((nil))
-
         /*
          Note
          The app may fire this message when entering the foreground (after the Web socket was disconnected after
          entering the background).
          */
 
-        if !shouldAutoConnect { return }
+        if let err = error as? WSError {
+            os_log("[%@] Delegate: Did Disconnect: %@", log: .socket, type: .error, err.message, typeName(self))
+        } else if let err = error {
+            os_log("[%@] Delegate: Did Disconnect: %@", log: .socket, type: .error, err.localizedDescription, typeName(self))
+        } else {
+            os_log("[%@] Delegate: Did Disconnect: No Error.", log: .socket, type: .error, typeName(self))
+        }
 
-        // attempt to reconnect
-        self.connect()
-        // attempt to reconnect in `n` seconds
-        let delay = delayOption.make(reconnectCount)
-        self.reconnectTimer = Timer.scheduledTimer(withTimeInterval: delay, repeats: true, block: { _ in
-            self.reconnectCount += 1
-            self.connect()
-        })
+        // Fire an error informing the observers that the Web socket has disconnected.
+        self.onDisconnected.fire((nil))
 
+        //
+        scheduleReconnect()
     }
 
     public func websocketDidReceiveMessage(socket: WebSocketClient, text: String) {
@@ -342,7 +358,8 @@ extension WebSocketManager: WebSocketDelegate {
         // parse to data
         guard
             let data = text.data(using: .utf8) else {
-                printBV(error: "Web socket - Parse error - Unable to convert string to data: \(text)")
+                os_log("[%@] Delegate: Parse error - Unable to convert string to data: %@", log: .socket, type: .error,
+                       typeName(self), text)
                 return
         }
 
@@ -350,7 +367,8 @@ extension WebSocketManager: WebSocketDelegate {
         guard
             let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []),
             let jsonDictionary = jsonObject as? [String: Any] else {
-                printBV(error: "Web socket - Unable to parse JSON data.")
+                os_log("[%@] Delegate: Parse error - Unable to parse JSON data: %@", log: .socket, type: .error,
+                       typeName(self), String(data: data, encoding: .utf8) ?? "--")
                 return
         }
 
@@ -366,7 +384,7 @@ extension WebSocketManager: WebSocketDelegate {
 
         // find message type
         guard let typeString = jsonDictionary["msg_type"] as? String else {
-            printBV(error: "Web socket - Cannot parse 'msg_type'.")
+            os_log("[%@] Decode error: %@", log: .socket, type: .error, typeName(self))
             return
         }
 
@@ -385,7 +403,8 @@ extension WebSocketManager: WebSocketDelegate {
                     //TODO: Set an enum `event` = .added or .removed - this will require the user id (decode the jwt).
                     self.onInventoryUpdate.fire(inventoryEvent)
                 } catch {
-                    printBV(error: error.localizedDescription)
+                    os_log("[%@] Decode error: %@", log: .socket, type: .error, typeName(self),
+                           error.localizedDescription)
                 }
 
             case .stateUpdate:
@@ -393,7 +412,8 @@ extension WebSocketManager: WebSocketDelegate {
                     let stateUpdateEvent = try blockvJSONDecoder.decode(WSStateUpdateEvent.self, from: data)
                     self.onVatomStateUpdate.fire(stateUpdateEvent)
                 } catch {
-                    printBV(error: error.localizedDescription)
+                    os_log("[%@] Decode error: %@", log: .socket, type: .error, typeName(self),
+                           error.localizedDescription)
                 }
 
             case .activity:
@@ -402,20 +422,23 @@ extension WebSocketManager: WebSocketDelegate {
                     let activityEvent = try blockvJSONDecoder.decode(WSActivityEvent.self, from: data)
                     self.onActivityUpdate.fire(activityEvent)
                 } catch {
-                    printBV(error: error.localizedDescription)
+                    os_log("[%@] Decode error: %@", log: .socket, type: .error, typeName(self),
+                           error.localizedDescription)
                 }
-                
+
             case .map:
                 do {
                     let mapEvent = try blockvJSONDecoder.decode(WSMapEvent.self, from: data)
                     self.onMapUpdate.fire(mapEvent)
                 } catch {
-                    printBV(error: error.localizedDescription)
+                    os_log("[%@] Decode error: %@", log: .socket, type: .error, typeName(self),
+                           error.localizedDescription)
                 }
 
             }
         default:
-            printBV(error: "Unrecognised message type: \(typeString).")
+            os_log("[%@] Unrecognized message type: %@", log: .socket, type: .error, typeName(self),
+                   typeName(self), typeString)
             return
         }
 

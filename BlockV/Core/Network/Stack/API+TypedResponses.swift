@@ -121,7 +121,7 @@ extension API {
         static func getTokens() -> Endpoint<BaseModel<[FullTokenModel]>> {
             return Endpoint(path: currentUserPath + "/tokens")
         }
-        
+
         /// Builds the endpoint to get the current user's accounts.
         ///
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
@@ -267,14 +267,14 @@ extension API {
 
     /// Namespace for vatom related endpoints with a typed reponse model.
     enum Vatom {
-        
+
         /// Builds an endpoint to get the current user's inventory sync hash.
         ///
         /// - Returns: Constructed endpoint specialized to parse out a `InventoryHashModel`.
         static func getInventoryHash() -> Endpoint<BaseModel<InventoryHashModel>> {
             return API.Generic.getInventoryHash()
         }
-        
+
         /// Builds an endpoint to get the current user's inventory vatoms' sync number.
         ///
         /// - Returns: Constructed endpoint specialized to parse out a `InventorySyncModel`.
@@ -296,9 +296,22 @@ extension API {
 
         }
 
-        /// Builds an endpoint to get a vAtom by its unique identifier.
+        /// Builds an endpoint to get a vatom paylaod by its unique identifier.
         ///
-        /// - Parameter ids: Unique identifier of the vatom.
+        /// This endpoint may optionally be used to fetch unowned public vatom payloaded without requiring
+        /// authorization. For owned-private and owned-public vatom authorization is required.
+        ///
+        /// Only the vatom payload is returned. The `faces` and and `actions` array on the vatom will be empty.
+        ///
+        /// - Parameter id: Unique identifier.
+        /// - Returns: Constructed endpoint specialized to parse out a `UnpackedModel`.
+        static func getVatomPayload(withID id: String) -> Endpoint<BaseModel<VatomModel>> {
+            return API.Generic.getVatomPayload(withID: id)
+        }
+
+        /// Builds an endpoint to get Vatoms by their unique identifiers.
+        ///
+        /// - Parameter ids: Unique identifier.
         /// - Returns: Constructed endpoint specialized to parse out a `UnpackedModel`.
         static func getVatoms(withIDs ids: [String]) -> Endpoint<BaseModel<UnpackedModel>> {
             return API.Generic.getVatoms(withIDs: ids)
@@ -381,6 +394,14 @@ extension API {
                                                  precision: precision,
                                                  filter: filter)
 
+        }
+
+        /// Builds the endpoint to alllow merchants to request redemption on a particular vatom.
+        ///
+        /// - Parameter vatomID: Uniquie identifier of the vatom for redemption.
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        static func requestRedemption(vatomID: String) -> Endpoint<BaseModel<GeneralModel>> {
+            return API.Generic.requestRedemption(vatomID: vatomID)
         }
 
     }

@@ -9,6 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import Foundation
 import PromiseKit
 import CoreLocation
@@ -37,7 +38,7 @@ class GeoPosRegion: BLOCKvRegion {
 
     /// The monitored region.
     let region: MKCoordinateRegion
-    
+
     /// Current user ID.
     let currentUserID = DataPool.sessionInfo["userID"] as? String ?? ""
 
@@ -164,143 +165,157 @@ class GeoPosRegion: BLOCKvRegion {
         // write region command
         BLOCKv.socket.writeRegionCommand(region.toDictionary())
     }
-    
+
     /// Called on Web socket message.
     ///
     /// Allows super to handle 'state_update', then goes on to process 'inventory' events.
     /// Message process is paused for 'inventory' events which indicate a vatom was added. Since the vatom must
     /// be fetched from the server.
     override func processMessage(_ msg: [String: Any]) {
-        
-        // - Look at state update
-        
+
         // get info
         guard
             let msgType = msg["msg_type"] as? String,
             let payload = msg["payload"] as? [String: Any] else { return }
-        
+
         if msgType == "state_update" {
-            
-            guard
-                let newData = payload["new_object"] as? [String: Any],
-                let vatomID = payload["id"] as? String else { return }
-            
-            // check update is related to drop
-            guard let properties = newData["vAtom::vAtomType"] as? [String: Any],
-                let dropped = properties["dropped"] as? Bool
-                else { return }
-            
-            // check if vatom was picked up
-            if !dropped {
-                // remove vatom from this region
-                self.remove(ids: [vatomID])
-                return
-            }
-            
-            // check if we have the vatom
-            if self.get(id: vatomID) != nil {
-                // ask super to process the update to the object (i.e. setting dropped to true)
+            processStateUpdateMessage(msg: msg, payload: payload)
+        } else if msgType == "inventory" {
+            processInventoryMessage(payload: payload)
+        } else if msgType == "map" {
+            processMapMessage(payload: payload)
+        }
+
+    }
+
+    /// Process state update message.
+    private func processStateUpdateMessage(msg: [String: Any], payload: [String: Any]) {
+
+        guard
+            let newData = payload["new_object"] as? [String: Any],
+            let vatomID = payload["id"] as? String else { return }
+
+        // check update is related to drop
+        guard let properties = newData["vAtom::vAtomType"] as? [String: Any],
+            let dropped = properties["dropped"] as? Bool
+            else {
                 super.processMessage(msg)
-            } else {
-                
-                // pause this instance's message processing and fetch vatom payload
-                self.pauseMessages()
-                
-                // create endpoint over void
-                let endpoint: Endpoint<Void> = API.Generic.getVatoms(withIDs: [vatomID])
-                BLOCKv.client.request(endpoint).done { data in
-                    
-                    // convert
-                    guard
-                        let object = try? JSONSerialization.jsonObject(with: data),
-                        let json = object as? [String: Any],
-                        let payload = json["payload"] as? [String: Any] else {
-                            throw NSError.init("Unable to load") //FIXME: Create a better error
-                    }
-                    
-                    // parse out objects
-                    guard let items = self.parseDataObject(from: payload) else {
-                        throw NSError.init("Unable to parse data") //FIXME: Create a better error
-                    }
-                    
-                    // add new objects
-                    self.add(objects: items)
-                    
+                return
+        }
+
+        // check if vatom was picked up
+        if !dropped {
+            // remove vatom from this region
+            self.remove(ids: [vatomID])
+            return
+        }
+
+        // check if we have the vatom
+        if self.get(id: vatomID) != nil {
+            // ask super to process the update to the object (i.e. setting dropped to true)
+            super.processMessage(msg)
+        } else {
+
+            // pause this instance's message processing and fetch vatom payload
+            self.pauseMessages()
+
+            // create endpoint over void
+            let endpoint: Endpoint<Void> = API.Generic.getVatoms(withIDs: [vatomID])
+            BLOCKv.client.request(endpoint).done { data in
+
+                // convert
+                guard
+                    let object = try? JSONSerialization.jsonObject(with: data),
+                    let json = object as? [String: Any],
+                    let payload = json["payload"] as? [String: Any] else {
+                        throw NSError.init("Unable to load") //FIXME: Create a better error
+                }
+
+                // parse out objects
+                guard let items = self.parseDataObject(from: payload) else {
+                    throw NSError.init("Unable to parse data") //FIXME: Create a better error
+                }
+
+                // add new objects
+                self.add(objects: items)
+
                 }.catch { error in
-                    printBV(error: "[InventoryRegion] Unable to fetch vatom. \(error.localizedDescription)")
+                    os_log("[%@] Failed to fetch vatom: %@ error: %@", log: .dataPool, type: .error, typeName(self),
+                           vatomID, error.localizedDescription)
                 }.finally {
                     // resume WebSocket processing
                     self.resumeMessages()
-                }
-                
             }
-            
-        } else if msgType == "inventory" {
-            
-            // inspect inventory events
-            guard
-                let vatomID = payload["id"] as? String,
-                let oldOwner = payload["old_owner"] as? String,
-                let newOwner = payload["new_owner"] as? String else { return }
-            
-            /*
-             Iventory events indicate a vatom has entered or exited the user's inventory. It is unlikely that dropped vatoms
-             will experience inventory events, but it is possible.
-             Here we check only for outgoing inventory events (e.g. transfer). This gives the listener (e.g. map) the
-             opportinity to remove the vatom.
-             Incomming events don't need to be processed, since the user will subsequently need to drop the vatom. This
-             state-update event will be caught by the superclass `BLOCKvRegion`.
-             */
-            
-            // check if this is an incoming or outgoing vatom
-            if oldOwner == self.currentUserID && newOwner != self.currentUserID {
-                // vatom is no longer owned by us
-                self.remove(ids: [vatomID])
-            }
-            
-        } else if msgType == "map" {
-            
-            guard let operation = payload["op"] as? String,
-                let vatomID = payload["vatom_id"] as? String,
-                let actionName = payload["action_name"] as? String,
-                let lat = payload["lat"] as? Double,
-                let lon = payload["lon"] as? Double else {
-                    return
-            }
-            
-            // check operation typw
-            if operation == "add" {
-                
-                // create endpoint over void
-                let endpoint: Endpoint<Void> = API.Generic.getVatoms(withIDs: [vatomID])
-                BLOCKv.client.request(endpoint).done { data in
-                    
-                    // convert
-                    guard
-                        let object = try? JSONSerialization.jsonObject(with: data),
-                        let json = object as? [String: Any],
-                        let payload = json["payload"] as? [String: Any] else {
-                            throw RegionError.failedParsingResponse
-                    }
-                    
-                    // parse out objects
-                    guard let items = self.parseDataObject(from: payload) else {
-                        throw RegionError.failedParsingObject
-                    }
-                    
-                    // add new objects
-                    self.add(objects: items)
-                    
-                    }.catch { error in
-                        printBV(error: "[GeoPosRegion] Unable to vatom. \(error.localizedDescription)")
-                }
-                
-            } else if operation == "remove" {
-                self.remove(ids: [vatomID])
-            }
-            
+
         }
-        
+
+    }
+
+    /// Process inventory message.
+    private func processInventoryMessage(payload: [String: Any]) {
+
+        // inspect inventory events
+        guard
+            let vatomID = payload["id"] as? String,
+            let oldOwner = payload["old_owner"] as? String,
+            let newOwner = payload["new_owner"] as? String else { return }
+
+        /*
+         Iventory events indicate a vatom has entered or exited the user's inventory. It is unlikely that dropped
+         vatoms will experience inventory events, but it is possible.
+         Here we check only for outgoing inventory events (e.g. transfer). This gives the listener (e.g. map) the
+         opportinity to remove the vatom.
+         Incomming events don't need to be processed, since the user will subsequently need to drop the vatom. This
+         state-update event will be caught by the superclass `BLOCKvRegion`.
+         */
+
+        // check if this is an incoming or outgoing vatom
+        if oldOwner == self.currentUserID && newOwner != self.currentUserID {
+            // vatom is no longer owned by us
+            self.remove(ids: [vatomID])
+        }
+
+    }
+
+    /// Process map message.
+    private func processMapMessage(payload: [String: Any]) {
+
+        guard let operation = payload["op"] as? String, let vatomID = payload["vatom_id"] as? String else {
+            return
+        }
+
+        // check operation type
+        if operation == "add" {
+
+            // create endpoint over void
+            let endpoint: Endpoint<Void> = API.Generic.getVatoms(withIDs: [vatomID])
+            BLOCKv.client.request(endpoint).done { data in
+
+                // convert
+                guard
+                    let object = try? JSONSerialization.jsonObject(with: data),
+                    let json = object as? [String: Any],
+                    let payload = json["payload"] as? [String: Any] else {
+                        throw RegionError.failedParsingResponse
+                }
+
+                // parse out objects
+                guard let items = self.parseDataObject(from: payload) else {
+                    throw RegionError.failedParsingObject
+                }
+
+                // add new objects
+                self.add(objects: items)
+
+            }.catch { error in
+                os_log("[%@] Failed to fetch vatom: %@ error: %@", log: .dataPool, type: .error, typeName(self),
+                       vatomID, error.localizedDescription)
+            }
+
+        } else if operation == "remove" {
+            self.remove(ids: [vatomID])
+        }
+
     }
 
 }
@@ -330,7 +345,7 @@ public extension MKCoordinateRegion {
      Things to check:
      1. Behaviour around the poles and international date line.
      2. Potentially better way:
-     > https://stackoverflow.com/questions/8496551/how-to-fit-a-certain-bounds-consisting-of-ne-and-sw-coordinates-into-the-visible
+     > https://stackoverflow.com/q/8496551/3589408
      */
 
     /// Computes the coordinate of the bottom left point.

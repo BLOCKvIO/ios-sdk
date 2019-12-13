@@ -56,6 +56,21 @@ public struct MessageModel: Equatable {
         case geoPosition                    = "geo_pos"
     }
 
+    public init(id: Double, message: String, actionName: String, whenCreated: Date, triggerUserID: String,
+                targetUserID: String, vatomIdentifiers: [String], templateVariationIdentifiers: [String],
+                resources: [VatomResourceModel], geoPosition: [Double]?) {
+        self.id = id
+        self.message = message
+        self.actionName = actionName
+        self.whenCreated = whenCreated
+        self.triggerUserID = triggerUserID
+        self.targetUserID = targetUserID
+        self.vatomIdentifiers = vatomIdentifiers
+        self.templateVariationIdentifiers = templateVariationIdentifiers
+        self.resources = resources
+        self.geoPosition = geoPosition
+    }
+
 }
 
 extension MessageModel: Codable {

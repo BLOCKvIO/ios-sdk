@@ -29,7 +29,7 @@ extension API {
         private static let actionPath       = "/v1/user/vatom/action"
         private static let userActivityPath = "/v1/activity"
 
-        // MARK: OAuth
+        // MARK: - OAuth
 
         /// Builds the generic endpoint to exchange a code for tokens.
         ///
@@ -48,25 +48,25 @@ extension API {
                             parameters: params)
         }
 
-        // MARK: Asset Providers
+        // MARK: - Asset Providers
 
         static func getAssetProviders<T>() -> Endpoint<T> {
             return Endpoint(method: .get,
                             path: "/v1/user/asset_providers")
         }
 
-        // MARK: Vatoms
-        
+        // MARK: - Vatoms
+
         /// Builds the generic endpoint to get the current user's inventory vatom's sync number.
         ///
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func getInventoryVatomSyncNumbers<T>(limit: Int = 1000, token: String) -> Endpoint<T> {
             return Endpoint(method: .get,
                             path: userVatomPath + "/inventory/index",
-                            parameters: ["limit": limit, "nextToken": token],
+                            parameters: ["limit": limit, "next_token": token],
                             encoding: URLEncoding.queryString)
         }
-        
+
         /// Builds the generic endpoint to get the current user's inventory sync hash.
         ///
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
@@ -89,11 +89,22 @@ extension API {
             )
         }
 
-        /// Builds a generic endpoint to get a vAtom by its unique identifier.
+        /// Builds a generic endpoint to get a vatom payload by its unique identifier.
         ///
-        /// - Parameter ids: Unique identifier of the vatom.
+        /// Exlcudes Faces & Actions.
+        ///
+        /// - Parameter id: Unique identifier of the vatom.
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        static func getVatomPayload<T>(withID id: String) -> Endpoint<T> {
+            return Endpoint(method: .get, path: "/v1/vatoms/\(id)")
+        }
+
+        /// Builds a generic endpoint to get vAtoms by their unique identifiers.
+        ///
+        /// - Parameter ids: Array of unique identifiers.
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
         static func getVatoms<T>(withIDs ids: [String]) -> Endpoint<T> {
+            assert(ids.count <= 100, "This call can retrive a maximum of 100 vatoms.")
             return Endpoint(method: .post,
                             path: userVatomPath + "/get",
                             parameters: ["ids": ids]
@@ -207,7 +218,19 @@ extension API {
 
         }
 
-        // MARK: Perform Actions
+        // MARK: - Redemption
+
+        /// Builds the generic endpoint to request redemption on a vatom.
+        ///
+        /// - Parameter vatomID: Vatom identifier for redemption.
+        /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
+        static func requestRedemption<T>(vatomID: String) -> Endpoint<T> {
+            return Endpoint(method: .post,
+                            path: userVatomPath + "/request/redemption",
+                            parameters: ["object_id": vatomID])
+        }
+
+        // MARK: - Perform Actions
 
         /// Builds the endpoint to perform and action on a vAtom.
         ///
@@ -220,7 +243,7 @@ extension API {
                             path: actionPath + "/\(name)", parameters: payload)
         }
 
-        // MARK: Fetch Actions
+        // MARK: - Fetch Actions
 
         /// Builds the endpoint for fetching the actions configured for a template ID.
         ///
@@ -231,7 +254,7 @@ extension API {
                             path: userActionsPath + "/\(id)")
         }
 
-        // MARK: User Activity
+        // MARK: - User Activity
 
         /// Builds the endpoint for fetching the threads involving the current user.
         ///

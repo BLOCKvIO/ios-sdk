@@ -9,6 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import Foundation
 import WebKit
 
@@ -68,8 +69,8 @@ class WebFaceView: FaceView {
 
     // MARK: - Initialization
 
-    required init(vatom: VatomModel, faceModel: FaceModel) {
-        super.init(vatom: vatom, faceModel: faceModel)
+    required init(vatom: VatomModel, faceModel: FaceModel) throws {
+        try super.init(vatom: vatom, faceModel: faceModel)
 
         self.addSubview(webView)
     }
@@ -107,7 +108,7 @@ class WebFaceView: FaceView {
 
     /// Resets the contents of the face view.
     private func reset() {
-        
+
     }
 
     func unload() {
@@ -119,7 +120,7 @@ class WebFaceView: FaceView {
     private func loadFace() {
         let faceURL = faceModel.properties.displayURL
         guard let url = URL.init(string: faceURL) else {
-            printBV(error: "Cannot initialise URL from: \(faceURL)")
+            os_log("[%@] Cannot initialise URL from:", log: .vatomView, type: .error, faceURL, typeName(self))
             return
         }
         let request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 20)

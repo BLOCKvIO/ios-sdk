@@ -19,7 +19,7 @@ class KeyPath_Tests: XCTestCase {
         do {
             let headAndTail = try self.require(keyPath.headAndTail())
             XCTAssertEqual(headAndTail.head, "")
-            XCTAssertEqual(headAndTail.tail, KeyPath())
+            XCTAssertEqual(headAndTail.tail.segments, [])
         } catch {
             XCTFail(error.localizedDescription)
         }
@@ -30,7 +30,7 @@ class KeyPath_Tests: XCTestCase {
         do {
             let headAndTail = try self.require(keyPath.headAndTail())
             XCTAssertEqual(headAndTail.head, "a")
-            XCTAssertEqual(headAndTail.tail, KeyPath())
+            XCTAssertEqual(headAndTail.tail.segments, [])
         } catch {
             XCTFail(error.localizedDescription)
         }

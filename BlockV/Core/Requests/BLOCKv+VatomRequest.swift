@@ -61,6 +61,46 @@ extension BLOCKv {
 
     }
 
+    /// Fetches a vatom by its identifier. The completion handler passes in a `VatomModel` that has been *packaged*.
+    /// Packaged vAtoms have their template's configured Faces and Actions as properties.
+    ///
+    /// - Parameters:
+    ///   - id: Unique identifier.
+    ///   - completion: The completion handler to call when the request is completed.
+    ///                 This handler is executed on the main queue.
+    public static func getVatom(withID id: String, completion: @escaping (Result<VatomModel, BVError>) -> Void) {
+
+        let endpoint = API.Vatom.getVatoms(withIDs: [id])
+
+        self.client.request(endpoint) { result in
+
+            switch result {
+            case .success(let baseModel):
+                do {
+                    // model is available
+                    let unpackedModel = baseModel.payload
+                    let vatom = try unpackedModel.packagedSingle()
+                    DispatchQueue.main.async {
+                        completion(.success(vatom))
+                    }
+                } catch {
+                    // handle error
+                    DispatchQueue.main.async {
+                        completion(.failure(error as! BVError)) // swiftlint:disable:this force_cast
+                    }
+                }
+
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+            }
+
+        }
+
+    }
+
     /// Fetches vAtoms by providing an array of vAtom IDs. The completion handler passes in an array of
     /// `VatomModel`. The array contains *packaged* vAtoms. Packaged vAtoms have their template's configured Faces
     /// and Actions as properties.
@@ -457,7 +497,7 @@ extension BLOCKv {
         }
 
     }
-    
+
     /// Performs an acquire pub variation action on the specified vatom id.
     ///
     /// - Parameters:
@@ -466,13 +506,61 @@ extension BLOCKv {
     ///                 This handler is executed on the main queue.
     public static func acquirePubVariation(withID id: String,
                                            completion: @escaping (Result<[String: Any], BVError>) -> Void) {
-        
+
         let body = ["this.id": id]
         // perform the action
         self.performAction(name: "AcquirePubVariation", payload: body) { result in
             completion(result)
         }
-        
+
+    }
+
+    /// Performs an dispense action on the specified vatom id.
+    ///
+    /// - Parameters:
+    ///   - id: The id of the vatom to dispense.
+    ///   - completion: The completion handler to call when the action is completed.
+    ///                 This handler is executed on the main queue.
+    public static func dispense(vatomID id: String,
+                                completion: @escaping (Result<[String: Any], BVError>) -> Void) {
+
+        let body = ["this.id": id]
+        // perform the action
+        self.performAction(name: "Dispense", payload: body) { result in
+            completion(result)
+        }
+    }
+
+    // MARK: - Redemption
+
+    /// Performs a redemption request on the specified vatom id. This will trigger an RPC socket event to the client informing it of the redemption request.
+    ///
+    /// This call is intended for merchant accounts.
+    ///
+    /// - Parameter id: Vatom identifier for redemption.
+    /// - Parameter completion: The completion handler to call when the action is completed.
+    ///                         This handler is executed on the main queue.
+    public static func requestRedemption(vatomID id: String, completion: @escaping (BVError?) -> Void) {
+
+        let endpoint = API.Vatom.requestRedemption(vatomID: id)
+
+        self.client.request(endpoint) { result in
+
+            switch result {
+            case .success:
+                // model is available
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    completion(error)
+                }
+            }
+
+        }
+
     }
 
 }

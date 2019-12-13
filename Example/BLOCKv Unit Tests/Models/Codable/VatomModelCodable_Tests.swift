@@ -37,26 +37,6 @@ class VatomModelCodable_Tests: XCTestCase {
             XCTFail("Decoding failed: \(error.localizedDescription)")
         }
 
-        do {
-            _ = try TestUtility.jsonDecoder.decode(VatomModel.self, from: MockModel2.vatomJSON_Version2)
-
-        } catch {
-            XCTFail("Decoding failed: \(error.localizedDescription)")
-        }
-
-        do {
-            _ = try TestUtility.jsonDecoder.decode(VatomModel.self, from: MockModel2.vatomJSON_Version3)
-
-        } catch {
-            XCTFail("Decoding failed: \(error.localizedDescription)")
-        }
-
-        do {
-            _ = try TestUtility.jsonDecoder.decode(VatomModel.self, from: MockModel2.vatomJSON_ExtendedPrivateSection)
-        } catch {
-            XCTFail("Decoding failed: \(error.localizedDescription)")
-        }
-
     }
 
     // MARK: Array of vAtoms

@@ -14,7 +14,7 @@ import Foundation
 extension JSONDecoder {
 
     /// Singleton 
-    static let blockv: JSONDecoder = {
+    public static let blockv: JSONDecoder = {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         return decoder
@@ -24,7 +24,7 @@ extension JSONDecoder {
 extension JSONEncoder {
 
     /// Singleton
-    static let blockv: JSONEncoder = {
+    public static let blockv: JSONEncoder = {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         return encoder

@@ -27,6 +27,7 @@ extension VatomModel: Descriptable {
             let _version        = descriptor["version"] as? String,
             let _whenCreated    = descriptor["when_created"] as? String,
             let _whenModified   = descriptor["when_modified"] as? String,
+            let _whenAdded      = descriptor["when_added"] as? String,
             let _sync           = descriptor["sync"] as? UInt,
             let _private        = descriptor["private"] as? [String: Any],
             let _rootDescriptor = descriptor["vAtom::vAtomType"] as? [String: Any]
@@ -37,6 +38,7 @@ extension VatomModel: Descriptable {
         self.version = _version
         self.whenCreated = DateFormatter.blockvDateFormatter.date(from: _whenCreated)! //FIXME: force
         self.whenModified = DateFormatter.blockvDateFormatter.date(from: _whenModified)! //FIXME: force
+        self.whenAdded = DateFormatter.blockvDateFormatter.date(from: _whenAdded)! //FIXME: force
         self.sync = _sync
         self.private = try? JSON.init(_private)
         self.props = try RootProperties(from: _rootDescriptor)

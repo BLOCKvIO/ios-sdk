@@ -11,13 +11,13 @@
 
 import Foundation
 
-/// A struct that holds **unpackaged** vAtoms.
+/// A struct that holds **unpackaged** vatoms.
 ///
-/// - Array of unpackaged vAtoms
+/// - Array of unpackaged vatoms
 /// - Array of faces for each of the present templates.
-///   - Technically, a consolidated array of all the faces linked to the parent templates of the present vAtoms.
+///   - Technically, a consolidated array of all the faces linked to the parent templates of the present vatoms.
 /// - Array of actions for each of the present templates.
-///   - Technically, a consolidated array of all the actions linked to the parent templates of the present vAtoms.
+///   - Technically, a consolidated array of all the actions linked to the parent templates of the present vatoms.
 public struct UnpackedModel: Decodable, Equatable {
 
     public var vatoms: [VatomModel]
@@ -84,7 +84,7 @@ public struct UnpackedModel: Decodable, Equatable {
     /// The resulting vatoms have their template's face and action models directly attached.
     ///
     /// - note:
-    /// Actions and Faces are associated at the template level. The BLOCKv API returns vAtoms, Action, and Faces as
+    /// Actions and Faces are associated at the template level. The BLOCKv API returns vatoms, Action, and Faces as
     /// three separate arrays (i.e. unpacked). This methods 'packages' the actions and faces onto associated vatoms.
     func package() -> [VatomModel] {
 
@@ -102,6 +102,22 @@ public struct UnpackedModel: Decodable, Equatable {
 
         // return the packed vatoms
         return packedVatoms
+
+    }
+
+    /// Converts an unpacked-model into a `VatomModel` if the package contains only one vatom.
+    ///
+    /// - Returns: A single model.
+    /// - Throws: Throws an error if the unpacked-model does not contain exactly one vatom.
+    func packagedSingle() throws -> VatomModel {
+
+        guard self.vatoms.count == 1 else {
+            throw BVError.modelDecoding(reason: "UnpackedModel must contain exactly one vatom.")
+        }
+        var first = self.vatoms.first!
+        first.faceModels = faces
+        first.actionModels = actions
+        return first
 
     }
 

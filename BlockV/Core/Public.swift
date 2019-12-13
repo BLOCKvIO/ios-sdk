@@ -11,26 +11,6 @@
 
 import Foundation
 
-// MARK: - Hash
-
-public struct InventoryHashModel: Codable {
-    let hash: String
-}
-
-// MARK: - Sync
-
-public struct VatomSyncModel: Codable {
-    let id: String
-    let sync: UInt
-}
-
-public struct InventorySyncModel: Codable {
-    
-    let vatoms: [VatomSyncModel]
-    let nextToken: String
-    
-    enum CodingKeys: String, CodingKey {
-        case vatoms
-        case nextToken = "next_token"
-    }
+public protocol Cancellable {
+    func cancel()
 }

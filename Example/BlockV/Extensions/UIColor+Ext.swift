@@ -24,13 +24,13 @@
 import UIKit
 
 extension UIColor {
-    
+
     @nonobjc class var seafoamBlue: UIColor {
         return UIColor(red: 86.0 / 255.0, green: 194.0 / 255.0, blue: 201.0 / 255.0, alpha: 1.0)
     }
-    
+
     @nonobjc class var destruciveOrange: UIColor {
         return UIColor(red: 219.0 / 255.0, green: 76.0 / 255.0, blue: 43.0 / 255.0, alpha: 1.0)
     }
-    
+
 }

@@ -13,10 +13,10 @@ import Foundation
 
 public struct VatomUpdateModel: Decodable, Equatable {
 
-    let numberUpdated: Int
-    let numberErrors: Int
-    let errorMessage: [String: String]
-    let ids: [String]
+    public let numberUpdated: Int
+    public let numberErrors: Int
+    public let errorMessage: [String: String]
+    public let ids: [String]
 
     enum CodingKeys: String, CodingKey {
         case numberUpdated = "num_updated"

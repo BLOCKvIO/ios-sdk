@@ -249,7 +249,7 @@ class CoreBridgeV2: CoreBridge { //swiftlint:disable:this type_body_length
                 }
 
             }
-            
+
         case .getCurrentUser:
             self.getCurrentUser { result in
                 switch result {
@@ -261,7 +261,7 @@ class CoreBridgeV2: CoreBridge { //swiftlint:disable:this type_body_length
                         return
                     }
                     completion(.success(payload))
-                    
+
                 case .failure(let error):
                     completion(.failure(error))
                 }
@@ -651,8 +651,8 @@ class CoreBridgeV2: CoreBridge { //swiftlint:disable:this type_body_length
                     }
                     completion(.success(json))
 
-                case .failure:
-                    let bridgeError = BridgeError.viewer("Unable to perform action: \(name).")
+                case .failure(let error):
+                    let bridgeError = BridgeError.viewer("Unable to perform action: \(name). \(error.localizedDescription)")
                     completion(.failure(bridgeError))
                 }
 

@@ -11,10 +11,14 @@
 
 import Foundation
 
+//TODO: 1. Preemptive updates should be distributed to all regions.
+//TODO: 2. Regions' should be able to opt into preemptive updates.
+
 /// Extends VatomModel with common vatom actions available on owned vatoms.
 ///
-/// All actions are *preemptive* where possible. That is, data pool is updated locally before the network request is
-/// made performing the action on the server.
+/// Actions are *preemptive* where possible. That is, data pool is updated locally before the network request is
+/// made performing the action on the server. Preemptive updates are always applied to the Inventory Region. Pickup and Drop preemtive updates
+/// are applied to all regions.
 extension VatomModel {
 
     // MARK: - Common Actions
@@ -35,10 +39,10 @@ extension VatomModel {
 
         // prempt reactor outcome
         // remove vatom from inventory region
-        let undo = DataPool.inventory().preemptiveRemove(id: self.id)
+        let undoRemove = DataPool.inventory().preemptiveRemove(id: self.id)
 
         // perform the action
-        self.performAction("Transfer", payload: body, undos: [undo], completion: completion)
+        self.performAction("Transfer", payload: body, undos: [undoRemove], completion: completion)
 
     }
 
@@ -131,36 +135,82 @@ extension VatomModel {
             ]
         ]
 
-        // preempt the reactor outcome
-        let undoCoords = DataPool.inventory().preemptiveChange(id: self.id,
-                                                               keyPath: "vAtom::vAtomType.geo_pos.coordinates",
-                                                               value: [longitude, latitude])
+        var undos: [Region.UndoFunction] = []
+        // preempt reactor outcome
+        DataPool.regions.forEach {
+            undos.append($0.preemptiveChange(id: self.id,
+                                             keyPath: "vAtom::vAtomType.geo_pos.coordinates",
+                                             value: [longitude, latitude]))
 
-        let undoDropped = DataPool.inventory().preemptiveChange(id: self.id,
-                                                                keyPath: "vAtom::vAtomType.dropped",
-                                                                value: true)
+            undos.append($0.preemptiveChange(id: self.id,
+                                             keyPath: "vAtom::vAtomType.dropped",
+                                             value: true))
+        }
 
         // perform the action
-        self.performAction("Drop", payload: body, undos: [undoCoords, undoDropped], completion: completion)
+        self.performAction("Drop", payload: body, undos: undos, completion: completion)
 
     }
 
     /// Performs the **Pickup** action on the current vatom and preeempts the action result.
     ///
     ///   - completion: The completion handler to call when the action is completed.
-    ///                 This handler is executed on the main queue.
+    ///              This handler is executed on the main queue.
     public func pickUp(completion: @escaping (Result<[String: Any], BVError>) -> Void) {
 
         let body = ["this.id": self.id]
 
-        // preempt the reactor outcome
-        let undo = DataPool.inventory().preemptiveChange(id: self.id,
-                                                         keyPath: "vAtom::vAtomType.dropped",
-                                                         value: false)
+        var undos: [Region.UndoFunction] = []
+        // perform reactor outcome
+        DataPool.regions.forEach {
+            undos.append($0.preemptiveChange(id: self.id, keyPath: "vAtom::vAtomType.dropped", value: false))
+        }
 
         // perform the action
-        self.performAction("Pickup", payload: body, undos: [undo], completion: completion)
+        self.performAction("Pickup", payload: body, undos: undos, completion: completion)
 
+    }
+    
+    /// Performs the **Split** action on the current vatom and preempts the result.
+    ///
+    /// - Parameters:
+    ///   - vatomIds: Array of vatom ids to be split off this parent. The vatoms are moved up one level.
+    ///   - completion: The completion handler to call when the action is completed.
+    ///                 This handler is executed on the main queue.
+    public func split(vatomIds: [String], completion: ((Result<[String: Any], BVError>) -> Void)?) {
+        
+        let body: [String: Any] = ["this.id": self.id,
+                                   "vatom.ids": vatomIds]
+        
+        // prempt reactor outcome
+        var undos = [Region.UndoFunction]()
+        for id in vatomIds {
+            // update parent id to self's parent id (i.e. move up one level).
+            let undo = DataPool.inventory().preemptiveChange(id: id, keyPath: "vAtom::vAtomType.parent_id",
+                                                             value: self.props.parentID)
+            undos.append(undo)
+        }
+        
+        // perform the action
+        self.performAction("Split", payload: body, undos: undos, completion: completion)
+    }
+    
+    /// Performs the **Combine** action on the current vatom and preempts the result.
+    ///
+    /// - Parameters:
+    ///   - vatomId: Vatom id of the child vatom to combine with this vatom (i.e. parent).
+    ///   - completion: The completion handler to call when the action is completed.
+    ///                 This handler is executed on the main queue.
+    public func combine(vatomId: String, completion: ((Result<[String: Any], BVError>) -> Void)?) {
+        
+        let body: [String: Any] = ["this.id": self.id,
+                                   "child.id": vatomId]
+        // update the child's parent id to be self's id
+        let undo = DataPool.inventory().preemptiveChange(id: vatomId, keyPath: "vAtom::vAtomType.parent_id",
+                                                         value: self.id)
+        // perform the action
+        self.performAction("Combine", payload: body, undos: [undo], completion: completion)
+        
     }
 
     private typealias Undo = () -> Void
@@ -176,26 +226,32 @@ extension VatomModel {
     private func performAction(_ name: String,
                                payload: [String: Any],
                                undos: [Undo] = [],
-                               completion: @escaping (Result<[String: Any], BVError>) -> Void) {
+                               completion: ((Result<[String: Any], BVError>) -> Void)?) {
 
         /// passed in vatom id must match `this.id`
         guard let vatomId = payload["this.id"] as? String, self.id == vatomId else {
             let error = BVError.custom(reason: "Invalid payload. Value `this.id` must be match the current vAtom.")
-            completion(.failure(error))
+            completion?(.failure(error))
             return
         }
+
+        // update 'when_modified' date
+        let nowDate = DateFormatter.blockvDateFormatter.string(from: Date())
+        let undoModified = DataPool.inventory().preemptiveChange(id: self.id, keyPath: "when_modified", value: nowDate)
+        var allUndos = undos
+        allUndos.append(undoModified)
 
         // perform the action
         BLOCKv.performAction(name: name, payload: payload) { result in
 
             switch result {
             case .success(let payload):
-                completion(.success(payload))
+                completion?(.success(payload))
 
             case .failure(let error):
                 // run undo closures
-                undos.forEach { $0() }
-                completion(.failure(error))
+                allUndos.forEach { $0() }
+                completion?(.failure(error))
             }
 
         }

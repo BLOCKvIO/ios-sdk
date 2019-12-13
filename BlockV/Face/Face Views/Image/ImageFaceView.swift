@@ -9,6 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import UIKit
 import FLAnimatedImage
 import Nuke
@@ -82,12 +83,12 @@ class ImageFaceView: FaceView {
 
     // MARK: - Initialization
 
-    required init(vatom: VatomModel, faceModel: FaceModel) {
+    required init(vatom: VatomModel, faceModel: FaceModel) throws {
 
         // init face config
         self.config = Config(faceModel)
 
-        super.init(vatom: vatom, faceModel: faceModel)
+        try super.init(vatom: vatom, faceModel: faceModel)
 
         // add image view
         self.addSubview(animatedImageView)
@@ -127,7 +128,7 @@ class ImageFaceView: FaceView {
     }
 
     // MARK: - Face View Lifecycle
-    
+
     private var storedCompletion: ((Error?) -> Void)?
 
     /// Begins loading the face view's content.
@@ -146,9 +147,9 @@ class ImageFaceView: FaceView {
         self.reset()
         // store the completion
         self.storedCompletion = completion
-        //
+        // flag a known-bounds layout
         self.requiresBoundsBasedSetup = true
-        
+
     }
 
     /// Updates the backing Vatom and loads the new state.
@@ -184,20 +185,20 @@ class ImageFaceView: FaceView {
 
     // MARK: - Resources
 
-    var nukeContentMode: ImageDecompressor.ContentMode {
+    var configContentMode: ImageProcessor.Resize.ContentMode {
         // check face config, convert to nuke content mode
         switch config.scale {
         case .fill: return .aspectFill
         case .fit:  return .aspectFit
         }
     }
-    
+
     override func setupWithBounds() {
         super.setupWithBounds()
-        
+
         // load required resources
         self.loadResources { [weak self] error in
-            
+
             guard let self = self else { return }
             // update state and inform delegate of load completion
             if let error = error {
@@ -207,9 +208,9 @@ class ImageFaceView: FaceView {
                 self.isLoaded = true
                 self.storedCompletion?(nil)
             }
-            
+
         }
-        
+
     }
 
     private func loadResources(completion: ((Error?) -> Void)?) {
@@ -220,30 +221,18 @@ class ImageFaceView: FaceView {
             return
         }
 
-        do {
-            // encode url
-            let encodeURL = try BLOCKv.encodeURL(resourceModel.url)
-            // create request
-            var request = ImageRequest(url: encodeURL,
-                                       targetSize: pixelSize,
-                                       contentMode: nukeContentMode)
-
-            // set cache key
-            request.cacheKey = request.generateCacheKey(url: resourceModel.url, targetSize: pixelSize)
-
-            /*
-             Nuke's `loadImage` cancels any exisitng requests and nils out the old image. This takes care of the reuse-pool
-             use case where the same face view is used to display a vatom of the same template variation.
-             */
-
-            // load image (auto cancel previous)
-            Nuke.loadImage(with: request, into: self.animatedImageView) { (_, error) in
-                self.isLoaded = true
+        let resize = ImageProcessor.Resize(size: self.bounds.size, contentMode: configContentMode)
+        let request = BVImageRequest(url: resourceModel.url, processors: [resize])
+        // load iamge
+        ImageDownloader.loadImage(with: request, into: self.animatedImageView) { result in
+            self.isLoaded = true
+            do {
+                try result.get()
+                completion?(nil)
+            } catch {
+                os_log("Failed to load: %@", log: .vatomView, type: .error, resourceModel.url.description)
                 completion?(error)
             }
-
-        } catch {
-            completion?(error)
         }
 
     }

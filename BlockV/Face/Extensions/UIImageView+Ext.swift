@@ -21,15 +21,3 @@ extension UIImageView {
     }
 
 }
-
-extension BaseFaceView {
-    
-    /// Size of the bounds of the view in pixels.
-    public var pixelSize: CGSize {
-        get {
-            return CGSize(width: self.bounds.size.width * UIScreen.main.scale,
-                          height: self.bounds.size.height * UIScreen.main.scale)
-        }
-    }
-    
-}

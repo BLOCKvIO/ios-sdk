@@ -38,83 +38,83 @@ protocol VerfiyTokenDelegate: class {
 ///
 /// It allows the user to enter or resend a verification code.
 class VerifyTableViewController: UITableViewController {
-    
+
     // MARK: - Enums
-    
+
     /// The view controller from which this view controller was presented.
     enum Origin {
         case register // presented from registeration vc
         case profile // presented from profile vc
     }
-    
+
     // MARK: - Outlets
-    
+
     @IBOutlet var nextBarButton: UIBarButtonItem!
-    
+
     // MARK: - Properties
-    
+
     fileprivate let tokenCellID = "cell.token.id"
-    
+
     /// This view controller shows a different set of data based on its presentation origin.
     var origin: Origin!
-    
+
     /// Array of user tokens from registration.
     /// Set on segue to this view controller.
     var registrationTokens: [UserToken] = []
-    
+
     /// Array of all tokens from the `getCurrentUserTokens` call.
     /// Set off the back of the network call.
     fileprivate var allTokens: [FullTokenModel] = []
-    
+
     // MARK: - Lifecycle
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+
         precondition(origin != nil, "This view controller's orgin must be set before loading.")
-        
+
         // check the orgin of presentation
         if origin == .profile {
-            
+
             // remove the 'next' button
             nextBarButton = nil
-            
+
             // fetch all tokens
             fetchAllUserTokens()
         }
-        
+
         self.tableView.reloadData()
-        
+
     }
-    
+
     // MARK: - Networking
-    
+
     /// Fetches all the tokens associated with the user's account. This includes
     /// user tokens and oauth tokens.
     ///
     /// Note: The response contains an array of full token models.
     func fetchAllUserTokens() {
-        
+
         // show loader
         self.showNavBarActivityRight()
-        
+
         BLOCKv.getCurrentUserTokens { [weak self] result in
-            
+
             // hide loader
             self?.hideNavBarActivityRight()
-            
+
             switch result {
             case .success(let fullTokens):
                 print("Viewer > \(fullTokens)\n")
-                
+
                 // update the tokens
                 self?.allTokens = fullTokens
                 self?.tableView.reloadData()
-                
+
             case .failure(let error):
                 print(">>> Error > Viewer: \(error.localizedDescription)")
                 self?.present(UIAlertController.errorAlert(error), animated: true)
@@ -122,31 +122,31 @@ class VerifyTableViewController: UITableViewController {
             }
 
         }
-        
+
     }
-    
+
 }
 
 // MARK: - Table view delegate and data source
 
 extension VerifyTableViewController {
-    
+
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
-    
+
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch origin! {
         case .register: return registrationTokens.count
         case .profile: return allTokens.count
         }
     }
-    
+
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
+
         let cell = tableView.dequeueReusableCell(withIdentifier: tokenCellID, for: indexPath) as! TokenCell
         cell.delegate = self
-        
+
         switch origin! {
         case .register:
             let userToken = registrationTokens[indexPath.row]
@@ -157,17 +157,17 @@ extension VerifyTableViewController {
             cell.configure(fullToken: fullToken)
             return cell
         }
-        
+
     }
-        
+
     override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
-        
+
         // don't show actions in register flow
         if origin == .register { return [] }
-        
+
         // action to delete the token
-        let delete = UITableViewRowAction(style: .destructive, title: "Delete") { (action, indexPath) in
-            
+        let delete = UITableViewRowAction(style: .destructive, title: "Delete") { (_, indexPath) in
+
             // get the token
             let token = self.allTokens[indexPath.row]
             // make request
@@ -178,11 +178,11 @@ extension VerifyTableViewController {
                 // refresh local token list
                 self?.fetchAllUserTokens()
             }
-            
+
         }
-        
+
         // action to set the token as primary
-        let primary = UITableViewRowAction(style: .normal, title: "Primary") { (action, indexPath) in
+        let primary = UITableViewRowAction(style: .normal, title: "Primary") { (_, indexPath) in
 
             // get the token
             let token = self.allTokens[indexPath.row]
@@ -194,17 +194,17 @@ extension VerifyTableViewController {
                 // refresh local token list
                 self?.fetchAllUserTokens()
             }
-            
+
         }
-        
+
         return [delete, primary]
-        
+
     }
-    
+
     /*
      Add this to do the delete locally before going out to network. This will give good feedback locally.
      */
-    
+
 //    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
 //
 //        if editingStyle == .delete {
@@ -214,69 +214,69 @@ extension VerifyTableViewController {
 //        }
 //
 //    }
-    
+
 }
 
 extension VerifyTableViewController: VerfiyTokenDelegate {
-    
+
     func verifyUserToken(token: UserToken, code: String, completion: @escaping (Bool) -> Void) {
-        
+
         // show loader
         self.showNavBarActivityRight()
-        
+
         BLOCKv.verifyUserToken(token.value, type: token.type, code: code) { [weak self] result in
-            
+
             // hide loader
             self?.hideNavBarActivityRight()
             self?.navigationItem.rightBarButtonItem = self?.nextBarButton
-            
+
             switch result {
             case .success(let userToken):
                 self?.tableView.reloadData()
                 self?.present(UIAlertController.okAlert(title: "Info", message: "Token: \(userToken.value) has been verified."), animated: true)
-                
+
                 completion(true)
                 print("Viewer > \(userToken)\n")
-                
+
             case .failure(let error):
                 print(">>> Error > Viewer: \(error.localizedDescription)")
                 self?.present(UIAlertController.errorAlert(error), animated: true)
                 completion(false)
                 return
             }
-            
+
         }
     }
-    
+
     func resendVerification(token: UserToken, completion: @escaping (Bool) -> Void) {
-        
+
         // show loader
         self.showNavBarActivityRight()
-        
+
         BLOCKv.resetVerification(forUserToken: token.value, type: token.type) { [weak self] result in
-            
+
             // hide loader
             self?.hideNavBarActivityRight()
             self?.navigationItem.rightBarButtonItem = self?.nextBarButton
-            
+
             switch result {
             case .success(let userToken):
                 self?.tableView.reloadData()
                 self?.present(UIAlertController.okAlert(title: "Info",
                                                         message: "An verification link/OTP has been sent to your token."),
                               animated: true)
-                
+
                 completion(true)
                 print("Viewer > \(userToken)\n")
-                
+
             case .failure(let error):
                 print(">>> Error > Viewer: \(error.localizedDescription)")
                 self?.present(UIAlertController.errorAlert(error), animated: true)
                 completion(false)
                 return
             }
-            
+
         }
     }
-    
+
 }

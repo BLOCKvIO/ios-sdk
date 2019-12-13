@@ -9,6 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
+import os
 import UIKit
 import Nuke
 import GenericJSON
@@ -108,11 +109,11 @@ class ImageProgressFaceView: FaceView {
 
     // MARK: - Initialization
 
-    required init(vatom: VatomModel, faceModel: FaceModel) {
+    required init(vatom: VatomModel, faceModel: FaceModel) throws {
 
         // init face config (or legacy private section) fallback on default values
 
-        if let config = faceModel.properties.config {
+        if let config = faceModel.properties.config, config != .null {
             self.config = Config(config) // face config
         } else if let config = vatom.private {
             self.config = Config(config) // private section
@@ -120,7 +121,7 @@ class ImageProgressFaceView: FaceView {
             self.config = Config() // default values
         }
 
-        super.init(vatom: vatom, faceModel: faceModel)
+        try super.init(vatom: vatom, faceModel: faceModel)
 
         self.addSubview(emptyImageView)
         self.addSubview(fullImageView)
@@ -201,6 +202,13 @@ class ImageProgressFaceView: FaceView {
     override func layoutSubviews() {
         super.layoutSubviews()
 
+        // show/hide progress label based on current size
+        if self.bounds.size.width < 100 {
+            progressLabel.isHidden = true
+        } else {
+            progressLabel.isHidden = false
+        }
+
         // image size
         guard let image = fullImageView.image else { return }
 
@@ -278,40 +286,33 @@ class ImageProgressFaceView: FaceView {
                 return
         }
 
-        // ensure encoding passes
-        do {
+        // NB: Do not resize due to brittle pixel offsets in face config.
+        let emptyRequest = BVImageRequest(url: emptyImageResource.url)
+        let fullRequest = BVImageRequest(url: fullImageResource.url)
 
-            let encodedEmptyURL = try BLOCKv.encodeURL(emptyImageResource.url)
-            let encodedFullURL = try BLOCKv.encodeURL(fullImageResource.url)
-
-            dispatchGroup.enter()
-            dispatchGroup.enter()
-
-            var requestEmpty = ImageRequest(url: encodedEmptyURL)
-            // set cache key
-            requestEmpty.cacheKey = requestEmpty.generateCacheKey(url: emptyImageResource.url, targetSize: pixelSize)
-
-            // load image (automatically handles reuse)
-            Nuke.loadImage(with: requestEmpty, into: self.emptyImageView) { (_, _) in
-                self.dispatchGroup.leave()
+        dispatchGroup.enter()
+        dispatchGroup.enter()
+        // load images
+        ImageDownloader.loadImage(with: emptyRequest, into: self.emptyImageView) { result in
+            self.dispatchGroup.leave()
+            do {
+                try result.get()
+            } catch {
+                os_log("Failed to load: %@", log: .vatomView, type: .error, emptyImageResource.url.description)
             }
-
-            var requestFull = ImageRequest(url: encodedFullURL)
-            // set cache key
-            requestFull.cacheKey = requestFull.generateCacheKey(url: fullImageResource.url, targetSize: pixelSize)
-
-            // load image (automatically handles reuse)
-            Nuke.loadImage(with: requestFull, into: self.fullImageView) { (_, _) in
-                self.dispatchGroup.leave()
+        }
+        ImageDownloader.loadImage(with: fullRequest, into: self.fullImageView) { result in
+            self.dispatchGroup.leave()
+            do {
+                try result.get()
+            } catch {
+                os_log("Failed to load: %@", log: .vatomView, type: .error, fullImageResource.url.description)
             }
+        }
 
-            dispatchGroup.notify(queue: .main) {
-                self.isLoaded = true
-                completion(nil)
-            }
-
-        } catch {
-            completion(error)
+        dispatchGroup.notify(queue: .main) {
+            self.isLoaded = true
+            completion(nil)
         }
 
     }

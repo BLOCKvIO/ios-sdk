@@ -155,7 +155,7 @@ extension VatomModel {
     /// Performs the **Pickup** action on the current vatom and preeempts the action result.
     ///
     ///   - completion: The completion handler to call when the action is completed.
-    ///                 This handler is executed on the main queue.
+    ///              This handler is executed on the main queue.
     public func pickUp(completion: @escaping (Result<[String: Any], BVError>) -> Void) {
 
         let body = ["this.id": self.id]
@@ -169,6 +169,48 @@ extension VatomModel {
         // perform the action
         self.performAction("Pickup", payload: body, undos: undos, completion: completion)
 
+    }
+    
+    /// Performs the **Split** action on the current vatom and preempts the result.
+    ///
+    /// - Parameters:
+    ///   - vatomIds: Array of vatom ids to be split off this parent. The vatoms are moved up one level.
+    ///   - completion: The completion handler to call when the action is completed.
+    ///                 This handler is executed on the main queue.
+    public func split(vatomIds: [String], completion: ((Result<[String: Any], BVError>) -> Void)?) {
+        
+        let body: [String: Any] = ["this.id": self.id,
+                                   "vatom.ids": vatomIds]
+        
+        // prempt reactor outcome
+        var undos = [Region.UndoFunction]()
+        for id in vatomIds {
+            // update parent id to self's parent id (i.e. move up one level).
+            let undo = DataPool.inventory().preemptiveChange(id: id, keyPath: "vAtom::vAtomType.parent_id",
+                                                             value: self.props.parentID)
+            undos.append(undo)
+        }
+        
+        // perform the action
+        self.performAction("Split", payload: body, undos: undos, completion: completion)
+    }
+    
+    /// Performs the **Combine** action on the current vatom and preempts the result.
+    ///
+    /// - Parameters:
+    ///   - vatomId: Vatom id of the child vatom to combine with this vatom (i.e. parent).
+    ///   - completion: The completion handler to call when the action is completed.
+    ///                 This handler is executed on the main queue.
+    public func combine(vatomId: String, completion: ((Result<[String: Any], BVError>) -> Void)?) {
+        
+        let body: [String: Any] = ["this.id": self.id,
+                                   "child.id": vatomId]
+        // update the child's parent id to be self's id
+        let undo = DataPool.inventory().preemptiveChange(id: vatomId, keyPath: "vAtom::vAtomType.parent_id",
+                                                         value: self.id)
+        // perform the action
+        self.performAction("Combine", payload: body, undos: [undo], completion: completion)
+        
     }
 
     private typealias Undo = () -> Void
@@ -184,12 +226,12 @@ extension VatomModel {
     private func performAction(_ name: String,
                                payload: [String: Any],
                                undos: [Undo] = [],
-                               completion: @escaping (Result<[String: Any], BVError>) -> Void) {
+                               completion: ((Result<[String: Any], BVError>) -> Void)?) {
 
         /// passed in vatom id must match `this.id`
         guard let vatomId = payload["this.id"] as? String, self.id == vatomId else {
             let error = BVError.custom(reason: "Invalid payload. Value `this.id` must be match the current vAtom.")
-            completion(.failure(error))
+            completion?(.failure(error))
             return
         }
 
@@ -204,12 +246,12 @@ extension VatomModel {
 
             switch result {
             case .success(let payload):
-                completion(.success(payload))
+                completion?(.success(payload))
 
             case .failure(let error):
                 // run undo closures
                 allUndos.forEach { $0() }
-                completion(.failure(error))
+                completion?(.failure(error))
             }
 
         }

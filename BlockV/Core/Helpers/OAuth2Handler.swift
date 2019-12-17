@@ -72,8 +72,6 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
             // inject the bearer on every request
             urlRequest.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             return urlRequest
-        } else {
-            print("xxx Not bearer injecting: \(urlRequest)")
         }
         return urlRequest
     }

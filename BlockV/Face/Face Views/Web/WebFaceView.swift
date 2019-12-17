@@ -102,7 +102,7 @@ class WebFaceView: FaceView {
         }
         self.coreBridge?.sendVatom(vatom)
         // fetch first-level children
-        let children = self.vatom.listCachedChildren()
+        let children = (try? self.vatom.listCachedChildren()) ?? []
         self.coreBridge?.sendVatomChildren(children)
     }
 

@@ -18,6 +18,11 @@ import GenericJSON
 /// Native Image face view
 ///
 /// Displays a resource based on the frist matching item in the policy array.
+///
+/// ### Owned vs. Unowned Vatoms
+///
+/// The real-time addition and removal of child vatoms is only tracked for vatoms the user owns. Since this face view
+/// is dependent on child relationships, it's representation of unowned vatoms may be inaccurate.
 class ImagePolicyFaceView: FaceView {
 
     class var displayURL: String { return "native://image-policy" }
@@ -147,7 +152,7 @@ class ImagePolicyFaceView: FaceView {
     /// Current count of child vAtoms.
     private var currentChildCount: Int {
         // inspect cached children
-        return self.vatom.listCachedChildren().count
+        return (try? self.vatom.listCachedChildren().count) ?? 0
     }
 
     /// Update the face view using *local* data.

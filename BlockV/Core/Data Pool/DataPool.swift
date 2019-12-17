@@ -29,6 +29,10 @@ import MapKit
 /// Region instances are created on-demand.
 /// Regions are loaded from disk cache.
 public final class DataPool {
+    
+    enum SessionError: Error {
+        case currentUserPermission
+    }
 
     /// List of available plugins, i.e. region classes.
     internal static let plugins: [Region.Type] = [
@@ -49,6 +53,10 @@ public final class DataPool {
                 reg.onSessionInfoChanged(info: sessionInfo)
             }
         }
+    }
+    
+    public static var currentUserId: String {
+        return sessionInfo["userID"] as? String ?? ""
     }
 
     /// Fetches or creates a named data region.

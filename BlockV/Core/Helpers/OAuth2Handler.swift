@@ -52,18 +52,28 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
     }
 
     // MARK: - Request Adapter
+    
+    /// List of endpoint paths that have 'guest' scope. These enpoints do not require a bearer header.
+    let guestScopes = [
+        "/v1/users",
+        "/v1/user/login",
+        "/v1/user/guest"
+    ]
 
     /// Inspects and adapts the specified `URLRequest` in some manner if necessary and returns the result.
     ///
     /// Adapts a `URLRequest` to include the Authorization header.
     func adapt(_ urlRequest: URLRequest) throws -> URLRequest {
+        
+        guard let url = urlRequest.url else { return urlRequest }
 
-        if let urlString = urlRequest.url?.absoluteString, urlString.hasPrefix(baseURLString) {
+        if url.absoluteString.hasPrefix(baseURLString) && !guestScopes.contains(where: { $0 == url.path }) {
             var urlRequest = urlRequest
             // inject the bearer on every request
-            // TODO: Don't send on auth calls (register / login)
             urlRequest.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             return urlRequest
+        } else {
+            print("xxx Not bearer injecting: \(urlRequest)")
         }
         return urlRequest
     }

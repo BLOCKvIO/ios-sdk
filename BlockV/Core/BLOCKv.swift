@@ -314,6 +314,25 @@ public final class BLOCKv {
 
     }
 
+    // MARK: - Action Pipeline
+
+    /// This closure is executed immediately before any action is processed by the platform.
+    ///
+    /// - Parameters:
+    ///   - name: Name of the action to perform, e.g. "Drop".
+    ///   - payload: Body payload that will be sent as JSON in the request body.
+    public static var onActionStart: ((_ name: String, _ payload: [String: Any]) -> Void)?
+
+    /// This closure is executed immediately after any action has been processed by the platform.
+    ///
+    /// - Parameters:
+    ///   - name: Name of the action to perform, e.g. "Drop".
+    ///   - payload: Body payload that will be sent as JSON in the request body.
+    ///   - result: Platform response to the perform action request.
+    public static var onActionComplete: ((_ name: String,
+    _ payload: [String: Any],
+    _ result: Swift.Result<[String: Any], BVError>) -> Void)?
+
     // MARK: - Resources
 
     enum URLEncodingError: Error {

@@ -441,6 +441,8 @@ extension BLOCKv {
     public static func performAction(name: String,
                                      payload: [String: Any],
                                      completion: @escaping (Result<[String: Any], BVError>) -> Void) {
+        
+        self.onActionStart?(name, payload)
 
         let endpoint = API.VatomAction.custom(name: name, payload: payload)
 
@@ -457,17 +459,20 @@ extension BLOCKv {
                     }
                     // model is available
                     DispatchQueue.main.async {
+                        self.onActionComplete?(name, payload, .success(payload))
                         completion(.success(payload))
                     }
 
                 } catch {
                     let error = BVError.modelDecoding(reason: error.localizedDescription)
+                    self.onActionComplete?(name, payload, .failure(error))
                     completion(.failure(error))
                 }
 
             case .failure(let error):
                 // handle error
                 DispatchQueue.main.async {
+                    self.onActionComplete?(name, payload, .failure(error))
                     completion(.failure(error))
                 }
             }

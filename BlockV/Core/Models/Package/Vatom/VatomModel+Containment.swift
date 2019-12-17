@@ -39,6 +39,8 @@ extension VatomModel {
 
     /// Returns `true` if this container vatom's child policy permits containment of the child vatom. `false` otherwise.
     ///
+    /// Poilcy max an min rules are evaluated locally.
+    ///
     /// Only applicable to *owned* vatoms.
     private func doesChildPolicyAllowContainmentOf(_ childVatom: VatomModel) -> Bool {
 
@@ -47,11 +49,15 @@ extension VatomModel {
 
             // check if there is a maximum number of children
             if policy.creationPolicy.enforcePolicyCountMax {
+                // get cached children (owned vatoms only)
+                guard let children = try? self.listCachedChildren() else {
+                    return false
+                }
                 // check if current child count is less then policy max
-                let children = self.listCachedChildren().filter {
+                let filteredChildren = children.filter {
                     $0.props.templateVariationID ==  policy.templateVariationID
                 }
-                if policy.creationPolicy.policyCountMax > children.count {
+                if policy.creationPolicy.policyCountMax > filteredChildren.count {
                     return true
                 }
             } else {

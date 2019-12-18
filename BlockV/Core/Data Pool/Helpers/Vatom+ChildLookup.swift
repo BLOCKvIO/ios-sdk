@@ -56,13 +56,16 @@ extension VatomModel {
 
     /// Fetches the first-level child vatoms for this container vatom.
     ///
-    /// Only available on *owned* container vatoms. Use this function to get a best-effort snapshot of the number of
+    /// Only available on *owned* container vatoms (throws otherwise). Use this function to get a best-effort snapshot of the number of
     /// children contained by this vatom. This call is useful where getting the number of children is critical, e.g.
     /// face code in a re-use list.
     ///
     /// - important:
-    /// This method will inspect the 'inventory' region irrespective of sync state. This means the method is fast.
-    public func listCachedChildren() -> [VatomModel] {
+    /// This method will inspect the 'inventory' region irrespective of sync state. This means the method is fast but potentially unsynchronized.
+    public func listCachedChildren() throws -> [VatomModel] {
+        
+        // ensure data-pool's session owner is the vatom's owner
+        if self.props.owner != DataPool.currentUserId { throw DataPool.SessionError.currentUserPermission }
 
         // fetch children from inventory region
         let children = DataPool.inventory().getAll()

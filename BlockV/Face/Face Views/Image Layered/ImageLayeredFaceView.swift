@@ -34,7 +34,12 @@ private class Layer: UIImageView {
 
 }
 
-/// Layered image face view
+/// Image Layered Face View.
+///
+/// ### Owned vs. Unowned Vatoms
+///
+/// The real-time addition and removal of child vatoms is only tracked for vatoms the user owns. Since this face view
+/// is dependent on child relationships, it's representation of unowned vatoms may be inaccurate.
 class ImageLayeredFaceView: FaceView {
 
     class var displayURL: String { return "native://layered-image" }
@@ -54,7 +59,7 @@ class ImageLayeredFaceView: FaceView {
 
     private var childVatoms: [VatomModel] {
         // fetch cached children
-        return self.vatom.listCachedChildren()
+        return (try? self.vatom.listCachedChildren()) ?? []
     }
 
     // MARK: - Config

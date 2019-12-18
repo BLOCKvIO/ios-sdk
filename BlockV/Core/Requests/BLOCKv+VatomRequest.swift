@@ -429,9 +429,21 @@ extension BLOCKv {
 
     }
 
+    /// Models an action response.
+    struct ActionResponse {
+        /// Name of the action.
+        let name: String
+        /// Request payload.
+        let payload: [String: Any]
+        /// Platform response.
+        let result: Result<[String: Any], BVError>
+    }
+
     /// Performs an action on the BLOCKv platform.
     ///
-    /// This is the most flexible of the action calls and should be used as a last resort.
+    /// ### Notifications:
+    /// - `willPerformAction` is broadcast before the request is sent to the platform to perform the action.
+    /// - `didPerformAction` is broadcast after a response is received from the platform.
     ///
     /// - Parameters:
     ///   - name: Name of the action to perform, e.g. "Drop".
@@ -441,8 +453,11 @@ extension BLOCKv {
     public static func performAction(name: String,
                                      payload: [String: Any],
                                      completion: @escaping (Result<[String: Any], BVError>) -> Void) {
-        
-        self.onActionStart?(name, payload)
+
+        // broadcast will perform action
+        NotificationCenter.default.post(name: Notification.Name.BVAction.willPerformAction,
+                                        object: nil,
+                                        userInfo: ["name": name, "payload": payload])
 
         let endpoint = API.VatomAction.custom(name: name, payload: payload)
 
@@ -459,20 +474,36 @@ extension BLOCKv {
                     }
                     // model is available
                     DispatchQueue.main.async {
-                        self.onActionComplete?(name, payload, .success(payload))
+                        // broadcast did perform action
+                        let response = ActionResponse(name: name, payload: payload, result: .success(payload))
+                        NotificationCenter.default.post(name: Notification.Name.BVAction.didPerformAction,
+                                                        object: nil,
+                                                        userInfo: ["name": name, "payload": payload,
+                                                                   "response": response])
                         completion(.success(payload))
                     }
 
                 } catch {
-                    let error = BVError.modelDecoding(reason: error.localizedDescription)
-                    self.onActionComplete?(name, payload, .failure(error))
-                    completion(.failure(error))
+                    DispatchQueue.main.async {
+                        let error = BVError.modelDecoding(reason: error.localizedDescription)
+                        // broadcast did perform action
+                        let response = ActionResponse(name: name, payload: payload, result: .failure(error))
+                        NotificationCenter.default.post(name: Notification.Name.BVAction.didPerformAction,
+                                                        object: nil,
+                                                        userInfo: ["name": name, "payload": payload,
+                                                                   "response": response])
+                        completion(.failure(error))
+                    }
                 }
 
             case .failure(let error):
-                // handle error
                 DispatchQueue.main.async {
-                    self.onActionComplete?(name, payload, .failure(error))
+                    // broadcast did perform action
+                    let response = ActionResponse(name: name, payload: payload, result: .failure(error))
+                    NotificationCenter.default.post(name: Notification.Name.BVAction.didPerformAction,
+                                                    object: nil,
+                                                    userInfo: ["name": name, "payload": payload,
+                                                               "response": response])
                     completion(.failure(error))
                 }
             }

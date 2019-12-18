@@ -11,17 +11,23 @@
 
 import Foundation
 
-// MARK: - BLOCKv
-
+/// Extension containing internal notifications.
 extension Notification.Name {
 
-    // MARK: - Internal
-
     internal struct BVInternal {
-
         /// INTERNAL: Broadcast to indicate user authorization is required.
         internal static let UserAuthorizationRequried = Notification.Name("com.blockv.internal.user.auth.required")
-
     }
 
 }
+
+/// Extension containing external notifications.
+public extension Notification.Name {
+
+    struct BVAction {
+        public static let willPerformAction = Notification.Name("com.blockv.action.will.perform")
+        public static let didPerformAction = Notification.Name("com.blockv.action.did.perform")
+    }
+
+}
+

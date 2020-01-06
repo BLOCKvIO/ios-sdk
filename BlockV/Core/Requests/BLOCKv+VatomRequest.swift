@@ -469,13 +469,13 @@ extension BLOCKv {
                 do {
                     guard
                         let object = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                        let payload = object["payload"] as? [String: Any] else {
+                        let responsePayload = object["payload"] as? [String: Any] else {
                             throw BVError.modelDecoding(reason: "Unable to extract payload.")
                     }
                     // model is available
                     DispatchQueue.main.async {
                         // broadcast did perform action
-                        let response = ActionResponse(name: name, payload: payload, result: .success(payload))
+                        let response = ActionResponse(name: name, payload: payload, result: .success(responsePayload))
                         NotificationCenter.default.post(name: Notification.Name.BVAction.didPerformAction,
                                                         object: nil,
                                                         userInfo: ["name": name, "payload": payload,

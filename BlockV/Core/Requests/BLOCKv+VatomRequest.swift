@@ -432,11 +432,11 @@ extension BLOCKv {
     /// Models an action response.
     public struct ActionResponse {
         /// Name of the action.
-        let name: String
+        public let name: String
         /// Request payload.
-        let payload: [String: Any]
+        public let payload: [String: Any]
         /// Platform response.
-        let result: Result<[String: Any], BVError>
+        public let result: Result<[String: Any], BVError>
     }
 
     /// Performs an action on the BLOCKv platform.

@@ -430,7 +430,7 @@ extension BLOCKv {
     }
 
     /// Models an action response.
-    struct ActionResponse {
+    public struct ActionResponse {
         /// Name of the action.
         let name: String
         /// Request payload.

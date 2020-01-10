@@ -454,8 +454,19 @@ class CoreBridgeV2: CoreBridge { //swiftlint:disable:this type_body_length
             }
         }
 
+        struct Tokens: Encodable {
+            let hasVerifiedEmail: Bool
+            let hasVerifiedPhone: Bool
+
+            enum CodingKeys: String, CodingKey {
+                case hasVerifiedEmail = "has_verified_email"
+                case hasVerifiedPhone = "has_verified_phone"
+            }
+        }
+
         let id: String
         let properties: Properties
+        let tokens: Tokens
 
     }
 
@@ -599,21 +610,65 @@ class CoreBridgeV2: CoreBridge { //swiftlint:disable:this type_body_length
     /// Fetches the bridge-available properties of the current user.
     private func getCurrentUser(completion: @escaping (Result<BRCurrentUser, BridgeError>) -> Void) {
 
+        var userID: String!
+        var properties: BRCurrentUser.Properties!
+        var tokens: BRCurrentUser.Tokens!
+        var bridgeError: BridgeError?
+
+        let group = DispatchGroup()
+
+        group.enter()
         BLOCKv.getCurrentUser { result in
 
             switch result {
             case .success(let user):
                 // build response
-                let properties = BRCurrentUser.Properties(firstName: user.firstName,
-                                                          lastName: user.lastName,
-                                                          avatarURI: user.avatarURL?.absoluteString ?? "",
-                                                          isGuest: user.guestID.isEmpty ? false : true)
-                let response = BRCurrentUser(id: user.id, properties: properties)
-                completion(.success(response))
+                properties = BRCurrentUser.Properties(firstName: user.firstName,
+                                                      lastName: user.lastName,
+                                                      avatarURI: user.avatarURL?.absoluteString ?? "",
+                                                      isGuest: user.guestID.isEmpty ? false : true)
+                userID = user.id
 
             case .failure:
-                let bridgeError = BridgeError.viewer("Unable to fetch current user.")
-                completion(.failure(bridgeError))
+                bridgeError = BridgeError.viewer("Unable to fetch current user.")
+            }
+
+            group.leave()
+        }
+
+        group.enter()
+        BLOCKv.getCurrentUserTokens { result in
+
+            switch result {
+            case .success(let tokenModel):
+
+                // check for at least one verified email
+                let hasVerifiedEmail = tokenModel.contains(where: {
+                    $0.properties.tokenType == "email" && $0.properties.isConfirmed == true
+                })
+                // check for at least one verified phone number
+                let hasVerifiedPhone = tokenModel.contains(where: {
+                    $0.properties.tokenType == "phone_number" && $0.properties.isConfirmed == true
+                })
+
+                tokens = BRCurrentUser.Tokens(hasVerifiedEmail: hasVerifiedEmail,
+                                              hasVerifiedPhone: hasVerifiedPhone)
+
+            case .failure:
+                bridgeError = BridgeError.viewer("Unable to fetch current user.")
+            }
+
+            group.leave()
+
+        }
+
+        // send response once both are done
+        group.notify(queue: .main) {
+            if let error = bridgeError {
+                completion(.failure(error))
+            } else {
+                let response = BRCurrentUser(id: userID, properties: properties, tokens: tokens)
+                completion(.success(response))
             }
         }
 

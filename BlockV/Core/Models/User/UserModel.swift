@@ -28,7 +28,7 @@ public struct UserModel: Equatable {
     public let meta: MetaModel
     public let avatarURL: URL?
     public let isPasswordSet: Bool
-    public let userConsents: [String]
+    public let userConsents: [ConsentModel]
 
     // Internal
 
@@ -93,7 +93,7 @@ extension UserModel: Codable {
         nonPushNotification = try propertiesContainer.decode(Bool.self, forKey: .nonPushNotification)
         language            = try propertiesContainer.decode(String.self, forKey: .language)
         isPasswordSet       = try propertiesContainer.decode(Bool.self, forKey: .isPasswordSet)
-        userConsents        = try propertiesContainer.decode([String].self, forKey: .userConsents)
+        userConsents        = try propertiesContainer.decode([ConsentModel].self, forKey: .userConsents)
 
         // Avatar URLs generally have a default value - but this is not guaranteed.
         avatarURL           = propertiesContainer.decodeSafely(Safe<URL>.self, forKey: .avatarURL)?.value
@@ -123,4 +123,46 @@ extension UserModel: Codable {
 
     }
 
+}
+
+/// Consent Model
+public struct ConsentModel: Equatable {
+    
+    // Public
+
+    public let meta: MetaModel
+    public let appId: String
+    public let version: Int
+    public let address: String
+    
+    enum CodingKeys: String, CodingKey {
+        case meta
+        case appId = "app_id"
+        case version
+        case address
+    }
+    
+}
+
+// MARK: - Codable
+
+extension ConsentModel: Codable {
+    
+    public init(from decoder: Decoder) throws {
+        // top-level
+        let items        = try decoder.container(keyedBy: CodingKeys.self)
+        meta             = try items.decode(MetaModel.self, forKey: .meta)
+        appId            = try items.decode(String.self, forKey: .appId)
+        version          = try items.decode(Int.self, forKey: .version)
+        address          = try items.decode(String.self, forKey: .address)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        // top-level
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(meta, forKey: .meta)
+        try container.encode(appId, forKey: .appId)
+        try container.encode(version, forKey: .version)
+        try container.encode(address, forKey: .address)
+    }
 }

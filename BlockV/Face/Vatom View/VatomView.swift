@@ -281,7 +281,7 @@ open class VatomView: UIView {
 
     // MARK: - State Management
 
-    /// Updates the vAtom and optionally the procedure.
+    /// Updates the vatom and optionally the procedure.
     ///
     /// Both vatom and procedure may be updated over the lifespan of the `VatomView`. If either are updated the VVLC
     /// will run. This and may (or may not) result in the selected face model changing.
@@ -309,6 +309,21 @@ open class VatomView: UIView {
         self.vatom = newVatom
         runVVLC(oldVatom: oldVatom)
 
+    }
+    
+    /// Updates the procudure of this vatom view.
+    ///
+    /// This will trigger a run of the VVLC.
+    ///
+    /// - If the selected face model remains the same, then updates will be passed down to the currently selected face
+    /// view.
+    /// - If the selected face model changes, then the current face view will be torndown an the newly selected face
+    /// view added to the view hierarchy.
+    ///
+    /// - Parameter procedure: The Face Selection Procedure (FSP) that determines which face view to display.
+    public func update(procedure: @escaping FaceSelectionProcedure) {
+        self.procedure = procedure
+        runVVLC()
     }
 
     /// Calling `unload` will inform the selected face view to unload its contents.

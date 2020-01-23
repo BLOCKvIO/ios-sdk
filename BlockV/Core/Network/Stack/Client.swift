@@ -146,7 +146,7 @@ final class Client: ClientProtocol {
                         return
                 }
 
-                let reason = BVError.PlatformErrorReason(code: errorModel.code, message: errorModel.message)
+                let reason = BVError.PlatformErrorReason(code: errorModel.code, message: errorModel.message, requestId: errorModel.requestId)
                 let error = BVError.platform(reason: reason)
                 completion(.failure(error))
 
@@ -184,7 +184,7 @@ final class Client: ClientProtocol {
                         return
                 }
 
-                let reason = BVError.PlatformErrorReason(code: errorModel.code, message: errorModel.message)
+                let reason = BVError.PlatformErrorReason(code: errorModel.code, message: errorModel.message, requestId: errorModel.requestId)
                 let error = BVError.platform(reason: reason)
                 completion(.failure(error))
             }
@@ -252,7 +252,7 @@ final class Client: ClientProtocol {
                         return
                 }
 
-                let reason = BVError.PlatformErrorReason(code: errorModel.code, message: errorModel.message)
+                let reason = BVError.PlatformErrorReason(code: errorModel.code, message: errorModel.message, requestId: errorModel.requestId)
                 let error = BVError.platform(reason: reason)
                 completion(.failure(error))
 

@@ -48,7 +48,7 @@ extension DataRequest {
                         // decode the payload into an blockv error object
                         let errorModel = try decoder.decode(ErrorModel.self, from: validData)
                         let error = BVError.platform(reason:
-                            BVError.PlatformErrorReason(code: errorModel.code, message: errorModel.message))
+                            BVError.PlatformErrorReason(code: errorModel.code, message: errorModel.message, requestId: errorModel.requestId))
                         return .failure(error) //TODO: Alamofire error is lost in this case.
 
                     } catch let DecodingError.keyNotFound(key, context) {
@@ -93,49 +93,3 @@ extension DataRequest {
     }
 
 }
-
-//extension DataResponse {
-//
-//    func blockvHandler() {
-//
-//        // DEBUG
-//        //            let json = try? JSONSerialization.jsonObject(with: dataResponse.data!, options: [])
-//        //            dump(json)
-//
-//        switch dataResponse.result {
-//        case let .success(val):
-//
-//            //TODO: This may not be the best solution with threading and all?
-//            // handle oauth tokens
-//            if let model = val.payload.self as? OAuthTokenModel {
-//                self.oauthHandler.setTokens(accessToken: model.accessToken.token,
-//                      refreshToken: model.refreshToken.token)
-//            }
-//
-//            //TODO: Add some thing like this to pull back to a completion thread?
-//            // This tread should be different to the response handler thread...
-//            //(queue ?? DispatchQueue.main).async { completionHandler(dataResponse) }
-//
-//            completion(val.payload, nil)
-//
-//        case let .failure(err):
-//
-//            // DEBUG
-//            //                if let data = dataResponse.data {
-//            //                    let json = String(data: data, encoding: String.Encoding.utf8)
-//            //                    print("Failure Response: \(json)")
-//            //                }
-//
-//            //FIXME: Can this error casting be done away with?
-//            if let err = err as? BVError {
-//                completion(nil, err)
-//            } else {
-//                let error = BVError.networkingError(error: err)
-//                completion(nil, error)
-//            }
-//
-//        }
-//
-//    }
-//
-//}

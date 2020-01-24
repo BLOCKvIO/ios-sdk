@@ -47,17 +47,23 @@ class ImageProgressFaceView: FaceView {
 
     private lazy var fullImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.frame = self.bounds
-        imageView.autoresizingMask = [ .flexibleWidth, .flexibleHeight ]
+        imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
         return imageView
+    }()
+    
+    private lazy var clippingView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.clipsToBounds = true
+        return view
     }()
 
     // MARK: - Dynamic Vatom Private Properties
 
     private var progress: CGFloat {
-        return  CGFloat(min(1, max(0, vatom.props.cloningScore)))
+        return CGFloat(min(1, max(0, vatom.props.cloningScore)))
     }
 
     // MARK: - Config
@@ -106,6 +112,8 @@ class ImageProgressFaceView: FaceView {
     /// Dynamically responding to face and action changes is not a function of Face Views. For this reason, the config
     /// struct immutalbe and is ONLY populated on init.
     private let config: Config
+    
+    private var directionalConstraint: NSLayoutConstraint!
 
     // MARK: - Initialization
 
@@ -124,14 +132,48 @@ class ImageProgressFaceView: FaceView {
         try super.init(vatom: vatom, faceModel: faceModel)
 
         self.addSubview(emptyImageView)
-        self.addSubview(fullImageView)
-
+        self.addSubview(clippingView)
+        clippingView.addSubview(fullImageView)
+        
         // progress label
         self.addSubview(progressLabel)
         progressLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: 10).isActive = true
         progressLabel.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -10).isActive = true
         progressLabel.heightAnchor.constraint(equalToConstant: 20).isActive = true
-
+        
+        fullImageView.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
+        fullImageView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
+        fullImageView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
+        fullImageView.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
+                
+        switch self.config.direction {
+            
+        case "left":
+            clippingView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
+            clippingView.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
+            clippingView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
+            directionalConstraint =  NSLayoutConstraint(item: clippingView, attribute: .width, relatedBy: .equal, toItem: self, attribute: .width, multiplier: 0.5, constant: 0)
+            directionalConstraint.isActive = true
+        case "right":
+            clippingView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
+            clippingView.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
+            clippingView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
+            directionalConstraint =  NSLayoutConstraint(item: clippingView, attribute: .width, relatedBy: .equal, toItem: self, attribute: .width, multiplier: 0.5, constant: 0)
+            directionalConstraint.isActive = true
+        case "down":
+            clippingView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
+            clippingView.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
+            clippingView.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
+            directionalConstraint =  NSLayoutConstraint(item: clippingView, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 0.5, constant: 0)
+            directionalConstraint.isActive = true
+        default:
+            clippingView.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
+            clippingView.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
+            clippingView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
+            directionalConstraint =  NSLayoutConstraint(item: clippingView, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 0.5, constant: 0)
+            directionalConstraint.isActive = true
+        }
+        
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -193,6 +235,8 @@ class ImageProgressFaceView: FaceView {
     private func updateUI() {
         self.progressLabel.isHidden = !self.config.showPercentage
         self.progressLabel.text = "\(Int(progress * 100))%"
+        
+        self.updateMask()
 
         // request layout
         self.setNeedsLayout()
@@ -201,6 +245,7 @@ class ImageProgressFaceView: FaceView {
 
     override func layoutSubviews() {
         super.layoutSubviews()
+        print(#function)
 
         // show/hide progress label based on current size
         if self.bounds.size.width < 100 {
@@ -208,61 +253,82 @@ class ImageProgressFaceView: FaceView {
         } else {
             progressLabel.isHidden = false
         }
-
+            
+    }
+    
+    private func updateMask() {
+        
         // image size
         guard let image = fullImageView.image else { return }
-
+        
         // - Pixels
         // size of image in pixels
         let imagePixelSize = CGSize(width: (image.size.width * image.scale), height: (image.size.height * image.scale))
-
+        
         // rect of the image inside the image view
-        let contentClippingRect = self.fullImageView.contentClippingRect
-
+        let contentClippingRect = self.emptyImageView.contentClippingRect
+        
         let paddingStart = contentClippingRect.height * CGFloat(self.config.paddingStart) / imagePixelSize.height
         let paddingEnd = contentClippingRect.width * CGFloat(self.config.paddingEnd) / imagePixelSize.width
-
+        
         let innerY = contentClippingRect.height - paddingStart - paddingEnd
-//        let innerX = contentClippingRect.width - paddingStart - paddingEnd
-
-        let innerProgressY = (contentClippingRect.height - paddingStart - paddingEnd) * progress
-        let innerProgressX = (contentClippingRect.width - paddingStart - paddingEnd) * progress
-
-        // assuming up
-
-        var maskRect: CGRect!
-
+        let innerX = contentClippingRect.width - paddingStart - paddingEnd
+        
+        let innerProgressY = innerY * progress
+        let innerProgressX = innerX * progress
+        
+        var percentage: CGFloat
+        
         switch self.config.direction.lowercased() {
-
+            
         case "left":
-            let offset = paddingStart + innerProgressX
-            maskRect = CGRect(x: contentClippingRect.maxX - offset,
-                              y: 0,
-                              width: offset,
-                              height: self.bounds.height)
+            let paddingStart = contentClippingRect.width * CGFloat(self.config.paddingStart) / imagePixelSize.width
+            let paddingEnd = contentClippingRect.width * CGFloat(self.config.paddingEnd) / imagePixelSize.width
+            
+            let innerX = contentClippingRect.width - paddingStart - paddingEnd
+            let innerProgressX = innerX * progress
+            
+            let directionOffset: CGFloat = paddingStart + innerProgressX
+            let absoluteOffset = contentClippingRect.minX + directionOffset
+            percentage = 1 - (absoluteOffset / self.bounds.width)
+            
         case "right":
-            maskRect = CGRect(x: contentClippingRect.minX,
-                              y: 0,
-                              width: paddingStart + innerProgressX,
-                              height: self.bounds.height)
+            let paddingStart = contentClippingRect.width * CGFloat(self.config.paddingStart) / imagePixelSize.width
+            let paddingEnd = contentClippingRect.width * CGFloat(self.config.paddingEnd) / imagePixelSize.width
+            
+            let innerX = contentClippingRect.width - paddingStart - paddingEnd
+            let innerProgressX = innerX * progress
+            
+            let directionOffset: CGFloat = paddingStart + innerProgressX
+            let absoluteOffset = contentClippingRect.minX + directionOffset
+            percentage = absoluteOffset / self.bounds.width
+            
         case "down":
-            maskRect = CGRect(x: self.bounds.minX,
-                              y: contentClippingRect.minY,
-                              width: self.bounds.width,
-                              height: paddingStart + innerProgressY)
+            let paddingStart = contentClippingRect.height * CGFloat(self.config.paddingStart) / imagePixelSize.height
+            let paddingEnd = contentClippingRect.height * CGFloat(self.config.paddingEnd) / imagePixelSize.height
+            
+            let innerY = contentClippingRect.height - paddingStart - paddingEnd
+            let innerProgressY = innerY * progress
+            
+            let directionOffset: CGFloat = paddingStart + innerProgressY
+            let absoluteOffset = contentClippingRect.maxY - directionOffset
+            percentage = absoluteOffset / self.bounds.height
+
         default: // "up"
-            let topOffset: CGFloat = paddingEnd + (innerY - innerProgressY)
-            maskRect = CGRect(x: self.bounds.minX,
-                                  y: contentClippingRect.minY + topOffset,
-                                  width: self.bounds.width,
-                                  height: contentClippingRect.height - topOffset)
-
+            
+            let paddingStart = contentClippingRect.height * CGFloat(self.config.paddingStart) / imagePixelSize.height
+            let paddingEnd = contentClippingRect.height * CGFloat(self.config.paddingEnd) / imagePixelSize.height
+            
+            let innerY = contentClippingRect.height - paddingStart - paddingEnd
+            let innerProgressY = innerY * progress
+            
+            let directionOffset: CGFloat = paddingStart + innerProgressY
+            let absoluteOffset = contentClippingRect.maxY - directionOffset
+            percentage = 1 - (absoluteOffset / self.bounds.height)
+            
         }
-
-        // mask in the full portion (as a function of the direction and progress)
-        let maskPath = CGPath.init(rect: maskRect, transform: nil)
-        maskLayer.path = maskPath
-        self.fullImageView.layer.mask = maskLayer
+        // update constraint
+        self.directionalConstraint = self.directionalConstraint.setMultiplier(multiplier: percentage)
 
     }
 
@@ -317,4 +383,33 @@ class ImageProgressFaceView: FaceView {
 
     }
 
+}
+
+extension NSLayoutConstraint {
+    /**
+     Change multiplier constraint
+
+     - parameter multiplier: CGFloat
+     - returns: NSLayoutConstraint
+    */
+    func setMultiplier(multiplier:CGFloat) -> NSLayoutConstraint {
+
+        NSLayoutConstraint.deactivate([self])
+
+        let newConstraint = NSLayoutConstraint(
+            item: firstItem,
+            attribute: firstAttribute,
+            relatedBy: relation,
+            toItem: secondItem,
+            attribute: secondAttribute,
+            multiplier: multiplier,
+            constant: constant)
+
+        newConstraint.priority = priority
+        newConstraint.shouldBeArchived = self.shouldBeArchived
+        newConstraint.identifier = self.identifier
+
+        NSLayoutConstraint.activate([newConstraint])
+        return newConstraint
+    }
 }

@@ -63,7 +63,7 @@ class ImageProgressFaceView: FaceView {
     // MARK: - Dynamic Vatom Private Properties
 
     private var progress: CGFloat {
-        return 0.50 //CGFloat(min(1, max(0, vatom.props.cloningScore)))
+        return CGFloat(min(1, max(0, vatom.props.cloningScore)))
     }
 
     // MARK: - Config

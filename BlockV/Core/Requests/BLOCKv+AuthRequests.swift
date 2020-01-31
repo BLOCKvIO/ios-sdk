@@ -355,7 +355,7 @@ extension BLOCKv {
     ///   - token: User token of the other account (i.e. the account to be merged in).
     ///   - password: Password to the other account (i.e. the account to be merged in).
     ///   - completion: Completion handler that is called when the request is completed.
-    public static func mergeAccount(token: UserToken, password: String, completion: @escaping ((Error?) -> Void)) {
+    public static func mergeAccount(token: UserToken, password: String, completion: @escaping ((BVError?) -> Void)) {
 
         let endpoint = API.Session.mergeAccount(token: token, password: password)
         // send request

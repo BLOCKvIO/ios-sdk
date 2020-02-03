@@ -18,6 +18,23 @@ extension API {
     /// Namespace for session related endpoints with a typed reponse model.
     enum Session {
 
+        // MARK: - Account Managenent
+
+        /// Builds the endpoint to merge the specified user accont into the current session's account.
+        static func mergeAccount(token: UserToken, password: String) -> Endpoint<BaseModel<GeneralModel>> {
+
+            return Endpoint(method: .post,
+                            path: "v1/user/merge_accounts",
+                            parameters: [
+                                "token": token.value,
+                                "token_type": token.type.rawValue,
+                                "auth_data": [
+                                    "password": password
+                                ]   
+            ])
+
+        }
+
         // MARK: - Push Notifications
 
         /// Builds the endpoint to update the push notification settings.

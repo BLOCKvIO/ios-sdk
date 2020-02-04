@@ -98,13 +98,14 @@ class InventoryRegion: BLOCKvRegion {
             self.lastHash = newHash
 
             if oldHash == newHash {
-                // nothing has changes
-                self.resumeMessages()
-                // return nil(no-op)
-                return Promise.value(nil)
+                // check if faces and actions have changed (since they are independent of the hash)
+                self.processFaceAndActionChanges().done {
+                    // nothing has changes
+                    self.resumeMessages()
+                }
             }
 
-            // fetch changes recursively
+            // fetch changes recursively (this will include faces and actions)
             return self.fetchChanges().ensure {
                 // resume websocket events
                 self.resumeMessages()
@@ -215,8 +216,6 @@ extension InventoryRegion {
 
     /// Fetches only changed items (based on sync state).
     func fetchChanges() -> Promise<[String]?> {
-        
-        self.processFaceAndActionChanges()
 
         // fetch sync numbers for *all* vatoms
         return self.fetchVatomSyncNumbers().then { newSyncModels -> Promise<[String]?> in
@@ -460,81 +459,74 @@ extension InventoryRegion {
         return fetchChunk(index: 0)
 
     }
-    
+
 }
 
+// MARK: - Face & Action Sync
+
 extension InventoryRegion {
-    
+
     //TODO: This code must get called with synchronizartion in mind.
     // However if synchronization is happending, then this is not needed.
     //
     // Cases where face and action changes are needed:
     // - App comes into the foreground.
-    // - A full synchronization is done.
+    // - `load()` is called and the hash is the same (becuase we still don't know the state of face and actions)
     func processFaceAndActionChanges() -> Promise<Void> {
-        
-        return self.fetchFaceAndActionChanges().done { remoteChangeDiff in
-            
-            print("Remote changes", remoteChangeDiff)
-            //TODO: Update data pool.
-            
-        
 
-            
+        return self.fetchFaceAndActionChanges().done { remoteChangeDiff in
+            // update data-pool
+            self.add(objects: remoteChangeDiff.inserted)
+            self.remove(ids: remoteChangeDiff.deleted)
         }
-        
+
     }
-    
-    /*
-     This must be called *after* data pool sync. This is because all the templates must be downloaded..
-     Actually, do they need to be, if there are new templates, then the whole vatom package would need to be downloaded..
-     */
 
     /// Fetches and processes face and action changes.
     func fetchFaceAndActionChanges() -> Promise<RemoteChangeDiff> {
-        
+
         //FIXME: Need to store and retrieve since timestamp
-        
+
         // time
         let nowNano: TimeInterval = Double(Int(Date().timeIntervalSince1970) * 1000_000)
         let since: TimeInterval = 1580376600000 // nowNano - (2678400000 * 1000)
         print("since", since)
-        
+
         let templateIds = Array(self.templateIds)
-        
+
         var changeDiff = RemoteChangeDiff()
-        
+
         let facePromise = self.fetchChanges(for: .face, templateIds: templateIds, since: since).done { faceDiff in
             changeDiff.merge(other: faceDiff)
         }
-        
+
         let actionPromise = self.fetchChanges(for: .action, templateIds: templateIds, since: since).done { actionDiff in
             changeDiff.merge(other: actionDiff)
         }
-        
+
         return when(fulfilled: facePromise, actionPromise).map { (_, _) -> RemoteChangeDiff in
             return changeDiff
         }
-        
+
     }
-     
+
      enum ObjectType {
          case face
          case action
      }
-    
+
     struct RemoteChangeDiff {
         var inserted: [DataObject] = []
         var deleted: [String] = []
         var updated: [DataObject] = []
-        
+
         mutating func merge(other: RemoteChangeDiff) {
             self.inserted.append(contentsOf: other.inserted)
             self.deleted.append(contentsOf: other.deleted)
             self.updated.append(contentsOf: other.updated)
         }
     }
-    
+
     /// Fetches the remote change set for the specified object type (e.g. face, action).
     ///
     /// - Parameters:
@@ -550,7 +542,7 @@ extension InventoryRegion {
         case .action:
             endpoint = API.Generic.getActionChanges(templateIds: templateIds, since: since)
         }
-        
+
         return BLOCKv.client.requestJSONParsed(endpoint)
             .then(on: .global(qos: .userInitiated)) { (_, payload) -> Promise<RemoteChangeDiff> in
                 // parse out changes
@@ -564,10 +556,10 @@ extension InventoryRegion {
     ///
     /// This function is able to parse both face and action change sets by passing in an `ObjectType`.
     private func parseRemoteChanges(payload: [String: Any], objectType: ObjectType) throws -> RemoteChangeDiff {
-        
+
         let key: String
         let payloadKey: String
-        
+
         switch objectType {
         case .face:
             key = "face"
@@ -576,23 +568,23 @@ extension InventoryRegion {
             key = "action"
             payloadKey = "actions_changes"
         }
-        
+
         // parse out objects
         guard let changes = payload[payloadKey] as? [String: [[String: Any]]] else {
             throw RegionError.failedParsingResponse
         }
-        
+
         // create data objects to be added
         var remoteChangeDiff = RemoteChangeDiff()
-        
+
         // loop through array of template id to modifications map
         for templateMap in changes {
-            
+
             let modifications = templateMap.value
-            
+
             // loop over each modification (for the template)
             for mod in modifications {
-                
+
                 guard let operation = mod["operation"] as? String,
                     let face = mod[key] as? [String: Any] else {
                         throw RegionError.failedParsingResponse
@@ -618,11 +610,11 @@ extension InventoryRegion {
                     fatalError()
                 }
             }
-            
+
         }
-        
+
         return remoteChangeDiff
-        
+
     }
 
 }

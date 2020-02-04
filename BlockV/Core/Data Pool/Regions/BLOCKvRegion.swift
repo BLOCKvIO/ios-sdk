@@ -467,3 +467,25 @@ extension BLOCKvRegion {
     }
 
 }
+
+extension BLOCKvRegion {
+    
+    /// Returns the set of template ids associated with objects in this region.
+    var templateIds: Set<String> {
+        
+        // unique set of template ids
+        var templateIds: Set<String> = []
+        
+        for object in self.objects {
+            if object.value.type == "vatom" {
+                if let tempId = (object.value.data?["vAtom::vAtomType"] as? [String: Any])?["template"] as? String {
+                    templateIds.insert(tempId)
+                }
+            }
+        }
+        
+        return templateIds
+        
+    }
+    
+}

@@ -53,6 +53,27 @@ internal extension Client {
         }
 
     }
+    
+    /// Performs a request on a given endpoint.
+    ///
+    /// - Parameter endpoint: Endpoint on which to perform the request.
+    /// - Returns: A promise that resolves with the top-level structure parsed out.
+    func requestJSONParsed(_ endpoint: Endpoint<Void>) -> Promise<(requestID: String, payload: [String: Any])> {
+        
+        self.requestJSON(endpoint)
+            .then(on: .global(qos: .userInitiated)) { json -> Promise<(requestID: String, payload: [String: Any])> in
+                // parse out the standard top-level BLOCKv platform response
+                guard
+                    let json = json as? [String: Any],
+                    let payload = json["payload"] as? [String: Any],
+                    let requestId = json["request_id"] as? String
+                    else { throw BVError.modelDecoding(reason: "Unable to parse top level payload.") }
+                
+                return Promise.value((requestId, payload))
+                
+        }
+        
+    }
 
     func request<T: Decodable>(_ endpoint: Endpoint<T>) -> Promise<T> {
 

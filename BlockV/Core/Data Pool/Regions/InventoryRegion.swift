@@ -25,12 +25,30 @@ import PromiseKit
 /// Two primary functions:
 /// 1. Overrides load (to fetch all object from the server).
 /// 2. Processing 'inventory' messages.
-///    > Importanly, for vatom additions, this pauses the message processing, fetches the vatom, and only resumes the
+///    > Importantly, for vatom additions, this pauses the message processing, fetches the vatom, and only resumes the
 ///    message processing.
 ///
 /// # Synchronisation
 ///
-/// The 
+/// Essentially there are 2 modes of synchronisation: full sync (V1) and parital sync (V2).
+///
+/// ## Full Sync (V1)
+/// - The inventory endpoint is recursed to fetch all vatoms in the user's inventory. This includes all faces and actions.
+/// - This method is simple since uses one synchronisation point, where it retireves the full state of the inventory at a particular
+///   point in time (bar a few async annomalies on the backend).
+/// - Drawbacks are that the entire payload must be fetched and processed.
+///
+/// ## Partial Sync (V2)
+/// - This methods uses three synchronisation points.
+/// 1. Inventory Hash - Informs the client of the state of all vatoms in the user's inventory. Equal hashes mean the inventory is in an
+/// equivalent state.
+///    - This hash however does NOT capture the state of the template's faces and actions. In other words, additions, deletions, or updates
+///           will not affect the hash.
+/// 2. Vatom Sync Nr. - This number respresents the state of a vatom and is incremented on every change. This allows the client to compate its
+/// local sync numbers with that of the remote.
+///    - Simlar to the hash, the sync nr. does NOT capture the state the template's faces and actions.
+/// 3. Face & Action Since-Sync - To ensure the client has the latest faces and actions, the client can query the `face/changes` and
+/// `action/changes` endpoints. These endpoints provide a changeset from the `since` date.
 class InventoryRegion: BLOCKvRegion {
 
     /// Plugin identifier.

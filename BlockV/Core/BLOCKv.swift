@@ -218,6 +218,8 @@ public final class BLOCKv {
         self._socket = nil
         // clear data pool
         DataPool.clear()
+        //
+        BVDefaults.shared.clear()
 
         os_log("Resetting SDK", log: .lifecycle, type: .debug)
     }

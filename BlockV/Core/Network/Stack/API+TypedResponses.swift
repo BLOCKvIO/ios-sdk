@@ -284,6 +284,20 @@ extension API {
 
     /// Namespace for vatom related endpoints with a typed reponse model.
     enum Vatom {
+        
+        /// Builds and endpoint to get the action changes to the specified template ids after the specified time (unix epoch milliseconds).
+        ///
+        /// - Returns: Constructed endpoint specialized to parse out a `FaceModelChanges`.
+        static func getActionChanges(templateIds: [String], since: Double) -> Endpoint<BaseModel<FaceChangesModel>> {
+            return API.Generic.getActionChanges(templateIds: templateIds, since: since)
+        }
+        
+        /// Builds and endpoint to get the face changes to the specified template ids after the specified time (unix epoch milliseconds).
+        ///
+        /// - Returns: Constructed endpoint specialized to parse out a `ActionChangesModel`.
+        static func getFaceChanges(templateIds: [String], since: Double) -> Endpoint<BaseModel<ActionChangesModel>> {
+            return API.Generic.getFaceChanges(templateIds: templateIds, since: since)
+        }
 
         /// Builds an endpoint to get the current user's inventory sync hash.
         ///

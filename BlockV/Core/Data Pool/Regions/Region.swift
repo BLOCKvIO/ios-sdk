@@ -161,8 +161,9 @@ public class Region {
     ///
     /// This function should fetch the _entire_ region.
     ///
-    /// - Returns: A promise which will fullsil with an array of object IDs, or `nil`. If an array of object IDs is
-    ///   returned, any IDs not in this list should be removed from the region.
+    /// - Returns: A promise which will fullfills with an array of object IDs, or `nil`. If an array of object Ids is
+    ///   returned, any Ids not in this list should be removed from the region. Object Ids should only be returned *after*
+    ///   full sync. For partial syncs, return `nil`.
     func load() -> Promise<[String]?> {
         return Promise(error: NSError("Subclasses must override Region.load()"))
     }

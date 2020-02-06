@@ -54,6 +54,38 @@ extension API {
             return Endpoint(method: .get,
                             path: "/v1/user/asset_providers")
         }
+        
+        // MARK: - Sync
+        
+        /// Builds the generic endpoint to get the face changes for the specified template ids after the specified time (unix epoch milliseconds).
+        ///
+        /// - Parameters:
+        ///   - templateIds: List of template ids for inspection.
+        ///   - since: Unix epoch time interval (measured in milliseconds).
+        /// - Returns: Constructed endpoint generic over response model that may be used to parse the response.
+        static func getFaceChanges<T>(templateIds: [String], since: TimeInterval) -> Endpoint<T> {
+            return Endpoint(method: .post,
+                            path: "/v1/vatom/faces/changes",
+                            parameters: [
+                                "templates": templateIds,
+                                "since": since
+            ])
+        }
+        
+        /// Builds the generic endpoint to get the action changes for the specified template ids after the specified time (unix epoch milliseconds).
+        ///
+        /// - Parameters:
+        ///   - templateIds: List of template ids for inspection.
+        ///   - since: Unix epoch time interval (measured in milliseconds).
+        /// - Returns: Constructed endpoint generic over response model that may be used to parse the response.
+        static func getActionChanges<T>(templateIds: [String], since: TimeInterval) -> Endpoint<T> {
+            return Endpoint(method: .post,
+                            path: "/v1/vatom/actions/changes",
+                            parameters: [
+                                "templates": templateIds,
+                                "since": since
+            ])
+        }
 
         // MARK: - Vatoms
 

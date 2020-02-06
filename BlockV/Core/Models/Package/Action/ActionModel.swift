@@ -84,7 +84,7 @@ extension ActionModel: Codable {
 extension ActionModel {
 
     /// Extract action and template name from the compound name.
-    static func splitCompoundName(_ compoundName: String) throws -> (String, String) {
+    static func splitCompoundName(_ compoundName: String) throws -> (templateID: String, actionName: String) {
 
         // find the marker
         guard let markerRange = compoundName.range(of: "::action::",

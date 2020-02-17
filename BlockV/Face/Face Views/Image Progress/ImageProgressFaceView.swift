@@ -235,11 +235,11 @@ class ImageProgressFaceView: FaceView {
     private func updateUI() {
         self.progressLabel.isHidden = !self.config.showPercentage
         self.progressLabel.text = "\(Int(progress * 100))%"
-        
-        self.updateMask()
 
         // request layout
         self.setNeedsLayout()
+        self.layoutIfNeeded()
+        self.updateMask()
         self.layoutIfNeeded()
     }
 
@@ -253,79 +253,84 @@ class ImageProgressFaceView: FaceView {
         } else {
             progressLabel.isHidden = false
         }
-            
+
     }
     
     private func updateMask() {
-        
+
+        if self.bounds == CGRect.zero {
+            print("bounds are zero")
+            return
+        }
+
         // image size
         guard let image = fullImageView.image else { return }
-        
+
         // - Pixels
         // size of image in pixels
         let imagePixelSize = CGSize(width: (image.size.width * image.scale), height: (image.size.height * image.scale))
-        
+
         // rect of the image inside the image view
         let contentClippingRect = self.emptyImageView.contentClippingRect
-        
+
         let paddingStart = contentClippingRect.height * CGFloat(self.config.paddingStart) / imagePixelSize.height
         let paddingEnd = contentClippingRect.width * CGFloat(self.config.paddingEnd) / imagePixelSize.width
-        
+
         let innerY = contentClippingRect.height - paddingStart - paddingEnd
         let innerX = contentClippingRect.width - paddingStart - paddingEnd
-        
+
         let innerProgressY = innerY * progress
         let innerProgressX = innerX * progress
-        
+
         var percentage: CGFloat
-        
+
         switch self.config.direction.lowercased() {
-            
+
         case "left":
             let paddingStart = contentClippingRect.width * CGFloat(self.config.paddingStart) / imagePixelSize.width
             let paddingEnd = contentClippingRect.width * CGFloat(self.config.paddingEnd) / imagePixelSize.width
-            
+
             let innerX = contentClippingRect.width - paddingStart - paddingEnd
             let innerProgressX = innerX * progress
-            
+
             let directionOffset: CGFloat = paddingStart + innerProgressX
             let absoluteOffset = contentClippingRect.minX + directionOffset
             percentage = 1 - (absoluteOffset / self.bounds.width)
-            
+
         case "right":
             let paddingStart = contentClippingRect.width * CGFloat(self.config.paddingStart) / imagePixelSize.width
             let paddingEnd = contentClippingRect.width * CGFloat(self.config.paddingEnd) / imagePixelSize.width
-            
+
             let innerX = contentClippingRect.width - paddingStart - paddingEnd
             let innerProgressX = innerX * progress
-            
+
             let directionOffset: CGFloat = paddingStart + innerProgressX
             let absoluteOffset = contentClippingRect.minX + directionOffset
             percentage = absoluteOffset / self.bounds.width
-            
+
         case "down":
             let paddingStart = contentClippingRect.height * CGFloat(self.config.paddingStart) / imagePixelSize.height
             let paddingEnd = contentClippingRect.height * CGFloat(self.config.paddingEnd) / imagePixelSize.height
-            
+
             let innerY = contentClippingRect.height - paddingStart - paddingEnd
             let innerProgressY = innerY * progress
-            
+
             let directionOffset: CGFloat = paddingStart + innerProgressY
             let absoluteOffset = contentClippingRect.maxY - directionOffset
             percentage = absoluteOffset / self.bounds.height
 
         default: // "up"
-            
+
             let paddingStart = contentClippingRect.height * CGFloat(self.config.paddingStart) / imagePixelSize.height
             let paddingEnd = contentClippingRect.height * CGFloat(self.config.paddingEnd) / imagePixelSize.height
-            
+
             let innerY = contentClippingRect.height - paddingStart - paddingEnd
             let innerProgressY = innerY * progress
-            
+
             let directionOffset: CGFloat = paddingStart + innerProgressY
             let absoluteOffset = contentClippingRect.maxY - directionOffset
             percentage = 1 - (absoluteOffset / self.bounds.height)
-            
+ 
         }
         // update constraint
         self.directionalConstraint = self.directionalConstraint.setMultiplier(multiplier: percentage)
@@ -359,16 +364,16 @@ class ImageProgressFaceView: FaceView {
         dispatchGroup.enter()
         dispatchGroup.enter()
         // load images
-        ImageDownloader.loadImage(with: emptyRequest, into: self.emptyImageView) { result in
-            self.dispatchGroup.leave()
+        ImageDownloader.loadImage(with: emptyRequest, into: self.emptyImageView) { [weak self] result in
+            self?.dispatchGroup.leave()
             do {
                 try result.get()
             } catch {
                 os_log("Failed to load: %@", log: .vatomView, type: .error, emptyImageResource.url.description)
             }
         }
-        ImageDownloader.loadImage(with: fullRequest, into: self.fullImageView) { result in
-            self.dispatchGroup.leave()
+        ImageDownloader.loadImage(with: fullRequest, into: self.fullImageView) { [weak self] result in
+            self?.dispatchGroup.leave()
             do {
                 try result.get()
             } catch {
@@ -376,8 +381,8 @@ class ImageProgressFaceView: FaceView {
             }
         }
 
-        dispatchGroup.notify(queue: .main) {
-            self.isLoaded = true
+        dispatchGroup.notify(queue: .main) { [weak self] in
+            self?.isLoaded = true
             completion(nil)
         }
 
@@ -392,7 +397,7 @@ extension NSLayoutConstraint {
      - parameter multiplier: CGFloat
      - returns: NSLayoutConstraint
     */
-    func setMultiplier(multiplier:CGFloat) -> NSLayoutConstraint {
+    func setMultiplier(multiplier: CGFloat) -> NSLayoutConstraint {
 
         NSLayoutConstraint.deactivate([self])
 

@@ -201,10 +201,7 @@ open class VatomView: UIView {
 
         commonSetup()
 
-        // don't wait for the dispatched block
-        DispatchQueue.main.async {
-            self.runVVLC()
-        }
+        self.runVVLC()
 
     }
 
@@ -238,10 +235,7 @@ open class VatomView: UIView {
 
         commonSetup()
 
-        // don't wait for the dispatched block
-        DispatchQueue.main.async {
-            self.runVVLC()
-        }
+        self.runVVLC()
 
     }
 
@@ -323,7 +317,8 @@ open class VatomView: UIView {
     /// - Parameter procedure: The Face Selection Procedure (FSP) that determines which face view to display.
     public func update(procedure: @escaping FaceSelectionProcedure) {
         self.procedure = procedure
-        runVVLC()
+        // vatom is unchanged
+        runVVLC(oldVatom: self.vatom)
     }
 
     /// Calling `unload` will inform the selected face view to unload its contents.
@@ -410,12 +405,15 @@ open class VatomView: UIView {
              (since the selected face view does not need replacing).
              */
 
-            // update currently selected face view (without replacement)
-            self.selectedFaceView?.vatomChanged(vatom)
             // complete
             self.state = .completed
             // inform delegate the face view is unchanged
             self.vatomViewDelegate?.vatomView(self, didSelectFaceView: .success(self.selectedFaceView!))
+            
+            if vatom != oldVatom {
+                // if vatom package has changed, update currently selected face view (without replacement)
+                self.selectedFaceView?.vatomChanged(vatom)
+            }
 
         } else {
             // os_log("Face model changed - Creating new face view.", log: .vatomView, type: .debug)

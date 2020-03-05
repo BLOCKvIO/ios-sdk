@@ -376,5 +376,29 @@ extension BLOCKv {
         }
 
     }
+    
+    /// Generates a guest ID which can be used to login.
+    ///
+    /// - Parameter completion: Completion handler that is called when the request is completed.
+    public static func generateGuestID(completion: @escaping (Result<UserModel, BVError>) -> Void) {
+        
+        let endpoint = API.Session.generateGuestID()
+        
+        self.client.request(endpoint) { result in
+            switch result {
+            case .success(let model):
+                // model is available
+                DispatchQueue.main.async {
+                    completion(.success(model.payload))
+                }
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+            }
+        }
+        
+    }
 
 }

@@ -19,6 +19,13 @@ extension API {
     enum Session {
 
         // MARK: - Account Managenent
+        
+        /// Builds the endpoit to generate a guest identifier.
+        static func generateGuestID() -> Endpoint<BaseModel<UserModel>> {
+            
+            return Endpoint(method: .post, path: "v1/user/guest")
+            
+        }
 
         /// Builds the endpoint to merge the specified user accont into the current session's account.
         static func mergeAccount(token: UserToken, password: String) -> Endpoint<BaseModel<GeneralModel>> {

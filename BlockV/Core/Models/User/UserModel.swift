@@ -92,8 +92,9 @@ extension UserModel: Codable {
         guestID             = try propertiesContainer.decode(String.self, forKey: .guestID)
         nonPushNotification = try propertiesContainer.decode(Bool.self, forKey: .nonPushNotification)
         language            = try propertiesContainer.decode(String.self, forKey: .language)
-        isPasswordSet       = try propertiesContainer.decode(Bool.self, forKey: .isPasswordSet)
-        userConsents        = try propertiesContainer.decode([ConsentModel].self, forKey: .userConsents)
+
+        userConsents        = try propertiesContainer.decodeIfPresent([ConsentModel].self, forKey: .userConsents) ?? []
+        isPasswordSet       = try propertiesContainer.decodeIfPresent(Bool.self, forKey: .isPasswordSet) ?? false
 
         // Avatar URLs generally have a default value - but this is not guaranteed.
         avatarURL           = propertiesContainer.decodeSafely(Safe<URL>.self, forKey: .avatarURL)?.value

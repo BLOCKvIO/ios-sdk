@@ -26,6 +26,10 @@ Pod::Spec.new do |s|
         s.dependency 'GenericJSON', '~> 2.0'    # JSON
         s.dependency 'PromiseKit', '~> 6.8'     # Promises
         #s.exclude_files = '**/Info*.plist'
+        #        s.resource_bundles = {
+        #            'CoreModule' => ['BlockV/Core/Sync/*.xcdatamodeld']
+        #        }
+        s.resources = 'BlockV/Core/Sync/InventoryModel.xcdatamodeld'
     end
     
     s.subspec 'Face' do |s|

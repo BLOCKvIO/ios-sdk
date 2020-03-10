@@ -134,7 +134,7 @@ public struct RootProperties: Equatable {
     public var clonedFrom: String
     public var cloningScore: Double
     public var commerce: Commerce
-    public var isInContract: Bool
+    public var isInContract: Bool //
     public var inContractWith: String
     public var notifyMessage: String
     public var numberDirectClones: Int

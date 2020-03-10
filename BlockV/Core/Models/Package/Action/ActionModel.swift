@@ -34,17 +34,11 @@ public struct ActionModel: Equatable {
      Calls such as GET /user/actions/:template_id do not.
     */
     public let meta: MetaModel?
-    public let properties: Properties?
-
-    public struct Properties: Codable, Equatable {
-        public let reactor: String
-    }
 
     enum CodingKeys: String, CodingKey {
         case name
         case templateName
         case meta
-        case properties
     }
 
 }
@@ -58,7 +52,6 @@ extension ActionModel: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         let name = try container.decode(String.self, forKey: .name)
-        let properties = try container.decodeIfPresent(Properties.self, forKey: .properties)
         let meta = try container.decodeIfPresent(MetaModel.self, forKey: .meta)
 
         let (templateID, actionName) = try ActionModel.splitCompoundName(name)
@@ -66,14 +59,12 @@ extension ActionModel: Codable {
         self.init(compoundName: name,
                   name: actionName,
                   templateID: templateID,
-                  meta: meta,
-                  properties: properties)
+                  meta: meta)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(compoundName, forKey: .name)
-        try container.encode(properties, forKey: .properties)
         try container.encode(meta, forKey: .meta)
     }
 

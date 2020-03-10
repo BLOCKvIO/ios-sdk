@@ -13,12 +13,16 @@ import os
 import Foundation
 import Alamofire
 import JWTDecode
+import CoreData
 import Nuke
 
 /*
  Goal:
- BLOCKv should be invariant over App ID and Environment. In other words, the properties should not
+ 
+ - BLOCKv should be invariant over App ID and Environment. In other words, the properties may not
  change, once set. Possibly targets for each environemnt?
+ 
+ - Clients shoudl be able to have configure whether a sync stack is setup on session launch.
  */
 
 /// Primary interface into the the BLOCKv SDK.
@@ -39,6 +43,12 @@ public final class BLOCKv {
         }
 
     }
+    
+    /// Boolean value that controls wheather a synchronization stack is created on session launch.
+    ///
+    /// App that intend on dispalying vatoms and receiving updates over time should leave this value as `true`.
+    /// If your app is not interested in synchronizing with the BLOCKv platform set this value as `false`.
+    internal fileprivate(set) static var shouldCreateSyncStackOnSessionLaunch: Bool = true
 
     //TODO: Detect an environment switch, e.g. dev to prod, reset the client.
 
@@ -55,15 +65,35 @@ public final class BLOCKv {
     }
 
     // MARK: - Configuration
+    
+    public struct SessionConfiguration {
+        /// App ID which identifes your application to the BLOCKv platform.
+        public let appID: String
+        
+        /// Boolean value that controls whether a synchronization stack is created on session launch, defaults to `true`.
+        ///
+        /// If your apps intends on dispalying an inventory of vatoms and receiving updates to those vatoms from the BLOCKv platform, set this as `true`.
+        public let createSyncStack: Bool
+        
+        public init(appID: String, createSyncStack: Bool = true) {
+            self.appID = appID
+            self.createSyncStack = createSyncStack
+        }
+        
+    }
 
     /// Configures the SDK with your issued app id.
     ///
     /// Note, as a viewer, `configure` should be the first method call you make on the BLOCKv SDK.
-    /// Typically, you would call `configure` in `application(_:didFinishLaunchingWithOptions:)`
+    /// Typically, you would call `configure` in `application(_:didFinishLaunchingWithOptions:)`.
     ///
+    /// - important
     /// This method must be called ONLY once.
-    public static func configure(appID: String) {
-        self.appID = appID
+    ///
+    /// - Parameter config: An instance of `SessionConfiguration` containing the data and setting to setup the BLOCKv SDK.
+    public static func configure(with config: SessionConfiguration) {
+        self.appID = config.appID
+        self.shouldCreateSyncStackOnSessionLaunch = config.createSyncStack
 
         // - CONFIGURE ENVIRONMENT
 
@@ -218,8 +248,10 @@ public final class BLOCKv {
         self._socket = nil
         // clear data pool
         DataPool.clear()
-        //
+        // clear defaults
         BVDefaults.shared.clear()
+        // teardown sync stack
+        self.teardownSyncStack()
 
         os_log("Resetting SDK", log: .lifecycle, type: .debug)
     }
@@ -274,6 +306,13 @@ public final class BLOCKv {
     /// - important:
     /// This method is *not* called when the access token refreshes.
     static internal func onLogin() {
+        
+        //TODO: Update `onLogin` to have a userID argunment (or is there a better way to fetch the user?)
+        
+        //FIXME: Why was I moving this here?
+//        self.createBLOCKVContainer(userID: "27e23978-1fd0-4257-b44d-2129be76c55c") { persistentContainer in
+//            //
+//        }
 
         // stand up the session
         self.onSessionLaunch()
@@ -282,6 +321,21 @@ public final class BLOCKv {
 
     /// Holds a closure to call on logout
     public static var onLogout: (() -> Void)?
+    
+    /// Session launch arguments.
+    public struct SessionArguments {
+        
+        /// User ID of the launched session.
+        public let userID: String
+        
+        /// Reference to the persistent container of the underlying CoreData stack. If `shouldCreateSyncStackOnSessionLaunch` was
+        /// set as `false` durign configuration, then this reference wil be `nil`.
+        public let persistentContainter: NSPersistentContainer?
+        
+    }
+    
+    /// Holds a single shot closure that is called on session lauch.
+    public static var sessionDidLaunch: ((_ arguments: SessionArguments) -> Void)?
 
     /// This function is called everytime a user session is launched.
     ///
@@ -313,7 +367,20 @@ public final class BLOCKv {
 
         // standup data pool
         DataPool.sessionInfo = ["userID": userId]
-
+        
+        if shouldCreateSyncStackOnSessionLaunch {
+            
+            // create blockv stack
+            self.createBLOCKVContainer(userID: userId) { container in
+                let launchArguments = SessionArguments(userID: userId, persistentContainter: container)
+                self.sessionDidLaunch?(launchArguments)
+            }
+            
+        } else {
+            let launchArguments = SessionArguments(userID: userId, persistentContainter: nil)
+            self.sessionDidLaunch?(launchArguments)
+        }
+        
     }
 
     // MARK: - Resources
@@ -346,7 +413,143 @@ public final class BLOCKv {
 
     /// BLOCKv follows the static pattern. Instance creation is not allowed.
     fileprivate init() {}
+    
+    // MARK: - Core Data
+    
+    static var persistentContainer: NSPersistentContainer!
+    static var syncCoordinator: SyncCoordinator?
+    
+    //FIXME: TEMPORARY METHOD TO HELP TESTING
+    public static func refresh() {
+        syncCoordinator?._refresh()
+    }
+    
+    /// pass through application events
+    public static func applicationDidEnterBackground(_ application: UIApplication) {
+        persistentContainer.viewContext.batchDeleteObjectsMarkedForLocalDeletion()
+        persistentContainer.viewContext.refreshAllObjects()
+    }
+    
+    /// pass through application events
+    public static func applicationDidReceiveMemoryWarning(_ application: UIApplication) {
+        persistentContainer.viewContext.refreshAllObjects()
+    }
 
+    /*
+     - This method should only be called *after* a user has been logged in.
+     */
+
+    /// Create an `NSPersistentContainer` for the user's inventory.
+    ///
+    /// Creates and configures the sync coordinator
+    ///
+    /// - Parameter userID: User ID.
+    /// - Parameter completion: Completes with a pointer to the `NSPersistentContainer` used the sync framework. As a viewer, use the container's
+    ///                         `viewContext` to drive your view controller graph.
+    static func createBLOCKVContainer(userID: String, completion: @escaping (NSPersistentContainer) -> ()) {
+        
+        //FIXME: This does not work because the model is part of a pod (and being vended as a resource)
+//        let container = NSPersistentContainer(name: "Model") // same name as the '.xcdatamodeld' file
+//        container.loadPersistentStores { _, error in
+//            guard error == nil else { fatalError("Failed to load store: \(error!)") }
+//            DispatchQueue.main.async { completion(container) }
+//        }
+        
+        print("Asset Providers", CredentialStore.assetProviders)
+        
+        /*
+         Here we create the container.
+         This stands up the CoreData stack.
+         1. Find the Core Data Model - file containing the definition of the application's *data structure*
+         2. Persistent Store - Database - The file containing tha application's *data*. This persists the data.
+         3. Managed Object - Object holding a set of properties from the Persistent Store.
+         4. Managed Object Context - ScratchPad - An area in memory where you interact with Managed Objects.
+         5. Persistent Store Coordinator - An object that mediates between the Persistent Store(s) and the Managed Object Context(s).
+         6. Entity - Defines Managed Objects.
+         7. Relationship - Joins Entities.
+         8. Fetch Request - A way of retrieving managed objects from a Peristent Store.
+         9. Predicate - Filter - A way of filtering which Managed Objects that a fetch request will return.
+         10. Sort Descriptor - A way of ordering the managed objects that a Fetch Request will return.
+         */
+        self.persistentContainer = makeBlockvContainer()
+        
+        /*
+         Somehow need to ensure the web socket is up before the sync coordinator is up and running.
+         
+         BUT, the user must see vatoms before the socket is up and running.
+         
+         This does not prevent the UI from pulling already persisted data, right? It just mean the sync coordinator
+         is dependent on the configuration of the socket.
+         */
+        
+        /*
+         This should become the new instance through which all networking is done, yes?
+         */
+        let blockvRemote = BLOCKvRemote(client: self.client)
+        
+        /*
+         SocketSubscription need to get the notifications (currently signals) coming out of the WebSocketManager.
+         Options:
+         1. Subscribe to signals here (shown below)
+         2. Delegate?
+         > WebSocketManager is not condusive to the delegate pattern (1:1) since it's a broadcaster (1:N).
+         
+         How is SocketSubscription going to broadcast it's messages? It's queuing events on its own private queue.
+         How many component inside sync will use it? At the moment, I think it's only Sync coordinator. So the delegate
+         pattern might be ok.
+         - What about when there are multiple regions (not only inventory).
+         */
+        
+        // - socket subscription
+        let socketSubscription = SocketSubscription(currentUserID: userID, socketManager: self.socket, remote: blockvRemote)
+        
+        //FIXME: The socket must be connected, and only then should the the synchronization process start.
+        
+        // - sync coordinator
+        self.syncCoordinator = SyncCoordinator(container: persistentContainer, remote: blockvRemote, socket: socketSubscription)
+        
+        // open the underlying database file
+        persistentContainer.loadPersistentStores { _, error in
+            guard error == nil else { fatalError("Failed to load store: \(error!)") }
+            DispatchQueue.main.async { completion(persistentContainer) }
+        }
+        
+    }
+    
+    static func teardownSyncStack() {
+        
+        //TODO: Incomplete - see: https://stackoverflow.com/a/14727650/3589408
+        
+        /*
+         How do I teardown the stack?
+         I need to prevent objects elsewhere in the app from accessing the core data items.
+         */
+        
+        self.syncCoordinator?.syncGroup.enter() // prevent any ws events
+        self.syncCoordinator?.viewContext.reset()
+        self.syncCoordinator?.syncContext.reset()
+        self.syncCoordinator = nil
+        
+        if self.persistentContainer != nil {
+            let store = self.persistentContainer.persistentStoreCoordinator.persistentStores[0]
+            try! self.persistentContainer.persistentStoreCoordinator.remove(store)
+        }
+        
+        //TODO: Remove the file from disk
+        
+        
+    }
+    
+}
+
+// MARK: - Logging Helpers
+
+class BVPersistentContainer: NSPersistentContainer {
+    override open class func defaultDirectoryURL() -> URL {
+        let urls = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)
+        let url = urls[urls.count - 1].appendingPathComponent("BLOCKv")
+        return url
+    }
 }
 
 extension BLOCKv {
@@ -398,6 +601,7 @@ extension OSLog {
     static let dataPool =  OSLog(subsystem: subsystem, category: "dataPool")
     static let authentication = OSLog(subsystem: subsystem, category: "authentication")
     static let socket = OSLog(subsystem: subsystem, category: "socket")
+    static let sync = OSLog(subsystem: subsystem, category: "sync")
 }
 
 /// Returns type name.

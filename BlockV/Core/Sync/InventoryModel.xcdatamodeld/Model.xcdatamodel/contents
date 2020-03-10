@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="15702" systemVersion="19D76" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Action" representedClassName=".ActionCD" syncable="YES">
+        <attribute name="compoundName" attributeType="String"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="templateID" attributeType="String"/>
+        <relationship name="meta" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="MetaData" inverseName="actions" inverseEntity="MetaData"/>
+        <relationship name="vatoms" toMany="YES" deletionRule="Nullify" destinationEntity="Vatom" inverseName="actions" inverseEntity="Vatom"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="name"/>
+                <constraint value="templateID"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="Face" representedClassName=".FaceCD" syncable="YES">
+        <attribute name="configStorage" optional="YES" attributeType="Binary"/>
+        <attribute name="constraintPlatform" attributeType="String"/>
+        <attribute name="constraintViewMode" attributeType="String"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isNative" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="isWeb" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="propsConfigData" optional="YES" attributeType="Binary"/>
+        <attribute name="propsDisplayURL" attributeType="String"/>
+        <attribute name="propsResources" optional="YES" attributeType="Transformable"/>
+        <attribute name="templateID" attributeType="String"/>
+        <relationship name="meta" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="MetaData" inverseName="faces" inverseEntity="MetaData"/>
+        <relationship name="vatom" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Vatom" inverseName="faces" inverseEntity="Vatom"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="id"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="MetaData" representedClassName=".MetaDataCD" syncable="YES">
+        <attribute name="createdBy" attributeType="String"/>
+        <attribute name="dataType" optional="YES" attributeType="String"/>
+        <attribute name="whenCreated" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="whenModified" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="actions" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Action" inverseName="meta" inverseEntity="Action"/>
+        <relationship name="faces" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Face" inverseName="meta" inverseEntity="Face"/>
+    </entity>
+    <entity name="Resource" representedClassName=".ResourceCD" syncable="YES">
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="type" optional="YES" attributeType="String"/>
+        <attribute name="url" optional="YES" attributeType="URI"/>
+        <relationship name="vatoms" toMany="YES" deletionRule="Deny" destinationEntity="Vatom" inverseName="resources" inverseEntity="Vatom"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="name"/>
+                <constraint value="type"/>
+                <constraint value="url"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="Tag" representedClassName="TagCD" syncable="YES">
+        <attribute name="name" attributeType="String"/>
+        <relationship name="vatoms" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Vatom" inverseName="tags" inverseEntity="Vatom"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="name"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="Vatom" representedClassName=".VatomCD" syncable="YES">
+        <attribute name="author" attributeType="String"/>
+        <attribute name="category" attributeType="String"/>
+        <attribute name="clonedFrom" attributeType="String"/>
+        <attribute name="cloningScore" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="cryptoEOSData" optional="YES" attributeType="Binary"/>
+        <attribute name="cryptoETHData" optional="YES" attributeType="Binary"/>
+        <attribute name="descriptionInfo" attributeType="String"/>
+        <attribute name="id" attributeType="String"/>
+        <attribute name="inContractWith" attributeType="String"/>
+        <attribute name="isAcquirable" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="isDisabled" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="isDropped" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="isInContract" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="isRedeemable" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="isTradeable" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="isTransferable" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="isUnpublished" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="latitude" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="longitude" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="markedForDeletionDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="markedForRemoteDeletion" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="notifyMessage" attributeType="String"/>
+        <attribute name="numberDirectClones" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="owner" attributeType="String"/>
+        <attribute name="parentID" attributeType="String"/>
+        <attribute name="privateStorage" optional="YES" attributeType="Binary"/>
+        <attribute name="publisherFQDN" attributeType="String"/>
+        <attribute name="rootType" attributeType="String"/>
+        <attribute name="sync" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="templateID" attributeType="String"/>
+        <attribute name="templateVariationID" attributeType="String"/>
+        <attribute name="title" attributeType="String"/>
+        <attribute name="transferredBy" attributeType="String"/>
+        <attribute name="version" attributeType="String"/>
+        <attribute name="whenAdded" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="whenCreated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="whenModified" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="actions" toMany="YES" deletionRule="Nullify" destinationEntity="Action" inverseName="vatoms" inverseEntity="Action"/>
+        <relationship name="childPolicy" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="VatomChildPolicy" inverseName="vatom" inverseEntity="VatomChildPolicy"/>
+        <relationship name="children" toMany="YES" deletionRule="Nullify" destinationEntity="Vatom" inverseName="parent" inverseEntity="Vatom"/>
+        <relationship name="commerce" maxCount="1" deletionRule="Cascade" destinationEntity="VatomCommerce" inverseName="vatom" inverseEntity="VatomCommerce"/>
+        <relationship name="faces" toMany="YES" deletionRule="Nullify" destinationEntity="Face" inverseName="vatom" inverseEntity="Face"/>
+        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Vatom" inverseName="children" inverseEntity="Vatom"/>
+        <relationship name="resources" toMany="YES" deletionRule="Cascade" destinationEntity="Resource" inverseName="vatoms" inverseEntity="Resource"/>
+        <relationship name="tags" toMany="YES" deletionRule="Nullify" destinationEntity="Tag" inverseName="vatoms" inverseEntity="Tag"/>
+        <relationship name="visibility" maxCount="1" deletionRule="Cascade" destinationEntity="VatomVisibility" inverseName="vatom" inverseEntity="VatomVisibility"/>
+        <fetchIndex name="byPropertyIndex">
+            <fetchIndexElement property="id" type="Binary" order="ascending"/>
+        </fetchIndex>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="id"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="VatomChildPolicy" representedClassName=".VatomChildPolicyCD" syncable="YES">
+        <attribute name="count" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="templateVariationID" attributeType="String"/>
+        <relationship name="creationPolicy" maxCount="1" deletionRule="Cascade" destinationEntity="VatomCreationPolicy" inverseName="childPolicy" inverseEntity="VatomCreationPolicy"/>
+        <relationship name="vatom" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Vatom" inverseName="childPolicy" inverseEntity="Vatom"/>
+    </entity>
+    <entity name="VatomCommerce" representedClassName=".VatomCommerceCD" syncable="YES">
+        <relationship name="pricing" maxCount="1" deletionRule="Nullify" destinationEntity="VatomPricing" inverseName="commerce" inverseEntity="VatomPricing"/>
+        <relationship name="vatom" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Vatom" inverseName="commerce" inverseEntity="Vatom"/>
+    </entity>
+    <entity name="VatomCreationPolicy" representedClassName=".VatomCreationPolicyCD" syncable="YES">
+        <attribute name="autoCreate" attributeType="String"/>
+        <attribute name="autoCreateCount" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="autoCreateCountRandom" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="enforcePolicyCountMax" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="enforcePolicyCountMin" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="policyCountMax" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="policyCountMin" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="childPolicy" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="VatomChildPolicy" inverseName="creationPolicy" inverseEntity="VatomChildPolicy"/>
+    </entity>
+    <entity name="VatomPricing" representedClassName=".VatomPricingCD" syncable="YES">
+        <attribute name="currency" attributeType="String"/>
+        <attribute name="isVatIncluded" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="price" optional="YES" attributeType="String"/>
+        <attribute name="pricingType" optional="YES" attributeType="String"/>
+        <attribute name="validFrom" optional="YES" attributeType="String"/>
+        <attribute name="validThrough" optional="YES" attributeType="String"/>
+        <relationship name="commerce" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="VatomCommerce" inverseName="pricing" inverseEntity="VatomCommerce"/>
+    </entity>
+    <entity name="VatomVisibility" representedClassName=".VatomVisibilityCD" syncable="YES">
+        <attribute name="type" optional="YES" attributeType="String"/>
+        <attribute name="value" optional="YES" attributeType="String"/>
+        <relationship name="vatom" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Vatom" inverseName="visibility" inverseEntity="Vatom"/>
+    </entity>
+    <elements>
+        <element name="Action" positionX="-149.68359375" positionY="697.203125" width="128" height="118"/>
+        <element name="Face" positionX="-172.890625" positionY="846.140625" width="128" height="223"/>
+        <element name="MetaData" positionX="67.28125" positionY="792.140625" width="128" height="135"/>
+        <element name="Resource" positionX="-648.453125" positionY="458.8203125" width="128" height="105"/>
+        <element name="Tag" positionX="-647.13671875" positionY="624.72265625" width="128" height="73"/>
+        <element name="Vatom" positionX="-380.6875" positionY="-16.76171875" width="128" height="733"/>
+        <element name="VatomChildPolicy" positionX="-111.30078125" positionY="189.62109375" width="128" height="105"/>
+        <element name="VatomCommerce" positionX="-78.0703125" positionY="366.1015625" width="128" height="73"/>
+        <element name="VatomCreationPolicy" positionX="76.5234375" positionY="130.02734375" width="146.78515625" height="163"/>
+        <element name="VatomPricing" positionX="108.55078125" positionY="336.11328125" width="128" height="148"/>
+        <element name="VatomVisibility" positionX="-123.375" positionY="538.28515625" width="128" height="90"/>
+    </elements>
+</model>

@@ -18,13 +18,13 @@ Pod::Spec.new do |s|
     
     s.subspec 'Core' do |s|
         s.source_files = 'BlockV/Core/**/*.{swift}'
-        s.dependency 'Alamofire',  '~> 4.7'     # Networking
-        s.dependency 'Starscream', '~> 3.0'   # Web socket
-        s.dependency 'JWTDecode',  '~> 2.1'     # JWT decoding
+        s.dependency 'Alamofire',  '~> 4.9'     # Networking
+        s.dependency 'Starscream', '~> 3.1'   # Web socket
+        s.dependency 'JWTDecode',  '~> 2.4'     # JWT decoding
         s.dependency 'Signals',    '~> 6.0'     # Elegant eventing
-        s.dependency 'SwiftLint',  '~> 0.27'    # Linter
+        s.dependency 'SwiftLint',  '~> 0.39'    # Linter
         s.dependency 'GenericJSON', '~> 2.0'    # JSON
-        s.dependency 'PromiseKit', '~> 6.8'     # Promises
+        s.dependency 'PromiseKit', '~> 6.13'     # Promises
         #s.exclude_files = '**/Info*.plist'
     end
     
@@ -32,7 +32,7 @@ Pod::Spec.new do |s|
         s.ios.source_files = 'BlockV/Face/**/*.{swift}'
         s.dependency 'BLOCKv/Core'
         s.dependency 'FLAnimatedImage', '~> 1.0' # Gifs
-        s.dependency 'Nuke',            '~> 8.0' # Image downloading
+        s.dependency 'Nuke',            '~> 8.4' # Image downloading
         #s.resource_bundles = {
         #    'FaceModule' => ['BlockV/Face/Face\ Views/**/*.{xib}']
         #}

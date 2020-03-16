@@ -1,9 +1,9 @@
 //
-//  BlockV AG. Copyright (c) 2018, all rights reserved.
+//  BLOCKv AG. Copyright (c) 2018, all rights reserved.
 //
-//  Licensed under the BlockV SDK License (the "License"); you may not use this file or
-//  the BlockV SDK except in compliance with the License accompanying it. Unless
-//  required by applicable law or agreed to in writing, the BlockV SDK distributed under
+//  Licensed under the BLOCKv SDK License (the "License"); you may not use this file or
+//  the BLOCKv SDK except in compliance with the License accompanying it. Unless
+//  required by applicable law or agreed to in writing, the BLOCKv SDK distributed under
 //  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
@@ -34,7 +34,12 @@ private class Layer: UIImageView {
 
 }
 
-/// Layered image face view
+/// Image Layered Face View.
+///
+/// ### Owned vs. Unowned Vatoms
+///
+/// The real-time addition and removal of child vatoms is only tracked for vatoms the user owns. Since this face view
+/// is dependent on child relationships, it's representation of unowned vatoms may be inaccurate.
 class ImageLayeredFaceView: FaceView {
 
     class var displayURL: String { return "native://layered-image" }
@@ -54,7 +59,7 @@ class ImageLayeredFaceView: FaceView {
 
     private var childVatoms: [VatomModel] {
         // fetch cached children
-        return self.vatom.listCachedChildren()
+        return (try? self.vatom.listCachedChildren()) ?? []
     }
 
     // MARK: - Config

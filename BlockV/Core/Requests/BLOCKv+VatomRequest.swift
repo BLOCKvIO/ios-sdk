@@ -1,9 +1,9 @@
 //
-//  BlockV AG. Copyright (c) 2018, all rights reserved.
+//  BLOCKv AG. Copyright (c) 2018, all rights reserved.
 //
-//  Licensed under the BlockV SDK License (the "License"); you may not use this file or
-//  the BlockV SDK except in compliance with the License accompanying it. Unless
-//  required by applicable law or agreed to in writing, the BlockV SDK distributed under
+//  Licensed under the BLOCKv SDK License (the "License"); you may not use this file or
+//  the BLOCKv SDK except in compliance with the License accompanying it. Unless
+//  required by applicable law or agreed to in writing, the BLOCKv SDK distributed under
 //  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
@@ -429,9 +429,21 @@ extension BLOCKv {
 
     }
 
+    /// Models an action response.
+    public struct ActionResponse {
+        /// Name of the action.
+        public let name: String
+        /// Request payload.
+        public let payload: [String: Any]
+        /// Platform response.
+        public let result: Result<[String: Any], BVError>
+    }
+
     /// Performs an action on the BLOCKv platform.
     ///
-    /// This is the most flexible of the action calls and should be used as a last resort.
+    /// ### Notifications:
+    /// - `willPerformAction` is broadcast before the request is sent to the platform to perform the action.
+    /// - `didPerformAction` is broadcast after a response is received from the platform.
     ///
     /// - Parameters:
     ///   - name: Name of the action to perform, e.g. "Drop".
@@ -441,6 +453,11 @@ extension BLOCKv {
     public static func performAction(name: String,
                                      payload: [String: Any],
                                      completion: @escaping (Result<[String: Any], BVError>) -> Void) {
+
+        // broadcast will perform action
+        NotificationCenter.default.post(name: Notification.Name.BVAction.willPerformAction,
+                                        object: nil,
+                                        userInfo: ["name": name, "payload": payload])
 
         let endpoint = API.VatomAction.custom(name: name, payload: payload)
 
@@ -452,22 +469,41 @@ extension BLOCKv {
                 do {
                     guard
                         let object = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                        let payload = object["payload"] as? [String: Any] else {
+                        let responsePayload = object["payload"] as? [String: Any] else {
                             throw BVError.modelDecoding(reason: "Unable to extract payload.")
                     }
                     // model is available
                     DispatchQueue.main.async {
+                        // broadcast did perform action
+                        let response = ActionResponse(name: name, payload: payload, result: .success(responsePayload))
+                        NotificationCenter.default.post(name: Notification.Name.BVAction.didPerformAction,
+                                                        object: nil,
+                                                        userInfo: ["name": name, "payload": payload,
+                                                                   "response": response])
                         completion(.success(payload))
                     }
 
                 } catch {
-                    let error = BVError.modelDecoding(reason: error.localizedDescription)
-                    completion(.failure(error))
+                    DispatchQueue.main.async {
+                        let error = BVError.modelDecoding(reason: error.localizedDescription)
+                        // broadcast did perform action
+                        let response = ActionResponse(name: name, payload: payload, result: .failure(error))
+                        NotificationCenter.default.post(name: Notification.Name.BVAction.didPerformAction,
+                                                        object: nil,
+                                                        userInfo: ["name": name, "payload": payload,
+                                                                   "response": response])
+                        completion(.failure(error))
+                    }
                 }
 
             case .failure(let error):
-                // handle error
                 DispatchQueue.main.async {
+                    // broadcast did perform action
+                    let response = ActionResponse(name: name, payload: payload, result: .failure(error))
+                    NotificationCenter.default.post(name: Notification.Name.BVAction.didPerformAction,
+                                                    object: nil,
+                                                    userInfo: ["name": name, "payload": payload,
+                                                               "response": response])
                     completion(.failure(error))
                 }
             }

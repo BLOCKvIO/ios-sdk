@@ -1,9 +1,9 @@
 //
-//  BlockV AG. Copyright (c) 2018, all rights reserved.
+//  BLOCKv AG. Copyright (c) 2018, all rights reserved.
 //
-//  Licensed under the BlockV SDK License (the "License"); you may not use this file or
-//  the BlockV SDK except in compliance with the License accompanying it. Unless
-//  required by applicable law or agreed to in writing, the BlockV SDK distributed under
+//  Licensed under the BLOCKv SDK License (the "License"); you may not use this file or
+//  the BLOCKv SDK except in compliance with the License accompanying it. Unless
+//  required by applicable law or agreed to in writing, the BLOCKv SDK distributed under
 //  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
@@ -161,8 +161,9 @@ public class Region {
     ///
     /// This function should fetch the _entire_ region.
     ///
-    /// - Returns: A promise which will fullsil with an array of object IDs, or `nil`. If an array of object IDs is
-    ///   returned, any IDs not in this list should be removed from the region.
+    /// - Returns: A promise which will fullfills with an array of object IDs, or `nil`. If an array of object Ids is
+    ///   returned, any Ids not in this list should be removed from the region. Object Ids should only be returned *after*
+    ///   full sync. For partial syncs, return `nil`.
     func load() -> Promise<[String]?> {
         return Promise(error: NSError("Subclasses must override Region.load()"))
     }
@@ -405,6 +406,41 @@ public class Region {
             return self.get(id: id)
         }
 
+    }
+    
+    /// Returns any objects within this region with the given ids.
+    public func get(ids: [String]) -> [Any?] {
+        
+        var mappedArray: [Any?] = []
+        
+        for id in ids {
+            // get object
+            guard let object = objects[id] else {
+                mappedArray.append(nil)
+                continue
+            }
+            
+            // check for cached concrete type
+            if let cached = object.cached {
+                mappedArray.append(cached)
+            } else {
+                // map to the plugin's intended type
+                if let mapped = self.map(object) {
+                    // cache it
+                    object.cached = mapped
+                    // store it
+                    mappedArray.append(mapped)
+                } else {
+                    mappedArray.append(nil)
+                    continue
+                }
+                
+            }
+            
+        }
+        
+        return mappedArray
+        
     }
 
     /// Returns an object within this region by it's ID.

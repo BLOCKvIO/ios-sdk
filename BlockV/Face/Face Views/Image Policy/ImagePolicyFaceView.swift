@@ -1,9 +1,9 @@
 //
-//  BlockV AG. Copyright (c) 2018, all rights reserved.
+//  BLOCKv AG. Copyright (c) 2018, all rights reserved.
 //
-//  Licensed under the BlockV SDK License (the "License"); you may not use this file or
-//  the BlockV SDK except in compliance with the License accompanying it. Unless
-//  required by applicable law or agreed to in writing, the BlockV SDK distributed under
+//  Licensed under the BLOCKv SDK License (the "License"); you may not use this file or
+//  the BLOCKv SDK except in compliance with the License accompanying it. Unless
+//  required by applicable law or agreed to in writing, the BLOCKv SDK distributed under
 //  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
@@ -18,6 +18,11 @@ import GenericJSON
 /// Native Image face view
 ///
 /// Displays a resource based on the frist matching item in the policy array.
+///
+/// ### Owned vs. Unowned Vatoms
+///
+/// The real-time addition and removal of child vatoms is only tracked for vatoms the user owns. Since this face view
+/// is dependent on child relationships, it's representation of unowned vatoms may be inaccurate.
 class ImagePolicyFaceView: FaceView {
 
     class var displayURL: String { return "native://image-policy" }
@@ -147,7 +152,7 @@ class ImagePolicyFaceView: FaceView {
     /// Current count of child vAtoms.
     private var currentChildCount: Int {
         // inspect cached children
-        return self.vatom.listCachedChildren().count
+        return (try? self.vatom.listCachedChildren().count) ?? 0
     }
 
     /// Update the face view using *local* data.

@@ -1,9 +1,9 @@
 //
-//  BlockV AG. Copyright (c) 2018, all rights reserved.
+//  BLOCKv AG. Copyright (c) 2018, all rights reserved.
 //
-//  Licensed under the BlockV SDK License (the "License"); you may not use this file or
-//  the BlockV SDK except in compliance with the License accompanying it. Unless
-//  required by applicable law or agreed to in writing, the BlockV SDK distributed under
+//  Licensed under the BLOCKv SDK License (the "License"); you may not use this file or
+//  the BLOCKv SDK except in compliance with the License accompanying it. Unless
+//  required by applicable law or agreed to in writing, the BLOCKv SDK distributed under
 //  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
@@ -53,6 +53,38 @@ extension API {
         static func getAssetProviders<T>() -> Endpoint<T> {
             return Endpoint(method: .get,
                             path: "/v1/user/asset_providers")
+        }
+        
+        // MARK: - Sync
+        
+        /// Builds the generic endpoint to get the face changes for the specified template ids after the specified time (unix epoch milliseconds).
+        ///
+        /// - Parameters:
+        ///   - templateIds: List of template ids for inspection.
+        ///   - since: Unix epoch time interval (measured in milliseconds).
+        /// - Returns: Constructed endpoint generic over response model that may be used to parse the response.
+        static func getFaceChanges<T>(templateIds: [String], since: TimeInterval) -> Endpoint<T> {
+            return Endpoint(method: .post,
+                            path: "/v1/vatom/faces/changes",
+                            parameters: [
+                                "templates": templateIds,
+                                "since": since
+            ])
+        }
+        
+        /// Builds the generic endpoint to get the action changes for the specified template ids after the specified time (unix epoch milliseconds).
+        ///
+        /// - Parameters:
+        ///   - templateIds: List of template ids for inspection.
+        ///   - since: Unix epoch time interval (measured in milliseconds).
+        /// - Returns: Constructed endpoint generic over response model that may be used to parse the response.
+        static func getActionChanges<T>(templateIds: [String], since: TimeInterval) -> Endpoint<T> {
+            return Endpoint(method: .post,
+                            path: "/v1/vatom/actions/changes",
+                            parameters: [
+                                "templates": templateIds,
+                                "since": since
+            ])
         }
 
         // MARK: - Vatoms

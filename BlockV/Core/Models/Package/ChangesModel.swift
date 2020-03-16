@@ -11,24 +11,36 @@
 
 import Foundation
 
-/// BlockV token model.
-///
-/// Used to represent a refresh or access token.
-struct BVToken: Codable, Equatable {
-    let token: String
-    let tokenType: String
+// MARK: - Action Changes
 
+struct ActionChangesModel: Codable {
+    
+    let faceChanges: [String: [FaceInnerModel]]
+    
     enum CodingKeys: String, CodingKey {
-        case token = "token"
-        case tokenType = "token_type"
+        case faceChanges = "faces_changes"
     }
 }
 
-/// BLOCKv refresh token response
-struct RefreshModel: Decodable {
-    let accessToken: BVToken
+struct ActionInnerModel: Codable {
+    let action: ActionModel
+    let operation: String
+}
 
+// MARK: - Face Models
+
+struct FaceChangesModel: Codable {
+    
+    let actionChanges: [String: [ActionInnerModel]]
+    
     enum CodingKeys: String, CodingKey {
-        case accessToken = "access_token"
+        case actionChanges = "actions_changes"
     }
 }
+
+struct FaceInnerModel: Codable {
+    let face: FaceModel
+    let opertation: String
+}
+
+

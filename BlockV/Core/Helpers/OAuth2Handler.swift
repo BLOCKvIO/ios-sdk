@@ -1,9 +1,9 @@
 //
-//  BlockV AG. Copyright (c) 2018, all rights reserved.
+//  BLOCKv AG. Copyright (c) 2018, all rights reserved.
 //
-//  Licensed under the BlockV SDK License (the "License"); you may not use this file or
-//  the BlockV SDK except in compliance with the License accompanying it. Unless
-//  required by applicable law or agreed to in writing, the BlockV SDK distributed under
+//  Licensed under the BLOCKv SDK License (the "License"); you may not use this file or
+//  the BLOCKv SDK except in compliance with the License accompanying it. Unless
+//  required by applicable law or agreed to in writing, the BLOCKv SDK distributed under
 //  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
@@ -52,16 +52,24 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
     }
 
     // MARK: - Request Adapter
+    
+    /// List of endpoint paths that have 'guest' scope. These enpoints do not require a bearer header.
+    let guestScopes = [
+        "/v1/users",
+        "/v1/user/login",
+        "/v1/user/guest"
+    ]
 
     /// Inspects and adapts the specified `URLRequest` in some manner if necessary and returns the result.
     ///
     /// Adapts a `URLRequest` to include the Authorization header.
     func adapt(_ urlRequest: URLRequest) throws -> URLRequest {
+        
+        guard let url = urlRequest.url else { return urlRequest }
 
-        if let urlString = urlRequest.url?.absoluteString, urlString.hasPrefix(baseURLString) {
+        if url.absoluteString.hasPrefix(baseURLString) && !guestScopes.contains(where: { $0 == url.path }) {
             var urlRequest = urlRequest
             // inject the bearer on every request
-            // TODO: Don't send on auth calls (register / login)
             urlRequest.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             return urlRequest
         }

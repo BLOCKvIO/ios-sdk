@@ -1,9 +1,9 @@
 //
-//  BlockV AG. Copyright (c) 2018, all rights reserved.
+//  BLOCKv AG. Copyright (c) 2018, all rights reserved.
 //
-//  Licensed under the BlockV SDK License (the "License"); you may not use this file or
-//  the BlockV SDK except in compliance with the License accompanying it. Unless
-//  required by applicable law or agreed to in writing, the BlockV SDK distributed under
+//  Licensed under the BLOCKv SDK License (the "License"); you may not use this file or
+//  the BLOCKv SDK except in compliance with the License accompanying it. Unless
+//  required by applicable law or agreed to in writing, the BLOCKv SDK distributed under
 //  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
@@ -201,10 +201,7 @@ open class VatomView: UIView {
 
         commonSetup()
 
-        // don't wait for the dispatched block
-        DispatchQueue.main.async {
-            self.runVVLC()
-        }
+        self.runVVLC()
 
     }
 
@@ -238,10 +235,7 @@ open class VatomView: UIView {
 
         commonSetup()
 
-        // don't wait for the dispatched block
-        DispatchQueue.main.async {
-            self.runVVLC()
-        }
+        self.runVVLC()
 
     }
 
@@ -281,7 +275,7 @@ open class VatomView: UIView {
 
     // MARK: - State Management
 
-    /// Updates the vAtom and optionally the procedure.
+    /// Updates the vatom and optionally the procedure.
     ///
     /// Both vatom and procedure may be updated over the lifespan of the `VatomView`. If either are updated the VVLC
     /// will run. This and may (or may not) result in the selected face model changing.
@@ -309,6 +303,22 @@ open class VatomView: UIView {
         self.vatom = newVatom
         runVVLC(oldVatom: oldVatom)
 
+    }
+    
+    /// Updates the procudure of this vatom view.
+    ///
+    /// This will trigger a run of the VVLC.
+    ///
+    /// - If the selected face model remains the same, then updates will be passed down to the currently selected face
+    /// view.
+    /// - If the selected face model changes, then the current face view will be torndown an the newly selected face
+    /// view added to the view hierarchy.
+    ///
+    /// - Parameter procedure: The Face Selection Procedure (FSP) that determines which face view to display.
+    public func update(procedure: @escaping FaceSelectionProcedure) {
+        self.procedure = procedure
+        // vatom is unchanged
+        runVVLC(oldVatom: self.vatom)
     }
 
     /// Calling `unload` will inform the selected face view to unload its contents.
@@ -395,12 +405,15 @@ open class VatomView: UIView {
              (since the selected face view does not need replacing).
              */
 
-            // update currently selected face view (without replacement)
-            self.selectedFaceView?.vatomChanged(vatom)
             // complete
             self.state = .completed
             // inform delegate the face view is unchanged
             self.vatomViewDelegate?.vatomView(self, didSelectFaceView: .success(self.selectedFaceView!))
+            
+            if vatom != oldVatom {
+                // if vatom package has changed, update currently selected face view (without replacement)
+                self.selectedFaceView?.vatomChanged(vatom)
+            }
 
         } else {
             // os_log("Face model changed - Creating new face view.", log: .vatomView, type: .debug)

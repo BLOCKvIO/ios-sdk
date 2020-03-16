@@ -1,9 +1,9 @@
 //
-//  BlockV AG. Copyright (c) 2018, all rights reserved.
+//  BLOCKv AG. Copyright (c) 2018, all rights reserved.
 //
-//  Licensed under the BlockV SDK License (the "License"); you may not use this file or
-//  the BlockV SDK except in compliance with the License accompanying it. Unless
-//  required by applicable law or agreed to in writing, the BlockV SDK distributed under
+//  Licensed under the BLOCKv SDK License (the "License"); you may not use this file or
+//  the BLOCKv SDK except in compliance with the License accompanying it. Unless
+//  required by applicable law or agreed to in writing, the BLOCKv SDK distributed under
 //  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
@@ -84,7 +84,7 @@ extension ActionModel: Codable {
 extension ActionModel {
 
     /// Extract action and template name from the compound name.
-    static func splitCompoundName(_ compoundName: String) throws -> (String, String) {
+    static func splitCompoundName(_ compoundName: String) throws -> (templateID: String, actionName: String) {
 
         // find the marker
         guard let markerRange = compoundName.range(of: "::action::",

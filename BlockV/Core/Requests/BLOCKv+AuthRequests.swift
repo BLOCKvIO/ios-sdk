@@ -1,9 +1,9 @@
 //
-//  BlockV AG. Copyright (c) 2018, all rights reserved.
+//  BLOCKv AG. Copyright (c) 2018, all rights reserved.
 //
-//  Licensed under the BlockV SDK License (the "License"); you may not use this file or
-//  the BlockV SDK except in compliance with the License accompanying it. Unless
-//  required by applicable law or agreed to in writing, the BlockV SDK distributed under
+//  Licensed under the BLOCKv SDK License (the "License"); you may not use this file or
+//  the BLOCKv SDK except in compliance with the License accompanying it. Unless
+//  required by applicable law or agreed to in writing, the BLOCKv SDK distributed under
 //  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
@@ -347,6 +347,58 @@ extension BLOCKv {
 
         }
 
+    }
+    
+    /// Merges the specified account into the current session's account.
+    ///
+    /// - Parameters:
+    ///   - token: User token of the other account (i.e. the account to be merged in).
+    ///   - password: Password to the other account (i.e. the account to be merged in).
+    ///   - completion: Completion handler that is called when the request is completed.
+    public static func mergeAccount(token: UserToken, password: String, completion: @escaping ((BVError?) -> Void)) {
+
+        let endpoint = API.Session.mergeAccount(token: token, password: password)
+        // send request
+        self.client.request(endpoint) { result in
+
+            switch result {
+            case .success:
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    completion(error)
+                }
+            }
+
+        }
+
+    }
+    
+    /// Generates a guest ID which can be used to login.
+    ///
+    /// - Parameter completion: Completion handler that is called when the request is completed.
+    public static func generateGuestID(completion: @escaping (Result<UserModel, BVError>) -> Void) {
+        
+        let endpoint = API.Session.generateGuestID()
+        
+        self.client.request(endpoint) { result in
+            switch result {
+            case .success(let model):
+                // model is available
+                DispatchQueue.main.async {
+                    completion(.success(model.payload))
+                }
+            case .failure(let error):
+                // handle error
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+            }
+        }
+        
     }
 
 }

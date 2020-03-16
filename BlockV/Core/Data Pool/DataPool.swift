@@ -1,9 +1,9 @@
 //
-//  BlockV AG. Copyright (c) 2018, all rights reserved.
+//  BLOCKv AG. Copyright (c) 2018, all rights reserved.
 //
-//  Licensed under the BlockV SDK License (the "License"); you may not use this file or
-//  the BlockV SDK except in compliance with the License accompanying it. Unless
-//  required by applicable law or agreed to in writing, the BlockV SDK distributed under
+//  Licensed under the BLOCKv SDK License (the "License"); you may not use this file or
+//  the BLOCKv SDK except in compliance with the License accompanying it. Unless
+//  required by applicable law or agreed to in writing, the BLOCKv SDK distributed under
 //  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
@@ -29,6 +29,10 @@ import MapKit
 /// Region instances are created on-demand.
 /// Regions are loaded from disk cache.
 public final class DataPool {
+    
+    enum SessionError: Error {
+        case currentUserPermission
+    }
 
     /// List of available plugins, i.e. region classes.
     internal static let plugins: [Region.Type] = [
@@ -49,6 +53,10 @@ public final class DataPool {
                 reg.onSessionInfoChanged(info: sessionInfo)
             }
         }
+    }
+    
+    public static var currentUserId: String {
+        return sessionInfo["userID"] as? String ?? ""
     }
 
     /// Fetches or creates a named data region.

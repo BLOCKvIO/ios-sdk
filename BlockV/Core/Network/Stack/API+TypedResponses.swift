@@ -1,9 +1,9 @@
 //
-//  BlockV AG. Copyright (c) 2018, all rights reserved.
+//  BLOCKv AG. Copyright (c) 2018, all rights reserved.
 //
-//  Licensed under the BlockV SDK License (the "License"); you may not use this file or
-//  the BlockV SDK except in compliance with the License accompanying it. Unless
-//  required by applicable law or agreed to in writing, the BlockV SDK distributed under
+//  Licensed under the BLOCKv SDK License (the "License"); you may not use this file or
+//  the BLOCKv SDK except in compliance with the License accompanying it. Unless
+//  required by applicable law or agreed to in writing, the BLOCKv SDK distributed under
 //  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
@@ -17,6 +17,30 @@ extension API {
 
     /// Namespace for session related endpoints with a typed reponse model.
     enum Session {
+
+        // MARK: - Account Managenent
+        
+        /// Builds the endpoit to generate a guest identifier.
+        static func generateGuestID() -> Endpoint<BaseModel<UserModel>> {
+            
+            return Endpoint(method: .post, path: "v1/user/guest")
+            
+        }
+
+        /// Builds the endpoint to merge the specified user accont into the current session's account.
+        static func mergeAccount(token: UserToken, password: String) -> Endpoint<BaseModel<GeneralModel>> {
+
+            return Endpoint(method: .post,
+                            path: "v1/user/merge_accounts",
+                            parameters: [
+                                "token": token.value,
+                                "token_type": token.type.rawValue,
+                                "auth_data": [
+                                    "password": password
+                                ]   
+            ])
+
+        }
 
         // MARK: - Push Notifications
 
@@ -267,6 +291,20 @@ extension API {
 
     /// Namespace for vatom related endpoints with a typed reponse model.
     enum Vatom {
+        
+        /// Builds and endpoint to get the action changes to the specified template ids after the specified time (unix epoch milliseconds).
+        ///
+        /// - Returns: Constructed endpoint specialized to parse out a `FaceModelChanges`.
+        static func getActionChanges(templateIds: [String], since: Double) -> Endpoint<BaseModel<FaceChangesModel>> {
+            return API.Generic.getActionChanges(templateIds: templateIds, since: since)
+        }
+        
+        /// Builds and endpoint to get the face changes to the specified template ids after the specified time (unix epoch milliseconds).
+        ///
+        /// - Returns: Constructed endpoint specialized to parse out a `ActionChangesModel`.
+        static func getFaceChanges(templateIds: [String], since: Double) -> Endpoint<BaseModel<ActionChangesModel>> {
+            return API.Generic.getFaceChanges(templateIds: templateIds, since: since)
+        }
 
         /// Builds an endpoint to get the current user's inventory sync hash.
         ///

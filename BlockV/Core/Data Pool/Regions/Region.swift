@@ -207,12 +207,15 @@ public class Region {
 
                 // notify
                 self.will(update: existingObject, withFields: data)
+                
+                // capture a snapshot of the old current object (before updates)
+                let snapshotObject = DataObject(id: existingObject.id, type: existingObject.type, data: data)
 
                 // it exists already, update the object (replace data)
                 existingObject.data = data
                 existingObject.cached = nil
 
-                self.did(update: existingObject, withFields: data)
+                self.did(update: snapshotObject, to: existingObject, withFields: data)
 
             } else {
 
@@ -261,6 +264,9 @@ public class Region {
 
             // notify
             self.will(update: existingObject, withFields: obj.changes)
+            
+            // capture a snapshot of the old current object (before updates)
+            let snapshotObject = DataObject(id: existingObject.id, type: existingObject.type, data: existingData)
 
             // update fields
             existingObject.data = existingData.deepMerged(with: obj.changes)
@@ -269,7 +275,7 @@ public class Region {
             existingObject.cached = nil
 
             // notify
-            self.did(update: existingObject, withFields: obj.changes)
+            self.did(update: snapshotObject, to: existingObject, withFields: obj.changes)
 
             // emit event
             changedIDs.insert(obj.id)
@@ -609,6 +615,8 @@ public class Region {
     ///   - value: The new value
     /// - Returns: An undo function
     func preemptiveChange(id: String, keyPath: String, value: Any) -> UndoFunction {
+        
+        return {}
 
         // get object. If it doesn't exist, do nothing and return an undo function which does nothing.
         guard let object = objects[id], object.data != nil else {
@@ -696,7 +704,7 @@ public class Region {
     func will(remove object: DataObject) {}
 
     func did(add: DataObject) {}
-    func did(update: DataObject, withFields: [String: Any]) {}
+    func did(update from: DataObject, to: DataObject, withFields: [String: Any]) {}
     func did(update: DataObject, keyPath: String, oldValue: Any?, newValue: Any?) {}
     func did(remove object: DataObject) {}
 

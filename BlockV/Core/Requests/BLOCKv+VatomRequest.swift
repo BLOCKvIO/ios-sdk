@@ -196,7 +196,7 @@ extension BLOCKv {
         let endpoint = API.Vatom.updateVatom(payload: payload)
 
         /*
-         Note: This endpoint not not fail in the typical HTTP style. It always returns 200 OK. Rather, the paylaod
+         Note: This endpoint does not fail in the typical HTTP style. It always returns 200 OK. Rather, the paylaod
          contains an array description of successful updates and errors.
          */
         BLOCKv.client.request(endpoint) { result in

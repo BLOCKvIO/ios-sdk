@@ -345,7 +345,9 @@ class BLOCKvRegion: Region {
             // notify parents
             DispatchQueue.main.async {
                 self.emit(.willUpdateObject, userInfo: ["id": oldParentID])
-                self.emit(.willUpdateObject, userInfo: ["id": newParentID])
+                if oldParentID != newParentID {
+                    self.emit(.willUpdateObject, userInfo: ["id": newParentID])
+                }
             }
         }
         // notify object
@@ -363,7 +365,9 @@ class BLOCKvRegion: Region {
             let newParentID = (to.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String {
             DispatchQueue.main.async {
                 self.emit(.didUpdateObject, userInfo: ["id": oldParentID])
-                self.emit(.didUpdateObject, userInfo: ["id": newParentID])
+                if oldParentID != newParentID {
+                    self.emit(.didUpdateObject, userInfo: ["id": newParentID])
+                }
             }
         }
         // notify object
@@ -382,7 +386,9 @@ class BLOCKvRegion: Region {
             guard let newParentID = newValue as? String else { return }
             DispatchQueue.main.async {
                 self.emit(.willUpdateObject, userInfo: ["id": oldParentID])
-                self.emit(.willUpdateObject, userInfo: ["id": newParentID])
+                if oldParentID != newParentID {
+                    self.emit(.willUpdateObject, userInfo: ["id": newParentID])
+                }
             }
         }
 
@@ -400,7 +406,9 @@ class BLOCKvRegion: Region {
             guard let newParentID = newValue as? String else { return }
             DispatchQueue.main.async {
                 self.emit(.didUpdateObject, userInfo: ["id": oldParentID])
-                self.emit(.didUpdateObject, userInfo: ["id": newParentID])
+                if oldParentID != newParentID {
+                    self.emit(.didUpdateObject, userInfo: ["id": newParentID])
+                }
             }
         }
 

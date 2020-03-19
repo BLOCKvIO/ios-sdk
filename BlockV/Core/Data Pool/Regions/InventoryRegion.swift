@@ -716,7 +716,7 @@ extension InventoryRegion {
             
             if uniqueTemplates.contains(object.value.templateId) {
                 // broadcast that the object has been updated (in this case with a change in faces and/or actions)
-                self.did(update: object.value, withFields: object.value.data!)
+                self.did(update: object.value, to: object.value, withFields: object.value.data!)
             }
             
         }

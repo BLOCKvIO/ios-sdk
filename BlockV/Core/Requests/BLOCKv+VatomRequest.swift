@@ -195,6 +195,10 @@ extension BLOCKv {
 
         let endpoint = API.Vatom.updateVatom(payload: payload)
 
+        /*
+         Note: This endpoint does not fail in the typical HTTP style. It always returns 200 OK. Rather, the paylaod
+         contains an array description of successful updates and errors.
+         */
         BLOCKv.client.request(endpoint) { result in
 
             switch result {
@@ -204,7 +208,7 @@ extension BLOCKv {
                  # Note
                  The most likely scenario where there will be partial containment errors is when setting the parent id
                  to a container vatom of type `DefinedFolderContainerType`. However, as of writting, the server does
-                 not enforce child policy rules so this always succeed (using the current API).
+                 not enforce child policy rules so this always succeeds (using the current API).
                  */
                 let updateVatomModel = baseModel.payload
                 DispatchQueue.main.async {

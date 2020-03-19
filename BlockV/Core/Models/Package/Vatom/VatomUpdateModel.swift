@@ -16,6 +16,7 @@ public struct VatomUpdateModel: Decodable, Equatable {
     public let numberUpdated: Int
     public let numberErrors: Int
     public let errorMessage: [String: String]
+    /// List of ids that were successfuly updated.
     public let ids: [String]
 
     enum CodingKeys: String, CodingKey {

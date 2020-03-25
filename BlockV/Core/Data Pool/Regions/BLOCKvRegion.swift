@@ -345,7 +345,9 @@ class BLOCKvRegion: Region {
             // notify parents
             DispatchQueue.main.async {
                 self.emit(.willUpdateObject, userInfo: ["id": oldParentID])
-                self.emit(.willUpdateObject, userInfo: ["id": newParentID])
+                if oldParentID != newParentID {
+                    self.emit(.willUpdateObject, userInfo: ["id": newParentID])
+                }
             }
         }
         // notify object
@@ -356,19 +358,21 @@ class BLOCKvRegion: Region {
     }
 
     /// Called when an object is about to be updated.
-    override func did(update object: DataObject, withFields: [String: Any]) {
+    override func did(update from: DataObject, to: DataObject, withFields: [String: Any]) {
 
         // notify parents
-        if let oldParentID = (object.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String,
-            let newParentID = (withFields["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String {
+        if let oldParentID = (from.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String,
+            let newParentID = (to.data?["vAtom::vAtomType"] as? [String: Any])?["parent_id"] as? String {
             DispatchQueue.main.async {
                 self.emit(.didUpdateObject, userInfo: ["id": oldParentID])
-                self.emit(.didUpdateObject, userInfo: ["id": newParentID])
+                if oldParentID != newParentID {
+                    self.emit(.didUpdateObject, userInfo: ["id": newParentID])
+                }
             }
         }
         // notify object
         DispatchQueue.main.async {
-            self.emit(.didUpdateObject, userInfo: ["id": object.id])
+            self.emit(.didUpdateObject, userInfo: ["id": to.id])
         }
     }
 
@@ -382,7 +386,9 @@ class BLOCKvRegion: Region {
             guard let newParentID = newValue as? String else { return }
             DispatchQueue.main.async {
                 self.emit(.willUpdateObject, userInfo: ["id": oldParentID])
-                self.emit(.willUpdateObject, userInfo: ["id": newParentID])
+                if oldParentID != newParentID {
+                    self.emit(.willUpdateObject, userInfo: ["id": newParentID])
+                }
             }
         }
 
@@ -400,7 +406,9 @@ class BLOCKvRegion: Region {
             guard let newParentID = newValue as? String else { return }
             DispatchQueue.main.async {
                 self.emit(.didUpdateObject, userInfo: ["id": oldParentID])
-                self.emit(.didUpdateObject, userInfo: ["id": newParentID])
+                if oldParentID != newParentID {
+                    self.emit(.didUpdateObject, userInfo: ["id": newParentID])
+                }
             }
         }
 

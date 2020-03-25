@@ -28,5 +28,14 @@ class DataObject {
     /// Plugins use the `map` function to transform raw `data` into a concrete type.
     /// This property is used to cache the transformed type. This avoids the overhead of performing the transformation.
     var cached: Any?
+    
+    init() { }
+    
+    init(id: String, type: String, data: [String: Any]? = nil, cached: Any? = nil) {
+        self.id = id
+        self.type = type
+        self.data = data
+        self.cached = cached
+    }
 
 }

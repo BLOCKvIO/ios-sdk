@@ -410,11 +410,11 @@ open class VatomView: UIView {
             // inform delegate the face view is unchanged
             self.vatomViewDelegate?.vatomView(self, didSelectFaceView: .success(self.selectedFaceView!))
             
-            if vatom != oldVatom {
-                // if vatom package has changed, update currently selected face view (without replacement)
-                self.selectedFaceView?.vatomChanged(vatom)
-            }
-
+            // if vatom package has changed, update currently selected face view (without replacement)
+            // note: updates are broadcast for parent id side-effect changes, in which case the old and new vatoms are
+            // equivalent, but the update must still be passed through
+            self.selectedFaceView?.vatomChanged(vatom)
+            
         } else {
             // os_log("Face model changed - Creating new face view.", log: .vatomView, type: .debug)
 

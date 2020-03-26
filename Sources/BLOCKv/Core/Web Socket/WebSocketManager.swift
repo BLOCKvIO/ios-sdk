@@ -10,7 +10,7 @@
 //
 
 import os
-import Foundation
+import UIKit
 import Starscream
 import Signals
 

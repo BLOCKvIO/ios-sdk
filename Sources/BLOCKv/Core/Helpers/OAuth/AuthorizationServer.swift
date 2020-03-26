@@ -10,7 +10,7 @@
 //
 
 import os
-import Foundation
+import UIKit
 import SafariServices
 
 //TODO: Update for iOS 12 ASWebAuthenticationSession

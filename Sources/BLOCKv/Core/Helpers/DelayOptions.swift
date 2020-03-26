@@ -11,6 +11,8 @@
 
 // Adapted from: https://github.com/kean
 
+import Foundation
+
 enum DelayOption {
     /// Zero delay.
     case immediate

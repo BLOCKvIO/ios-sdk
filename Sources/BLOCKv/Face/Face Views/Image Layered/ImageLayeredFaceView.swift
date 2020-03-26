@@ -10,7 +10,7 @@
 //
 
 import os
-import Foundation
+import UIKit
 import Nuke
 
 // Subclass of UIImageView which represents a vatom image layer.

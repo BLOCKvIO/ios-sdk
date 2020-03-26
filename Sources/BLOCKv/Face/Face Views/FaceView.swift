@@ -9,7 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
-import Foundation
+import UIKit
 
 /// TODO: This operator is useful, but has a drawback in that it always makes an assignment.
 infix operator ?=

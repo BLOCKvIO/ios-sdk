@@ -33,3 +33,5 @@ Carthage
 Pods/
 Secret.swift
 *_README.MD
+/.build
+/BLOCKv.xcodeproj

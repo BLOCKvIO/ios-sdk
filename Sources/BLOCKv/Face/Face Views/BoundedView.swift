@@ -9,7 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
-import Foundation
+import UIKit
 
 /*
  This class attempts to solve two problems:

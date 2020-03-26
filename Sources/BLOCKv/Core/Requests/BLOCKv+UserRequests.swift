@@ -9,7 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
-import Foundation
+import UIKit
 
 /// This extension groups together all BLOCKv user requests.
 extension BLOCKv {

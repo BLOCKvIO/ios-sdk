@@ -10,8 +10,8 @@
 //
 
 import os
-import Foundation
 import GenericJSON
+import UIKit
 
 // MARK: - Protocols
 

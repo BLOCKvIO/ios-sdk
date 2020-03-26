@@ -1,8 +1,8 @@
 PODS:
   - Alamofire (4.9.1)
-  - BLOCKv (3.2.0):
-    - BLOCKv/Face (= 3.2.0)
-  - BLOCKv/Core (3.2.0):
+  - BLOCKv (3.2.1):
+    - BLOCKv/Face (= 3.2.1)
+  - BLOCKv/Core (3.2.1):
     - Alamofire (~> 4.9)
     - GenericJSON (~> 2.0)
     - JWTDecode (~> 2.4)
@@ -10,14 +10,14 @@ PODS:
     - Signals (~> 6.0)
     - Starscream (~> 3.1)
     - SwiftLint (~> 0.39)
-  - BLOCKv/Face (3.2.0):
+  - BLOCKv/Face (3.2.1):
     - BLOCKv/Core
     - FLAnimatedImage (~> 1.0)
     - Nuke (~> 8.4)
   - FLAnimatedImage (1.0.12)
   - GenericJSON (2.0.1)
   - JWTDecode (2.4.1)
-  - Nuke (8.4.0)
+  - Nuke (8.4.1)
   - NVActivityIndicatorView (4.8.0):
     - NVActivityIndicatorView/Presenter (= 4.8.0)
   - NVActivityIndicatorView/Presenter (4.8.0)
@@ -33,13 +33,16 @@ PODS:
   - Signals (6.1.0)
   - Starscream (3.1.1)
   - SwiftLint (0.39.1)
-  - VatomFace3D (3.0.3):
-    - BLOCKv
+  - VatomFace3D (3.0.2):
+    - BLOCKv/Face
+    - FLAnimatedImage
+    - GenericJSON
+    - Nuke
     - NVActivityIndicatorView
 
 DEPENDENCIES:
   - BLOCKv (from `../`)
-  - VatomFace3D (from `../../../faces/3D-Face`)
+  - VatomFace3D
 
 SPEC REPOS:
   trunk:
@@ -53,27 +56,26 @@ SPEC REPOS:
     - Signals
     - Starscream
     - SwiftLint
+    - VatomFace3D
 
 EXTERNAL SOURCES:
   BLOCKv:
     :path: "../"
-  VatomFace3D:
-    :path: "../../../faces/3D-Face"
 
 SPEC CHECKSUMS:
   Alamofire: 85e8a02c69d6020a0d734f6054870d7ecb75cf18
-  BLOCKv: 1b55e2a9c9fe6be4d2dab9f9f05591cdf30bf1a8
+  BLOCKv: 797b893a024a111b552bf9402dc94f7d0948b02b
   FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
   GenericJSON: a6e74e2c457f8693caab08e0eafde7d97e6666de
   JWTDecode: 4bd4da0cdf0f8154fd467fa48499f34ec057fb88
-  Nuke: fa6f784c4f7e1c0f9313668510186c68b7af2509
+  Nuke: d780e3507a86b86c589ab3cc5cd302d5456f06fb
   NVActivityIndicatorView: d24b7ebcf80af5dcd994adb650e2b6c93379270f
   PromiseKit: 28fda91c973cc377875d8c0ea4f973013c05b6db
   Signals: f8e5c979e93c35273f8dfe55ee7f47213d3e8fe8
   Starscream: 4bb2f9942274833f7b4d296a55504dcfc7edb7b0
   SwiftLint: 55e96a4a4d537d4a3156859fc1c54bd24851a046
-  VatomFace3D: ea1c3d60da71c6d42fcd4b03ee6d412274bf4940
+  VatomFace3D: aabeb4a3c9d72835fbfd8a4bcac3917151b30e0c
 
-PODFILE CHECKSUM: c06b08df2c0da959c36a092d9f81c8703998dbfb
+PODFILE CHECKSUM: d2ad0cdcd830de687ee1e7475c49221546a727b8
 
 COCOAPODS: 1.9.1

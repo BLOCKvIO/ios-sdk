@@ -31,9 +31,9 @@ let package = Package(
         .target(
             name: "BLOCKv",
             dependencies: ["Alamofire", "Starscream", "Nuke", "Signals", "PromiseKit", "JWTDecode", "GenericJSON", "FLAnimatedImage"],
-            path: "Sources/BLOCKv"),
+            path: "Sources"),
         .testTarget(
-            name: "BLOCKv_Unit_Tests",
+            name: "BLOCKv-Unit-Tests",
             dependencies: ["BLOCKv"]),
     ],
     swiftLanguageVersions: [

@@ -21,7 +21,7 @@
 //  SOFTWARE.
 //
 
-import Foundation
+import UIKit
 import BLOCKv
 
 /// Example custom VatomView loader view.

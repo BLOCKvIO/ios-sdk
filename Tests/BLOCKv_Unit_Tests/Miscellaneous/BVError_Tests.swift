@@ -30,7 +30,7 @@ class BVError_Tests: XCTestCase {
 
         // Top level
 
-        let errorPlatform = BVError.platform(reason: .authenticationFailed(0, "test"))
+        let errorPlatform = BVError.platform(reason: .sessionUnauthorized(0, "test", "req_1"))
         let errorWebSocket = BVError.webSocket(error: .connectionFailed)
         let errorModelDecoding = BVError.modelDecoding(reason: "test")
 
@@ -43,19 +43,19 @@ class BVError_Tests: XCTestCase {
 
         // Top level
 
-        let errorA = BVError.platform(reason: .authenticationFailed(0, "test"))
-        let errorB = BVError.platform(reason: .authenticationFailed(0, "test"))
-        let errorC = BVError.platform(reason: .cannotDeletePrimaryToken(0, "test"))
+        let errorA = BVError.platform(reason: .sessionUnauthorized(0, "test", "req_1"))
+        let errorB = BVError.platform(reason: .sessionUnauthorized(0, "test", "req_1"))
+        let errorC = BVError.platform(reason: .cannotDeletePrimaryToken(0, "test", "req_1"))
 
         XCTAssertEqual(errorA, errorB)
         XCTAssertNotEqual(errorA, errorC)
 
         // Reason
 
-        let errorReasonA = BVError.PlatformErrorReason(code: 100, message: "Some test error message.")
-        let errorReasonB = BVError.PlatformErrorReason(code: 100, message: "Some test error message.")
-        let errorReasonC = BVError.PlatformErrorReason(code: 100, message: "Some different test error message")
-        let errorReasonD = BVError.PlatformErrorReason(code: 200, message: "Some test error message.")
+        let errorReasonA = BVError.PlatformErrorReason(code: 100, message: "Some test error message.", requestId: "req_1")
+        let errorReasonB = BVError.PlatformErrorReason(code: 100, message: "Some test error message.", requestId: "req_1")
+        let errorReasonC = BVError.PlatformErrorReason(code: 100, message: "Some different test error message", requestId: "req_1")
+        let errorReasonD = BVError.PlatformErrorReason(code: 200, message: "Some test error message.", requestId: "req_1")
 
         XCTAssertEqual(errorReasonA, errorReasonA)
         XCTAssertEqual(errorReasonA, errorReasonB)

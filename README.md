@@ -1,25 +1,26 @@
 # BLOCKv SDK for iOS
 
-[![Version](https://img.shields.io/cocoapods/v/BLOCKv.svg?style=flat)](http://cocoapods.org/pods/BLOCKv)
-[![License](https://img.shields.io/cocoapods/l/BLOCKv.svg?style=flat)](http://cocoapods.org/pods/BLOCKv)
-[![Platform](https://img.shields.io/cocoapods/p/BLOCKv.svg?style=flat)](http://cocoapods.org/pods/BLOCKv)
-
 This is the official BLOCKv SDK. It allows you to easily build your own Vatom Viewer app, or integrate your own apps into the BLOCKv platform.
 
 ## Requirements
 
 - iOS 11.0+
-- Xcode 11.2+
-- Swift 5.1+
+- Xcode 11.4+
+- Swift 5.2+
 
 ## Installation
 
-BLOCKv is available through [CocoaPods](http://cocoapods.org). To install
-it, simply add the following line to your Podfile:
+### Swift Package Manager
 
-```ruby
-pod 'BLOCKv'
+Simply add the package dependecy to your Package.swift:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/BLOCKvIO/ios-sdk", from: "3.3.0"),
+]
 ```
+
+and specify "BLOCKv" as a dependency in the appropriate targets.
 
 ## Configuration
 

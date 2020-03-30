@@ -1,4 +1,4 @@
-// swift-tools-version:5.2
+// swift-tools-version:5.1
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -15,15 +15,15 @@ let package = Package(
             targets: ["BLOCKv"]),
     ],
     dependencies: [
-        .package(name: "Alamofire", url: "https://github.com/Alamofire/Alamofire", from: "4.9.0"),
-        .package(name: "Starscream", url: "https://github.com/daltoniam/Starscream", from: "3.1.1"),
-        .package(name: "Nuke", url: "https://github.com/kean/Nuke", from: "8.4.1"),
-        .package(name: "PromiseKit", url: "https://github.com/mxcl/PromiseKit", from: "6.13.1"),
-        .package(name: "JWTDecode", url: "https://github.com/auth0/JWTDecode.swift", from: "2.4.1"),
-        .package(name: "Signals", url: "https://github.com/artman/Signals", from: "6.1.0"),
-        .package(name: "GenericJSON", url: "https://github.com/zoul/generic-json-swift", from: "2.0.1"),
-        .package(name: "SwiftLint", url: "https://github.com/realm/SwiftLint", from: "0.39.1"),
-        .package(name: "FLAnimatedImage", url: "https://github.com/sonsongithub/FLAnimatedImageSPM", .revision("a4aa45188e09e951b57bed19ff2b4cb900d93289")),
+        .package(url: "https://github.com/Alamofire/Alamofire", from: "4.9.0"),
+        .package(url: "https://github.com/daltoniam/Starscream", from: "3.1.1"),
+        .package(url: "https://github.com/kean/Nuke", from: "8.4.1"),
+        .package(url: "https://github.com/mxcl/PromiseKit", from: "6.13.1"),
+        .package(url: "https://github.com/auth0/JWTDecode.swift", from: "2.4.1"),
+        .package(url: "https://github.com/artman/Signals", from: "6.1.0"),
+        .package(url: "https://github.com/zoul/generic-json-swift", from: "2.0.1"),
+        .package(url: "https://github.com/realm/SwiftLint", from: "0.39.1"),
+        .package(url: "https://github.com/sonsongithub/FLAnimatedImageSPM", .revision("a4aa45188e09e951b57bed19ff2b4cb900d93289")),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.

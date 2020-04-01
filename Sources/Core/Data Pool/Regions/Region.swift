@@ -615,8 +615,6 @@ public class Region {
     ///   - value: The new value
     /// - Returns: An undo function
     func preemptiveChange(id: String, keyPath: String, value: Any) -> UndoFunction {
-        
-        return {}
 
         // get object. If it doesn't exist, do nothing and return an undo function which does nothing.
         guard let object = objects[id], object.data != nil else {

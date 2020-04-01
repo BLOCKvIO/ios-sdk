@@ -455,10 +455,14 @@ class CoreBridgeV2: CoreBridge { //swiftlint:disable:this type_body_length
         }
 
         struct Tokens: Encodable {
+            let hasEmail: Bool
+            let hasPhone: Bool
             let hasVerifiedEmail: Bool
             let hasVerifiedPhone: Bool
 
             enum CodingKeys: String, CodingKey {
+                case hasEmail = "has_email"
+                case hasPhone = "has_phone"
                 case hasVerifiedEmail = "has_verified_email"
                 case hasVerifiedPhone = "has_verified_phone"
             }
@@ -642,6 +646,9 @@ class CoreBridgeV2: CoreBridge { //swiftlint:disable:this type_body_length
             switch result {
             case .success(let tokenModel):
 
+                let hasEmail = tokenModel.contains(where: { $0.properties.tokenType == "email" })
+                let hasPhone = tokenModel.contains(where: { $0.properties.tokenType == "phone_number" })
+
                 // check for at least one verified email
                 let hasVerifiedEmail = tokenModel.contains(where: {
                     $0.properties.tokenType == "email" && $0.properties.isConfirmed == true
@@ -651,8 +658,8 @@ class CoreBridgeV2: CoreBridge { //swiftlint:disable:this type_body_length
                     $0.properties.tokenType == "phone_number" && $0.properties.isConfirmed == true
                 })
 
-                tokens = BRCurrentUser.Tokens(hasVerifiedEmail: hasVerifiedEmail,
-                                              hasVerifiedPhone: hasVerifiedPhone)
+                tokens = BRCurrentUser.Tokens(hasEmail: hasEmail, hasPhone: hasPhone,
+                                              hasVerifiedEmail: hasVerifiedEmail, hasVerifiedPhone: hasVerifiedPhone)
 
             case .failure:
                 bridgeError = BridgeError.viewer("Unable to fetch current user.")

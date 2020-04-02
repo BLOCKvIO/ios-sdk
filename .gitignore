@@ -22,7 +22,10 @@ DerivedData
 # Bundler
 .bundle
 
-#SPM
+# Cocoapods
+Pods/
+
+# SPM
 /.build
 /.swiftpm
 /BLOCKv.xcodeproj

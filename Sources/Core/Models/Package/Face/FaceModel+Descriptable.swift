@@ -42,10 +42,10 @@ extension FaceModel.Properties: Descriptable {
     init(from descriptor: [String: Any]) throws {
         guard
             let _displayURL = descriptor["display_url"] as? String,
-            let _constraintsDescriptor = descriptor["constraints"] as? [String: Any],
-            let _resources = descriptor["resources"] as? [String]
+            let _constraintsDescriptor = descriptor["constraints"] as? [String: Any]
             else { throw BVError.modelDecoding(reason: "Model decoding failed.") }
 
+        let _resources = descriptor["resources"] as? [String] ?? []
         let _config = descriptor["config"] as? [String: Any]
 
         self.displayURL = _displayURL

@@ -89,7 +89,7 @@ extension MessageModel: Codable {
         geoPosition          = try container.decodeIfPresent([Double].self, forKey: .geoPosition)
         templateVariationIdentifiers = try container.decodeIfPresent([String].self,
                                                                      forKey: .templateVariationIdentifiers) ?? []
-        vatomIdentifiers     = try container.decodeIfPresent([String].self, forKey: .vatomIdentifiers) ?? []
+        vatomIdentifiers     = try container.decodeSafelyIfPresentArray(of: String.self, forKey: .vatomIdentifiers)
         resources            = container.decodeSafelyIfPresentArray(of: VatomResourceModel.self, forKey: .resources)
 
     }

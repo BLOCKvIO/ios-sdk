@@ -254,12 +254,16 @@ public enum MockModel {
         """.data(using: .utf8)!
 
         public static let nativeGenericIcon = """
-            {"id":"48476b21-a4cf-45b6-a2f3-9a9c7b491237","template":"vatomic.prototyping::Drone2","meta":{"created_by":"BLOCKv Backend","when_created":"2018-07-25T12:58:24Z","modified_by":"","when_modified":"2018-07-25T12:58:24Z","data_type":"v1::FaceType","in_sync":false,"when_synced":"","is_syncing":false},"properties":{"display_url":"native://generic-3d","package_url":".","constraints":{"bluetooth_le":false,"contact_list":false,"gps":false,"three_d":false,"view_mode":"icon","platform":"generic","quality":"high"},"resources":[]}}
+            {"id":"48476b21-a4cf-45b6-a2f3-9a9c7b491237","template":"vatomic.prototyping::Drone2","meta":{"created_by":"BLOCKv Backend","when_created":"2018-07-25T12:58:24Z","modified_by":"","when_modified":"2018-07-25T12:58:24Z","data_type":"v1::FaceType","in_sync":false,"when_synced":"","is_syncing":false},"properties":{"display_url":"native://generic-3d","package_url":".","constraints":{"bluetooth_le":false,"contact_list":false,"gps":false,"three_d":false,"view_mode":"icon","platform":"generic","quality":"high"},"resources":["ActivatedImage"]}}
             """.data(using: .utf8)!
 
         public static let webGenericFullscreen = """
             {"id":"856a8bc5-ada5-4158-840f-370d27171234c","template":"vatomic.prototyping::Invitation::v1","meta":{"created_by":"BLOCKv Backend","when_created":"2018-05-09T02:50:38Z","modified_by":"BLOCKv Backend","when_modified":"2018-05-10T14:35:21Z","data_type":"v1::FaceType","in_sync":false,"when_synced":"","is_syncing":false},"properties":{"display_url":"https://somewebsite.face.index.html","package_url":".","constraints":{"bluetooth_le":false,"contact_list":false,"gps":false,"three_d":false,"view_mode":"fullscreen","platform":"generic","quality":"high"},"resources":["CardBackground"]}}
             """.data(using: .utf8)!
+        
+        public static let nativeImageV2 = """
+        {"id":"c0231a61-fea4-4110-925c-9998b8812345","template":"vatomic.prototyping::bridge-tester::unit-test","meta":{"created_by":"BLOCKv","when_created":"2020-04-02T17:54:33Z","modified_by":"","when_modified":"2020-04-02T17:54:33Z","data_type":"v1::FaceType"},"properties":{"display_url":"native://image","package_url":".","constraints":{"bluetooth_le":false,"contact_list":false,"gps":false,"three_d":false,"view_mode":"icon","platform":"generic","quality":"high"},"resources":null}}
+        """.data(using: .utf8)!
 
     }
 

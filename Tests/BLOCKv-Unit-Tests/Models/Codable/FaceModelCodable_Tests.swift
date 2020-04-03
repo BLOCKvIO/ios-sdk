@@ -29,6 +29,7 @@ class FaceModelCodable_Tests: XCTestCase {
             XCTAssertEqual(faceModel.templateID, "vatomic.prototyping::Drone2")
             XCTAssertTrue(faceModel.isNative)
             XCTAssertFalse(faceModel.isWeb)
+            XCTAssertEqual(faceModel.properties.resources, ["ActivatedImage"])
         } catch {
             XCTFail(error.localizedDescription)
         }
@@ -48,10 +49,28 @@ class FaceModelCodable_Tests: XCTestCase {
             XCTAssertEqual(faceModel.templateID, "vatomic.prototyping::Invitation::v1")
             XCTAssertFalse(faceModel.isNative)
             XCTAssertTrue(faceModel.isWeb)
+            XCTAssertEqual(faceModel.properties.resources, ["CardBackground"])
         } catch {
             XCTFail(error.localizedDescription)
         }
 
+    }
+    
+    func testWebFaceDecodingNullArray() {
+        
+        do {
+            let model = try TestUtility.jsonDecoder.decode(FaceModel.self, from: MockModel.FaceModel.nativeImageV2)
+            let faceModel = try self.require(model)
+            // pack model tests
+            XCTAssertEqual(faceModel.id, "c0231a61-fea4-4110-925c-9998b8812345")
+            XCTAssertEqual(faceModel.templateID, "vatomic.prototyping::bridge-tester::unit-test")
+            XCTAssertTrue(faceModel.isNative)
+            XCTAssertFalse(faceModel.isWeb)
+            XCTAssertEqual(faceModel.properties.resources, [])
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+        
     }
 
     /// Test codable (i.e. encode and decode).

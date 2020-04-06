@@ -39,28 +39,31 @@ All notable changes to this project will be documented in this file.
   - Pull Request [#354](https://github.com/BLOCKvIO/ios-sdk/pull/354)
   - Pull Request [#338](https://github.com/BLOCKvIO/ios-sdk/pull/338)
   - Pull Request [#244](https://github.com/BLOCKvIO/ios-sdk/pull/244)
-- Swift Package Manager support
+  - Pull Request [#199](https://github.com/BLOCKvIO/ios-sdk/pull/199)
+- Swift Package Manager support.
   - Pull Request [#352](https://github.com/BLOCKvIO/ios-sdk/pull/352)
-- Action notifications
+- Action notifications.
   - Pull Request [#333](https://github.com/BLOCKvIO/ios-sdk/pull/333)
-- Split and Combine actions
+- Split and Combine actions.
   - Pull Request [#323](https://github.com/BLOCKvIO/ios-sdk/pull/323)
-- (Face) Trigger Rules
+- (Face) Trigger Rules.
   - Pull Request [#311](https://github.com/BLOCKvIO/ios-sdk/pull/311)
-- Redemption request on Vatom id
+- Redemption request on Vatom id.
   - Pull Request [#297](https://github.com/BLOCKvIO/ios-sdk/pull/297)
-- Dispense request
+- Dispense request.
   - Pull Request [#286](https://github.com/BLOCKvIO/ios-sdk/pull/286)
-- Convenience method to clear auth credentials
+- Convenience method to clear auth credentials.
   - Pull Request [#280](https://github.com/BLOCKvIO/ios-sdk/pull/280)
-- OAuth login
+- OAuth login.
   - Pull Request [#275](https://github.com/BLOCKvIO/ios-sdk/pull/275)
-- os_log
+  - Pull Request [#215](https://github.com/BLOCKvIO/ios-sdk/pull/215)
+  - Pull Request [#210](https://github.com/BLOCKvIO/ios-sdk/pull/210)
+- `os_log` support.
   - Pull Request [#272](https://github.com/BLOCKvIO/ios-sdk/pull/272)
   - Pull Request [#271](https://github.com/BLOCKvIO/ios-sdk/pull/271)
-- Method `updatePushNotification(fcmToken:platformID:enabled:complete)`
+- Method update push notification token and preferences.
   - Pull Request [#224](https://github.com/BLOCKvIO/ios-sdk/pull/224)
-- App version support
+- App version support.
   - Pull Request [#223](https://github.com/BLOCKvIO/ios-sdk/pull/223)
 
 ### Updated
@@ -75,20 +78,22 @@ All notable changes to this project will be documented in this file.
   - Pull Request [#248](https://github.com/BLOCKvIO/ios-sdk/pull/248)
 - Generate Guest ID.
   - Pull Request [#347](https://github.com/BLOCKvIO/ios-sdk/pull/347)
-- Update vatom view with only a procedure
+- Update vatom view with only a procedure.
   - Pull Request [#340](https://github.com/BLOCKvIO/ios-sdk/pull/340)
 - User consent property in `UserModel`.
   - Pull Request [#339](https://github.com/BLOCKvIO/ios-sdk/pull/339)
-- Error Spec 1.0.0 conformance
+- Error Spec 1.0.0 conformance.
   - Pull Request [#321](https://github.com/BLOCKvIO/ios-sdk/pull/321)
 - KeyPath with nested strings
   - Pull Request [#291](https://github.com/BLOCKvIO/ios-sdk/pull/291)
-- KayPath lookup
+- KayPath lookup.
   - Pull Request [#287](https://github.com/BLOCKvIO/ios-sdk/pull/287)
-- Image downloader
+- Image downloader.
   - Pull Request [#277](https://github.com/BLOCKvIO/ios-sdk/pull/277)
-- Add `sync` to `WSStateUpdateEvent`
+- Add `sync` to `WSStateUpdateEvent`.
   - Pull Request [#268](https://github.com/BLOCKvIO/ios-sdk/pull/268)
+- Migrate to Swift 3
+  - Pull Request [#205](https://github.com/BLOCKvIO/ios-sdk/pull/205)
 
 ### Fixed
 
@@ -97,7 +102,7 @@ All notable changes to this project will be documented in this file.
   - Pull Request [#283](https://github.com/BLOCKvIO/ios-sdk/pull/283)
   - Pull Request [#282](https://github.com/BLOCKvIO/ios-sdk/pull/282)
   - Pull Request [#243](https://github.com/BLOCKvIO/ios-sdk/pull/243)
-- Add member-wise initializer to `FaceModel`
+- Add member-wise initializer to `FaceModel`.
   - Pull Request [#358](https://github.com/BLOCKvIO/ios-sdk/pull/358)
 - JSON parsing for arrays where the value is `null`.
   - Pull Request [#357](https://github.com/BLOCKvIO/ios-sdk/pull/357)
@@ -105,51 +110,64 @@ All notable changes to this project will be documented in this file.
   - Pull Request [#350](https://github.com/BLOCKvIO/ios-sdk/pull/350)
 - Parent ID side effects.
   - Pull Request [#349](https://github.com/BLOCKvIO/ios-sdk/pull/349)
-- (Face) Image progress layout
+- (Face) Image progress layout.
   - Pull Request [#346](https://github.com/BLOCKvIO/ios-sdk/pull/346)
 - (Face) Vatom View Life Cycle.
   - Pull Request [#345](https://github.com/BLOCKvIO/ios-sdk/pull/345)
-- Expose properties of `ActionResponse`
+- Expose properties of `ActionResponse`.
   - Pull Request [#337](https://github.com/BLOCKvIO/ios-sdk/pull/337)
   - Pull Request [#336](https://github.com/BLOCKvIO/ios-sdk/pull/336)
-- Bearer token endpoint scope
+- Bearer token endpoint scope.
   - Pull Request [#331](https://github.com/BLOCKvIO/ios-sdk/pull/331)
-- Add class conformance to `FacePresenter`
+- Add class conformance to `FacePresenter`.
   - Pull Request [#317](https://github.com/BLOCKvIO/ios-sdk/pull/317)
-- Expose `SystemProperties` on `UserModel`
+- Expose `SystemProperties` on `UserModel`.
   - Pull Request [#305](https://github.com/BLOCKvIO/ios-sdk/pull/305)
-- Requests should retry only once
+- Requests should retry only once.
   - Pull Request [#303](https://github.com/BLOCKvIO/ios-sdk/pull/303)
-- (Face) Image progress label responsiveness
+- (Face) Image progress label responsiveness.
   - Pull Request [#295](https://github.com/BLOCKvIO/ios-sdk/pull/295)
-- Image policy face config
+- Image policy face config.
   - Pull Request [#293](https://github.com/BLOCKvIO/ios-sdk/pull/293)
-- Fetch user as part of OAuth
+- Fetch user as part of OAuth.
   - Pull Request [#292](https://github.com/BLOCKvIO/ios-sdk/pull/292)
-- (Face) Use throwing initializer
+- (Face) Use throwing initializer.
   - Pull Request [#285](https://github.com/BLOCKvIO/ios-sdk/pull/285)
-- Reference cycle in save closure
+- Reference cycle in save closure.
   - Pull Request [#218](https://github.com/BLOCKvIO/ios-sdk/pull/218)
 - BoundedView
   - Pull Request [#273](https://github.com/BLOCKvIO/ios-sdk/pull/273)
-- `when_added` on `VatomModel`
+- `when_added` on `VatomModel`.
   - Pull Request [#264](https://github.com/BLOCKvIO/ios-sdk/pull/264)
-- Member-wise initializer for `MessageModel`
+- Member-wise initializer for `MessageModel`.
   - Pull Request [#259](https://github.com/BLOCKvIO/ios-sdk/pull/259)
-- Migrate to GenericJSON 2.0.0 (fix double point precision)
+- Migrate to GenericJSON 2.0.0 (fix double point precision).
   - Pull Request [#250](https://github.com/BLOCKvIO/ios-sdk/pull/250)
-- (Face) Image policy face root property lookup (`cloning_score` and `num_direct_clones`)
+- (Face) Image policy face - root property lookup (`cloning_score` and `num_direct_clones`).
   - Pull Request [#251](https://github.com/BLOCKvIO/ios-sdk/pull/251)
-- Vatom View Life Cycle
+- Vatom View Life Cycle.
   - Pull Request [#230](https://github.com/BLOCKvIO/ios-sdk/pull/230)
-- (Face) Fix web view scrolling
+- (Face) Fix web view scrolling.
   - Pull Request [#229](https://github.com/BLOCKvIO/ios-sdk/pull/229)
-- Add `nonPushNotification` to `TokenRegisterParams`
+- Add `nonPushNotification` to `TokenRegisterParams`.
   - Pull Request [#228](https://github.com/BLOCKvIO/ios-sdk/pull/228)
-- Web face caching
+- Web face caching.
   - Pull Request [#225](https://github.com/BLOCKvIO/ios-sdk/pull/225)
-- VatomView in reuse pool
+- VatomView in reuse pool.
   - Pull Request [#222](https://github.com/BLOCKvIO/ios-sdk/pull/222)
+  - Pull Request [#218](https://github.com/BLOCKvIO/ios-sdk/pull/218)
+- Vatom containment & action name
+  - Pull Request [#](https://github.com/BLOCKvIO/ios-sdk/pull/)
+- `ErrorView` vatom assignment.
+  - Pull Request [#220](https://github.com/BLOCKvIO/ios-sdk/pull/220)
+- (Face) Image/resource scaling.
+  - Pull Request [#219](https://github.com/BLOCKvIO/ios-sdk/pull/219)
+- Invoke Viewer's closure on logout
+  - Pull Request [#214](https://github.com/BLOCKvIO/ios-sdk/pull/214)
+- Request setParentID() completion queue.
+  - Pull Request [#206](https://github.com/BLOCKvIO/ios-sdk/pull/206)
+
+---
 
 ## [3.1.0](https://github.com/BLOCKvIO/ios-sdk/releases/tag/3.1.0)
 

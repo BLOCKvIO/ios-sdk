@@ -77,8 +77,15 @@ extension FaceModel: Codable {
             let items = try decoder.container(keyedBy: CodingKeys.self)
             displayURL = try items.decode(String.self, forKey: .displayURL)
             constraints = try items.decode(Constraints.self, forKey: .constraints)
-            resources = try items.decodeSafelyIfPresentArray(of: String.self, forKey: .resources)
-            config = try items.decodeSafelyIfPresent(JSON.self, forKey: .config) ?? nil
+            resources = items.decodeSafelyIfPresentArray(of: String.self, forKey: .resources)
+            config = items.decodeSafelyIfPresent(JSON.self, forKey: .config) ?? nil
+        }
+
+        public init(displayURL: String, constraints: Properties.Constraints, resources: [String], config: JSON?) {
+            self.displayURL = displayURL
+            self.constraints = constraints
+            self.resources = resources
+            self.config = config
         }
 
     }

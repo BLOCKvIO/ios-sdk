@@ -205,6 +205,8 @@ public class WebSocketManager {
     }
 
     private func scheduleReconnect(initialDelay: TimeInterval = 0) {
+        
+        guard BLOCKv.isLoggedIn else { return }
 
         self.reconnectTimer = Timer.scheduledTimer(withTimeInterval: initialDelay, repeats: false) { [weak self] _ in
 

@@ -1,5 +1,9 @@
 # BLOCKv SDK for iOS
 
+[![Version](https://img.shields.io/cocoapods/v/BLOCKv.svg?style=flat)](http://cocoapods.org/pods/BLOCKv)
+[![License](https://img.shields.io/cocoapods/l/BLOCKv.svg?style=flat)](http://cocoapods.org/pods/BLOCKv)
+[![Platform](https://img.shields.io/cocoapods/p/BLOCKv.svg?style=flat)](http://cocoapods.org/pods/BLOCKv)
+
 This is the official BLOCKv SDK. It allows you to easily build your own Vatom Viewer app, or integrate your own apps into the BLOCKv platform.
 
 ## Requirements
@@ -12,15 +16,23 @@ This is the official BLOCKv SDK. It allows you to easily build your own Vatom Vi
 
 ### Swift Package Manager
 
-Simply add the package dependecy to your Package.swift:
+Simply add the package dependency to your Package.swift:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/BLOCKvIO/ios-sdk", from: "3.3.0"),
+    .package(url: "https://github.com/BLOCKvIO/ios-sdk", from: "4.0.0"),
 ]
 ```
 
 and specify "BLOCKv" as a dependency in the appropriate targets.
+
+### Cocoapods
+
+To install, simply add the following line to your *.podfile*:
+
+```ruby
+pod 'BLOCKv', => '4.0.0'
+```
 
 ## Configuration
 
@@ -30,22 +42,22 @@ Within the `AppDelegate` be sure to set the App ID.
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-    
+
         // Set app id
         BLOCKv.configure(appID: "your-app-id")
-        
+
         // Check logged in state
         if BLOCKv.isLoggedIn {
             // show interesting ui
         } else {
             // show authentication ui
         }
-        
+
         // Handle user re-authentication
         BLOCKv.onLogout = {
             // show authentication ui
         }
-        
+
         return true
     }
 }
@@ -53,7 +65,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 ## Sample App
 
-The sample app lets you try out the BLOCKv SDK. It's a great place to start if you're getting up to speed on the platform. It offers the following features:
+The [sample app](https://github.com/BLOCKvIO/ios-sample) lets you try out the BLOCKv SDK. It's a great place to start if you're getting up to speed on the platform. It offers the following features:
 
 - [x] Authentication (registration & login)
 - [x] Profile management
@@ -61,25 +73,25 @@ The sample app lets you try out the BLOCKv SDK. It's a great place to start if y
 - [x] Fetching individual Vatoms
 - [x] Searching for Vatoms on the BLOCKv platform
 - [x] Responding to Web socket events
-- [x] Dispalying Vatoms in a `UICollectionView`
-- [x] Visually representing Vatoms using faces (new)
+- [x] Displaying Vatoms in a `UICollectionView`
+- [x] Visually representing Vatoms using faces
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
 ## Design
 
-The SDK has two logical modules: Core and Face. The responsibilites are as follows:
+The SDK has two logical modules: Core and Face. The responsibilities are as follows:
 
 ### Core
 
 - API integration
-   - Provides platform endpoints with a strongly typed API.  
+  - Provides platform endpoints with a strongly typed API.  
 - User token management
-   - Handles platform authentication.
+  - Handles platform authentication.
 - Web socket integration
-   - Simplified layer for interacting with the websocket.
+  - Simplified layer for interacting with the websocket.
 - Data Pool
-   - Vends 'regions' which monitor a collection of Vatoms. Enables real-time synchronization for some regions. 
+  - Vends 'regions' which monitor a collection of Vatoms. Enables real-time synchronization for some regions.
 
 ### Face
 

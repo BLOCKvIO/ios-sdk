@@ -163,7 +163,7 @@ class GeoPosRegion: BLOCKvRegion {
     /// Web socket.
     func sendRegionCommand() {
         // write region command
-        BLOCKv.socket.writeRegionCommand(region.toDictionary())
+        BLOCKv.socket.monitorRegion(region)
     }
 
     /// Called on Web socket message.
@@ -316,25 +316,6 @@ class GeoPosRegion: BLOCKvRegion {
             self.remove(ids: [vatomID])
         }
 
-    }
-
-}
-
-private extension MKCoordinateRegion {
-
-    /// Returns a dictionary in data pool format.
-    func toDictionary() -> [String: Any] {
-        let payload: [String: [String: Any]] = [
-            "top_left": [
-                "lat": self.topLeft.latitude,
-                "lon": self.topLeft.longitude
-            ],
-            "bottom_right": [
-                "lat": self.bottomRight.latitude,
-                "lon": self.bottomRight.longitude
-            ]
-        ]
-        return payload
     }
 
 }

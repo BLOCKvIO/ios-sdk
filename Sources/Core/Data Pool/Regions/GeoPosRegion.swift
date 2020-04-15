@@ -15,14 +15,6 @@ import PromiseKit
 import CoreLocation
 import MapKit
 
-/*
- - Map must have it's own array of on-screen vatom array model (which is only those vatoms for the visible region).
- - When visialble regions changes, the previous region must close, and a new region created.
- - Once the new region is created, the region's vatoms must be diffed with the in-memory model.
- This means the in-memory model only holds the on-screen vatoms, but as the region changes, remaining vatoms
- arn't removed and re-added. This could be achived with the map's annotation model.
- */
-
 /// This region plugin provides access to a collection of vatoms that has been dropped within the specified region on
 /// the map.
 ////

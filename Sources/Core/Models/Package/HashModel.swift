@@ -14,20 +14,20 @@ import Foundation
 // MARK: - Hash
 
 public struct InventoryHashModel: Codable {
-    let hash: String
+    public let hash: String
 }
 
 // MARK: - Sync
 
 public struct VatomSyncModel: Codable {
-    let id: String
-    let sync: UInt
+    public let id: String
+    public let sync: UInt
 }
 
 public struct InventorySyncModel: Codable {
 
-    let vatoms: [VatomSyncModel]
-    let nextToken: String
+    public let vatoms: [VatomSyncModel]
+    public let nextToken: String
 
     enum CodingKeys: String, CodingKey {
         case vatoms

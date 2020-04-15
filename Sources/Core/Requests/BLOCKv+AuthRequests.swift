@@ -325,7 +325,7 @@ extension BLOCKv {
     ///   - enabled: Flag indicating whether push notifications should be sent to this device. Defaults to `true`.
     ///   - completion: Completion handler that is called when the request is completed.
     public static func updatePushNotification(fcmToken: String,
-                                              platformID: String,
+                                              platformID: String = "ios",
                                               enabled: Bool,
                                               completion: @escaping ((Error?) -> Void)) {
 

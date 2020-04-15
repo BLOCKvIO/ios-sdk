@@ -20,6 +20,9 @@ extension BLOCKv {
     /// `VatomModel`. The array contains *packaged* vAtoms. Packaged vAtoms have their template's configured Faces
     /// and Actions as properties.
     ///
+    /// ## Asynchronous Behavior
+    /// This method is **non-deterministc**.
+    ///
     /// - Parameters:
     ///   - id: Allows you to specify the `id` of a vAtom whose children should be returned. If a period "." is
     ///         supplied the root inventory will be retrieved (i.e. all vAtom's without a parent) - this is the
@@ -64,6 +67,9 @@ extension BLOCKv {
     /// Fetches a vatom by its identifier. The completion handler passes in a `VatomModel` that has been *packaged*.
     /// Packaged vAtoms have their template's configured Faces and Actions as properties.
     ///
+    /// ## Asynchronous Behavior
+    /// This method is **deterministc**.
+    ///
     /// - Parameters:
     ///   - id: Unique identifier.
     ///   - completion: The completion handler to call when the request is completed.
@@ -105,6 +111,9 @@ extension BLOCKv {
     /// `VatomModel`. The array contains *packaged* vAtoms. Packaged vAtoms have their template's configured Faces
     /// and Actions as properties.
     ///
+    /// ## Asynchronous Behavior
+    /// This method is **deterministic** when sipplied with a single vatom id, and  **non-deterministc** for two or more vatom ids.
+    ///
     /// - Parameters:
     ///   - ids: Array of vAtom IDs
     ///   - completion: The completion handler to call when the request is completed.
@@ -142,6 +151,9 @@ extension BLOCKv {
     ///
     /// This will remove the vAtom from the current user's inventory.
     ///
+    /// ## Asynchronous Behavior
+    /// This method is **non-deterministc**.
+    ///
     /// - Parameters:
     ///   - id: Unique identifer of the vAtom.
     ///   - completion: The completion handler to call when the request is completed.
@@ -170,6 +182,9 @@ extension BLOCKv {
     }
 
     /// Sets the parent ID of the specified vatom.
+    ///
+    /// ## Asynchronous Behavior
+    /// This method is **non-deterministc**.
     ///
     /// - Parameters:
     ///   - vatom: Vatom whose parent ID must be set.
@@ -231,6 +246,9 @@ extension BLOCKv {
     }
 
     /// Searches for vAtoms on the BLOCKv platform.
+    ///
+    /// ## Asynchronous Behavior
+    /// This method is **non-deterministc**.
     ///
     /// - Parameters:
     ///   - builder: A discover query builder object. Use the builder to simplify constructing

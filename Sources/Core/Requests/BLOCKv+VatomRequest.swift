@@ -21,7 +21,7 @@ extension BLOCKv {
     /// and Actions as properties.
     ///
     /// ## Asynchronous Behavior
-    /// This method is **non-deterministc**.
+    /// This method is **non-deterministic**.
     ///
     /// - Parameters:
     ///   - id: Allows you to specify the `id` of a vAtom whose children should be returned. If a period "." is
@@ -68,7 +68,7 @@ extension BLOCKv {
     /// Packaged vAtoms have their template's configured Faces and Actions as properties.
     ///
     /// ## Asynchronous Behavior
-    /// This method is **deterministc**.
+    /// This method is **deterministic**.
     ///
     /// - Parameters:
     ///   - id: Unique identifier.
@@ -112,7 +112,7 @@ extension BLOCKv {
     /// and Actions as properties.
     ///
     /// ## Asynchronous Behavior
-    /// This method is **deterministic** when sipplied with a single vatom id, and  **non-deterministc** for two or more vatom ids.
+    /// This method is **deterministic** when supplied with a single vatom id, and  **non-deterministic** for two or more vatom ids.
     ///
     /// - Parameters:
     ///   - ids: Array of vAtom IDs
@@ -149,13 +149,13 @@ extension BLOCKv {
 
     /// Trashes the specified vAtom.
     ///
-    /// This will remove the vAtom from the current user's inventory.
+    /// This will remove the vAtom from the current user's inventory.identifier
     ///
     /// ## Asynchronous Behavior
-    /// This method is **non-deterministc**.
+    /// This method is **non-deterministic**.
     ///
     /// - Parameters:
-    ///   - id: Unique identifer of the vAtom.
+    ///   - id: Unique identifier of the vAtom.
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
     public static func trashVatom(_ id: String, completion: @escaping (BVError?) -> Void) {
@@ -184,7 +184,7 @@ extension BLOCKv {
     /// Sets the parent ID of the specified vatom.
     ///
     /// ## Asynchronous Behavior
-    /// This method is **non-deterministc**.
+    /// This method is **non-deterministic**.
     ///
     /// - Parameters:
     ///   - vatom: Vatom whose parent ID must be set.
@@ -211,7 +211,7 @@ extension BLOCKv {
         let endpoint = API.Vatom.updateVatom(payload: payload)
 
         /*
-         Note: This endpoint does not fail in the typical HTTP style. It always returns 200 OK. Rather, the paylaod
+         Note: This endpoint does not fail in the typical HTTP style. It always returns 200 OK. Rather, the payload
          contains an array description of successful updates and errors.
          */
         BLOCKv.client.request(endpoint) { result in
@@ -222,7 +222,7 @@ extension BLOCKv {
                 /*
                  # Note
                  The most likely scenario where there will be partial containment errors is when setting the parent id
-                 to a container vatom of type `DefinedFolderContainerType`. However, as of writting, the server does
+                 to a container vatom of type `DefinedFolderContainerType`. However, as of writing, the server does
                  not enforce child policy rules so this always succeeds (using the current API).
                  */
                 let updateVatomModel = baseModel.payload
@@ -248,7 +248,7 @@ extension BLOCKv {
     /// Searches for vAtoms on the BLOCKv platform.
     ///
     /// ## Asynchronous Behavior
-    /// This method is **non-deterministc**.
+    /// This method is **non-deterministic**.
     ///
     /// - Parameters:
     ///   - builder: A discover query builder object. Use the builder to simplify constructing
@@ -333,7 +333,7 @@ extension BLOCKv {
     ///   - bottomLeftLat: Bottom left latitude coordinate.
     ///   - bottomLeftLon: Bottom left longitude coordinate.
     ///   - topRightLat: Top right latitude coordinate.
-    ///   - topRightLon: Top right longitude coordinte.
+    ///   - topRightLon: Top right longitude coordinate.
     ///   - filter: The vAtom filter option to apply. Defaults to "vatoms".
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
@@ -378,7 +378,7 @@ extension BLOCKv {
     ///   - bottomLeftLat: Bottom left latitude coordinate.
     ///   - bottomLeftLon: Bottom left longitude coordinate.
     ///   - topRightLat: Top right latitude coordinate.
-    ///   - topRightLon: Top right longitude coordinte.
+    ///   - topRightLon: Top right longitude coordinate.
     ///   - precision: Controls the density of the group distribution. Defaults to 3.
     ///                Lower values return fewer groups (with a higher vatom count) — less dense.
     ///                Higher values return more groups (with a lower vatom count) - more dense.
@@ -538,7 +538,7 @@ extension BLOCKv {
 
     /// Performs an acquire action on the specified vatom id.
     ///
-    /// Often, only a vAtom's ID is known, e.g. scanning a QR code with an embeded vAtom
+    /// Often, only a vAtom's ID is known, e.g. scanning a QR code with an embedded vAtom
     /// ID. This call is useful is such circumstances.
     ///
     /// - Parameters:

@@ -127,7 +127,7 @@ final class OAuth2Handler: RequestAdapter, RequestRetrier {
                     return
             }
 
-            // store the completion hanlder
+            // store the completion handler
             requestsToRetry.append(completion)
             // attemp to fetch a new access token
             refreshAndUpdate()

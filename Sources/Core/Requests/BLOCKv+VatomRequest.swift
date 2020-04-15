@@ -189,7 +189,7 @@ extension BLOCKv {
     /// - Parameters:
     ///   - vatom: Vatom whose parent ID must be set.
     ///   - parentID: Unique identifier of the parent vatom.
-    ///   - completion: The completion hanlder to call when the request is completed.
+    ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main thread.
     public static func setParentID(ofVatoms vatoms: [VatomModel], to parentID: String,
                                    completion: @escaping (Result<VatomUpdateModel, BVError>) -> Void) {

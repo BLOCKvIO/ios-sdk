@@ -16,7 +16,7 @@ extension BLOCKv {
     
     /// Fetches the current user's inventory hash.
     ///
-    /// - Parameter completion: Completion hanlder that so called once the request completes.
+    /// - Parameter completion: Completion handler that so called once the request completes.
     public static func getInventoryHash(completion: @escaping (Result<InventoryHashModel, BVError>) -> Void) {
         
         let endpoint = API.Vatom.getInventoryHash()
@@ -43,7 +43,7 @@ extension BLOCKv {
     /// - Parameters:
     ///   - limit: Paging limit.
     ///   - token: Paging token.
-    ///   - completion: Completion hanlder that so called once the request completes.
+    ///   - completion: Completion handler that so called once the request completes.
     public static func getInventoryVatomSyncNumbers(limit: Int, token: String, completion: @escaping (Result<InventorySyncModel, BVError>) -> Void) {
         
         let endpoint = API.Vatom.getInventoryVatomSyncNumbers(limit: limit, token: token)
@@ -70,7 +70,7 @@ extension BLOCKv {
     /// - Parameters:
     ///   - templateIds: List of local template ids whose changes should be fetched.
     ///   - since: Unix epoch after which changes should be fetched (measured in milliseconds).
-    ///   - completion: Completion hanlder that so called once the request completes.
+    ///   - completion: Completion handler that so called once the request completes.
     public static func getFaceChanges(templateIds: [String], since: Double, completion: @escaping (Result<FaceChangesModel, BVError>) -> Void) {
         
         let endpoint = API.Vatom.getFaceChanges(templateIds: templateIds, since: since)
@@ -97,7 +97,7 @@ extension BLOCKv {
     /// - Parameters:
     ///   - templateIds: List of local template ids whose changes should be fetched.
     ///   - since: Unix epoch after which changes should be fetched (measured in milliseconds).
-    ///   - completion: Completion hanlder that so called once the request completes.
+    ///   - completion: Completion handler that so called once the request completes.
     public static func getActionChanges(templateIds: [String], since: Double, completion: @escaping (Result<ActionChangesModel, BVError>) -> Void) {
         
         let endpoint = API.Vatom.getActionChanges(templateIds: templateIds, since: since)

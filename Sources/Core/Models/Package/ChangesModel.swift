@@ -11,36 +11,35 @@
 
 import Foundation
 
-// MARK: - Action Changes
+// MARK: - Face Changes
 
-struct ActionChangesModel: Codable {
+public struct FaceChangesModel: Codable {
     
-    let faceChanges: [String: [FaceInnerModel]]
+    public let faceChanges: [String: [FaceInnerModel]]
     
     enum CodingKeys: String, CodingKey {
         case faceChanges = "faces_changes"
     }
 }
 
-struct ActionInnerModel: Codable {
-    let action: ActionModel
-    let operation: String
+public struct FaceInnerModel: Codable {
+    public let face: FaceModel
+    public let opertation: String
 }
 
-// MARK: - Face Models
+// MARK: - Action Models
 
-struct FaceChangesModel: Codable {
+public struct ActionChangesModel: Codable {
     
-    let actionChanges: [String: [ActionInnerModel]]
+    public let actionChanges: [String: [ActionInnerModel]]
     
     enum CodingKeys: String, CodingKey {
         case actionChanges = "actions_changes"
     }
 }
 
-struct FaceInnerModel: Codable {
-    let face: FaceModel
-    let opertation: String
+
+public struct ActionInnerModel: Codable {
+    public let action: ActionModel
+    public let operation: String
 }
-
-

@@ -93,7 +93,7 @@ class GeoPosRegion: BLOCKvRegion {
         // pause websocket events
         self.pauseMessages()
         
-        // convert regiont to geohash
+        // convert region to geohash
         let geohash = self.region.center.geohash(precision: .seventySixMeters)
         
         let endpoint: Endpoint<Void> = API.Generic.geoDiscover(geohash: geohash, filter: "vatoms")

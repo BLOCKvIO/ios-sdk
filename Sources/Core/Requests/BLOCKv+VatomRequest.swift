@@ -330,28 +330,18 @@ extension BLOCKv {
     ///
     ///
     /// - Parameters:
-    ///   - bottomLeftLat: Bottom left latitude coordinate.
-    ///   - bottomLeftLon: Bottom left longitude coordinate.
-    ///   - topRightLat: Top right latitude coordinate.
-    ///   - topRightLon: Top right longitude coordinate.
+    ///   - geohash: Short alphanumeric string which expresses a location with some precision.
     ///   - filter: The vAtom filter option to apply. Defaults to "vatoms".
     ///   - completion: The completion handler to call when the request is completed.
     ///                 This handler is executed on the main queue.
     ///   - vatoms: Array of *packaged* vAtoms. Packaged vAtoms have their template's registered faces and actions
     ///     action models as populated properties.
     ///   - error: BLOCKv error.
-    public static func geoDiscover(bottomLeftLat: Double,
-                                   bottomLeftLon: Double,
-                                   topRightLat: Double,
-                                   topRightLon: Double,
+    public static func geoDiscover(geohash: String,
                                    filter: VatomGeoFilter = .vatoms,
                                    completion: @escaping (Result<[VatomModel], BVError>) -> Void) {
 
-        let endpoint = API.Vatom.geoDiscover(bottomLeftLat: bottomLeftLat,
-                                                     bottomLeftLon: bottomLeftLon,
-                                                     topRightLat: topRightLat,
-                                                     topRightLon: topRightLon,
-                                                     filter: filter.rawValue)
+        let endpoint = API.Vatom.geoDiscover(geohash: geohash, filter: filter.rawValue)
 
         self.client.request(endpoint) { result in
 

@@ -169,32 +169,15 @@ extension API {
         /// Use this endpoint to fetch a collection of vAtoms.
         ///
         /// - Parameters:
-        ///   - bottomLeftLat: Bottom left latitude coordinate.
-        ///   - bottomLeftLon: Bottom left longitude coordinate.
-        ///   - topRightLat: Top right latitude coordinate.
-        ///   - topRightLon: Top right longitude coordinte.
+        ///   - geohash: Short alphanumeric string which expresses an approximation of a location.
         ///   - filter: The vAtom filter option to apply.
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
-        static func geoDiscover<T>(bottomLeftLat: Double,
-                                   bottomLeftLon: Double,
-                                   topRightLat: Double,
-                                   topRightLon: Double,
-                                   filter: String) -> Endpoint<T> {
+        static func geoDiscover<T>(geohash: String, filter: String) -> Endpoint<T> {
 
             // create the payload
-            let payload: [String: Any] =
-                [
-                    "bottom_left":
-                        [
-                            "lat": bottomLeftLat,
-                            "lon": bottomLeftLon
-                    ],
-                    "top_right":
-                        [
-                            "lat": topRightLat,
-                            "lon": topRightLon
-                    ],
-                    "filter": filter
+            let payload: [String: Any] = [
+                "geohash": geohash,
+                "filter": filter
             ]
 
             // create the endpoint

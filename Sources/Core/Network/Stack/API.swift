@@ -169,14 +169,14 @@ extension API {
         /// Use this endpoint to fetch a collection of vAtoms.
         ///
         /// - Parameters:
-        ///   - geoHas: Short alphanumeric string which expresses an approximation of a location.
+        ///   - geohash: Short alphanumeric string which expresses an approximation of a location.
         ///   - filter: The vAtom filter option to apply.
         /// - Returns: Constructed endpoint generic over response model that may be passed to a request.
-        static func geoDiscover<T>(geoHash: String, filter: String) -> Endpoint<T> {
+        static func geoDiscover<T>(geohash: String, filter: String) -> Endpoint<T> {
 
             // create the payload
             let payload: [String: Any] = [
-                "geoHash": geoHash,
+                "geohash": geohash,
                 "filter": filter
             ]
 

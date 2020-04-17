@@ -93,8 +93,10 @@ class GeoPosRegion: BLOCKvRegion {
         // pause websocket events
         self.pauseMessages()
         
-        //TODO: The 
-        let endpoint: Endpoint<Void> = API.Generic.geoDiscover(geoHash: self.region.center.geohash(precision: .seventySixMeters), filter: "vatoms")
+        // convert regiont to geohash
+        let geohash = self.region.center.geohash(precision: .seventySixMeters)
+        
+        let endpoint: Endpoint<Void> = API.Generic.geoDiscover(geohash: geohash, filter: "vatoms")
 
         // execute request
         return BLOCKv.client.requestJSON(endpoint).map { json -> [String]? in

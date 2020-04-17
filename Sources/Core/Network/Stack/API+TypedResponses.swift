@@ -386,13 +386,13 @@ extension API {
         /// Use this endpoint to fetch a collection of vAtoms.
         ///
         /// - Parameters:
-        ///   - geoHash: Short alphanumeric string which expresses a location.
+        ///   - geohash: Short alphanumeric string which expresses a location.
         ///   - filter: The vAtom filter option to apply.
         /// - Returns: Constructed endpoint specialized to parse out a `UnpackedModel`.
-        static func geoDiscover(geoHash: String,
+        static func geoDiscover(geohash: String,
                                 filter: String) -> Endpoint<BaseModel<UnpackedModel>> {
 
-            return API.Generic.geoDiscover(geoHash: geoHash, filter: filter)
+            return API.Generic.geoDiscover(geohash: geohash, filter: filter)
         }
 
         /// Builds the endpoint to geo search for vAtom groups (i.e. search for clusters of dropped vAtoms).

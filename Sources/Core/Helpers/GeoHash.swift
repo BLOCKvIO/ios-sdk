@@ -26,8 +26,8 @@ import Foundation
  Useful info: https://releases.dataone.org/online/api-documentation-v2.0.1/design/geohash.html
  */
 
-public struct Geohash {
-    public static func decode(hash: String) -> (latitude: (min: Double, max: Double), longitude: (min: Double, max: Double))? {
+struct Geohash {
+    static func decode(hash: String) -> (latitude: (min: Double, max: Double), longitude: (min: Double, max: Double))? {
         // For example: hash = u4pruydqqvj
 
         let bits = hash.map { bitmap[$0] ?? "?" }.joined(separator: "")
@@ -58,7 +58,7 @@ public struct Geohash {
         return (latRange, lonRange)
     }
 
-    public static func encode(latitude: Double, longitude: Double, length: Int) -> String {
+    static func encode(latitude: Double, longitude: Double, length: Int) -> String {
         // For example: (latitude, longitude) = (57.6491106301546, 10.4074396938086)
 
         func combiner(array a: (min: Double, max: Double, array: [String]), value: Double) -> (Double, Double, [String]) {
@@ -90,7 +90,7 @@ public struct Geohash {
 
     // MARK: Private
 
-    private static let bitmap = "0123456789bcdefghjkmnpqrstuvwxyz".enumerated()
+    static let bitmap = "0123456789bcdefghjkmnpqrstuvwxyz".enumerated()
         .map {
             ($1, String(integer: $0, radix: 2, padding: 5))
         }
@@ -104,7 +104,7 @@ public struct Geohash {
     }
 }
 
-public extension Geohash {
+extension Geohash {
     enum Precision: Int {
         case twentyFiveHundredKilometers = 1    // ±2500 km
         case sixHundredThirtyKilometers         // ±630 km
@@ -152,7 +152,7 @@ private func << (left: [String], right: String) -> [String] {
 
 import CoreLocation
 
-public extension CLLocationCoordinate2D {
+extension CLLocationCoordinate2D {
     init(geohash: String) {
         if let (lat, lon) = Geohash.decode(hash: geohash) {
             self = CLLocationCoordinate2DMake((lat.min + lat.max) / 2, (lon.min + lon.max) / 2)

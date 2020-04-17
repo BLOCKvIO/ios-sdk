@@ -386,23 +386,13 @@ extension API {
         /// Use this endpoint to fetch a collection of vAtoms.
         ///
         /// - Parameters:
-        ///   - bottomLeftLat: Bottom left latitude coordinate.
-        ///   - bottomLeftLon: Bottom left longitude coordinate.
-        ///   - topRightLat: Top right latitude coordinate.
-        ///   - topRightLon: Top right longitude coordinte.
+        ///   - geoHash: Short alphanumeric string which expresses a location.
         ///   - filter: The vAtom filter option to apply.
         /// - Returns: Constructed endpoint specialized to parse out a `UnpackedModel`.
-        static func geoDiscover(bottomLeftLat: Double,
-                                bottomLeftLon: Double,
-                                topRightLat: Double,
-                                topRightLon: Double,
+        static func geoDiscover(geoHash: String,
                                 filter: String) -> Endpoint<BaseModel<UnpackedModel>> {
 
-            return API.Generic.geoDiscover(bottomLeftLat: bottomLeftLat,
-                                           bottomLeftLon: bottomLeftLon,
-                                           topRightLat: topRightLat,
-                                           topRightLon: topRightLon,
-                                           filter: filter)
+            return API.Generic.geoDiscover(geoHash: geoHash, filter: filter)
         }
 
         /// Builds the endpoint to geo search for vAtom groups (i.e. search for clusters of dropped vAtoms).

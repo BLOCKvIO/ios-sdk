@@ -30,8 +30,8 @@ internal class DataObjectAnimator {
     fileprivate init() {
 
         // subscribe to raw socket messages
-        BLOCKv.socket.onMessageReceivedRaw.subscribe(with: self) { descriptor in
-            self.onWebSocketMessage(descriptor)
+        BLOCKv.socket.onMessageReceivedRaw.subscribe(with: self) { [weak self] descriptor in
+            self?.onWebSocketMessage(descriptor)
         }
 
     }

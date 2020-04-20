@@ -35,13 +35,13 @@ class BLOCKvRegion: Region {
         try super.init(descriptor: descriptor)
 
         // subscribe to socket connections
-        BLOCKv.socket.onConnected.subscribe(with: self) { _ in
-            self.onWebSocketConnect()
+        BLOCKv.socket.onConnected.subscribe(with: self) { [weak self] _ in
+            self?.onWebSocketConnect()
         }
 
         // subscribe to raw socket messages
-        BLOCKv.socket.onMessageReceivedRaw.subscribe(with: self) { descriptor in
-            self.onWebSocketMessage(descriptor)
+        BLOCKv.socket.onMessageReceivedRaw.subscribe(with: self) { [weak self] descriptor in
+            self?.onWebSocketMessage(descriptor)
         }
 
         // monitor for timed updates

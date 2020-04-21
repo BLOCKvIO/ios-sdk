@@ -94,13 +94,13 @@ class GeoPosRegion: BLOCKvRegion {
         self.pauseMessages()
         
         // convert region to geohash
-        let geohash = self.region.center.geohash(precision: .seventySixMeters)
+        let geohash = self.region.center.geohash(precision: .sixHundredTenMeters)
+        print("geohash: \(geohash)")
         
+        // fetch vatoms
         let endpoint: Endpoint<Void> = API.Generic.geoDiscover(geohash: geohash, filter: "vatoms")
-
-        // execute request
-        return BLOCKv.client.requestJSON(endpoint).map { json -> [String]? in
-
+        return BLOCKv.client.requestJSON(endpoint).map(on: .global(qos: .userInitiated)) { json  -> [DataObject] in
+            
             // parse items
             guard
                 let json = json as? [String: Any],
@@ -108,16 +108,17 @@ class GeoPosRegion: BLOCKvRegion {
                 let items = self.parseDataObject(from: payload) else {
                 throw NSError.init("Unable to load") //FIXME: Create a better error
             }
+            return items
+            
+        }.map { items -> [String] in
             // add all objects
             self.add(objects: items)
             // return IDs
             return items.map { $0.id }
-
+            
         }.ensure {
-
             // resume websocket events
             self.resumeMessages()
-
         }
 
     }
@@ -152,6 +153,9 @@ class GeoPosRegion: BLOCKvRegion {
     /// Sends the monitor command to the backend. This allows this client to receive preemptive brain updates over the
     /// Web socket.
     func sendRegionCommand() {
+        
+        //TODO: This region should match the geohash, not the visible region.
+        
         // write region command
         BLOCKv.socket.writeRegionCommand(region.toDictionary())
     }

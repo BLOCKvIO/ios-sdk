@@ -80,7 +80,7 @@ public class Region {
     public internal(set) var error: Error?
 
     /// An ID which uniquely identifies this region. Used for caching purposes.
-    var stateKey: String {
+    public var stateKey: String {
         assertionFailure("subclass-should-override")
         return ""
     }
@@ -206,7 +206,7 @@ public class Region {
             if let existingObject = self.objects[obj.id] {
 
                 // notify
-                self.will(update: existingObject, withFields: data)
+                self.will(update: existingObject, withFields: data, regionInfo: nil)
                 
                 // capture a snapshot of the old current object (before updates)
                 let snapshotObject = DataObject(id: existingObject.id, type: existingObject.type, data: data)
@@ -215,12 +215,12 @@ public class Region {
                 existingObject.data = data
                 existingObject.cached = nil
 
-                self.did(update: snapshotObject, to: existingObject, withFields: data)
+                self.did(update: snapshotObject, to: existingObject, withFields: data, regionInfo: nil)
 
             } else {
 
                 // notify
-                self.will(add: obj)
+                self.will(add: obj, regionInfo: nil)
                 // add it
                 self.objects[obj.id] = obj
                 // notify
@@ -238,14 +238,22 @@ public class Region {
 
     }
 
-    enum Source: String {
+    /// Source of the change.
+    public enum Source: String {
+        /// Local preemptive update.
+        case premptive
+        /// Local preemptive update rollback (something went wrong).
+        case premptiveRollback
+        /// Standard platform update.
+        case stateUpdate
+        /// Vatom brain update.
         case brain
     }
 
     /// Updates data objects within our pool.
     ///
     /// - Parameter objects: The list of changes to perform to our data objects.
-    func update(objects: [DataObjectUpdateRecord], source: Source? = nil) {
+    func update(objects: [DataObjectUpdateRecord], source: Source) {
 
         // batch emit events, so if a object is updated multiple times, only one event is sent
         var changedIDs = Set<String>()
@@ -263,7 +271,7 @@ public class Region {
             }
 
             // notify
-            self.will(update: existingObject, withFields: obj.changes)
+            self.will(update: existingObject, withFields: obj.changes, regionInfo: RegionInfo(source: source))
             
             // capture a snapshot of the old current object (before updates)
             let snapshotObject = DataObject(id: existingObject.id, type: existingObject.type, data: existingData)
@@ -275,16 +283,11 @@ public class Region {
             existingObject.cached = nil
 
             // notify
-            self.did(update: snapshotObject, to: existingObject, withFields: obj.changes)
+            self.did(update: snapshotObject, to: existingObject, withFields: obj.changes, regionInfo: RegionInfo(source: source))
 
             // emit event
             changedIDs.insert(obj.id)
 
-        }
-
-        // notify each item that was updated
-        for id in changedIDs {
-            self.emit(.willUpdateObject, userInfo: ["id": id, "source": source?.rawValue ?? ""])
         }
 
         // notify overall update
@@ -325,11 +328,11 @@ public class Region {
 
             // get object
             guard let object = self.objects[id] else { continue }
-            self.will(remove: object)
+            self.will(remove: object, regionInfo: nil)
 
             // remove it
             self.objects.removeValue(forKey: id)
-            self.did(remove: object)
+            self.did(remove: object, regionInfo: nil)
 
             // notify
             didUpdate = true
@@ -615,6 +618,8 @@ public class Region {
     ///   - value: The new value
     /// - Returns: An undo function
     func preemptiveChange(id: String, keyPath: String, value: Any) -> UndoFunction {
+        
+        return {}
 
         // get object. If it doesn't exist, do nothing and return an undo function which does nothing.
         guard let object = objects[id], object.data != nil else {
@@ -625,16 +630,15 @@ public class Region {
         let oldValue = object.data![keyPath: KeyPath(keyPath)]
 
         // notify
-        self.will(update: object, keyPath: keyPath, oldValue: oldValue, newValue: value)
+        self.will(update: object, keyPath: keyPath, oldValue: oldValue, newValue: value, regionInfo: RegionInfo(source: .premptive))
 
         // update to new value
         object.data![keyPath: KeyPath(keyPath)] = value
         object.cached = nil
-        self.emit(.willUpdateObject, userInfo: ["id": id])
 
         self.onPreemptiveChange(object)
 
-        self.did(update: object, keyPath: keyPath, oldValue: oldValue, newValue: value)
+        self.did(update: object, keyPath: keyPath, oldValue: oldValue, newValue: value, regionInfo: RegionInfo(source: .premptive))
         self.emit(.updated)
         self.save()
 
@@ -642,13 +646,12 @@ public class Region {
         return {
 
             // notify
-            self.will(update: object, keyPath: keyPath, oldValue: value, newValue: oldValue)
+            self.will(update: object, keyPath: keyPath, oldValue: value, newValue: oldValue, regionInfo: RegionInfo(source: .premptiveRollback))
 
             // update to new value
             object.data![keyPath: KeyPath(keyPath)] = oldValue
             object.cached = nil
-            self.emit(.willUpdateObject, userInfo: ["id": id])
-            self.did(update: object, keyPath: keyPath, oldValue: oldValue, newValue: value)
+            self.did(update: object, keyPath: keyPath, oldValue: oldValue, newValue: value, regionInfo: RegionInfo(source: .premptiveRollback))
 
             self.emit(.updated)
             self.save()
@@ -662,14 +665,14 @@ public class Region {
     /// - Parameter id: The object ID to remove
     /// - Returns: An undo function
     func preemptiveRemove(id: String) -> UndoFunction {
+        
+        return {}
 
         // get object
         guard let removedObject = objects.removeValue(forKey: id) else { return {} }
-        self.will(remove: removedObject)
 
         // remove object
-        objects.removeValue(forKey: id)
-        self.did(remove: removedObject)
+        self.remove(ids: [id])
 
         self.emit(.updated)
         self.save()
@@ -678,14 +681,12 @@ public class Region {
         return {
 
             // check that a new object wasn't added in the mean time
-            guard self.objects[id] == nil else {
-                return
-            }
+            guard self.objects[id] == nil else { return }
 
             // notify
-            self.will(add: removedObject)
             self.add(objects: [removedObject])
-            self.did(add: removedObject)
+            
+            self.emit(.updated)
             self.save()
 
         }
@@ -693,17 +694,21 @@ public class Region {
     }
 
     // MARK: - Listener functions, can be overridden by subclasses
+    
+    public struct RegionInfo {
+        public let source: Region.Source
+    }
 
     func onPreemptiveChange(_ object: DataObject) {}
 
-    func will(add: DataObject) {}
-    func will(update: DataObject, withFields: [String: Any]) {}
-    func will(update: DataObject, keyPath: String, oldValue: Any?, newValue: Any?) {}
-    func will(remove object: DataObject) {}
+    func will(add object: DataObject, regionInfo: RegionInfo?) {}
+    func will(update object: DataObject, withFields: [String: Any], regionInfo: RegionInfo?) {}
+    func will(update object: DataObject, keyPath: String, oldValue: Any?, newValue: Any?, regionInfo: RegionInfo?) {}
+    func will(remove object: DataObject, regionInfo: RegionInfo?) {}
 
-    func did(add: DataObject) {}
-    func did(update from: DataObject, to: DataObject, withFields: [String: Any]) {}
-    func did(update: DataObject, keyPath: String, oldValue: Any?, newValue: Any?) {}
-    func did(remove object: DataObject) {}
+    func did(add object: DataObject, regionInfo: RegionInfo? = nil) {}
+    func did(update from: DataObject, to: DataObject, withFields: [String: Any], regionInfo: RegionInfo?) {}
+    func did(update object: DataObject, keyPath: String, oldValue: Any?, newValue: Any?, regionInfo: RegionInfo?) {}
+    func did(remove object: DataObject, regionInfo: RegionInfo?) {}
 
 }

@@ -95,7 +95,7 @@ class GeoPosRegion: BLOCKvRegion {
         
         // convert region to geohash
         let geohash = self.region.center.geohash(precision: .sixHundredTenMeters)
-        print("geohash: \(geohash)")
+        print("[GeoPosRegion] Fetching for geohash: \(geohash)")
         
         // fetch vatoms
         let endpoint: Endpoint<Void> = API.Generic.geoDiscover(geohash: geohash, filter: "vatoms")

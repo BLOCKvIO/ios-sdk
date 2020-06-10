@@ -84,14 +84,14 @@ extension UserModel: Codable {
 
         // de-nest properties to top level
         let propertiesContainer = try items.nestedContainer(keyedBy: PropertiesCodingKeys.self, forKey: .properties)
-        firstName           = try propertiesContainer.decode(String.self, forKey: .firstName)
-        lastName            = try propertiesContainer.decode(String.self, forKey: .lastName)
-        isNamePublic        = try propertiesContainer.decode(Bool.self, forKey: .isNamePublic)
-        isAvatarPublic      = try propertiesContainer.decode(Bool.self, forKey: .isAvatarPublic)
-        birthday            = try propertiesContainer.decode(String.self, forKey: .birthday)
-        guestID             = try propertiesContainer.decode(String.self, forKey: .guestID)
-        nonPushNotification = try propertiesContainer.decode(Bool.self, forKey: .nonPushNotification)
-        language            = try propertiesContainer.decode(String.self, forKey: .language)
+        firstName           = try propertiesContainer.decodeIfPresent(String.self, forKey: .firstName) ?? ""
+        lastName            = try propertiesContainer.decodeIfPresent(String.self, forKey: .lastName) ?? ""
+        isNamePublic        = try propertiesContainer.decodeIfPresent(Bool.self, forKey: .isNamePublic) ?? false
+        isAvatarPublic      = try propertiesContainer.decodeIfPresent(Bool.self, forKey: .isAvatarPublic) ?? false
+        birthday            = try propertiesContainer.decodeIfPresent(String.self, forKey: .birthday) ?? ""
+        guestID             = try propertiesContainer.decodeIfPresent(String.self, forKey: .guestID) ?? ""
+        nonPushNotification = try propertiesContainer.decodeIfPresent(Bool.self, forKey: .nonPushNotification) ?? false
+        language            = try propertiesContainer.decodeIfPresent(String.self, forKey: .language) ?? "en"
 
         userConsents        = try propertiesContainer.decodeSafelyIfPresentArray(of: ConsentModel.self, forKey: .userConsents) ?? []
         isPasswordSet       = try propertiesContainer.decodeIfPresent(Bool.self, forKey: .isPasswordSet) ?? false

@@ -80,13 +80,13 @@ public final class BLOCKv {
             if let environmentString = Bundle.main.infoDictionary?["ENVIRONMENT_MAPPING"] as? String,
                 let mappedEnvironment = BVEnvironment(rawValue: environmentString) {
 
-                #if DEBUG
+//                #if DEBUG
                 // environment for experimentation (safe to modify)
-                self.environment = .production
-                #else
+//                self.environment = .production
+//                #else
                 // pre-mapped environment (do not modify)
                 self.environment = mappedEnvironment
-                #endif
+//                #endif
 
             } else {
 
@@ -122,7 +122,7 @@ public final class BLOCKv {
 
     // FIXME: Should this be nil on logout?
     // FIXME: This MUST become a singleton (since only a single instance should ever exist).
-    private static let oauthHandler = OAuth2Handler(appID: BLOCKv.appID!,
+    static let oauthHandler = OAuth2Handler(appID: BLOCKv.appID!,
                                      baseURLString: BLOCKv.environment!.apiServerURLString,
                                      refreshToken: CredentialStore.refreshToken?.token ?? "")
 

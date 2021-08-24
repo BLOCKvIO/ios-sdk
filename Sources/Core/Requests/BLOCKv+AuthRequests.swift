@@ -251,6 +251,72 @@ extension BLOCKv {
         }
 
     }
+    
+    /// Login using a manually fetched refresh token
+    public static func login(withRefreshToken refreshToken: String, completion: @escaping (Result<UserModel, BVError>) -> Void) {
+        
+        // Store refresh token
+        CredentialStore.saveRefreshToken(BVToken(token: refreshToken, tokenType: "refresh_token"))
+        self.oauthHandler.set(accessToken: "", refreshToken: refreshToken)
+        
+        // Update access token
+        self.oauthHandler.forceAccessTokenRefresh { success, accessToken in
+            
+            // Stop if not successful
+            if !success {
+                completion(.failure(BVError.custom(reason: "Unable to get a valid access token from the provided refresh token.")))
+                return
+            }
+            
+            // Get new asset provider details
+            let endpoint = API.Session.getAssetProviders()
+            self.client.request(endpoint) { result in
+                
+                switch result {
+                case .success(let baseModel):
+                    
+                    // Store asset provider details
+                    CredentialStore.saveAssetProviders(baseModel.payload.assetProviders)
+                    
+                    // get user info
+                    BLOCKv.getCurrentUser { result in
+                        
+                        switch result {
+                        case .success(let baseModel):
+                            
+                            // model is available
+                            DispatchQueue.main.async {
+                                
+                                // notify
+                                self.onLogin()
+                                
+                                // completion
+                                completion(.success(baseModel))
+                            }
+                            
+                        case .failure(let error):
+                            // handle error
+                            DispatchQueue.main.async {
+                                completion(.failure(error))
+                            }
+                        }
+                        
+                    }
+                    
+                case .failure(let error):
+                    
+                    // handle error
+                    DispatchQueue.main.async {
+                        completion(.failure(error))
+                    }
+                    
+                }
+
+            }
+            
+        }
+        
+    }
 
     // MARK: - Logout
 

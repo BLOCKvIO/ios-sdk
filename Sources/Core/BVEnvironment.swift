@@ -18,12 +18,15 @@ public enum BVEnvironment: String, CustomDebugStringConvertible {
     case production = "prod_env"
     /// Unstable development environement (DO NOT USE).
     case development = "dev_env"
+    /// Stable VatomInc environment
+    case vatomincProduction = "vatominc_prod_env"
 
     /// BLOCKv server base url
     var apiServerURLString: String {
         switch self {
         case .production:  return "https://api.blockv.io"
         case .development: return "https://apidev.blockv.net"
+        case .vatomincProduction: return "https://api.vi.vatom.network"
         }
     }
 
@@ -32,6 +35,7 @@ public enum BVEnvironment: String, CustomDebugStringConvertible {
         switch self {
         case .production:  return "wss://newws.blockv.io/ws"
         case .development: return "wss://ws.blockv.net/ws"
+        case .vatomincProduction: return "wss://ws.vatominc.net"
         }
     }
 
@@ -39,6 +43,7 @@ public enum BVEnvironment: String, CustomDebugStringConvertible {
         switch self {
         case .production: return "https://login.blockv.io"
         case .development: return "https:/login.blockv.net"
+        case .vatomincProduction: return "https://id.vatominc.com"
         }
     }
 

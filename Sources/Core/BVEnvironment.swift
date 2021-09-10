@@ -35,7 +35,7 @@ public enum BVEnvironment: String, CustomDebugStringConvertible {
         switch self {
         case .production:  return "wss://newws.blockv.io/ws"
         case .development: return "wss://ws.blockv.net/ws"
-        case .vatomincProduction: return "wss://ws.vatominc.net"
+        case .vatomincProduction: return "wss://ws.vatominc.net/ws"
         }
     }
 

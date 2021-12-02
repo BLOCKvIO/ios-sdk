@@ -46,8 +46,15 @@ extension VatomModel: Descriptable {
         self.faceModels = []
         self.actionModels = []
 
-        self.eth = nil
-        self.eos = nil
+        // Store ETH section
+        if let _eth = descriptor["eth"] as? [String:Any] {
+            self.eth = try? JSON(_eth)
+        }
+        
+        // Store EOS section
+        if let _eos = descriptor["eos"] as? [String:Any] {
+            self.eos = try? JSON(_eos)
+        }
 
         self.isUnpublished = (descriptor["unpublished"] as? Bool) ?? false
 

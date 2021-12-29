@@ -75,6 +75,7 @@ extension RootProperties: Descriptable {
             let _title                  = descriptor["title"] as? String,
             let _description            = descriptor["description"] as? String,
 
+            let _activateAction         = descriptor["activate_action"] as? String,
             let _category               = descriptor["category"] as? String,
             let _clonedFrom             = descriptor["cloned_from"] as? String,
             let _cloningScore           = descriptor["cloning_score"] as? Double,
@@ -112,6 +113,7 @@ extension RootProperties: Descriptable {
         self.title = _title
         self.description = _description
 
+        self.activateAction = _activateAction
         self.category = _category
         self.childPolicy = _childPolicyDescriptor.compactMap { try? VatomChildPolicy(from: $0) }
         self.clonedFrom = _clonedFrom

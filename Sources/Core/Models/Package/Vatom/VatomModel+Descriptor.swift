@@ -75,7 +75,6 @@ extension RootProperties: Descriptable {
             let _title                  = descriptor["title"] as? String,
             let _description            = descriptor["description"] as? String,
 
-            let _activateAction         = descriptor["activate_action"] as? String,
             let _category               = descriptor["category"] as? String,
             let _clonedFrom             = descriptor["cloned_from"] as? String,
             let _cloningScore           = descriptor["cloning_score"] as? Double,
@@ -102,6 +101,7 @@ extension RootProperties: Descriptable {
             else { throw BVError.modelDecoding(reason: "Model decoding failed.") }
 
         // decode if present
+        let _activateAction         = descriptor["activate_action"] as? String ?? ""
         let _childPolicyDescriptor  = descriptor["child_policy"] as? [[String: Any]] ?? []
         let _tags                   = descriptor["tags"] as? [String] ?? []
 

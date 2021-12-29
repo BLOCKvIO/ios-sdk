@@ -259,6 +259,7 @@ extension RootProperties: Codable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(isAcquirable, forKey: .isAcquirable)
+        try container.encode(activateAction, forKey: .activateAction)
         try container.encode(author, forKey: .author)
         try container.encode(category, forKey: .category)
         try container.encode(clonedFrom, forKey: .clonedFrom)
